@@ -4,6 +4,12 @@
 
 echo "a.txt" > a.txt
 chmod 000 a.txt
+flags=$( stat -c '%A' a.txt )
+if [ "${flags}" != "----------" ] ; then
+    echo "Failed to setup initial file permissions."
+    exit 1
+fi
+
 "${FS}" chmod 777 a.txt > out.txt 2>err.txt
 res=$?
 
@@ -18,7 +24,7 @@ if [ ! -s a.txt ] ; then
     exit 1
 fi
 
-flags=$( ls -l a.txt | cut -f 1 -d ' ' )
+flags=$( stat -c '%A' a.txt )
 if [ "${flags}" != "-rwxrwxrwx" ] ; then
     echo "Incorrect permissions: ${flags}"
     exit 1

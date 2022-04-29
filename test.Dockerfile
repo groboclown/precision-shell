@@ -7,7 +7,7 @@ WORKDIR /opt/code
 
 RUN \
        apk --no-cache update \
-    && apk add build-base=0.5-r1 bash=5.0.0-r0 \
+    && apk add "build-base=~0" "bash=~5" \
     && rm -rf /tmp/* /var/cache/apk/*
 
 COPY *.c Makefile ./

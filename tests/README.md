@@ -27,3 +27,5 @@ Tests should use these environment variables:
 * `TEST_DIR` - the directory to use for file manipulation.  The test will be run from this directory.
 * `TEST_NAME` - the name of the test.
 * `FS` - absolute path to the `fs-shell` tool.
+* `UID0`, `GID0` - user and group ID of the currently running user.
+* `UID1`, `UID2`, `GID1`, `GID2` - additional user and group IDS for testing.

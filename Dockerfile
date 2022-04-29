@@ -6,7 +6,7 @@ COPY *.c Makefile ./
 
 RUN \
        apk --no-cache update \
-    && apk add build-base=0.5-r1 \
+    && apk add "build-base=~0" \
     && rm -rf /tmp/* /var/cache/apk/* \
     && make
 
