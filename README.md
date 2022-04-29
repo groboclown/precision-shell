@@ -164,7 +164,7 @@ docker cp "${container}":/opt/code/fs-shell-debug fs-shell-debug
 docker rm "${container}"
 ```
 
-The build generates 2 versions of the shell - 1 with extra debug statements sent to stdout, and the normal, minimized version.
+The build generates 2 versions of the shell: one with extra debug statements sent to stdout; and the normal, minimized version.
 
 
 ## License
