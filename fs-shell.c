@@ -342,6 +342,13 @@ int main(const int src_argc, char *src_argv[]) {
                     if (i >= argc) {
                         err = 1;
                     } else {
+#ifdef DEBUG
+                    write(STDOUT, ":: ln-s ", 8);
+                    write(STDOUT, arg, strlen(arg));
+                    write(STDOUT, " ", 1);
+                    write(STDOUT, argv[i], strlen(argv[i]));
+                    write(STDOUT, "\n", 1);
+#endif
                         err = symlink(arg, argv[i]);
                         // Because this command only takes 2 arguments, set the
                         // current command as err.  Because we keep the real command name
@@ -356,6 +363,13 @@ int main(const int src_argc, char *src_argv[]) {
                     if (i >= argc) {
                         err = 1;
                     } else {
+#ifdef DEBUG
+                    write(STDOUT, ":: ln-h ", 8);
+                    write(STDOUT, arg, strlen(arg));
+                    write(STDOUT, " ", 1);
+                    write(STDOUT, argv[i], strlen(argv[i]));
+                    write(STDOUT, "\n", 1);
+#endif
                         err = link(arg, argv[i]);
                         // Because this command only takes 2 arguments, set the
                         // current command as err.  Because we keep the real command name
