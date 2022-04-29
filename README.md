@@ -64,7 +64,21 @@ If `-c` is the first argument and the argument count is 2, then the code perform
 * Report detailed error messages.
 * Change file timestamps.
 * File descriptor redirect.
+* Anything with the network.
 * Tell you how to use it.  That's what this file is for.
+
+
+## Why Would I Need It?
+
+The tool was built with Docker images that use minimal OS resources.  If something like busybox is too big for you, but you need some simple file manipulation because you built upon another image, then this is right for you.
+
+
+## What Does It Mean?
+
+The "fs" in `fs-shell` can mean:
+
+* "File System", because it only works with file system operations.
+* "FROM scratch", because it's useful in Docker images that come from scratch (no OS files).
 
 
 ## Help
@@ -130,19 +144,6 @@ Creates a symbolic link named dest file, pointing to src file.
 Usage: `ln-h (src file) (dest file)`
 
 Creates a hard link named dest file, pointing to src file.
-
-
-## Why Would I Need It?
-
-The tool was built with Docker images that use minimal OS resources.  If something like busybox is too big for you, but you need some simple file manipulation because you built upon another image, then this is right for you.
-
-
-## What Does It Mean?
-
-The "fs" in `fs-shell` can mean:
-
-* "File System", because it only works with file system operations.
-* "FROM scratch", because it's useful in Docker images that come from scratch (no OS files).
 
 
 ## Developing

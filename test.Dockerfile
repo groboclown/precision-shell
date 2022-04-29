@@ -24,4 +24,4 @@ ENV \
     GID2=2
 
 COPY tests/ tests/
-RUN mkdir -p "${TEST_TMP_DIR}" && bash -x tests/_all.sh
+RUN mkdir -p "${TEST_TMP_DIR}" && tests/_all.sh
