@@ -1,0 +1,5 @@
+*.o
+*.tar
+fs-shell
+LICENSE
+README.md

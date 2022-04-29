@@ -1,3 +1,9 @@
+# Compiled Output
+fs-shell
+
+# Test output
+.tmp/
+
 # Prerequisites
 *.d
 
