@@ -3,7 +3,7 @@ Minimal, non-interactive file manipulation shell
 
 Sometimes, you just don't need a shell.  You just need minimal file system operations.
 
-Last build size is 18,520 bytes.  Statically linked.
+Last build size is 22,024 bytes.  Statically linked.
 
 
 ## What It Does
@@ -32,6 +32,23 @@ $ ./fs-shell echo abc \&\& rmdir does-not-exist \&\& echo dce
 abc
 ERROR rmdir: does-not-exist
 ```
+
+You can also use it in Docker or Podman as a default shell, which is useful if you need file modifications to an image that has no shell.
+
+```Dockerfile
+FROM super-skinny-image:11.12
+
+COPY fs-shell /bin/sh
+
+# Because /bin/sh is now the shell, run commands will
+#   run through it by executing "/bin/sh -c (arguments)"
+RUN echo Startup \
+    && rm /www/404.html /www/501.html \
+    && rmdir /tmp \
+    echo Complete
+```
+
+If `-c` is the first argument and the argument count is 2, then the code performs special, limited parsing of the second argument under the assumption that the shell needs to handle that itself.
 
 
 ## What It Doesn't Do
@@ -133,8 +150,20 @@ The "fs" in `fs-shell` can mean:
 To test, run:
 
 ```bash
-docker build -f test.Dockerfile
+docker build -f test.Dockerfile .
 ```
+
+To build through Docker and capture the built executable:
+
+```bash
+docker build -t local/fs-shell -f build.Dockerfile .
+container=$( docker create local/fs-shell )
+docker cp "${container}":/opt/code/fs-shell fs-shell
+docker cp "${container}":/opt/code/fs-shell-debug fs-shell-debug
+docker rm "${container}"
+```
+
+The build generates 2 versions of the shell - 1 with extra debug statements sent to stdout, and the normal, minimized version.
 
 
 ## License

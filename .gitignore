@@ -1,5 +1,7 @@
 # Compiled Output
 fs-shell
+fs-shell-debug
+*.tar
 
 # Test output
 .tmp/

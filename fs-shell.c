@@ -40,7 +40,7 @@ SOFTWARE.
  *        noop (file1 (file2 ...))
  *          does nothing.
  *        echo (str1 (str2 ...))
- *          prints each argument to stdout with a newline between them.
+ *          prints each argument to STDOUT with a newline between them.
  *        rm (file1 (file2 ...))
  *          unlinks (removes) each file, hardlink, or symlink argument
  *        rmdir (file1 (file2 ...))
@@ -63,7 +63,10 @@ SOFTWARE.
 #include <unistd.h>
 #include <sys/stat.h>
 
+// This is turned in on the makefile for the debug build.
 // #define DEBUG 1
+
+#define MAX_PARSED_ARGS 1000
 
 #define CMD_ERR   0
 #define CMD_NOOP  1
@@ -75,21 +78,106 @@ SOFTWARE.
 #define CMD_HLINK 7
 #define CMD_SLINK 8
 
+#define STDOUT 1
+#define STDERR 2
 
-int main(const int argc, const char *argv[]) {
+static const char *EMPTY_STR = "";
+
+
+int main(const int src_argc, char *src_argv[]) {
+    int argc = src_argc;
+    char **argv = src_argv;
     int i = 1;
     long val1 = 0;
     long val2 = 0;
     int err = 0;
     int errCount = 0;
     int cmd = CMD_ERR;
-    const char *arg = "";
-    const char *cmdName = "";
+    const char *arg = EMPTY_STR;
+    const char *cmdName = EMPTY_STR;
+
     int isCmdStart = 1;
 
     if (argc > i && strcmp("-c", argv[i]) == 0) {
         // Invoked like "/bin/sh -c" style execution.
         // Just ignore the "-c".
+#ifdef DEBUG
+        write(STDOUT, ":: ignoring initial -c\n", 24);
+#endif
+
+        if (argc == 3) {
+            // This signal means we need to do our own argument
+            // parsing.  The Docker RUN command does not perform
+            // argument splitting.
+            argv = malloc(sizeof(char *) * MAX_PARSED_ARGS);
+            if (argv == NULL) {
+                write(STDERR, "ERROR malloc failed\n", 20);
+                return 1;
+            }
+            argv[0] = &(src_argv[0][0]);
+            argv[1] = &(src_argv[1][0]);
+            // val1: argv count.
+            val1 = 2;
+            // val2: src_argv[2] position
+            val2 = 0;
+            // i: state
+            //    0 == looking for the start of an argument
+            //    1 == in a double quoted string
+            //    2 == in a plain argument
+            i = 0;
+            while (val1 < MAX_PARSED_ARGS) {
+                switch (src_argv[2][val2]) {
+                    case 0:
+                        // null - end of input string
+                        // so wrap up everything and exit the loop.
+                        argc = val1;
+                        val1 = MAX_PARSED_ARGS;
+                        break;
+                    case '"':
+                        if (i == 0) {
+                            // enter a string.
+                            // Point the argument start to after this character.
+                            argv[val1] = &(src_argv[2][val2 + 1]);
+                            val1++;
+                            i = 1;
+                        } else if (i == 1) {
+                            // exit a string.
+                            // Set this character to be the end of the string.
+                            src_argv[2][val2] = 0;
+                            // and go back to looking for the start of an argument.
+                            i = 0;
+#ifdef DEBUG
+                            write(STDOUT, ":: Parsed string argument '", 27);
+                            write(STDOUT, argv[val1-1], strlen(argv[val1-1]));
+                            write(STDOUT, "'\n", 2);
+#endif
+                        } // else keep this character in the argument.
+                        break;
+                    case ' ':
+                        if (i == 2) {
+                            // inside an argument.  This ends it.
+                            src_argv[2][val2] = 0;
+                            i = 0;
+#ifdef DEBUG
+                            write(STDOUT, ":: Parsed std argument '", 24);
+                            write(STDOUT, argv[val1-1], strlen(argv[val1-1]));
+                            write(STDOUT, "'\n", 2);
+#endif
+                        }
+                        // else looking for an argument start or in a string.
+                        break;
+                    default:
+                        if (i == 0) {
+                            // looking for an argument start, and we found it.
+                            argv[val1] = &(src_argv[2][val2]);
+                            val1++;
+                            i = 2;
+                        }
+                        break;
+                }
+                val2++;
+            }
+        }
         i = 2;
     }
 
@@ -105,9 +193,9 @@ int main(const int argc, const char *argv[]) {
             isCmdStart = 0;
             cmdName = arg;
 #ifdef DEBUG
-            fwrite(":: start command ", 17, 1, stdout);
-            fwrite(arg, strlen(arg), 1, stdout);
-            fwrite("\n", 1, 1, stdout);
+            write(STDOUT, ":: start command '", 18);
+            write(STDOUT, arg, strlen(arg));
+            write(STDOUT, "'\n", 2);
 #endif
 
             // ends the loop prematurely, so need to explicitly
@@ -167,38 +255,39 @@ int main(const int argc, const char *argv[]) {
         //   Each of these must set the err state.
         err = 0;
 
-#ifdef DEBUG
-        fwrite(":: handing ", 11, 1, stdout);
-        fwrite(cmdName, strlen(cmdName), 1, stdout);
-        fwrite(" ", 1, 1, stdout);
-        fwrite(arg, strlen(arg), 1, stdout);
-        fwrite("\n", 1, 1, stdout);
-#endif
-
         // ==================================================================
         // Next command; this compares argument, not cmd
         // Note that cmd could be an error here.
         if (strcmp("&&", arg) == 0) {
             if (errCount > 0) {
                 // && with errors stops the shell.
-                fwrite("FAIL &&\n", 8, 1, stderr);
+                write(STDERR, "FAIL &&\n", 8);
                 break;
             }
 #ifdef DEBUG
-            fwrite(":: &&\n", 6, 1, stdout);
+            write(STDOUT, ":: &&\n", 6);
 #endif
             isCmdStart = 1;
         } else
         if (strcmp(";", arg) == 0) {
             // ";" ignores any errors, resetting the error count.
 #ifdef DEBUG
-            fwrite(":: ;\n", 5, 1, stdout);
+            write(STDOUT, ":: ;\n", 5);
 #endif
             errCount = 0;
             isCmdStart = 1;
         } else {
             // ==============================================================
             // Process the command argument.
+
+#ifdef DEBUG
+        write(STDOUT, ":: handing ", 11);
+        write(STDOUT, cmdName, strlen(cmdName));
+        write(STDOUT, " ", 1);
+        write(STDOUT, arg, strlen(arg));
+        write(STDOUT, "\n", 1);
+#endif
+
             err = 0;
             switch (cmd) {
                 case CMD_ERR:
@@ -206,42 +295,42 @@ int main(const int argc, const char *argv[]) {
                     break;
                 case CMD_ECHO:
 #ifdef DEBUG
-                    fwrite(":: echo ", 8, 1, stdout);
-                    fwrite(arg, strlen(arg), 1, stdout);
-                    fwrite("\n", 1, 1, stdout);
+                    write(STDOUT, ":: echo ", 8);
+                    write(STDOUT, arg, strlen(arg));
+                    write(STDOUT, "\n", 1);
 #endif
-                    fwrite(arg, strlen(arg), 1, stdout);
-                    fwrite("\n", 1, 1, stdout);
+                    write(STDOUT, arg, strlen(arg));
+                    write(STDOUT, "\n", 1);
                     break;
                 case CMD_RM:
 #ifdef DEBUG
-                    fwrite(":: rm ", 6, 1, stdout);
-                    fwrite(arg, strlen(arg), 1, stdout);
-                    fwrite("\n", 1, 1, stdout);
+                    write(STDOUT, ":: rm ", 6);
+                    write(STDOUT, arg, strlen(arg));
+                    write(STDOUT, "\n", 1);
 #endif
                     err = unlink(arg);
                     break;
                 case CMD_RMDIR:
 #ifdef DEBUG
-                    fwrite(":: rmdir ", 6, 1, stdout);
-                    fwrite(arg, strlen(arg), 1, stdout);
-                    fwrite("\n", 1, 1, stdout);
+                    write(STDOUT, ":: rmdir ", 9);
+                    write(STDOUT, arg, strlen(arg));
+                    write(STDOUT, "\n", 1);
 #endif
                     err = rmdir(arg);
                     break;
                 case CMD_CHOWN:
 #ifdef DEBUG
-                    fwrite(":: chown ", 9, 1, stdout);
-                    fwrite(arg, strlen(arg), 1, stdout);
-                    fwrite("\n", 1, 1, stdout);
+                    write(STDOUT, ":: chown ", 9);
+                    write(STDOUT, arg, strlen(arg));
+                    write(STDOUT, "\n", 1);
 #endif
                     err = chown(arg, val1, val2);
                     break;
                 case CMD_CHMOD:
 #ifdef DEBUG
-                    fwrite(":: chmod ", 9, 1, stdout);
-                    fwrite(arg, strlen(arg), 1, stdout);
-                    fwrite("\n", 1, 1, stdout);
+                    write(STDOUT, ":: chmod ", 9);
+                    write(STDOUT, arg, strlen(arg));
+                    write(STDOUT, "\n", 1);
 #endif
                     err = chmod(arg, val1);
                     break;
@@ -275,12 +364,12 @@ int main(const int argc, const char *argv[]) {
                     }
                     break;
                 case CMD_NOOP:
-                    fwrite(":: noop ", 8, 1, stdout);
-                    fwrite(arg, strlen(arg), 1, stdout);
-                    fwrite("\n", 1, 1, stdout);
+                    write(STDOUT, ":: noop ", 8);
+                    write(STDOUT, arg, strlen(arg));
+                    write(STDOUT, "\n", 1);
                     break;
                 default:
-                    fwrite(":: bad cmd index", 16, 1, stdout);
+                    write(STDOUT, ":: bad cmd index", 16);
                     break;
 #endif
             }
@@ -290,14 +379,19 @@ int main(const int argc, const char *argv[]) {
         // End if/else block.
         if (err != 0) {
             // Could use fprintf, but let's get smaller.
-            fwrite("ERROR ", 6, 1, stderr);
-            fwrite(cmdName, strlen(cmdName), 1, stderr);
-            fwrite(": ", 2, 1, stderr);
-            fwrite(arg, strlen(arg), 1, stderr);
-            fwrite("\n", 1, 1, stderr);
+            write(STDERR, "ERROR ", 6);
+            write(STDERR, cmdName, strlen(cmdName));
+            write(STDERR, ": ", 2);
+            write(STDERR, arg, strlen(arg));
+            write(STDERR, "\n", 1);
             errCount++;
         }
         i++;
+    }
+
+    // not needed, but we're nice.
+    if (argv != src_argv) {
+        free(argv);
     }
 
     return errCount;
