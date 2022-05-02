@@ -281,11 +281,11 @@ int main(const int src_argc, char *src_argv[]) {
             // Process the command argument.
 
 #ifdef DEBUG
-        write(STDOUT, ":: handing ", 11);
-        write(STDOUT, cmdName, strlen(cmdName));
-        write(STDOUT, " ", 1);
-        write(STDOUT, arg, strlen(arg));
-        write(STDOUT, "\n", 1);
+            write(STDOUT, ":: handing ", 11);
+            write(STDOUT, cmdName, strlen(cmdName));
+            write(STDOUT, " ", 1);
+            write(STDOUT, arg, strlen(arg));
+            write(STDOUT, "\n", 1);
 #endif
 
             err = 0;
@@ -334,7 +334,6 @@ int main(const int src_argc, char *src_argv[]) {
 #endif
                     err = chmod(arg, val1);
                     break;
-#ifdef DEBUG
                 case CMD_SLINK:
                     // On first argument of symlink request.  Need to find next argument.
                     // increase i to point to second argument.
@@ -343,11 +342,11 @@ int main(const int src_argc, char *src_argv[]) {
                         err = 1;
                     } else {
 #ifdef DEBUG
-                    write(STDOUT, ":: ln-s ", 8);
-                    write(STDOUT, arg, strlen(arg));
-                    write(STDOUT, " ", 1);
-                    write(STDOUT, argv[i], strlen(argv[i]));
-                    write(STDOUT, "\n", 1);
+                        write(STDOUT, ":: ln-s ", 8);
+                        write(STDOUT, arg, strlen(arg));
+                        write(STDOUT, " ", 1);
+                        write(STDOUT, argv[i], strlen(argv[i]));
+                        write(STDOUT, "\n", 1);
 #endif
                         err = symlink(arg, argv[i]);
                         // Because this command only takes 2 arguments, set the
@@ -364,11 +363,11 @@ int main(const int src_argc, char *src_argv[]) {
                         err = 1;
                     } else {
 #ifdef DEBUG
-                    write(STDOUT, ":: ln-h ", 8);
-                    write(STDOUT, arg, strlen(arg));
-                    write(STDOUT, " ", 1);
-                    write(STDOUT, argv[i], strlen(argv[i]));
-                    write(STDOUT, "\n", 1);
+                        write(STDOUT, ":: ln-h ", 8);
+                        write(STDOUT, arg, strlen(arg));
+                        write(STDOUT, " ", 1);
+                        write(STDOUT, argv[i], strlen(argv[i]));
+                        write(STDOUT, "\n", 1);
 #endif
                         err = link(arg, argv[i]);
                         // Because this command only takes 2 arguments, set the
@@ -378,14 +377,17 @@ int main(const int src_argc, char *src_argv[]) {
                     }
                     break;
                 case CMD_NOOP:
+#ifdef DEBUG
                     write(STDOUT, ":: noop ", 8);
                     write(STDOUT, arg, strlen(arg));
                     write(STDOUT, "\n", 1);
+#endif
                     break;
                 default:
+#ifdef DEBUG
                     write(STDOUT, ":: bad cmd index", 16);
-                    break;
 #endif
+                    break;
             }
         }
 

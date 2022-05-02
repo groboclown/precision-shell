@@ -32,12 +32,16 @@ fi
 # -s : file exists and not empty
 if [ -s out.txt ] || [ -s err.txt ] ; then
     echo "Generated output to stdout or stderr"
+    echo "stdout:"
+    cat out.txt
+    echo "stderr:"
+    cat err.txt
     exit 1
 fi
 
 # should have: out.txt and err.txt and a.txt
 count="$( ls -1A | wc -l )"
-if [ ${count} != 3 ] ; then
+if [ ${count} != 4 ] ; then
     echo "Generated unexpected files:"
     ls -lA
     exit 1
