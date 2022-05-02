@@ -19,18 +19,21 @@ The shell supports these commands:
 * [ln-s](#ln-s) - create a symbolic link.
 * [ln-h](#ln-h) - create a hard link.
 
+If `-c` is the first argument and the argument count is 2, then the code performs special, limited parsing of the second argument under the assumption that the shell needs to handle that itself.  This allows it to simulate how other shell tools work, and to work as a Docker drop-in replacement for `/bin/sh`.
+
 It also supports command chaining through `&&` and `;` :
 
 ```bash
 $ ls
 fs-shell
-$ ./fs-shell echo abc \&\& rmdir does-not-exist \; echo dce
+$ ./fs-shell -c "echo abc && rmdir does-not-exist ; echo dce"
 abc
 ERROR rmdir: does-not-exist
 dce
-$ ./fs-shell echo abc \&\& rmdir does-not-exist \&\& echo dce
+$ ./fs-shell -c "echo abc && rmdir does-not-exist && echo dce"
 abc
 ERROR rmdir: does-not-exist
+FAIL &&
 ```
 
 You can also use it in Docker or Podman as a default shell, which is useful if you need file modifications to an image that has no shell.
@@ -47,8 +50,6 @@ RUN echo Startup \
     && rmdir /tmp \
     echo Complete
 ```
-
-If `-c` is the first argument and the argument count is 2, then the code performs special, limited parsing of the second argument under the assumption that the shell needs to handle that itself.
 
 
 ## What It Doesn't Do
