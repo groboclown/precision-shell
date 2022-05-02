@@ -75,6 +75,8 @@ RUN echo Startup \
 
 The tool was built with Docker images that use minimal OS resources.  If something like busybox is too big for you, but you need some simple file manipulation because you built upon another image, then this is right for you.
 
+See [sample.Dockerfile](sample.Dockerfile) for an example of using it with Docker and a `FROM scratch`, to show that no OS setup is necessary to run the shell.
+
 
 ## What Does It Mean?
 
