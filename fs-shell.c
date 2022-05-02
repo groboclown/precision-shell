@@ -62,6 +62,7 @@ SOFTWARE.
 #include <string.h>
 #include <unistd.h>
 #include <sys/stat.h>
+#include <errno.h>
 
 // This is turned in on the makefile for the debug build.
 // #define DEBUG 1
@@ -217,6 +218,10 @@ int main(const int src_argc, char *src_argv[]) {
                 if (argc > i) {
                     // chmod (octal mode)
                     val1 = strtoul(argv[i], (char **)NULL, 8);
+                    // Note: octal max value.
+                    if (errno != 0 || val1 < 0 || val1 > 07777) {
+                        cmd = CMD_ERR;
+                    }
                     i++;
                 }
             } else if (strcmp("chown", arg) == 0) {
@@ -225,7 +230,13 @@ int main(const int src_argc, char *src_argv[]) {
                 if (argc > i + 1) {
                     // chown (uid) (gid)
                     val1 = strtoul(argv[i], (char **)NULL, 10);
+                    if (errno != 0 || val1 < 0 || val1 > 0xffff) {
+                        cmd = CMD_ERR;
+                    }
                     val2 = strtoul(argv[i + 1], (char **)NULL, 10);
+                    if (errno != 0 || val1 < 0 || val1 > 0xffff) {
+                        cmd = CMD_ERR;
+                    }
                     i += 2;
                 }
             } else if (strcmp("ln-s", arg) == 0) {
@@ -243,7 +254,14 @@ int main(const int src_argc, char *src_argv[]) {
                 // "ln-h && noop" is the same as "noop && noop"
                 cmd = CMD_HLINK;
             } else {
+                // Unknown command.
                 cmd = CMD_ERR;
+
+                // This doesn't set the error code, which means that the
+                // error will only be reported if there is an argument to
+                // this command.  Proper error handling here means more
+                // code to handle this edge case.  As it stands, this will
+                // not report an error if there is no argument.
             }
 
             continue;
@@ -383,11 +401,11 @@ int main(const int src_argc, char *src_argv[]) {
                     write(STDOUT, "\n", 1);
 #endif
                     break;
-                default:
 #ifdef DEBUG
+                default:
                     write(STDOUT, ":: bad cmd index", 16);
-#endif
                     break;
+#endif
             }
         }
 

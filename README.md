@@ -129,6 +129,8 @@ $ ls -l a.txt
 -rwxrwx--- 1 user user   0 Jan 19 09:51 a.txt
 ```
 
+This command will fail if the mode value is out of range or not a number.
+
 ### chown
 
 Usage: `chown (uid) (gid) (file1 (file2 ...))`
