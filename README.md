@@ -64,6 +64,8 @@ If `-c` is the first argument and the argument count is 2, then the code perform
 * Report detailed error messages.
 * Change file timestamps.
 * File descriptor redirect.
+* Change current directory.
+* Use environment variables.
 * Anything with the network.
 * Tell you how to use it.  That's what this file is for.
 
@@ -77,8 +79,10 @@ The tool was built with Docker images that use minimal OS resources.  If somethi
 
 The "fs" in `fs-shell` can mean:
 
+* "FROM scratch", because it's useful in Docker images that come from the scratch image (e.g. no OS files).
 * "File System", because it only works with file system operations.
-* "FROM scratch", because it's useful in Docker images that come from scratch (no OS files).
+* "Functionally Simple", because it's easy on the features.  It's the opposite of "Feature Rich".
+* "Freakin' Stupid", because it does so little.
 
 
 ## Help
