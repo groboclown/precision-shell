@@ -157,7 +157,7 @@ Creates a hard link named dest file, pointing to src file.
 To test, run:
 
 ```bash
-docker build -f test.Dockerfile .
+chmod +x tests/*.sh && docker build -f test.Dockerfile .
 ```
 
 To build through Docker and capture the built executable:

@@ -221,8 +221,9 @@ int main(const int src_argc, char *src_argv[]) {
                     // Note: octal max value.
                     if (errno != 0 || val1 < 0 || val1 > 07777) {
                         cmd = CMD_ERR;
+                    } else {
+                        i++;
                     }
-                    i++;
                 }
             } else if (strcmp("chown", arg) == 0) {
                 cmd = CMD_CHOWN;
@@ -232,12 +233,15 @@ int main(const int src_argc, char *src_argv[]) {
                     val1 = strtoul(argv[i], (char **)NULL, 10);
                     if (errno != 0 || val1 < 0 || val1 > 0xffff) {
                         cmd = CMD_ERR;
+                    } else {
+                        i++;
+                        val2 = strtoul(argv[i], (char **)NULL, 10);
+                        if (errno != 0 || val1 < 0 || val1 > 0xffff) {
+                            cmd = CMD_ERR;
+                        } else {
+                            i++;
+                        }
                     }
-                    val2 = strtoul(argv[i + 1], (char **)NULL, 10);
-                    if (errno != 0 || val1 < 0 || val1 > 0xffff) {
-                        cmd = CMD_ERR;
-                    }
-                    i += 2;
                 }
             } else if (strcmp("ln-s", arg) == 0) {
                 // symbolic link.  Special case where next arg is source and
