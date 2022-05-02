@@ -3,7 +3,7 @@ Minimal, non-interactive file manipulation shell
 
 Sometimes, you just don't need a shell.  You just need minimal file system operations.
 
-Last build size is 22,024 bytes.  Statically linked.
+Last build size is 22,024 bytes.  
 
 
 ## What It Does
@@ -14,12 +14,12 @@ The shell supports these commands:
 * [echo](#echo) - send text to `stdout`.
 * [rm](#rm) - remove files.
 * [rmdir](#rmdir) - remove empty directories.
+* [mkdir](#mkdir) - create an empty directory.
 * [chmod](#chmod) - change file permissions.
 * [chown](#chown) - change user and group owner for files.
 * [ln-s](#ln-s) - create a symbolic link.
 * [ln-h](#ln-h) - create a hard link.
-
-If `-c` is the first argument and the argument count is 2, then the code performs special, limited parsing of the second argument under the assumption that the shell needs to handle that itself.  This allows it to simulate how other shell tools work, and to work as a Docker drop-in replacement for `/bin/sh`.
+* [signal .. wait](#signal-wait) - wait for an OS signal before continuing.
 
 It also supports command chaining through `&&` and `;` :
 
@@ -51,22 +51,29 @@ RUN echo Startup \
     echo Complete
 ```
 
+This done through a special situation if there are exactly 2 arguments, and the first is `-c`.  In this specific situation, the shell will parse the second argument through limited formatting rules:
+
+* A space character (` `) separates arguments.
+* Pairs of quote characters (`"` and `'`) can encapsulate text, allowing space characters to be part of an argument, rather than separating arguments.
+* Characters can be escaped by adding a backslash (`\`) character.  `\n` turns into a newline, `\r` into a linefeed, `\t` into a tab, and anything else is the character itself.  This is how quote characters can be added, as well as an alternate to adding a space to an argument.
+
 
 ## What It Doesn't Do
 
 * List files.
-* Background jobs or job control.
-* Provide splat pattern replacements.
-* Allow for interactive execution.
 * Copy files.
-* Create normal files or directories.
+* Modify files.
+* Create normal files.
 * Alter file contents.
 * Process controls.
 * Report detailed error messages.
 * Change file timestamps.
 * File descriptor redirect.
 * Change current directory.
+* Provide splat pattern replacements.
 * Use environment variables.
+* Background jobs or job control.
+* Allow for interactive execution.
 * Anything with the network.
 * Tell you how to use it.  That's what this file is for.
 
@@ -112,7 +119,13 @@ Removes each file passed as an argument.  The command will attempt to remove eac
 
 Usage: `rmdir (dir1 (dir2 ...))`
 
-Removes each empty directory passed as an argument.  If a directory is not empty, the command will fail.  The command will attempt to remove each directory, and if any of them fail, then the whole command fails with an exit code equal to the sum of the error codes.
+Removes each empty directory passed as an argument.  If a directory is not empty, the command will fail.  The command will attempt to remove each directory, and if any of them fail, then the whole command fails with an exit code equal to the sum of the number of failed files.
+
+### mkdir
+
+Usage: `mkdir (octal mode) (file1 (file2 ...))`
+
+Creates the listed directories with the permissions of the first argument.  The parent directory must exist, or it will generate an error.  If any creation fails, then the command fails with the number of failed directories.
 
 ### chmod
 
@@ -140,19 +153,31 @@ Usage: `chown (uid) (gid) (file1 (file2 ...))`
 
 Changes the owner and group ID for each file, directory, or symlink argument.
 
-
 ### ln-s
 
 Usage: `ln-s (src file) (dest file)`
 
 Creates a symbolic link named dest file, pointing to src file.
 
-
 ### ln-h
 
 Usage: `ln-h (src file) (dest file)`
 
 Creates a hard link named dest file, pointing to src file.
+
+### signal-wait
+
+Usage: `signal [signal1 [signal2]] wait`
+
+Waits for any of the OS signal number arguments before continuing.  If no signal is given (just `signal wait`), then it waits for a standard OS interruption, which will kill the whole process.
+
+Of note, once a signal is added to the list, it is registered for standard OS ignoring.  Only by adding the statement `wait` will the processing wait for the signal to be raised.  This can be used for interesting applications, such as:
+
+```bash
+./fs-shell signal 2 \; signal 15 wait
+```
+
+This will cause the shell to ignore SIGINT (2, usually sent by a ctrl-c input), and wait for SIGTERM (15).
 
 
 ## Developing
@@ -166,11 +191,11 @@ chmod +x tests/*.sh && docker build -f test.Dockerfile .
 To build through Docker and capture the built executable:
 
 ```bash
-docker build -t local/fs-shell -f build.Dockerfile .
-container=$( docker create local/fs-shell )
-docker cp "${container}":/opt/code/fs-shell fs-shell
-docker cp "${container}":/opt/code/fs-shell-debug fs-shell-debug
-docker rm "${container}"
+docker build -t local/fs-shell -f build.Dockerfile . \
+    && container=$( docker create local/fs-shell ) \
+    && docker cp "${container}":/opt/code/fs-shell fs-shell \
+    && docker cp "${container}":/opt/code/fs-shell-debug fs-shell-debug \
+    && docker rm "${container}"
 ```
 
 The build generates 2 versions of the shell: one with extra debug statements sent to stdout; and the normal, minimized version.

@@ -40,11 +40,13 @@ SOFTWARE.
  *        noop (file1 (file2 ...))
  *          does nothing.
  *        echo (str1 (str2 ...))
- *          prints each argument to STDOUT with a newline between them.
+ *          prints each argument to STDOUT with a newline between them
  *        rm (file1 (file2 ...))
  *          unlinks (removes) each file, hardlink, or symlink argument
  *        rmdir (file1 (file2 ...))
- *          removes each directory.  They must be empty first.
+ *          removes each directory.  They must be empty first
+ *        mkdir (octal mode) (file1 (file2 ...))
+ *          creates the directories with the file mode
  *        chmod (octal mode) (file1 (file2 ...))
  *          changes the file mode for each file, directory, or symlink argument
  *        chown (uid) (gid) (file1 (file2 ...))
@@ -62,44 +64,58 @@ SOFTWARE.
 #include <string.h>
 #include <unistd.h>
 #include <sys/stat.h>
+#include <signal.h>
 #include <errno.h>
 
 // This is turned in on the makefile for the debug build.
 // #define DEBUG 1
-
-#define MAX_PARSED_ARGS 1000
 
 #define CMD_ERR   0
 #define CMD_NOOP  1
 #define CMD_ECHO  2
 #define CMD_RM    3
 #define CMD_RMDIR 4
-#define CMD_CHMOD 5
-#define CMD_CHOWN 6
-#define CMD_HLINK 7
-#define CMD_SLINK 8
+#define CMD_MKDIR 5
+#define CMD_CHMOD 6
+#define CMD_CHOWN 7
+#define CMD_HLINK 8
+#define CMD_SLINK 9
+#define CMD_PAUSE 10
+
+#define PARSE_SEARCH 0
+#define PARSE_PLAIN  1
+#define PARSE_DOUBLE 2
+#define PARSE_SINGLE 3
+#define PARSE_END 4
 
 #define STDOUT 1
 #define STDERR 2
 
-static const char *EMPTY_STR = "";
+static char *EMPTY_STR = "";
+
+void emptySignalHandler(int signal) {
+#ifdef DEBUG
+    write(STDOUT, ":: handled signal\n", 18);
+#endif
+}
 
 
-int main(const int src_argc, char *src_argv[]) {
-    int argc = src_argc;
-    char **argv = src_argv;
+int main(const int srcArgc, char *srcArgv[]) {
+    int argc = srcArgc;
+    char **argv = srcArgv;
     int i = 1;
     long val1 = 0;
     long val2 = 0;
     int err = 0;
     int errCount = 0;
     int cmd = CMD_ERR;
-    const char *arg = EMPTY_STR;
+    char *arg = EMPTY_STR;
     const char *cmdName = EMPTY_STR;
+    sigset_t signalSet;
 
     int isCmdStart = 1;
 
-    if (argc > i && strcmp("-c", argv[i]) == 0) {
+    if (argc > 1 && strcmp("-c", argv[1]) == 0) {
         // Invoked like "/bin/sh -c" style execution.
         // Just ignore the "-c".
 #ifdef DEBUG
@@ -107,76 +123,134 @@ int main(const int src_argc, char *src_argv[]) {
 #endif
 
         if (argc == 3) {
+            int maxArgs = strlen(argv[2]);
+            int srcPos = 0;
+            int targetPos = 0;
+            argc = 2;
+            arg = srcArgv[2];
+
             // This signal means we need to do our own argument
             // parsing.  The Docker RUN command does not perform
             // argument splitting.
-            argv = malloc(sizeof(char *) * MAX_PARSED_ARGS);
+            argv = malloc(sizeof(char *) * maxArgs);
             if (argv == NULL) {
                 write(STDERR, "ERROR malloc failed\n", 20);
                 return 1;
             }
-            argv[0] = &(src_argv[0][0]);
-            argv[1] = &(src_argv[1][0]);
-            // val1: argv count.
-            val1 = 2;
-            // val2: src_argv[2] position
-            val2 = 0;
-            // i: state
-            //    0 == looking for the start of an argument
-            //    1 == in a double quoted string
-            //    2 == in a plain argument
+            argv[0] = &(srcArgv[0][0]);
+            argv[1] = &(srcArgv[1][0]);
+
+            // i: parse state
             i = 0;
-            while (val1 < MAX_PARSED_ARGS) {
-                switch (src_argv[2][val2]) {
+            while (argc < maxArgs && i != PARSE_END) {
+                switch (arg[srcPos]) {
                     case 0:
                         // null - end of input string
-                        // so wrap up everything and exit the loop.
-                        argc = val1;
-                        val1 = MAX_PARSED_ARGS;
+                        arg[targetPos] = 0;
+                        // Terminate the loop
+                        i = PARSE_END;
+                        break;
+                    case '\'':
+                        if (i == PARSE_SEARCH) {
+                            // enter a string.
+                            // Point the argument start to the next character,
+                            //   which will be where targetPos is actively pointing.
+                            argv[argc] = &(arg[targetPos]);
+                            argc++;
+                            i = PARSE_SINGLE;
+                        } else if (i == PARSE_SINGLE) {
+                            // Exit a string.
+                            // This will always be considered as though there is
+                            // more text in this argument, so ignore the
+                            // character by stepping over it.
+                            i = PARSE_PLAIN;
+                        } else {
+                            // Encountered a quote in the middle of text.
+                            // Step over it.
+                            i = PARSE_SINGLE;
+                        }
                         break;
                     case '"':
-                        if (i == 0) {
+                        if (i == PARSE_SEARCH) {
                             // enter a string.
-                            // Point the argument start to after this character.
-                            argv[val1] = &(src_argv[2][val2 + 1]);
-                            val1++;
-                            i = 1;
-                        } else if (i == 1) {
-                            // exit a string.
-                            // Set this character to be the end of the string.
-                            src_argv[2][val2] = 0;
-                            // and go back to looking for the start of an argument.
-                            i = 0;
-#ifdef DEBUG
-                            write(STDOUT, ":: Parsed string argument '", 27);
-                            write(STDOUT, argv[val1-1], strlen(argv[val1-1]));
-                            write(STDOUT, "'\n", 2);
-#endif
-                        } // else keep this character in the argument.
+                            // Point the argument start to the next character,
+                            //   which will be where targetPos is actively pointing.
+                            argv[argc] = &(arg[targetPos]);
+                            argc++;
+                            i = PARSE_DOUBLE;
+                        } else if (i == PARSE_DOUBLE) {
+                            // Exit a string.
+                            // This will always be considered as though there is
+                            // more text in this argument, so ignore the
+                            // character by stepping over it.
+                            i = PARSE_PLAIN;
+                        } else {
+                            // Encountered a quote in the middle of text.
+                            // Step over it.
+                            i = PARSE_DOUBLE;
+                        }
                         break;
                     case ' ':
-                        if (i == 2) {
+                        if (i == PARSE_PLAIN) {
                             // inside an argument.  This ends it.
-                            src_argv[2][val2] = 0;
-                            i = 0;
+                            arg[targetPos++] = 0;
+                            i = PARSE_SEARCH;
 #ifdef DEBUG
-                            write(STDOUT, ":: Parsed std argument '", 24);
-                            write(STDOUT, argv[val1-1], strlen(argv[val1-1]));
+                            write(STDOUT, ":: Parsed argument '", 20);
+                            write(STDOUT, argv[argc-1], strlen(argv[argc-1]));
                             write(STDOUT, "'\n", 2);
 #endif
+                        } else if (i != PARSE_SEARCH) {
+                            // Inside a quoted part.  Make it part of the argument.
+                            arg[targetPos++] = arg[srcPos];
                         }
-                        // else looking for an argument start or in a string.
+                        break;
+                    case '\\':
+                        // standard string escaping.
+                        if (i == PARSE_SEARCH) {
+                            // looking for an argument start, and we found it.
+                            argv[argc] = &(arg[targetPos]);
+                            argc++;
+                            i = PARSE_PLAIN;
+                        }
+                        srcPos++;
+                        switch (arg[srcPos]) {
+                            case 0:
+                                // Whoops - ran over.  Formally, a problem
+                                //   with the input, but we'll silently ignore it.
+                                srcPos--;
+                                break;
+                            case 'n':
+                                arg[targetPos++] = '\n';
+                                break;
+                            case 'r':
+                                arg[targetPos++] = '\r';
+                                break;
+                            case 't':
+                                arg[targetPos++] = '\t';
+                                break;
+                            default:
+                                arg[targetPos++] = arg[srcPos];
+                                break;
+                        }
+#ifdef DEBUG
+                        write(STDOUT, ":: Escaped ", 11);
+                        write(STDOUT, &(arg[srcPos]), 1);
+                        write(STDOUT, "\n", 1);
+#endif
                         break;
                     default:
-                        if (i == 0) {
+                        if (i == PARSE_SEARCH) {
                             // looking for an argument start, and we found it.
-                            argv[val1] = &(src_argv[2][val2]);
-                            val1++;
-                            i = 2;
+                            argv[argc] = &(arg[targetPos]);
+                            argc++;
+                            i = PARSE_PLAIN;
                         }
+                        // Always keep the character.
+                        arg[targetPos++] = arg[srcPos];
                         break;
                 }
-                val2++;
+                srcPos++;
             }
         }
         i = 2;
@@ -212,6 +286,19 @@ int main(const int src_argc, char *src_argv[]) {
                 cmd = CMD_RM;
             } else if (strcmp("rmdir", arg) == 0) {
                 cmd = CMD_RMDIR;
+            } else if (strcmp("mkdir", arg) == 0) {
+                cmd = CMD_MKDIR;
+                // extra argument load for the permissions
+                if (argc > i) {
+                    // mkdir (octal mode)
+                    val1 = strtoul(argv[i], (char **)NULL, 8);
+                    // Note: octal max value.
+                    if (errno != 0 || val1 < 0 || val1 > 07777) {
+                        cmd = CMD_ERR;
+                    } else {
+                        i++;
+                    }
+                }
             } else if (strcmp("chmod", arg) == 0) {
                 cmd = CMD_CHMOD;
                 // extra argument load
@@ -257,6 +344,10 @@ int main(const int src_argc, char *src_argv[]) {
                 // are parsed when the first one is encountered.  That means
                 // "ln-h && noop" is the same as "noop && noop"
                 cmd = CMD_HLINK;
+            } else if (strcmp("signal", arg) == 0) {
+                // Marks the start of a signal wait.
+                sigemptyset(&signalSet);
+                cmd = CMD_PAUSE;
             } else {
                 // Unknown command.
                 cmd = CMD_ERR;
@@ -340,6 +431,14 @@ int main(const int src_argc, char *src_argv[]) {
 #endif
                     err = rmdir(arg);
                     break;
+                case CMD_MKDIR:
+#ifdef DEBUG
+                    write(STDOUT, ":: mkdir ", 9);
+                    write(STDOUT, arg, strlen(arg));
+                    write(STDOUT, "\n", 1);
+#endif
+                    err = mkdir(arg, val1);
+                    break;
                 case CMD_CHOWN:
 #ifdef DEBUG
                     write(STDOUT, ":: chown ", 9);
@@ -398,6 +497,34 @@ int main(const int src_argc, char *src_argv[]) {
                         cmd = CMD_ERR;
                     }
                     break;
+                case CMD_PAUSE:
+                    // The "wait" string indicates the end of the signals.
+                    if (strcmp("wait", arg) == 0) {
+#ifdef DEBUG
+                        write(STDOUT, ":: start signal wait\n", 21);
+#endif
+                        err = sigwait(&signalSet, &cmd);
+#ifdef DEBUG
+                        write(STDOUT, ":: wait complete\n", 17);
+#endif
+                        cmd = CMD_ERR;
+                    } else {
+                        // "wait" hasn't been found yet, so each argument is a
+                        // signal number.
+                        val1 = strtoul(arg, (char **)NULL, 10);
+                        if (errno != 0 || val1 < 0 || val1 > 32) {
+                            err = 1;
+                        } else {
+#ifdef DEBUG
+                            write(STDOUT, ":: signal ", 10);
+                            write(STDOUT, arg, strlen(arg));
+                            write(STDOUT, "\n", 1);
+#endif
+                            sigaddset(&signalSet, val1);
+                            signal(val1, &emptySignalHandler);
+                        }
+                    }
+                    break;
                 case CMD_NOOP:
 #ifdef DEBUG
                     write(STDOUT, ":: noop ", 8);
@@ -428,7 +555,7 @@ int main(const int src_argc, char *src_argv[]) {
     }
 
     // not needed, but we're nice.
-    if (argv != src_argv) {
+    if (argv != srcArgv) {
         free(argv);
     }
 
