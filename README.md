@@ -9,6 +9,7 @@ Last build size:
 * musl: 22,024 bytes
 * dietlibc: 17,352 bytes
 
+*The "input" branch contains an experiment to be able to read the commands from a file or stdin, but it increases the size of the binary from 100 bytes (dietlibc) to 4k (musl).*
 
 ## What It Does
 
