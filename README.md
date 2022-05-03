@@ -3,7 +3,11 @@ Minimal, non-interactive file manipulation shell
 
 Sometimes, you just don't need a shell.  You just need minimal file system operations.
 
-Last build size is 22,024 bytes.  
+Last build size:
+
+* glibc: 823,752 bytes
+* musl: 22,024 bytes
+* dietlibc: 17,352 bytes
 
 
 ## What It Does
@@ -191,15 +195,29 @@ chmod +x tests/*.sh && docker build -f test.Dockerfile .
 To build through Docker and capture the built executable:
 
 ```bash
-docker build -t local/fs-shell -f build.Dockerfile . \
-    && container=$( docker create local/fs-shell ) \
-    && docker cp "${container}":/opt/code/fs-shell fs-shell \
-    && docker cp "${container}":/opt/code/fs-shell-debug fs-shell-debug \
+docker build -t local/fs-shell-musl -f build-musl.Dockerfile . \
+    && container=$( docker create local/fs-shell-musl ) \
+    && docker cp "${container}":/opt/code/fs-shell musl.fs-shell \
+    && docker cp "${container}":/opt/code/fs-shell-debug musl.fs-shell-debug \
+    && docker rm "${container}"
+docker build -t local/fs-shell-glibc -f build-glibc.Dockerfile . \
+    && container=$( docker create local/fs-shell-glibc ) \
+    && docker cp "${container}":/opt/code/fs-shell glibc.fs-shell \
+    && docker cp "${container}":/opt/code/fs-shell-debug glibc.fs-shell-debug \
     && docker rm "${container}"
 ```
 
 The build generates 2 versions of the shell: one with extra debug statements sent to stdout; and the normal, minimized version.
 
+Additionally, for your own purposes, you can build it against the "dietlibc" library.  However, this has special considerations in that it's GPL v2, and [you can't distribute the binary under this program's MIT license](http://www.fefe.de/dietlibc/FAQ.txt).
+
+```bash
+docker build -t local/fs-shell-dietlibc -f build-dietlibc.Dockerfile . \
+    && container=$( docker create local/fs-shell-dietlibc ) \
+    && docker cp "${container}":/opt/code/fs-shell dietlibc.fs-shell \
+    && docker cp "${container}":/opt/code/fs-shell-debug dietlibc.fs-shell-debug \
+    && docker rm "${container}"
+```
 
 ## License
 

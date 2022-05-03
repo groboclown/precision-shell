@@ -164,10 +164,14 @@ int main(const int srcArgc, char *srcArgv[]) {
                             // more text in this argument, so ignore the
                             // character by stepping over it.
                             i = PARSE_PLAIN;
-                        } else {
+                        } else if (i == PARSE_PLAIN) {
                             // Encountered a quote in the middle of text.
                             // Step over it.
                             i = PARSE_SINGLE;
+                        } else {
+                            // In another quoting thing that requires this character
+                            // to be kept.
+                            arg[targetPos++] = arg[srcPos];
                         }
                         break;
                     case '"':
@@ -184,13 +188,24 @@ int main(const int srcArgc, char *srcArgv[]) {
                             // more text in this argument, so ignore the
                             // character by stepping over it.
                             i = PARSE_PLAIN;
-                        } else {
+                        } else if (i == PARSE_PLAIN) {
                             // Encountered a quote in the middle of text.
                             // Step over it.
                             i = PARSE_DOUBLE;
+                        } else {
+                            // In another quoting thing that requires this character
+                            // to be kept.
+                            arg[targetPos++] = arg[srcPos];
                         }
                         break;
+                    // Note: For the moment, '\n' is just whitespace.  If we are
+                    //   not in a quote, then this should be considered a separator.
+                    //   In that case, argv[argc++] would need to point to a constant
+                    //   separator string.
+                    case '\n':
+                    case '\r':
                     case ' ':
+                    case '\t':
                         if (i == PARSE_PLAIN) {
                             // inside an argument.  This ends it.
                             arg[targetPos++] = 0;

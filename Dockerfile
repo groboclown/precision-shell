@@ -2,7 +2,7 @@ FROM docker.io/library/alpine:3.10
 
 WORKDIR /opt/code
 
-COPY *.c Makefile ./
+COPY *.c *.h Makefile ./
 
 RUN \
        apk --no-cache update \

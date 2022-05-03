@@ -10,6 +10,6 @@ RUN \
     && apk add build-base=0.5-r1 \
     && rm -rf /tmp/* /var/cache/apk/*
 
-COPY *.c Makefile ./
+COPY *.c *.h Makefile ./
 
 RUN make

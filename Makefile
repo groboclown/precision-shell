@@ -12,3 +12,8 @@ fs-shell: fs-shell.c
 
 fs-shell-debug: fs-shell.c
 	$(CC) $(CFLAGS) -DDEBUG=1 -static $? $(LDFLAGS) -o $@
+
+
+clean:
+	test -f fs-shell && rm fs-shell
+	test -f fs-shell-debug && rm fs-shell-debug

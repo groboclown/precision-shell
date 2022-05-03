@@ -1,6 +1,12 @@
 # Compiled Output
 fs-shell
 fs-shell-debug
+musl.fs-shell
+musl.fs-shell-debug
+glibc.fs-shell
+glibc.fs-shell-debug
+dietlibc.fs-shell
+dietlibc.fs-shell-debug
 *.tar
 
 # Test output
