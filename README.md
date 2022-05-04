@@ -24,7 +24,7 @@ Last build size:
 
 *At some point, a decision should be made whether to keep these separate or just join them into a single executable.*
 
-*dietlibc requires that you either not distribute the compiled executable, or release the executable under GPL v2.*
+*dietlibc [requires](https://www.fefe.de/dietlibc/FAQ.txt) that you either not distribute the compiled executable, or release the executable under GPL v2.*
 
 
 ## What It Does
