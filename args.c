@@ -25,6 +25,7 @@ SOFTWARE.
 #include <stdlib.h>
 #include <string.h>
 #include "output.h"
+#include "general.h"
 #include "args.h"
 
 #define PARSE_SEARCH 0
@@ -52,7 +53,7 @@ TokenAdvanceFuncPtr tokenizeRequest(const int srcArgc, char *srcArgv[]) {
     _argi = 1;
     _allocated = 0;
 
-    if (srcArgc > 1 && strcmp("-c", srcArgv[1]) == 0) {
+    if (srcArgc > 1 && strequal("-c", srcArgv[1])) {
         // Invoked like "/bin/sh -c" style execution.
         // Just ignore the "-c".
         LOG(":: ignoring initial -c\n");

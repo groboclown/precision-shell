@@ -25,8 +25,8 @@ SOFTWARE.
 #define FS_SHELL_OUTPUT
 
 #include <stdio.h>
-#include <unistd.h>
 #include <string.h>
+#include <unistd.h>
 
 // We explicitly don't care about the return code from writing to stdout or stderr.
 #pragma GCC diagnostic push

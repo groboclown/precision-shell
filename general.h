@@ -21,18 +21,11 @@ LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
 */
-#ifndef FS_SHELL_SHRINKLIB
-#define FS_SHELL_SHRINKLIB
 
-// Custom small versions of standard library functions.
+#ifndef FS_SHELL_GENERAL
+#define FS_SHELL_GENERAL
 
-/**
- * @brief check if the first, static string equals the second.
- * 
- * @param expected a static string
- * @param actual a random string
- * @return int 0 if not equal, 1 if equal
- */
-int strequal(const char *expected, char *actual);
+// simplified semantics on strcmp.
+#define strequal(a, b) (strcmp((a), (b)) == 0)
 
 #endif

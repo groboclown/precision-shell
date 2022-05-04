@@ -28,6 +28,8 @@ SOFTWARE.
 #include <signal.h>
 #include <errno.h>
 #include "output.h"
+#include "general.h"
+#include "commands.h"
 
 #define CMD_ERR   0
 #define CMD_NOOP  1
@@ -81,15 +83,15 @@ int runCommands(const char *(*advance)()) {
             arg = (*advance)();
 
             // Command name check is done here.
-            if (strcmp("noop", cmdName) == 0) {
+            if (strequal("noop", cmdName)) {
                 cmd = CMD_NOOP;
-            } else if (strcmp("echo", cmdName) == 0) {
+            } else if (strequal("echo", cmdName)) {
                 cmd = CMD_ECHO;
-            } else if (strcmp("rm", cmdName) == 0) {
+            } else if (strequal("rm", cmdName)) {
                 cmd = CMD_RM;
-            } else if (strcmp("rmdir", cmdName) == 0) {
+            } else if (strequal("rmdir", cmdName)) {
                 cmd = CMD_RMDIR;
-            } else if (strcmp("mkdir", cmdName) == 0) {
+            } else if (strequal("mkdir", cmdName)) {
                 cmd = CMD_MKDIR;
                 // extra argument load for the permissions
                 if (arg != NULL) {
@@ -104,7 +106,7 @@ int runCommands(const char *(*advance)()) {
                         arg = (*advance)();
                     }
                 }
-            } else if (strcmp("chmod", cmdName) == 0) {
+            } else if (strequal("chmod", cmdName)) {
                 cmd = CMD_CHMOD;
                 // extra argument load
                 if (arg != NULL) {
@@ -119,7 +121,7 @@ int runCommands(const char *(*advance)()) {
                         arg = (*advance)();
                     }
                 }
-            } else if (strcmp("chown", cmdName) == 0) {
+            } else if (strequal("chown", cmdName)) {
                 cmd = CMD_CHOWN;
                 // extra argument load
                 if (arg != NULL) {
@@ -143,24 +145,24 @@ int runCommands(const char *(*advance)()) {
                         }
                     }
                 }
-            } else if (strcmp("ln-s", cmdName) == 0) {
+            } else if (strequal("ln-s", cmdName)) {
                 // symbolic link.  Special case where next arg is source and
                 //   the following arg is the destination.
                 // Due to the way error handling is done, the two arguments
                 //   are parsed when the first one is encountered.  That means
                 //   "ln-s && noop" is the same as "noop && noop"
                 cmd = CMD_SLINK;
-            } else if (strcmp("ln-h", cmdName) == 0) {
+            } else if (strequal("ln-h", cmdName)) {
                 // hard link.  Special case where next arg is source and
                 //   the following arg is the destination.
                 // Due to the way error handling is done, the two arguments
                 //   are parsed when the first one is encountered.  That means
                 //   "ln-h && noop" is the same as "noop && noop"
                 cmd = CMD_HLINK;
-            } else if (strcmp("mv", cmdName) == 0) {
+            } else if (strequal("mv", cmdName)) {
                 // Move file.  Similar to ln-s and ln-h.
                 cmd = CMD_MV;
-            } else if (strcmp("signal", cmdName) == 0) {
+            } else if (strequal("signal", cmdName)) {
                 // Marks the start of a signal wait.
                 sigemptyset(&signalSet);
                 cmd = CMD_PAUSE;
@@ -187,7 +189,7 @@ int runCommands(const char *(*advance)()) {
         // ==================================================================
         // Next command; this compares argument, not cmd
         // Note that cmd could be an error here.
-        if (strcmp("&&", arg) == 0) {
+        if (strequal("&&", arg)) {
             if (errCount > 0) {
                 // && with errors stops the shell.
                 stderrP("FAIL &&\n");
@@ -196,7 +198,7 @@ int runCommands(const char *(*advance)()) {
             LOG(":: &&\n");
             isCmdStart = 1;
         } else
-        if (strcmp(";", arg) == 0) {
+        if (strequal(";", arg)) {
             // ";" ignores any errors, resetting the error count.
             LOG(":: ;\n");
             errCount = 0;
@@ -276,7 +278,7 @@ int runCommands(const char *(*advance)()) {
                     break;
                 case CMD_PAUSE:
                     // The "wait" string indicates the end of the signals.
-                    if (strcmp("wait", arg) == 0) {
+                    if (strequal("wait", arg)) {
                         LOG(":: start signal wait\n");
                         err = sigwait(&signalSet, &cmd);
                         LOG(":: wait complete\n");
