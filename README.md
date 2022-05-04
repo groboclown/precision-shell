@@ -22,6 +22,8 @@ Last build size:
     * musl: 26,120 bytes
     * dietlibc: 17,424 bytes
 
+*At some point, a decision should be made whether to keep these separate or just join them into a single executable.*
+
 
 ## What It Does
 
@@ -38,24 +40,15 @@ The shell supports these commands:
 * [chown](#chown) - change user and group owner for files.
 * [ln-s](#ln-s) - create a symbolic link.
 * [ln-h](#ln-h) - create a hard link.
-* [signal .. wait](#signal-wait) - wait for an OS signal before continuing. *Must be explitly turned on.*
+* [signal .. wait](#signal-wait) - wait for an OS signal before continuing. *Only available in signal-enabled builds.*
 
-It also supports command chaining through `&&` and `;`.  `&&` stops the execution if the previous command failed and allows anothe command after it; and `;` resets the error count to 0 and allows another command to follow it.
+It also supports:
+* [Chaining commands](#command-chaining) together with `&&` and `;`.
+* [Standard script argument flag](#standard-script-flag) - if passed with the arguments `-c "commands"`, then the shell will parse the commands argument into individual commands.
+* [Script files](#script-files) - as an argument if used with `-f script-file-name`.  *Only available in input-enabled builds.*
+* [Commands from stdin](#passing-commands-from-stdin) - With the `-` argument, commands are parsed from stdin.  *Only available in input-enabled builds.*
 
-```bash
-$ ls
-fs-shell
-$ ./fs-shell -c "echo abc && rmdir does-not-exist ; echo dce"
-abc
-ERROR rmdir: does-not-exist
-dce
-$ ./fs-shell -c "echo abc && rmdir does-not-exist && echo dce"
-abc
-ERROR rmdir: does-not-exist
-FAIL &&
-```
-
-You can also use it in Docker or Podman as a default shell, which is useful if you need file modifications to an image that has no shell.
+This allows you to use it in Docker or Podman as a default shell, which is useful if you need file modifications to an image that has no shell.
 
 ```Dockerfile
 FROM super-skinny-image:11.12
@@ -69,12 +62,6 @@ RUN echo Startup \
     && rmdir /tmp \
     echo Complete
 ```
-
-This done through a special situation if there are exactly 2 arguments, and the first is `-c`.  In this specific situation, the shell will parse the second argument through limited formatting rules:
-
-* A space character (` `), tab, and newline separates arguments.  Newline does not act as a command separator.
-* Pairs of quote characters (`"` and `'`) can encapsulate text, allowing space characters and other quote characters to be part of an argument, rather than separating arguments.
-* Characters can be escaped by adding a backslash (`\`) character.  `\n` turns into a newline, `\r` into a linefeed, `\t` into a tab, and anything else is the character itself.  This is how quote characters can be added, as well as an alternate to adding a space to an argument.
 
 
 ## What It Doesn't Do
@@ -212,6 +199,51 @@ Of note, once a signal is added to the list, it is registered for standard OS ig
 ```
 
 This will cause the shell to ignore SIGINT (2, usually sent by a ctrl-c input), and wait for SIGTERM (15).
+
+
+### Chaining Commands
+
+Like most shells, you can chain commands together with `&&` and `;`.  `&&` stops the execution if the previous command failed and allows anothe command after it; and `;` resets the error count to 0 and allows another command to follow it.
+
+```bash
+$ ls
+fs-shell
+$ ./fs-shell -c "echo abc && rmdir does-not-exist ; echo dce"
+abc
+ERROR rmdir: does-not-exist
+dce
+$ ./fs-shell -c "echo abc && rmdir does-not-exist && echo dce"
+abc
+ERROR rmdir: does-not-exist
+FAIL &&
+```
+
+
+### Standard Script Flag
+
+The tool also supports invoking it with the arguments `-c "commands"` to simulate running the second argument as a script.
+
+The parsing is kept simple, and follows these rules:
+
+* A space character (` `), tab, and linefeed (`\r`) separates arguments.
+* The parser will handle newlines (`\n`) differently depending on whether you use an input-enabled build or not.  With an input-enabled build, newlines are treated like inserting a `;` between commands, whereas a non-input-enabled build treats newlines like a space.
+* Pairs of quote characters (`"` and `'`) can encapsulate text, allowing space characters and other quote characters to be part of an argument, rather than separating arguments.
+* Characters can be escaped by adding a backslash (`\`) character.  `\n` turns into a newline, `\r` into a linefeed, `\t` into a tab, and anything else is the character itself.  This is how quote characters can be added, as well as an alternate to adding a space to an argument.
+
+
+
+
+### Script Files
+
+If you use the input-enabled build, then you can pass the arguments `-f script-file-name` to run that file as a set of commands.
+
+In this mode, the newline character acts like joining the two lines with a [`;`](#chaining-commands).
+
+
+### Passing Commands from stdin
+
+If you use the input-enabled build, then you can pass the argument `-` to have the tool read commands from stdin.
+
 
 ## Building
 

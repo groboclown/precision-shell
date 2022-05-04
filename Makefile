@@ -19,33 +19,33 @@ clean:
 	fs-shell-signal-input.o fs-shell-signal-input-debug.o
 
 
-fs-shell.o: fs-shell.c commands.c args.c
+fs-shell.o: fs-shell.c commands.c args-argv.c
 	$(CC) $(CFLAGS) $(MINFLAGS) $? $(LDFLAGS) -o $@
 
 
-fs-shell-debug.o: fs-shell.c commands.c args.c
+fs-shell-debug.o: fs-shell.c commands.c args-argv.c
 	$(CC) $(CFLAGS) -DDEBUG=1 -static $? $(LDFLAGS) -o $@
 
 
-fs-shell-signal.o: fs-shell.c commands.c args.c
+fs-shell-signal.o: fs-shell.c commands.c args-argv.c
 	$(CC) $(CFLAGS) $(MINFLAGS) -DUSE_SIGNALS=1 -static $? $(LDFLAGS) -o $@
 
 
-fs-shell-signal-debug.o: fs-shell.c commands.c args.c
+fs-shell-signal-debug.o: fs-shell.c commands.c args-argv.c
 	$(CC) $(CFLAGS) -DDEBUG=1 -DUSE_SIGNALS=1 -static $? $(LDFLAGS) -o $@
 
 
-fs-shell-input.o: fs-shell.c commands.c uses-input-args.c
+fs-shell-input.o: fs-shell.c commands.c args-input.c
 	$(CC) $(CFLAGS) $(MINFLAGS) -DUSES_INPUT=1 $? $(LDFLAGS) -o $@
 
 
-fs-shell-input-debug.o: fs-shell.c commands.c uses-input-args.c
+fs-shell-input-debug.o: fs-shell.c commands.c args-input.c
 	$(CC) $(CFLAGS) -DDEBUG=1 -DUSES_INPUT=1 -static $? $(LDFLAGS) -o $@
 
 
-fs-shell-signal-input.o: fs-shell.c commands.c uses-input-args.c
+fs-shell-signal-input.o: fs-shell.c commands.c args-input.c
 	$(CC) $(CFLAGS) $(MINFLAGS) -DUSE_SIGNALS=1 -DUSES_INPUT=1 -static $? $(LDFLAGS) -o $@
 
 
-fs-shell-signal-input-debug.o: fs-shell.c commands.c uses-input-args.c
+fs-shell-signal-input-debug.o: fs-shell.c commands.c args-input.c
 	$(CC) $(CFLAGS) -DDEBUG=1 -DUSE_SIGNALS=1 -DUSES_INPUT=1 -static $? $(LDFLAGS) -o $@

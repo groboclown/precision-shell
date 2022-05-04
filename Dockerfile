@@ -21,7 +21,7 @@ LABEL name="local/fs-shell" \
 # docker will use it as the default shell when it encounters
 # the "RUN" instruction.
 COPY --from=0 \
-    /opt/code/fs-shell \
+    /opt/code/fs-shell.o \
     /bin/sh
 
 ENTRYPOINT ["/bin/sh"]

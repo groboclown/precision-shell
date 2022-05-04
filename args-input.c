@@ -256,6 +256,7 @@ void tokenizeBuffer(int isComplete) {
                 }
                 break;
             case ' ':
+            case '\r':
             case '\t':
                 if (_parseState == PARSE_PLAIN) {
                     // inside an argument.  This ends it.
@@ -325,9 +326,18 @@ void tokenizeBuffer(int isComplete) {
     if (isComplete) {
         _inputBuffer[_inputBufferTarget] = 0;
         _inputBufferLastArgStart = _inputBufferLen;
-        LOG(":: Parsed argument '");
-        LOG(_parsedArgs[_parsedArgLen-1]);
-        LOG("'\n");
+        if (_parseState != PARSE_SEARCH) {
+            _parsedArgLen++;
+        }
+#ifdef DEBUG
+        if (_parsedArgLen > 0) {
+            LOG(":: Parsed last argument '");
+            LOG(_parsedArgs[_parsedArgLen-1]);
+            LOG("'\n");
+        } else {
+            LOG(":: No last argument to parse\n");
+        }
+#endif
     } else if (_parseState == PARSE_SEARCH) {
         _inputBufferLastArgStart = _inputBufferLen;
     } else if (_parsedArgLen > 0) {
@@ -355,6 +365,7 @@ int setupTokenizer(const int srcArgc, char *srcArgv[]) {
         _parsedArgs = malloc(sizeof(char *) * DEFAULT_PARSED_ARG_SIZE);
         _parsedArgAllocated = 1;
         if (_parsedArgs == NULL) {
+            stderrP("ERROR malloc failed\n");
             return 1;
         }
         _parsedArgSize = DEFAULT_PARSED_ARG_SIZE;
@@ -362,6 +373,7 @@ int setupTokenizer(const int srcArgc, char *srcArgv[]) {
         _inputBuffer = malloc(sizeof(char *) * DEFAULT_INPUT_BUFFER_SIZE);
         _inputBufferAllocated = 1;
         if (_inputBuffer == NULL) {
+            stderrP("ERROR malloc failed\n");
             return 1;
         }
         _inputBufferSize = DEFAULT_INPUT_BUFFER_SIZE;
@@ -375,12 +387,13 @@ int setupTokenizer(const int srcArgc, char *srcArgv[]) {
             LOGLN(srcArgv[2]);
             _inputFD = open(srcArgv[2], O_RDONLY);
             if (_inputFD == -1) {
-                // TODO report error
+                stderrP("ERROR opening file ");
+                stderrPLn(srcArgv[2]);
                 return 1;
             }
         } else {
-            // ERROR STATE - invalid condition
-            return 1;
+            // ERROR STATE - invalid program state
+            return 15;
         }
     } else if (srcArgc == 3 && strcmp("-c", srcArgv[1]) == 0) {
         // Use the srcArgv[2] as a full script.
