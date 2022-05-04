@@ -16,6 +16,7 @@ fi
 # -s : file exists and not empty
 if [ -s out.txt ] ; then
     echo "Generated output to stdout"
+    cat out.txt
     exit 1
 fi
 

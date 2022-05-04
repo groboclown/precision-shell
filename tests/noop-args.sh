@@ -13,6 +13,10 @@ fi
 # -s : file exists and not empty
 if [ -s out.txt ] || [ -s err.txt ] ; then
     echo "Generated output to stdout or stderr"
+    echo "stdout:"
+    cat out.txt
+    echo "stderr:"
+    cat err.txt
     exit 1
 fi
 

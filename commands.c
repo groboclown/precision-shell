@@ -24,7 +24,6 @@ SOFTWARE.
 
 #include <stdlib.h>
 #include <stdio.h>
-#include <string.h>
 #include <sys/stat.h>
 #include <signal.h>
 #include <errno.h>
@@ -40,13 +39,8 @@ SOFTWARE.
 #define CMD_CHOWN 7
 #define CMD_HLINK 8
 #define CMD_SLINK 9
-#define CMD_PAUSE 10
-
-#define PARSE_SEARCH 0
-#define PARSE_PLAIN  1
-#define PARSE_DOUBLE 2
-#define PARSE_SINGLE 3
-#define PARSE_END 4
+#define CMD_MV    10
+#define CMD_PAUSE 11
 
 
 static char *EMPTY_STR = "";
@@ -151,18 +145,21 @@ int runCommands(const char *(*advance)()) {
                 }
             } else if (strcmp("ln-s", cmdName) == 0) {
                 // symbolic link.  Special case where next arg is source and
-                // the following arg is the destination.
+                //   the following arg is the destination.
                 // Due to the way error handling is done, the two arguments
-                // are parsed when the first one is encountered.  That means
-                // "ln-s && noop" is the same as "noop && noop"
+                //   are parsed when the first one is encountered.  That means
+                //   "ln-s && noop" is the same as "noop && noop"
                 cmd = CMD_SLINK;
             } else if (strcmp("ln-h", cmdName) == 0) {
                 // hard link.  Special case where next arg is source and
-                // the following arg is the destination.
+                //   the following arg is the destination.
                 // Due to the way error handling is done, the two arguments
-                // are parsed when the first one is encountered.  That means
-                // "ln-h && noop" is the same as "noop && noop"
+                //   are parsed when the first one is encountered.  That means
+                //   "ln-h && noop" is the same as "noop && noop"
                 cmd = CMD_HLINK;
+            } else if (strcmp("mv", cmdName) == 0) {
+                // Move file.  Similar to ln-s and ln-h.
+                cmd = CMD_MV;
             } else if (strcmp("signal", cmdName) == 0) {
                 // Marks the start of a signal wait.
                 sigemptyset(&signalSet);
@@ -250,35 +247,27 @@ int runCommands(const char *(*advance)()) {
                     err = chmod(arg, val1);
                     break;
                 case CMD_SLINK:
-                    // On first argument of symlink request.  Need to find next argument.
-                    // increase i to point to second argument.
-                    arg2 = (*advance)();
-                    if (arg2 == NULL) {
-                        err = 1;
-                    } else {
-                        LOG(":: ln-s ");
-                        LOG(arg);
-                        LOG(" ");
-                        LOGLN(arg2);
-                        err = symlink(arg, arg2);
-                        // Because this command only takes 2 arguments, set the
-                        // current command as err.  Because we keep the real command name
-                        // in cmdName, this change doesn't affect error reporting.
-                        cmd = CMD_ERR;
-                    }
-                    break;
                 case CMD_HLINK:
-                    // On first argument of symlink request.  Need to find next argument.
+                case CMD_MV:
+                    // On first argument of the request.  Need to find next argument.
                     // increase i to point to second argument.
                     arg2 = (*advance)();
                     if (arg2 == NULL) {
                         err = 1;
                     } else {
-                        LOG(":: ln-h ");
+                        LOG(":: ");
+                        LOG(cmdName);
+                        LOG(" ");
                         LOG(arg);
                         LOG(" ");
                         LOGLN(arg2);
-                        err = link(arg, arg2);
+                        if (cmd == CMD_SLINK) {
+                            err = symlink(arg, arg2);
+                        } else if (cmd == CMD_HLINK) {
+                            err = link(arg, arg2);
+                        } else if (cmd == CMD_MV) {
+                            err = rename(arg, arg2);
+                        }
                         // Because this command only takes 2 arguments, set the
                         // current command as err.  Because we keep the real command name
                         // in cmdName, this change doesn't affect error reporting.

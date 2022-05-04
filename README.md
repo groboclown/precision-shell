@@ -19,6 +19,7 @@ The shell supports these commands:
 * [echo](#echo) - send text to `stdout`.
 * [rm](#rm) - remove files.
 * [rmdir](#rmdir) - remove empty directories.
+* [mv](#mv) - move a file from one name to another.
 * [mkdir](#mkdir) - create an empty directory.
 * [chmod](#chmod) - change file permissions.
 * [chown](#chown) - change user and group owner for files.
@@ -26,7 +27,7 @@ The shell supports these commands:
 * [ln-h](#ln-h) - create a hard link.
 * [signal .. wait](#signal-wait) - wait for an OS signal before continuing.
 
-It also supports command chaining through `&&` and `;` :
+It also supports command chaining through `&&` and `;`.  `&&` stops the execution if the previous command failed and allows anothe command after it; and `;` resets the error count to 0 and allows another command to follow it.
 
 ```bash
 $ ls
@@ -58,8 +59,8 @@ RUN echo Startup \
 
 This done through a special situation if there are exactly 2 arguments, and the first is `-c`.  In this specific situation, the shell will parse the second argument through limited formatting rules:
 
-* A space character (` `) separates arguments.
-* Pairs of quote characters (`"` and `'`) can encapsulate text, allowing space characters to be part of an argument, rather than separating arguments.
+* A space character (` `), tab, and newline separates arguments.  Newline does not act as a command separator.
+* Pairs of quote characters (`"` and `'`) can encapsulate text, allowing space characters and other quote characters to be part of an argument, rather than separating arguments.
 * Characters can be escaped by adding a backslash (`\`) character.  `\n` turns into a newline, `\r` into a linefeed, `\t` into a tab, and anything else is the character itself.  This is how quote characters can be added, as well as an alternate to adding a space to an argument.
 
 
@@ -77,6 +78,7 @@ This done through a special situation if there are exactly 2 arguments, and the 
 * Change current directory.
 * Provide splat pattern replacements.
 * Use environment variables.
+* Flow control (if logic and loops) outside of early exit due to prior errors.
 * Background jobs or job control.
 * Allow for interactive execution.
 * Anything with the network.
@@ -126,6 +128,12 @@ Usage: `rmdir (dir1 (dir2 ...))`
 
 Removes each empty directory passed as an argument.  If a directory is not empty, the command will fail.  The command will attempt to remove each directory, and if any of them fail, then the whole command fails with an exit code equal to the sum of the number of failed files.
 
+### mv
+
+Usage: `mv (src file) (target file)`
+
+Renames the file referenced by the first argument to a new name referenced by the second argument.  If the operation fails, or if there is no second argument, then the command fails with an exit code of 1.
+
 ### mkdir
 
 Usage: `mkdir (octal mode) (file1 (file2 ...))`
@@ -172,7 +180,7 @@ Creates a hard link named dest file, pointing to src file.
 
 ### signal-wait
 
-Usage: `signal [signal1 [signal2]] wait`
+Usage: `signal [signal1 [signal2]] [wait]`
 
 Waits for any of the OS signal number arguments before continuing.  If no signal is given (just `signal wait`), then it waits for a standard OS interruption, which will kill the whole process.
 

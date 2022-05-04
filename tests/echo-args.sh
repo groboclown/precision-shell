@@ -13,6 +13,7 @@ fi
 # -s : file exists and not empty
 if [ -s err.txt ] ; then
     echo "Generated output to stderr"
+    cat err.txt
     exit 1
 fi
 if [ "$( printf "a\\nb\\n123\\na123\\na b c\\n" )" != "$( cat out.txt )" ] ; then

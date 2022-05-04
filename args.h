@@ -21,30 +21,22 @@ LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
 */
-#ifndef FS_SHELL_OUTPUT
-#define FS_SHELL_OUTPUT
+#ifndef FS_SHELL_ARGS
+#define FS_SHELL_ARGS
 
-#include <stdio.h>
-#include <unistd.h>
-#include <string.h>
+typedef const char *(*TokenAdvanceFuncPtr)();
 
-// We explicitly don't care about the return code from writing to stdout or stderr.
-#pragma GCC diagnostic push
-#pragma GCC diagnostic ignored "-Wunused-result"
+/**
+ * @brief Parse the shell execution request into tokens
+ * 
+ * @return token advancement call.
+ */
+TokenAdvanceFuncPtr tokenizeRequest(const int srcArgc, char *srcArgv[]);
 
-#define stdoutP(text) write(STDOUT_FILENO, (text), strlen(text))
-#define stdoutPLn(text) write(STDOUT_FILENO, (text), strlen(text)); write(STDOUT_FILENO, "\n", 1);
-#define stderrP(text) write(STDERR_FILENO, (text), strlen(text))
-#define stderrPLn(text) write(STDERR_FILENO, (text), strlen(text)); write(STDERR_FILENO, "\n", 1);
-
-#ifdef DEBUG
-#define LOG(text) stdoutP(text)
-#define LOG1(text) write(STDOUT_FILENO, (text), 1)
-#define LOGLN(text) stdoutPLn(text)
-#else
-#define LOG(text)
-#define LOG1(text)
-#define LOGLN(text)
-#endif
+/**
+ * @brief Clean out the tokenizer after using it.
+ * 
+ */
+void closeTokenizer();
 
 #endif
