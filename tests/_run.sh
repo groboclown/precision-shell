@@ -1,9 +1,5 @@
 #/bin/bash
 
-# Make sure we're in the right directory.
-test -x _before-each.sh || exit 99
-test -x _after-each.sh || exit 99
-
 # Make sure the tests are setup right.
 test -d "${TEST_TMP_DIR}" || exit 99
 test -x "${FS_SHELL}" || exit 99
@@ -25,6 +21,8 @@ get_abs_filename() {
   fi
 }
 
+myself="$( get_abs_filename $0 )"
+here="$( dirname "${myself}" )"
 
 export UID0=$( id -u )
 export GID0=$( id -g )
@@ -42,19 +40,32 @@ for test_name in "$@" ; do
         echo "-------------------------------------------"
         echo "${TEST_NAME}"
         cat "${test_script}" | sed -n 's/# desc: \(.*\)/>> \1/p'
-        
-        ${RUNNER} ./_before-each.sh
-        if [ $? -ne 0 ] ; then
-            FAILED=$(( FAILED + 1 ))
-        else
-            ( cd "${TEST_DIR}" && ${RUNNER} ${test_script} )
+        # Check if the required version is being run.
+        requirements="$( cat "${test_script}" | sed -n 's/# requires: \(.*\)/\1/p' )"
+        # Note that this requires running the command version before it's tested...
+        dorun=1
+        if [ ! -z "${requirements}" ] ; then
+            "${FS}" version | grep "${requirements}" >/dev/null 2>&1
             if [ $? -ne 0 ] ; then
-                FAILED=$(( FAILED + 1 ))
+                echo "!! SKIPPED because ${FS} does not support ${requirements}"
+                dorun=0
             fi
         fi
-        # Always run the after each, and ignore failures.
-        ${RUNNER} ./_after-each.sh
+        if [ "${dorun}" == 1 ] ; then
+            ${RUNNER} "${here}/_before-each.sh"
+            if [ $? -ne 0 ] ; then
+                FAILED=$(( FAILED + 1 ))
+            else
+                ( cd "${TEST_DIR}" && ${RUNNER} ${test_script} )
+                if [ $? -ne 0 ] ; then
+                    FAILED=$(( FAILED + 1 ))
+                fi
+            fi
+            # Always run the after each, and ignore failures.
+            ${RUNNER} "${here}/_after-each.sh"
+        fi
         echo ""
     fi
 done
+echo "${FS_SHELL} - ${FAILED} failure(s)"
 exit ${FAILED}

@@ -28,43 +28,8 @@ SOFTWARE.
  * At last count, this file compiled is huge, at 894 kilobytes.
  *
  * It is intended to be used as a non-interactive shell replacement.
- *
- * Usage:
- *   fshell (cmd)
- * Where:
- *   cmd: one of:
- *        cmd-part
- *        cmd-part "&&" cmd
- *        cmd-part ";" cmd
- *   cmd-part: one of:
- *        noop (file1 (file2 ...))
- *          does nothing.
- *        echo (str1 (str2 ...))
- *          prints each argument to STDOUT with a newline between them
- *        rm (file1 (file2 ...))
- *          unlinks (removes) each file, hardlink, or symlink argument
- *        rmdir (file1 (file2 ...))
- *          removes each directory.  They must be empty first
- *        mkdir (octal mode) (file1 (file2 ...))
- *          creates the directories with the file mode
- *        chmod (octal mode) (file1 (file2 ...))
- *          changes the file mode for each file, directory, or symlink argument
- *        chown (uid) (gid) (file1 (file2 ...))
- *          changes the owner and group ID for each file, directory, or symlink argument
- *        ln-s (src file) (dest file)
- *          creates a symbolic link named dest file, pointing to src file.
- *        ln-h (src file) (dest file)
- *          creates a hard link named dest file, pointing to src file.
- *        mv (src file) (dest file)
- *          moves src file to a new file named dest file.
- *        signal [sig1 [sig2 ...]] [wait]
- *          if "wait" is given, waits for any of the signals to be sent to the
- *          shell's process, or for a termination signal to be sent to the
- *          process.  Any signal numbers given will be ignored for the remainder
- *          of the shell execution, unless waited on.
- *
- * Commands like "cp" are not supported, because those should be done through
- * Docker ADD and COPY instructions.
+ * 
+ * See "commands.c" for a list of supported commands.
  */
 #include <stddef.h>
 #include "args.h"
@@ -72,12 +37,10 @@ SOFTWARE.
 
 
 int main(const int srcArgc, char *srcArgv[]) {
-    TokenAdvanceFuncPtr advance = tokenizeRequest(srcArgc, srcArgv);
-    if (advance == NULL) {
-        return 1;
+    int ret = setupTokenizer(srcArgc, srcArgv);
+    if (!ret) {
+        ret = runCommands();
     }
-    int ret = runCommands(advance);
-
-    closeTokenizer();
+    ret += closeTokenizer();
     return ret;
 }

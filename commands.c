@@ -29,20 +29,25 @@ SOFTWARE.
 #include <errno.h>
 #include "output.h"
 #include "general.h"
+#include "args.h"
+#include "version.h"
 #include "commands.h"
 
-#define CMD_ERR   0
-#define CMD_NOOP  1
-#define CMD_ECHO  2
-#define CMD_RM    3
-#define CMD_RMDIR 4
-#define CMD_MKDIR 5
-#define CMD_CHMOD 6
-#define CMD_CHOWN 7
-#define CMD_HLINK 8
-#define CMD_SLINK 9
-#define CMD_MV    10
-#define CMD_PAUSE 11
+#define CMD_ERR     0
+#define CMD_NOOP    1
+#define CMD_ECHO    2
+#define CMD_VERSION 3
+#define CMD_RM      3
+#define CMD_RMDIR   4
+#define CMD_MKDIR   5
+#define CMD_CHMOD   6
+#define CMD_CHOWN   7
+#define CMD_HLINK   8
+#define CMD_SLINK   9
+#define CMD_MV      10
+#ifdef USE_SIGNALS
+#define CMD_PAUSE   11
+#endif
 
 
 static char *EMPTY_STR = "";
@@ -51,8 +56,48 @@ void emptySignalHandler(int signal) {
     LOG(":: handled signal\n");
 }
 
-
-int runCommands(const char *(*advance)()) {
+/*
+ * Usage:
+ *   fs-shell (cmd)
+ * Where:
+ *   cmd: one of:
+ *        cmd-part
+ *        cmd-part "&&" cmd
+ *        cmd-part ";" cmd
+ *   cmd-part: one of:
+ *        version
+ *          prints the current version, including compile flags that affect
+ *          which commands are supported.
+ *        noop (file1 (file2 ...))
+ *          does nothing.
+ *        echo (str1 (str2 ...))
+ *          prints each argument to STDOUT with a newline between them
+ *        rm (file1 (file2 ...))
+ *          unlinks (removes) each file, hardlink, or symlink argument
+ *        rmdir (file1 (file2 ...))
+ *          removes each directory.  They must be empty first
+ *        mkdir (octal mode) (file1 (file2 ...))
+ *          creates the directories with the file mode
+ *        chmod (octal mode) (file1 (file2 ...))
+ *          changes the file mode for each file, directory, or symlink argument
+ *        chown (uid) (gid) (file1 (file2 ...))
+ *          changes the owner and group ID for each file, directory, or symlink argument
+ *        ln-s (src file) (dest file)
+ *          creates a symbolic link named dest file, pointing to src file.
+ *        ln-h (src file) (dest file)
+ *          creates a hard link named dest file, pointing to src file.
+ *        mv (src file) (dest file)
+ *          moves src file to a new file named dest file.
+ *        signal [sig1 [sig2 ...]] [wait]
+ *          if "wait" is given, waits for any of the signals to be sent to the
+ *          shell's process, or for a termination signal to be sent to the
+ *          process.  Any signal numbers given will be ignored for the remainder
+ *          of the shell execution, unless waited on.
+ *
+ * Commands like "cp" are not supported, because those should be done through
+ * Docker ADD and COPY instructions.
+ */
+int runCommands() {
     long val1 = 0;
     long val2 = 0;
     int err = 0;
@@ -60,12 +105,14 @@ int runCommands(const char *(*advance)()) {
     int cmd = CMD_ERR;
     const char *arg2 = EMPTY_STR;
     const char *cmdName = EMPTY_STR;
+#ifdef USE_SIGNALS
     sigset_t signalSet;
+#endif
 
     int isCmdStart = 1;
 
     // Inefficient loop in terms of performance, but condenses the code.
-    const char *arg = (*advance)();
+    const char *arg = advanceToken();
 
     while (arg != NULL) {
         // ----------------------------------------
@@ -80,13 +127,18 @@ int runCommands(const char *(*advance)()) {
             LOG("'\n");
 
             // ends the loop prematurely, so need to explicitly advance the argument.
-            arg = (*advance)();
+            arg = advanceToken();
 
             // Command name check is done here.
             if (strequal("noop", cmdName)) {
                 cmd = CMD_NOOP;
             } else if (strequal("echo", cmdName)) {
                 cmd = CMD_ECHO;
+            } else if (strequal("version", cmdName)) {
+                // print the version and force the next values to be
+                //   another command.
+                stdoutP(VERSION_STR);
+                cmd = CMD_ERR;
             } else if (strequal("rm", cmdName)) {
                 cmd = CMD_RM;
             } else if (strequal("rmdir", cmdName)) {
@@ -103,7 +155,7 @@ int runCommands(const char *(*advance)()) {
                         // and do not advance arg, because we want to report
                         // this error.
                     } else {
-                        arg = (*advance)();
+                        arg = advanceToken();
                     }
                 }
             } else if (strequal("chmod", cmdName)) {
@@ -118,7 +170,7 @@ int runCommands(const char *(*advance)()) {
                         // and do not advance arg, because we want to report
                         // this error.
                     } else {
-                        arg = (*advance)();
+                        arg = advanceToken();
                     }
                 }
             } else if (strequal("chown", cmdName)) {
@@ -132,7 +184,7 @@ int runCommands(const char *(*advance)()) {
                         // and do not advance arg, because we want to report
                         // this error.
                     } else {
-                        arg = (*advance)();
+                        arg = advanceToken();
                         if (arg != NULL) {
                             val2 = strtoul(arg, (char **)NULL, 10);
                             if (errno != 0 || val1 < 0 || val1 > 0xffff) {
@@ -140,7 +192,7 @@ int runCommands(const char *(*advance)()) {
                                 // and do not advance arg, because we want to report
                                 // this error.
                             } else {
-                                arg = (*advance)();
+                                arg = advanceToken();
                             }
                         }
                     }
@@ -162,10 +214,12 @@ int runCommands(const char *(*advance)()) {
             } else if (strequal("mv", cmdName)) {
                 // Move file.  Similar to ln-s and ln-h.
                 cmd = CMD_MV;
+#ifdef USE_SIGNALS
             } else if (strequal("signal", cmdName)) {
                 // Marks the start of a signal wait.
                 sigemptyset(&signalSet);
                 cmd = CMD_PAUSE;
+#endif
             } else {
                 // Unknown command.
                 cmd = CMD_ERR;
@@ -253,7 +307,7 @@ int runCommands(const char *(*advance)()) {
                 case CMD_MV:
                     // On first argument of the request.  Need to find next argument.
                     // increase i to point to second argument.
-                    arg2 = (*advance)();
+                    arg2 = advanceToken();
                     if (arg2 == NULL) {
                         err = 1;
                     } else {
@@ -276,6 +330,7 @@ int runCommands(const char *(*advance)()) {
                         cmd = CMD_ERR;
                     }
                     break;
+#ifdef USE_SIGNALS
                 case CMD_PAUSE:
                     // The "wait" string indicates the end of the signals.
                     if (strequal("wait", arg)) {
@@ -297,6 +352,7 @@ int runCommands(const char *(*advance)()) {
                         }
                     }
                     break;
+#endif /* USE_SIGNALS */
 #ifdef DEBUG
                 case CMD_NOOP:
                     LOG(":: noop ");
@@ -319,7 +375,7 @@ int runCommands(const char *(*advance)()) {
             stderrPLn(arg);
             errCount++;
         }
-        arg = (*advance)();
+        arg = advanceToken();
     }
 
     return errCount;

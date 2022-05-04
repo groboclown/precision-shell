@@ -3,8 +3,7 @@
 # desc: chown against a file with existing user id + group id with permissions to change them.
 
 if [ "${UID0}" -ne 0 ] ; then
-    echo "WARNING SKIPPING TEST"
-    echo "  Not enough permissions to run it."
+    echo "!! SKIPPED because not enough permissions to run it."
     exit 0
 fi
 if [ "${UID0}" == "${UID1}" ] || [ "${GID0}" == "${GID1}" ] ; then

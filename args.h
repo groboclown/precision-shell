@@ -24,19 +24,29 @@ SOFTWARE.
 #ifndef FS_SHELL_ARGS
 #define FS_SHELL_ARGS
 
-typedef const char *(*TokenAdvanceFuncPtr)();
+/**
+ * @brief Parse the shell execution request into tokens.
+ * 
+ * After calling this and all advanceToken calls, "closeTokenizer()" must be called.
+ * 
+ * @return 0 if okay, != 0 if problem.
+ */
+int setupTokenizer(const int srcArgc, char *srcArgv[]);
 
 /**
- * @brief Parse the shell execution request into tokens
+ * @brief advance to the next token.
  * 
- * @return token advancement call.
+ * "tokenize" must be called first.
+ * 
+ * @return const char* 
  */
-TokenAdvanceFuncPtr tokenizeRequest(const int srcArgc, char *srcArgv[]);
+const char *advanceToken();
 
 /**
  * @brief Clean out the tokenizer after using it.
  * 
+ * @return int 0 if okay, non-zero if error.
  */
-void closeTokenizer();
+int closeTokenizer();
 
 #endif

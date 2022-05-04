@@ -39,7 +39,8 @@ static int _argc = 0;
 static int _argi = 0;
 static int _allocated = 0;
 
-const char *advance() {
+
+const char *advanceToken() {
     if (_argi < _argc) {
         return _argv[_argi++];
     }
@@ -47,7 +48,7 @@ const char *advance() {
 }
 
 
-TokenAdvanceFuncPtr tokenizeRequest(const int srcArgc, char *srcArgv[]) {
+int setupTokenizer(const int srcArgc, char *srcArgv[]) {
     _argc = srcArgc;
     _argv = srcArgv;
     _argi = 1;
@@ -76,7 +77,7 @@ TokenAdvanceFuncPtr tokenizeRequest(const int srcArgc, char *srcArgv[]) {
             _argv = malloc(sizeof(char *) * maxArgs);
             if (_argv == NULL) {
                 stderrP("ERROR malloc failed\n");
-                return NULL;
+                return 1;
             }
             _allocated = 1;
             _argv[0] = &(srcArgv[0][0]);
@@ -203,13 +204,14 @@ TokenAdvanceFuncPtr tokenizeRequest(const int srcArgc, char *srcArgv[]) {
             }
         }
     }
-    return &advance;
+    return 0;
 }
 
-void closeTokenizer() {
+int closeTokenizer() {
     // not needed, but we're nice.
     if (_allocated == 1) {
         free(_argv);
         _argv = NULL;
     }
+    return 0;
 }

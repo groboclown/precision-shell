@@ -25,11 +25,11 @@ SOFTWARE.
 #define FS_SHELL_COMMANDS
 
 /**
- * @brief Handle commands specified by the token generator.
+ * @brief Handle commands.  Uses the tokens returned by args.
  * 
  * @param advance the token generator function.
  * @return exit code.
  */
-int runCommands(const char *(*advance)());
+int runCommands();
 
 #endif

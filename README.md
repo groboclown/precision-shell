@@ -5,16 +5,29 @@ Sometimes, you just don't need a shell.  You just need minimal file system opera
 
 Last build size:
 
-* glibc: 823,752 bytes
-* musl: 22,024 bytes
-* dietlibc: 17,352 bytes
+* Minimal build:
+    * glibc: 819,656 bytes
+    * musl: 22,024 bytes
+    * dietlibc: 13,256 bytes
+* Handle os signals build:
+    * glibc: 823,752 bytes
+    * musl: 26,120 bytes
+    * dietlibc: 17,352 bytes
+* Read script from stdin or file build:
+    * glibc: 823,752 bytes
+    * musl: 26,120 bytes
+    * dietlibc: 17,424 bytes
+* Handle os signals + read script from stdin or file build:
+    * glibc: 827,848 bytes
+    * musl: 26,120 bytes
+    * dietlibc: 17,424 bytes
 
-*The "input" branch contains an experiment to be able to read the commands from a file or stdin, but it increases the size of the binary from 100 bytes (dietlibc) to 4k (musl).*
 
 ## What It Does
 
 The shell supports these commands:
 
+* [version](#version) - prints the current version.
 * [noop](#noop) - do nothing.
 * [echo](#echo) - send text to `stdout`.
 * [rm](#rm) - remove files.
@@ -25,7 +38,7 @@ The shell supports these commands:
 * [chown](#chown) - change user and group owner for files.
 * [ln-s](#ln-s) - create a symbolic link.
 * [ln-h](#ln-h) - create a hard link.
-* [signal .. wait](#signal-wait) - wait for an OS signal before continuing.
+* [signal .. wait](#signal-wait) - wait for an OS signal before continuing. *Must be explitly turned on.*
 
 It also supports command chaining through `&&` and `;`.  `&&` stops the execution if the previous command failed and allows anothe command after it; and `;` resets the error count to 0 and allows another command to follow it.
 
@@ -104,6 +117,12 @@ The "fs" in `fs-shell` can mean:
 
 ## Help
 
+### version
+
+Usage: `version`
+
+Prints the version information to stdout.  Any additional arguments generates an error.
+
 ### noop
 
 Usage: `noop (arg1 (arg2 ...))`
@@ -180,6 +199,8 @@ Creates a hard link named dest file, pointing to src file.
 
 ### signal-wait
 
+*Only available in signal-enabled builds.*
+
 Usage: `signal [signal1 [signal2]] [wait]`
 
 Waits for any of the OS signal number arguments before continuing.  If no signal is given (just `signal wait`), then it waits for a standard OS interruption, which will kill the whole process.
@@ -191,6 +212,12 @@ Of note, once a signal is added to the list, it is registered for standard OS ig
 ```
 
 This will cause the shell to ignore SIGINT (2, usually sent by a ctrl-c input), and wait for SIGTERM (15).
+
+## Building
+
+You can build the shell either by installing the autoconf tools locally and running `make`, or you can build it through a container technology by using the example `build-*.Dockerfile` files.
+
+The make generates a collection of different forms of the shell, depending on your needs.  They have different file sizes.
 
 
 ## Developing
@@ -204,16 +231,16 @@ chmod +x tests/*.sh && docker build -f test.Dockerfile .
 To build through Docker and capture the built executable:
 
 ```bash
-docker build -t local/fs-shell-musl -f build-musl.Dockerfile . \
-    && container=$( docker create local/fs-shell-musl ) \
-    && docker cp "${container}":/opt/code/fs-shell musl.fs-shell \
-    && docker cp "${container}":/opt/code/fs-shell-debug musl.fs-shell-debug \
-    && docker rm "${container}"
-docker build -t local/fs-shell-glibc -f build-glibc.Dockerfile . \
-    && container=$( docker create local/fs-shell-glibc ) \
-    && docker cp "${container}":/opt/code/fs-shell glibc.fs-shell \
-    && docker cp "${container}":/opt/code/fs-shell-debug glibc.fs-shell-debug \
-    && docker rm "${container}"
+for libname in glibc musl dietlibc ; do
+    docker build -t local/fs-shell-${libname} -f build-${libname}.Dockerfile . || exit 1
+    container=$( docker create local/fs-shell-${libname} ) || exit 1
+    for name in fs-shell fs-shell-signal fs-shell-input fs-shell-signal-input ; do
+        # no exit on error so we clean up the container right.
+        docker cp "${container}":/opt/code/${name}.o ${name}.${libname}.o
+        docker cp "${container}":/opt/code/${name}-debug.o ${name}-debug.${libname}.o
+    done
+    docker rm "${container}"
+done
 ```
 
 The build generates 2 versions of the shell: one with extra debug statements sent to stdout; and the normal, minimized version.

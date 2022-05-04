@@ -1,0 +1,33 @@
+name: Build
+on:
+  # Trigger the workflow on pushes to only the 'master' branch (this avoids duplicate checks being run e.g. for dependabot pull requests)
+  push:
+    branches: [main]
+  # Trigger the workflow on any pull request
+  pull_request:
+
+jobs:
+
+  build:
+    name: Build
+    needs: test
+    runs-on: ubuntu-latest
+    outputs:
+      version: ${{ steps.properties.outputs.version }}
+      changelog: ${{ steps.properties.outputs.changelog }}
+    steps:
+
+      # Check out current repository
+      - name: Fetch Sources
+        uses: actions/checkout@v3
+      
+      # Install tools
+      - name: Install Required tools
+        run: |
+          sudo apt-get update
+          sudo apt-get install podman containerd
+      
+      # Setup docker for building
+      - name: Test
+        run: |
+          podman build -f test.Dockerfile .
