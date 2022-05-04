@@ -8,6 +8,7 @@ glibc.fs-shell-debug
 dietlibc.fs-shell
 dietlibc.fs-shell-debug
 *.tar
+local-*
 
 # Test output
 .tmp/
