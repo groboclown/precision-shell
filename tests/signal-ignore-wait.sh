@@ -64,7 +64,7 @@ fi
 
 # Give the process a bit of time to die.
 sleep 1
-"${kill_exec}" "-0" "${childpid}"
+"${kill_exec}" "-0" "${childpid}" >/dev/null 2>&1
 res=$?
 if [ ${res} == 0 ] ; then
     echo "Did not terminate on signal."

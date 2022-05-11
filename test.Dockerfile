@@ -28,4 +28,8 @@ RUN \
     && FS_SHELL=/opt/code/fs-shell.o tests/_all.sh \
     && FS_SHELL=/opt/code/fs-shell-signal.o tests/_all.sh \
     && FS_SHELL=/opt/code/fs-shell-input.o tests/_all.sh \
-    && FS_SHELL=/opt/code/fs-shell-signal-input.o tests/_all.sh
+    && FS_SHELL=/opt/code/fs-shell-signal-input.o tests/_all.sh \
+    && FS_SHELL=/opt/code/fs-shell-exec.o tests/_all.sh \
+    && FS_SHELL=/opt/code/fs-shell-signal-exec.o tests/_all.sh \
+    && FS_SHELL=/opt/code/fs-shell-input-exec.o tests/_all.sh \
+    && FS_SHELL=/opt/code/fs-shell-signal-input-exec.o tests/_all.sh

@@ -13,11 +13,7 @@ Last build size:
     * glibc: 823,752 bytes
     * musl: 26,120 bytes
     * dietlibc: 17,352 bytes
-* Read script from stdin or file build:
-    * glibc: 823,752 bytes
-    * musl: 26,120 bytes
-    * dietlibc: 17,424 bytes
-* Handle os signals + read script from stdin or file build:
+* Full build (input signals, read script from stdin or file, execute a program):
     * glibc: 827,848 bytes
     * musl: 26,120 bytes
     * dietlibc: 17,424 bytes
@@ -42,7 +38,9 @@ The shell supports these commands:
 * [chown](#chown) - change user and group owner for files.
 * [ln-s](#ln-s) - create a symbolic link.
 * [ln-h](#ln-h) - create a hard link.
+* [sleep](#sleep) - wait for a number of seconds.
 * [signal .. wait](#signal-wait) - wait for an OS signal before continuing. *Only available in signal-enabled builds.*
+* [exec](#exec) - switch execution to a new process. *Only available in exec-enabled builds.*
 
 It also supports:
 * [Chaining commands](#command-chaining) together with `&&` and `;`.
@@ -186,6 +184,12 @@ Usage: `ln-h (src file) (dest file)`
 
 Creates a hard link named dest file, pointing to src file.
 
+### sleep
+
+Usage: `sleep (seconds ...)`
+
+Sleeps for the number of seconds in the argument.  If no arguments are given, or if an argument is not a positive integer, then it does nothing (no error).  If multiple, positive integers are given, then it sleeps for the sum of them.
+
 ### signal-wait
 
 *Only available in signal-enabled builds.*
@@ -202,6 +206,15 @@ Of note, once a signal is added to the list, it is registered for standard OS ig
 
 This will cause the shell to ignore SIGINT (2, usually sent by a ctrl-c input), and wait for SIGTERM (15).
 
+### exec
+
+*Only available in exec-enabled builds.*
+
+Usage: `exec (cmd) [arg1 [arg2 ...]]`
+
+Reads the remaining arguments (even `;` and `&&`, thus it ignores command chaining), and replaces the current process with the new one.  If the command argument is not given, then this fails.
+
+Commands must be given in the full path; it doesn't look at any environment variable like `PATH`.
 
 ### Chaining Commands
 

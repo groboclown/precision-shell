@@ -8,15 +8,27 @@ all: \
 	fs-shell.o fs-shell-debug.o \
 	fs-shell-signal.o fs-shell-signal-debug.o \
 	fs-shell-input.o fs-shell-input-debug.o \
-	fs-shell-signal-input.o fs-shell-signal-input-debug.o
+	fs-shell-signal-input.o fs-shell-signal-input-debug.o \
+	fs-shell-exec.o fs-shell-exec-debug.o \
+	fs-shell-signal-exec.o fs-shell-signal-exec-debug.o \
+	fs-shell-input-exec.o fs-shell-input-exec-debug.o \
+	fs-shell-signal-input-exec.o fs-shell-signal-input-exec-debug.o \
+	fs-shell-lean.o fs-shell-fat.o
 
 
+# Note that the arguments to the rm match the all parameters.
 .PHONY: clean
 clean:
-	rm fs-shell.o fs-shell-debug.o \
+	rm \
+	fs-shell.o fs-shell-debug.o \
 	fs-shell-signal.o fs-shell-signal-debug.o \
 	fs-shell-input.o fs-shell-input-debug.o \
 	fs-shell-signal-input.o fs-shell-signal-input-debug.o
+	fs-shell-exec.o fs-shell-exec-debug.o \
+	fs-shell-input-exec.o fs-shell-input-exec-debug.o \
+	fs-shell-signal-exec.o fs-shell-signal-exec-debug.o \
+	fs-shell-signal-input-exec.o fs-shell-signal-input-exec-debug.o \
+	fs-shell-lean.o fs-shell-fat.o
 
 
 fs-shell.o: fs-shell.c commands.c args-argv.c
@@ -49,3 +61,41 @@ fs-shell-signal-input.o: fs-shell.c commands.c args-input.c
 
 fs-shell-signal-input-debug.o: fs-shell.c commands.c args-input.c
 	$(CC) $(CFLAGS) -DDEBUG=1 -DUSE_SIGNALS=1 -DUSES_INPUT=1 -static $? $(LDFLAGS) -o $@
+
+
+fs-shell-exec.o: fs-shell.c commands.c args-input.c
+	$(CC) $(CFLAGS) $(MINFLAGS) -DUSE_EXEC=1 $? $(LDFLAGS) -o $@
+
+
+fs-shell-exec-debug.o: fs-shell.c commands.c args-input.c
+	$(CC) $(CFLAGS) -DDEBUG=1 -DUSE_EXEC=1 -static $? $(LDFLAGS) -o $@
+
+
+fs-shell-signal-exec.o: fs-shell.c commands.c args-input.c
+	$(CC) $(CFLAGS) $(MINFLAGS) -DUSE_SIGNALS=1 -DUSE_EXEC=1 -static $? $(LDFLAGS) -o $@
+
+
+fs-shell-signal-exec-debug.o: fs-shell.c commands.c args-input.c
+	$(CC) $(CFLAGS) -DDEBUG=1 -DUSE_SIGNALS=1 -DUSE_EXEC=1 -static $? $(LDFLAGS) -o $@
+
+
+fs-shell-input-exec.o: fs-shell.c commands.c args-input.c
+	$(CC) $(CFLAGS) $(MINFLAGS) -DUSE_EXEC=1 -DUSES_INPUT=1 -static $? $(LDFLAGS) -o $@
+
+
+fs-shell-input-exec-debug.o: fs-shell.c commands.c args-input.c
+	$(CC) $(CFLAGS) -DDEBUG=1 -DUSE_EXEC=1 -DUSES_INPUT=1 -static $? $(LDFLAGS) -o $@
+
+
+fs-shell-signal-input-exec.o: fs-shell.c commands.c args-input.c
+	$(CC) $(CFLAGS) $(MINFLAGS) -DUSE_SIGNALS=1 -DUSES_INPUT=1-DUSE_EXEC=1  -static $? $(LDFLAGS) -o $@
+
+
+fs-shell-signal-input-exec-debug.o: fs-shell.c commands.c args-input.c
+	$(CC) $(CFLAGS) -DDEBUG=1 -DUSE_SIGNALS=1 -DUSES_INPUT=1 -DUSE_EXEC=1  -static $? $(LDFLAGS) -o $@
+
+fs-shell-lean.o: fs-shell.o
+	cp $? $@ 
+
+fs-shell-fat.o: fs-shell-signal-input-exec.o
+	cp $? $@

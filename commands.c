@@ -27,6 +27,8 @@ SOFTWARE.
 #include <sys/stat.h>
 #include <signal.h>
 #include <errno.h>
+#include <time.h>
+#include <unistd.h>
 #include "output.h"
 #include "general.h"
 #include "args.h"
@@ -45,10 +47,19 @@ SOFTWARE.
 #define CMD_HLINK   8
 #define CMD_SLINK   9
 #define CMD_MV      10
+#define CMD_SLEEP   11
 #ifdef USE_SIGNALS
-#define CMD_PAUSE   11
+#define CMD_PAUSE   12
 #endif
 
+// USE_EXEC is handled ... differently.
+
+#define MAX_SLEEP_SECONDS 60 * 60
+
+// Number of arguments for exec
+#define MAX_EXEC_ARGS 1000
+// Number of characters, including trailing \0 for all the arguments concatenated together.
+#define MAX_EXEC_ARG_LEN (MAX_EXEC_ARGS * 100)
 
 static char *EMPTY_STR = "";
 
@@ -88,11 +99,16 @@ void emptySignalHandler(int signal) {
  *          creates a hard link named dest file, pointing to src file.
  *        mv (src file) (dest file)
  *          moves src file to a new file named dest file.
+ *        sleep (time ...)
+ *          Wait for time seconds.
  *        signal [sig1 [sig2 ...]] [wait]
  *          if "wait" is given, waits for any of the signals to be sent to the
  *          shell's process, or for a termination signal to be sent to the
  *          process.  Any signal numbers given will be ignored for the remainder
  *          of the shell execution, unless waited on.
+ *        exec cmd (args ...)
+ *          launches "cmd" with the arguments, replacing the current command.
+ *          All arguments afterwards are consumed, including separators like ';' and '&&'.
  *
  * Commands like "cp" are not supported, because those should be done through
  * Docker ADD and COPY instructions.
@@ -107,6 +123,10 @@ int runCommands() {
     const char *cmdName = EMPTY_STR;
 #ifdef USE_SIGNALS
     sigset_t signalSet;
+#endif
+#ifdef USE_EXEC
+    const char **argv = NULL;
+    char *arg3 = NULL;
 #endif
 
     int isCmdStart = 1;
@@ -214,12 +234,66 @@ int runCommands() {
             } else if (strequal("mv", cmdName)) {
                 // Move file.  Similar to ln-s and ln-h.
                 cmd = CMD_MV;
+            } else if (strequal("sleep", cmdName)) {
+                // Sleep for a time.
+                cmd = CMD_SLEEP;
 #ifdef USE_SIGNALS
             } else if (strequal("signal", cmdName)) {
                 // Marks the start of a signal wait.
                 sigemptyset(&signalSet);
                 cmd = CMD_PAUSE;
 #endif
+#ifdef USE_EXEC
+            } else if (strequal("exec", cmdName)) {
+                // Strange form of the command.  All other arguments must be pulled in and run as-is.
+                // This ignores all command parsing after this.
+                // Slurp up all remaining arguments up to command max.
+                // arg: arguments
+                // argv: pointers to arguments.
+                // arg3: container for all arguments copied in.
+                // val1: position in argv
+                // val2: position in arg2
+                // err: loop counter
+                argv = malloc((sizeof(const char *) * MAX_EXEC_ARGS) + 1);
+                if (argv == NULL) {
+                    stderrP("ERROR malloc failed\n");
+                    return 1;
+                }
+                //   add a trailing + 1 for the final 0, if necessary
+                arg3 = malloc((sizeof(const char) * MAX_EXEC_ARG_LEN) + 1);
+                if (arg3 == NULL) {
+                    stderrP("ERROR malloc failed\n");
+                    return 1;
+                }
+                val1 = 0;
+                val2 = 0;
+                arg = advanceToken();
+                while (arg != NULL) {
+                    if (val1 >= MAX_EXEC_ARGS) {
+                        stderrP("ERROR exec too many arguments\n");
+                        return 1;
+                    }
+                    if (val2 >= MAX_EXEC_ARG_LEN) {
+                        stderrP("ERROR exec argument total length exceeded\n");
+                        return 1;
+                    }
+                    argv[val1++] = &(arg3[val2]);
+                    err = 0;
+                    while (arg[err] != 0 && val2 < MAX_EXEC_ARG_LEN) {
+                        arg3[val2++] = arg[err++];
+                    }
+                    arg3[val2++] = 0;
+                    arg = advanceToken();
+                }
+                argv[val2++] = NULL;
+                if (val2 <= 1) {
+                    // No command to run
+                    stderrP("ERROR no command\n");
+                    return 1;
+                }
+                // This launches a new executable and terminates this one immediately.
+                execvp(argv[0], (char * const*) argv);
+#endif  /* USE_EXEC */
             } else {
                 // Unknown command.
                 cmd = CMD_ERR;
@@ -328,6 +402,12 @@ int runCommands() {
                         // current command as err.  Because we keep the real command name
                         // in cmdName, this change doesn't affect error reporting.
                         cmd = CMD_ERR;
+                    }
+                    break;
+                case CMD_SLEEP:
+                    val1 = strtoul(arg, (char **)NULL, 10);
+                    if (val1 > 0 && val1 < MAX_SLEEP_SECONDS) {
+                        sleep(val1);
                     }
                     break;
 #ifdef USE_SIGNALS
