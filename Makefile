@@ -1,7 +1,7 @@
 
 # MINFLAGS = -g0 -static -s -O3 -fomit-frame-pointer -fno-strict-aliasing -fno-align-functions -fno-align-jumps -fno-align-loops -fno-align-labels
 MINFLAGS = -g0 -static -s -Os -fomit-frame-pointer -fno-strict-aliasing -fno-align-functions -fno-align-jumps -fno-align-loops -fno-align-labels
-CFLAGS += -Wall -pedantic -DVERSION_NUMBER=\"1.0\"
+CFLAGS += -Wall -pedantic -DVERSION_NUMBER=\"1.1\"
 
 .PHONY: all
 all: \

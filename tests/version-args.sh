@@ -12,10 +12,10 @@ if [ ${res} -ne 1 ] ; then
     exit 1
 fi
 
-cat out.txt | perl -e 'while (<STDIN>) { if (/fs-shell\s+\d+\.\d+(\s+(\+\w+)+)?\s*$/) { exit 0; } else { exit 1; }} exit 2;'
+count=$( awk '/^fs-shell\s+\d+\.\d+(\s+\+\w+)*$/{print 1}' out.txt | wc -l )
 res=$?
-if [ ${res} -ne 0 ] ; then
-    echo "Generated invalid version string:"
+if [ ${res} -ne 0 ] || [ ${count} -ne 1 ] ; then
+    echo "Generated invalid version string (${count} / ${res}):"
     cat out.txt
     exit 1
 fi
