@@ -233,6 +233,21 @@ ERROR rmdir: does-not-exist
 FAIL &&
 ```
 
+The `exec` command, however, ignores the chain, and passes all arguments to the requested command:
+
+```bash
+$ ./fs-shell -c "echo abc ; echo def"
+abc
+def
+# Use the "which" command to find where the echo command is located
+# on the path.  Some systems have this under /usr/sbin/echo.
+$ ./fs-shell -c "$( which echo ) abc ; echo def"
+ERROR /usr/sbin/echo: abc
+def
+$ ./fs-shell -c "exec $( which echo ) abc ; echo def"
+abc ; echo def
+```
+
 
 ### Standard Script Flag
 
@@ -244,8 +259,6 @@ The parsing is kept simple, and follows these rules:
 * The parser will handle newlines (`\n`) differently depending on whether you use an input-enabled build or not.  With an input-enabled build, newlines are treated like inserting a `;` between commands, whereas a non-input-enabled build treats newlines like a space.
 * Pairs of quote characters (`"` and `'`) can encapsulate text, allowing space characters and other quote characters to be part of an argument, rather than separating arguments.
 * Characters can be escaped by adding a backslash (`\`) character.  `\n` turns into a newline, `\r` into a linefeed, `\t` into a tab, and anything else is the character itself.  This is how quote characters can be added, as well as an alternate to adding a space to an argument.
-
-
 
 
 ### Script Files
@@ -269,6 +282,8 @@ The make generates a collection of different forms of the shell, depending on yo
 
 ## Developing
 
+To compile the shell, you will need a C compiler that includes a version of the standard C libraries.
+
 To test, run:
 
 ```bash
@@ -278,30 +293,28 @@ chmod +x tests/*.sh && docker build -f test.Dockerfile .
 To build through Docker and capture the built executable:
 
 ```bash
-for libname in glibc musl dietlibc ; do
+for libname in glibc musl ; do
     docker build -t local/fs-shell-${libname} -f build-${libname}.Dockerfile . || exit 1
-    container=$( docker create local/fs-shell-${libname} ) || exit 1
-    for name in fs-shell fs-shell-signal fs-shell-input fs-shell-signal-input ; do
-        # no exit on error so we clean up the container right.
-        docker cp "${container}":/opt/code/${name}.o ${name}.${libname}.o
-        docker cp "${container}":/opt/code/${name}-debug.o ${name}-debug.${libname}.o
-    done
-    docker rm "${container}"
+    ./extract-executables.sh local/fs-shell-${libname} -o out -s .${libname}.o -d || exit 1
 done
 ```
 
-The build generates 2 versions of the shell: one with extra debug statements sent to stdout; and the normal, minimized version.
+The build generates combinations of the flags for different executables with various enabled actions.  The `version` command lists which flags the executable has enabled.
 
 Additionally, for your own purposes, you can build it against the "dietlibc" library.  However, this has special considerations in that it's GPL v2, and [you can't distribute the binary under this program's MIT license](http://www.fefe.de/dietlibc/FAQ.txt).
 
 ```bash
 docker build -t local/fs-shell-dietlibc -f build-dietlibc.Dockerfile . \
-    && container=$( docker create local/fs-shell-dietlibc ) \
-    && docker cp "${container}":/opt/code/fs-shell dietlibc.fs-shell \
-    && docker cp "${container}":/opt/code/fs-shell-debug dietlibc.fs-shell-debug \
-    && docker rm "${container}"
+    && ./extract-executables.sh local/fs-shell-dietlibc -o out -s .dietlibc.o -d
 ```
+
+## Contributing
+
+To contribute to the project, submit a PR or open a bug.  All code submitted must be licensed under the MIT license.
+
 
 ## License
 
-fs-shell is licensed under the [MIT license](LICENSE)
+fs-shell is licensed under the [MIT license](LICENSE).
+
+Depending on how you compile the executable, the executable may be under a different license.  For example, compiling with the `dietlibc` library causes the compiled executable to be under GPL 2.0.
