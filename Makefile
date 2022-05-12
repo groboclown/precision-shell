@@ -13,7 +13,8 @@ all: \
 	fs-shell-signal-exec.o fs-shell-signal-exec-debug.o \
 	fs-shell-input-exec.o fs-shell-input-exec-debug.o \
 	fs-shell-signal-input-exec.o fs-shell-signal-input-exec-debug.o \
-	fs-shell-lean.o fs-shell-fat.o
+	fs-shell-lean.o fs-shell-lean-debug.o \
+	fs-shell-fat.o fs-shell-fat-debug.o
 
 
 # Note that the arguments to the rm match the all parameters.
@@ -28,7 +29,8 @@ clean:
 	fs-shell-input-exec.o fs-shell-input-exec-debug.o \
 	fs-shell-signal-exec.o fs-shell-signal-exec-debug.o \
 	fs-shell-signal-input-exec.o fs-shell-signal-input-exec-debug.o \
-	fs-shell-lean.o fs-shell-fat.o
+	fs-shell-lean.o fs-shell-lean-debug.o \
+	fs-shell-fat.o fs-shell-fat-debug.o
 
 
 fs-shell.o: fs-shell.c commands.c args-argv.c
@@ -97,5 +99,11 @@ fs-shell-signal-input-exec-debug.o: fs-shell.c commands.c args-input.c
 fs-shell-lean.o: fs-shell.o
 	cp $? $@ 
 
+fs-shell-lean-debug.o: fs-shell-debug.o
+	cp $? $@ 
+
 fs-shell-fat.o: fs-shell-signal-input-exec.o
+	cp $? $@
+	
+fs-shell-fat-debug.o: fs-shell-signal-input-exec-debug.o
 	cp $? $@

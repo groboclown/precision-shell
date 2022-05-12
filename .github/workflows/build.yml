@@ -30,3 +30,13 @@ jobs:
       - name: Test
         run: |
           podman build -f test.Dockerfile .
+      
+      - name: dietlibc
+        run: |
+          podman build -f build-dietlibc.Dockerfile .
+      - name: glibc
+        run: |
+          podman build -f build-glibc.Dockerfile .
+      - name: musl
+        run: |
+          podman build -f build-musl.Dockerfile .

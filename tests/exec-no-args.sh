@@ -24,9 +24,9 @@ if [ "$( printf "ERROR no command\\n" )" != "$( cat err.txt )" ] ; then
     exit 1
 fi
 
-# should have: out.txt and err.txt and a.txt
+# should have: out.txt and err.txt
 count="$( ls -1A | wc -l )"
-if [ ${count} != 3 ] ; then
+if [ ${count} != 2 ] ; then
     echo "Generated unexpected files:"
     ls -lA
     exit 1

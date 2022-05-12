@@ -267,7 +267,8 @@ int runCommands() {
                 }
                 val1 = 0;
                 val2 = 0;
-                arg = advanceToken();
+                // arg is already pointing at the next argument.
+                LOG(":: generating arguments\n");
                 while (arg != NULL) {
                     if (val1 >= MAX_EXEC_ARGS) {
                         stderrP("ERROR exec too many arguments\n");
@@ -277,12 +278,15 @@ int runCommands() {
                         stderrP("ERROR exec argument total length exceeded\n");
                         return 1;
                     }
-                    argv[val1++] = &(arg3[val2]);
                     err = 0;
+                    argv[val1++] = &(arg3[val2]);
                     while (arg[err] != 0 && val2 < MAX_EXEC_ARG_LEN) {
                         arg3[val2++] = arg[err++];
                     }
                     arg3[val2++] = 0;
+                    LOG(":: arg: [");
+                    LOG(argv[val1-1]);
+                    LOG("]\n");
                     arg = advanceToken();
                 }
                 argv[val2++] = NULL;
@@ -291,6 +295,16 @@ int runCommands() {
                     stderrP("ERROR no command\n");
                     return 1;
                 }
+#ifdef DEBUG
+                LOG(":: Running command [");
+                LOG(argv[0]);
+                LOG("] with arguments [");
+                for (err = 0; err < val1; err++) {
+                    LOG("] [");
+                    LOG(argv[err]);
+                }
+                LOG("]\n");
+#endif  /* DEBUG */
                 // This launches a new executable and terminates this one immediately.
                 execvp(argv[0], (char * const*) argv);
 #endif  /* USE_EXEC */
