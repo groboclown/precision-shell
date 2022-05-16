@@ -289,7 +289,7 @@ To compile the shell, you will need a C compiler that includes a version of the 
 To test, run:
 
 ```bash
-chmod +x tests/*.sh && docker build -f test.Dockerfile .
+chmod +x tests/*.sh && docker build -f build-(libname).Dockerfile .
 ```
 
 To build through Docker and capture the built executable:
@@ -297,7 +297,7 @@ To build through Docker and capture the built executable:
 ```bash
 for libname in glibc musl ; do
     docker build -t local/fs-shell-${libname} -f build-${libname}.Dockerfile . || exit 1
-    ./extract-executables.sh local/fs-shell-${libname} -o out -s .${libname}.o -d || exit 1
+    ./extract-executables.sh local/fs-shell-${libname} -o out -s .${libname} -d || exit 1
 done
 ```
 
@@ -307,7 +307,7 @@ Additionally, for your own purposes, you can build it against the "dietlibc" lib
 
 ```bash
 docker build -t local/fs-shell-dietlibc -f build-dietlibc.Dockerfile . \
-    && ./extract-executables.sh local/fs-shell-dietlibc -o out -s .dietlibc.o -d
+    && ./extract-executables.sh local/fs-shell-dietlibc -o out -s .dietlibc -d
 ```
 
 To bump the version number, change the [version.txt](version.txt) file.  Version numbers must be in a dewey decimal format MAJOR.MINOR.PATCH (e.g. `1.2.3`).
