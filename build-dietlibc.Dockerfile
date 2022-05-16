@@ -28,3 +28,4 @@ ENV \
 
 RUN    echo 'LIBNAME=dietlibc' >> version.txt \
     && CC="diet cc" make
+    && ls -lA out/fs-shell*

@@ -23,3 +23,4 @@ ENV \
 
 RUN    echo 'LIBNAME=musl' >> version.txt \
     && make
+    && ls -lA out/fs-shell*

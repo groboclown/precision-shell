@@ -23,3 +23,4 @@ ENV \
 
 RUN    echo 'LIBNAME=glibc' >> version.txt \
     && make
+    && ls -lA out/fs-shell*

@@ -29,10 +29,13 @@ jobs:
       - name: build-test
         run: |
           podman build -f build-glibc.Dockerfile -t glibc:offline .
-          podman images
-          ./extract-executables.sh localhost/glibc:offline -o out/glibc
-          ls -lA out/glibc
-      
+      # Podman on Ubuntu is a buggy version that causes this to look up the
+      # image online, rather than look in the local repo.
+      # https://github.com/containers/podman/issues/11181
+      # podman images
+      # ./extract-executables.sh localhost/glibc:offline -o out/glibc
+      # ls -lA out/glibc
+
   dietlibc:
     name: Build & Test with dietlibc
     runs-on: ubuntu-latest
@@ -54,9 +57,6 @@ jobs:
       - name: build-test
         run: |
           podman build -f build-dietlibc.Dockerfile -t dietlibc:offline .
-          podman images
-          ./extract-executables.sh localhost/dietlibc:offline -o out/dietlibc
-          ls -lA out/dietlibc
       
   musl:
     name: Build & Test with musl
@@ -79,6 +79,3 @@ jobs:
       - name: build-test
         run: |
           podman build -f build-musl.Dockerfile -t musl:offline .
-          podman images
-          ./extract-executables.sh localhost/musl:offline -o out/musl
-          ls -lA out/musl
