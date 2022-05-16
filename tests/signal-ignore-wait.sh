@@ -5,6 +5,17 @@
 
 # This tests the intended behavior of a mildly interesting setup.
 
+# Note: due to the way dietlibc works, it uses the older POSIX standard.
+#   It means that this particular setup won't work as expected, and causes
+#   an error code to be returned when a signal other than the built-up set
+#   is called.
+"${FS}" version | grep dietlibc > /dev/null 2>&1
+if [ $? = 0 ] ; then
+    echo "!!! SKIPPED becuase dietlibc does not support scenario"
+    exit 0
+fi
+
+
 # make sure we use the kill program, not the Bash built-in kill.
 kill_exec="$( which kill )"
 

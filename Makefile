@@ -1,10 +1,13 @@
+SUBDIRS = src tests
 
-.PHONY: all
-all: src-all
+.PHONY: all clean subdirs $(SUBDIRS)
 
-src-all:
-	${MAKE} -C src all
+subdirs: $(SUBDIRS)
 
-.PHONY: clean
+all: clean subdirs
+
 clean:
-	test -d out && rm -r out
+	test -d out && rm -rf out || echo "."
+
+$(SUBDIRS):
+	$(MAKE) -C $@

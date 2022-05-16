@@ -7,9 +7,19 @@ WORKDIR /opt/code
 
 RUN \
        apk --no-cache update \
-    && apk add build-base=0.5-r1 \
+    && apk add build-base=0.5-r1 "bash=~5" \
     && rm -rf /tmp/* /var/cache/apk/*
 
-COPY src ./
+COPY Makefile version.txt .
+COPY src/ src/
+COPY tests/ tests/
 
-RUN cd src && make
+ENV \
+#    DEBUG=1 \
+    UID1=1 \
+    UID2=2 \
+    GID1=1 \
+    GID2=2
+
+RUN    echo 'LIBNAME=musl' >> version.txt \
+    && make

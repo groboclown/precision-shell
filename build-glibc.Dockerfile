@@ -10,6 +10,16 @@ RUN \
     && apt-get -y install "build-essential=12.9ubuntu3" \
     && rm -rf /tmp/* /var/cache/apt/*
 
-COPY src ./
+COPY Makefile version.txt .
+COPY src/ src/
+COPY tests/ tests/
 
-RUN cd src && make
+ENV \
+#    DEBUG=1 \
+    UID1=1 \
+    UID2=2 \
+    GID1=1 \
+    GID2=2
+
+RUN    echo 'LIBNAME=glibc' >> version.txt \
+    && make

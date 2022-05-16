@@ -67,6 +67,16 @@ void emptySignalHandler(int signal) {
     LOG(":: handled signal\n");
 }
 
+int toUint(const char *value, int base, int maxValue) {
+    char *endPtr;
+    errno = 0;
+    unsigned long ret = strtoul(value, &endPtr, base);
+    if (value == endPtr || *endPtr != 0 || errno != 0 || ret > maxValue) {
+        return -1;
+    }
+    return ret;
+}
+
 /*
  * Usage:
  *   fs-shell (cmd)
@@ -125,8 +135,8 @@ int runCommands() {
     sigset_t signalSet;
 #endif
 #ifdef USE_EXEC
-    const char **argv = NULL;
     char *arg3 = NULL;
+    const char **argv = NULL;
 #endif
 
     int isCmdStart = 1;
@@ -168,9 +178,8 @@ int runCommands() {
                 // extra argument load for the permissions
                 if (arg != NULL) {
                     // mkdir (octal mode)
-                    val1 = strtoul(arg, (char **)NULL, 8);
-                    // Note: octal max value.
-                    if (errno != 0 || val1 < 0 || val1 > 07777) {
+                    val1 = toUint(arg, 8, 07777);
+                    if (val1 < 0) {
                         cmd = CMD_ERR;
                         // and do not advance arg, because we want to report
                         // this error.
@@ -183,9 +192,12 @@ int runCommands() {
                 // extra argument load
                 if (arg != NULL) {
                     // chmod (octal mode)
-                    val1 = strtoul(arg, (char **)NULL, 8);
+                    val1 = toUint(arg, 8, 07777);
+                    // arg == arg3: no conversion (non-numeric)
+                    // arg3 != NULL: extra text after.
+                    // so, if arg3 != NULL, then error.
                     // Note: octal max value.
-                    if (errno != 0 || val1 < 0 || val1 > 07777) {
+                    if (val1 < 0) {
                         cmd = CMD_ERR;
                         // and do not advance arg, because we want to report
                         // this error.
@@ -198,16 +210,19 @@ int runCommands() {
                 // extra argument load
                 if (arg != NULL) {
                     // chown (uid) (gid)
-                    val1 = strtoul(arg, (char **)NULL, 10);
-                    if (errno != 0 || val1 < 0 || val1 > 0xffff) {
+                    val1 = toUint(arg, 10, 0xffff);
+                    // arg == arg3: no conversion (non-numeric)
+                    // arg3 != NULL: extra text after.
+                    // so, if arg3 != NULL, then error.
+                    if (val1 < 0) {
                         cmd = CMD_ERR;
                         // and do not advance arg, because we want to report
                         // this error.
                     } else {
                         arg = advanceToken();
                         if (arg != NULL) {
-                            val2 = strtoul(arg, (char **)NULL, 10);
-                            if (errno != 0 || val1 < 0 || val1 > 0xffff) {
+                            val2 = toUint(arg, 10, 0xffff);
+                            if (val2 < 0) {
                                 cmd = CMD_ERR;
                                 // and do not advance arg, because we want to report
                                 // this error.
@@ -419,9 +434,11 @@ int runCommands() {
                     }
                     break;
                 case CMD_SLEEP:
-                    val1 = strtoul(arg, (char **)NULL, 10);
-                    if (val1 > 0 && val1 < MAX_SLEEP_SECONDS) {
+                    val1 = toUint(arg, 10, MAX_SLEEP_SECONDS);
+                    if (val1 > 0) {
                         sleep(val1);
+                    } else if (val1 < 0) {
+                        err = 1;
                     }
                     break;
 #ifdef USE_SIGNALS
@@ -429,15 +446,39 @@ int runCommands() {
                     // The "wait" string indicates the end of the signals.
                     if (strequal("wait", arg)) {
                         LOG(":: start signal wait\n");
-                        err = sigwait(&signalSet, &cmd);
-                        LOG(":: wait complete\n");
+                        // Early POSIX Draft 6 has sigwait() return the signal number.
+                        // New standard has sigwait() return 0 for no error, or the error number.
+                        // Dietlibc uses the old return code.
+                        // There's a small chance that an error occurs and that error code
+                        //   matches the signal.  To work around this, we carefully setup cmd
+                        //   before calling.
+                        // CMD_ERR == 0
                         cmd = CMD_ERR;
+                        err = sigwait(&signalSet, &cmd);
+//#ifdef DEBUG
+//printf(":: sigwait() returned %i, signal %i\n", err, cmd);
+//#endif
+                        if (err != 0 && err != cmd) {
+                            // Due to the cmd initialization and the old way of working,
+                            // this situation means that this is a real error situation.
+                            err = 1;
+                        } else {
+                            // Looks like a success.
+                            err = 0;
+                        }
+                        LOG(":: wait complete\n");
                     } else {
                         // "wait" hasn't been found yet, so each argument is a
                         // signal number.
-                        val1 = strtoul(arg, (char **)NULL, 10);
-                        if (errno != 0 || val1 < 0 || val1 > 32) {
+                        val1 = toUint(arg, 10, 32);
+                        // arg == arg3: no conversion (non-numeric)
+                        // arg3 != NULL: extra text after.
+                        // so, if arg3 != NULL, then error.
+                        if (val1 < 0) {
                             err = 1;
+                            // Do not allow the signal to wait.  This can lead to
+                            // invalid operations.
+                            cmd = CMD_ERR;
                         } else {
                             LOG(":: signal ");
                             LOGLN(arg);

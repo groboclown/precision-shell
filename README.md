@@ -206,6 +206,8 @@ Of note, once a signal is added to the list, it is registered for standard OS ig
 
 This will cause the shell to ignore SIGINT (2, usually sent by a ctrl-c input), and wait for SIGTERM (15).
 
+*Note that `dietlibc` does not support this scenario, and will exit with an error if the to-be-ignored signals are received.*
+
 ### exec
 
 *Only available in exec-enabled builds.*
@@ -307,6 +309,9 @@ Additionally, for your own purposes, you can build it against the "dietlibc" lib
 docker build -t local/fs-shell-dietlibc -f build-dietlibc.Dockerfile . \
     && ./extract-executables.sh local/fs-shell-dietlibc -o out -s .dietlibc.o -d
 ```
+
+To bump the version number, change the [version.txt](version.txt) file.  Version numbers must be in a dewey decimal format MAJOR.MINOR.PATCH (e.g. `1.2.3`).
+
 
 ## Contributing
 

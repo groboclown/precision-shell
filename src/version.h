@@ -1,5 +1,5 @@
-#ifndef FS_SHELL_VERSION
-#define FS_SHELL_VERSION
+#ifndef _FS_SHELL_VERSION_
+#define _FS_SHELL_VERSION_
 
 #ifdef DEBUG
 #define _VERSION_DEBUG " +debug"

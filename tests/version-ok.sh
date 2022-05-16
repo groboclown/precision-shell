@@ -17,7 +17,9 @@ if [ -s err.txt ] ; then
     exit 1
 fi
 
-count=$( awk '/^fs-shell\s+\d+\.\d+(\s+\+\w+)*$/{print 1}' out.txt | wc -l )
+# Ubuntu's awk is dumb. It doesn't recognize \d or \s or \w
+# count=$( awk '/^fs-shell\s+\d+\.\d+\.\d+-\w+(\s+\+\w+)*$/{print 1}' out.txt | wc -l )
+count=$( awk '/^fs-shell [0-9]+\.[0-9]+\.[0-9]+-[a-z]+( \+[a-z]+)*$/{print 1}' out.txt | wc -l )
 res=$?
 if [ ${res} -ne 0 ] || [ ${count} -ne 1 ] ; then
     echo "Generated invalid version string (${count} / ${res}):"

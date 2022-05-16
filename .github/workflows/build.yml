@@ -8,8 +8,8 @@ on:
 
 jobs:
 
-  build:
-    name: Build
+  glibc:
+    name: Build & Test with glibc
     runs-on: ubuntu-latest
     outputs:
       version: ${{ steps.properties.outputs.version }}
@@ -26,21 +26,55 @@ jobs:
           sudo apt-get update
           sudo apt-get install podman
       
-      - name: Test
+      - name: glibc
         run: |
-          podman build -f test.Dockerfile .
+          podman build -f build-glibc.Dockerfile -t glibc .
+          ./extract-executables.sh glibc -o out/glibc
+          ls -lA out/glibc
+      
+  dietlibc:
+    name: Build & Test with dietlibc
+    runs-on: ubuntu-latest
+    outputs:
+      version: ${{ steps.properties.outputs.version }}
+      changelog: ${{ steps.properties.outputs.changelog }}
+    steps:
+
+      # Check out current repository
+      - name: Fetch Sources
+        uses: actions/checkout@v3
+      
+      # Install tools
+      - name: Install Required tools
+        run: |
+          sudo apt-get update
+          sudo apt-get install podman
       
       - name: dietlibc
         run: |
           podman build -f build-dietlibc.Dockerfile -t dietlibc .
           ./extract-executables.sh dietlibc -o out/dietlibc
           ls -lA out/dietlibc
-      - name: glibc
+      
+  musl:
+    name: Build & Test with musl
+    runs-on: ubuntu-latest
+    outputs:
+      version: ${{ steps.properties.outputs.version }}
+      changelog: ${{ steps.properties.outputs.changelog }}
+    steps:
+
+      # Check out current repository
+      - name: Fetch Sources
+        uses: actions/checkout@v3
+      
+      # Install tools
+      - name: Install Required tools
         run: |
-          podman build -f build-glibc.Dockerfile -t glibc .
-          ./extract-executables.sh glibc -o out/glibc
-          ls -lA out/glibc
-      - name: musl
+          sudo apt-get update
+          sudo apt-get install podman
+      
+      - name: dietlibc
         run: |
           podman build -f build-musl.Dockerfile -t musl .
           ./extract-executables.sh musl -o out/musl

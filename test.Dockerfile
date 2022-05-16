@@ -10,9 +10,10 @@ RUN \
     && apk add "build-base=~0" "bash=~5" \
     && rm -rf /tmp/* /var/cache/apk/*
 
-COPY src ./
+COPY src ./src
+COPY Makefile .
 
-RUN cd src && make
+RUN make
 
 ENV \
 #    DEBUG=1 \
@@ -25,6 +26,7 @@ ENV \
 COPY tests/ tests/
 RUN \
     mkdir -p "${TEST_TMP_DIR}" \
+#    && ls -lA /opt/code/out \
     && FS_SHELL=/opt/code/out/fs-shell tests/_all.sh \
     && FS_SHELL=/opt/code/out/fs-shell-signal tests/_all.sh \
     && FS_SHELL=/opt/code/out/fs-shell-input tests/_all.sh \
