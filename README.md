@@ -82,7 +82,7 @@ RUN echo Startup \
 * Background jobs or job control.
 * Allow for interactive execution.
 * Anything with the network.
-* Tell you how to use it.  That's what this file is for.
+* Tell you how to use it.  That's what this document is for.
 
 
 ## Why Would I Need It?
