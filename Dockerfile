@@ -2,13 +2,13 @@ FROM docker.io/library/alpine:3.10
 
 WORKDIR /opt/code
 
-COPY *.c *.h Makefile ./
+COPY src ./
 
 RUN \
        apk --no-cache update \
     && apk add "build-base=~0" \
     && rm -rf /tmp/* /var/cache/apk/* \
-    && make
+    && cd src && make
 
 
 # ---------------------------------
@@ -21,7 +21,7 @@ LABEL name="local/fs-shell" \
 # docker will use it as the default shell when it encounters
 # the "RUN" instruction.
 COPY --from=0 \
-    /opt/code/fs-shell.o \
+    /opt/code/out/fs-shell \
     /bin/sh
 
 ENTRYPOINT ["/bin/sh"]

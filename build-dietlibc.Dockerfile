@@ -15,6 +15,6 @@ RUN \
     && ( cd /opt/dietlibc && make && install bin-x86_64/diet /usr/local/bin ) \
     && rm -rf /tmp/* /var/cache/apk/*
 
-COPY *.c *.h Makefile ./
+COPY src ./
 
-RUN CC="diet cc" make
+RUN cd src && CC="diet cc" make

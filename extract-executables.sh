@@ -28,7 +28,7 @@ fi
 
 outdir=.
 base=fs-shell
-suffix=.o
+suffix=""
 force=1
 image_name="$1"
 all_files=". \
@@ -104,7 +104,7 @@ fi
 container=$( "${container_exe}" create "${image_name}" ) || exit 1
 for part in ${all_files} ; do
     part="${part:1}"
-    src="${container}:/opt/code/fs-shell${part}.o"
+    src="${container}:/opt/code/out/fs-shell${part}"
     tgt="${outdir}/${base}${part}${suffix}"
     if [ ${force} = 0 ] && [ -e "${tgt}" ] ; then
         echo "${tgt} already exists"

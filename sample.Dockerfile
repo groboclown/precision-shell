@@ -5,7 +5,7 @@ LABEL name="local/fs-shell-example"
 # The build.Dockerfile will create it, but you need to extract it
 # yourself.  Alternatively, you can use the Dockerfile formula to
 # build the fs-shell within the same Dockerfile that it's used.
-COPY fs-shell /bin/sh
+COPY out/fs-shell /bin/sh
 
 # Example setting up files and performing some file manipulations
 # on them.

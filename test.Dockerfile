@@ -10,9 +10,9 @@ RUN \
     && apk add "build-base=~0" "bash=~5" \
     && rm -rf /tmp/* /var/cache/apk/*
 
-COPY *.c *.h Makefile ./
+COPY src ./
 
-RUN make
+RUN cd src && make
 
 ENV \
 #    DEBUG=1 \
@@ -25,11 +25,11 @@ ENV \
 COPY tests/ tests/
 RUN \
     mkdir -p "${TEST_TMP_DIR}" \
-    && FS_SHELL=/opt/code/fs-shell.o tests/_all.sh \
-    && FS_SHELL=/opt/code/fs-shell-signal.o tests/_all.sh \
-    && FS_SHELL=/opt/code/fs-shell-input.o tests/_all.sh \
-    && FS_SHELL=/opt/code/fs-shell-signal-input.o tests/_all.sh \
-    && FS_SHELL=/opt/code/fs-shell-exec.o tests/_all.sh \
-    && FS_SHELL=/opt/code/fs-shell-signal-exec.o tests/_all.sh \
-    && FS_SHELL=/opt/code/fs-shell-input-exec.o tests/_all.sh \
-    && FS_SHELL=/opt/code/fs-shell-signal-input-exec.o tests/_all.sh
+    && FS_SHELL=/opt/code/out/fs-shell tests/_all.sh \
+    && FS_SHELL=/opt/code/out/fs-shell-signal tests/_all.sh \
+    && FS_SHELL=/opt/code/out/fs-shell-input tests/_all.sh \
+    && FS_SHELL=/opt/code/out/fs-shell-signal-input tests/_all.sh \
+    && FS_SHELL=/opt/code/out/fs-shell-exec tests/_all.sh \
+    && FS_SHELL=/opt/code/out/fs-shell-signal-exec tests/_all.sh \
+    && FS_SHELL=/opt/code/out/fs-shell-input-exec tests/_all.sh \
+    && FS_SHELL=/opt/code/out/fs-shell-signal-input-exec tests/_all.sh

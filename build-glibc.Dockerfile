@@ -10,6 +10,6 @@ RUN \
     && apt-get -y install "build-essential=12.9ubuntu3" \
     && rm -rf /tmp/* /var/cache/apt/*
 
-COPY *.c *.h Makefile ./
+COPY src ./
 
-RUN make
+RUN cd src && make
