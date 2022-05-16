@@ -26,7 +26,7 @@ jobs:
           sudo apt-get update
           sudo apt-get install podman
       
-      - name: glibc
+      - name: build-test
         run: |
           podman build -f build-glibc.Dockerfile -t glibc .
           ./extract-executables.sh glibc -o out/glibc
@@ -50,7 +50,7 @@ jobs:
           sudo apt-get update
           sudo apt-get install podman
       
-      - name: dietlibc
+      - name: build-test
         run: |
           podman build -f build-dietlibc.Dockerfile -t dietlibc .
           ./extract-executables.sh dietlibc -o out/dietlibc
@@ -74,7 +74,7 @@ jobs:
           sudo apt-get update
           sudo apt-get install podman
       
-      - name: dietlibc
+      - name: build-test
         run: |
           podman build -f build-musl.Dockerfile -t musl .
           ./extract-executables.sh musl -o out/musl
