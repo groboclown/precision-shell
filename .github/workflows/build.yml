@@ -29,7 +29,7 @@ jobs:
       - name: build-test
         run: |
           podman build -f build-glibc.Dockerfile -t local/glibc .
-          ./extract-executables.sh local/glibc -o out/glibc
+          ./extract-executables.sh localhost/local/glibc -o out/glibc
           ls -lA out/glibc
       
   dietlibc:
@@ -53,7 +53,7 @@ jobs:
       - name: build-test
         run: |
           podman build -f build-dietlibc.Dockerfile -t local/dietlibc .
-          ./extract-executables.sh local/dietlibc -o out/dietlibc
+          ./extract-executables.sh localhost/local/dietlibc -o out/dietlibc
           ls -lA out/dietlibc
       
   musl:
@@ -77,5 +77,5 @@ jobs:
       - name: build-test
         run: |
           podman build -f build-musl.Dockerfile -t local/musl .
-          ./extract-executables.sh local/musl -o out/musl
+          ./extract-executables.sh localhost/local/musl -o out/musl
           ls -lA out/musl
