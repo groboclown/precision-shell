@@ -124,8 +124,8 @@ int toUint(const char *value, int base, int maxValue) {
  * Docker ADD and COPY instructions.
  */
 int runCommands() {
-    long val1 = 0;
-    long val2 = 0;
+    int val1 = 0;
+    int val2 = 0;
     int err = 0;
     int errCount = 0;
     int cmd = CMD_ERR;
