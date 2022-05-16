@@ -1,4 +1,9 @@
 
+## v1.1.2
+
+* [0b7fd3b](0b7fd3ba4195ab7430773156fd616c133bcf5a09) - changed values to be integers instead of longs.
+
+
 ## v1.1.1
 
 * [1d24bd5](1d24bd5546140a2439c3b88b6f402928b8a1e473) - bug fixes based on test results from running in glibc and dietlibc.
