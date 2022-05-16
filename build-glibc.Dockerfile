@@ -22,5 +22,5 @@ ENV \
     GID2=2
 
 RUN    echo 'LIBNAME=glibc' >> version.txt \
-    && make
+    && make \
     && ls -lA out/fs-shell*

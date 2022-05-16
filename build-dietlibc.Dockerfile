@@ -27,5 +27,5 @@ ENV \
     GID2=2
 
 RUN    echo 'LIBNAME=dietlibc' >> version.txt \
-    && CC="diet cc" make
+    && CC="diet cc" make \
     && ls -lA out/fs-shell*
