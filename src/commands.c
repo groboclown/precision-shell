@@ -71,7 +71,23 @@ int toUint(const char *value, int base, int maxValue) {
     char *endPtr;
     errno = 0;
     unsigned long ret = strtoul(value, &endPtr, base);
-    if (value == endPtr || *endPtr != 0 || errno != 0 || ret > maxValue) {
+    if (
+            // nothing was parsed.  This can happen while endPtr[0] == 0 if the argument
+            //   has length 0.
+            value == endPtr
+
+            // the argument had non-numeric stuff after the first numbers.
+            || endPtr[0] != 0
+
+            // Bad number parsing, usually a value of of range problem.
+            || errno != 0
+
+            // Easy max value checking, which is a requirement for all our stuff.
+            //   It also helps with unsigned long -> int conversion restrictions.
+            || ret > maxValue
+
+            // || ret < 0, but we're reading unsigned, so it can't ever happen.
+    ) {
         return -1;
     }
     return ret;
