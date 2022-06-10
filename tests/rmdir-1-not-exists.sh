@@ -1,6 +1,6 @@
 #!/bin/bash
 
-# desc: rmdir against a directory that exists
+# desc: rmdir against a directory that does not exist
 
 mkdir a
 mkdir b

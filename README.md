@@ -39,6 +39,8 @@ The shell supports these commands:
 * [ln-s](#ln-s) - create a symbolic link.
 * [ln-h](#ln-h) - create a hard link.
 * [sleep](#sleep) - wait for a number of seconds.
+* [touch](#touch) - Update the access and modification times of each file to the current time, or, if a file does not exist, it is created empty. *Only available in input-enabled builds.*
+* [trunc](#trunc) - Sets the file length to 0, and if the file does not exist, creates it. *Only available in input-enabled builds.*
 * [signal .. wait](#signal-wait) - wait for an OS signal before continuing. *Only available in signal-enabled builds.*
 * [exec](#exec) - switch execution to a new process. *Only available in exec-enabled builds.*
 
@@ -69,7 +71,6 @@ RUN echo Startup \
 * List files.
 * Copy files.
 * Modify files.
-* Create normal files.
 * Alter file contents.
 * Process controls.
 * Report detailed error messages.
@@ -189,6 +190,22 @@ Creates a hard link named dest file, pointing to src file.
 Usage: `sleep (seconds ...)`
 
 Sleeps for the number of seconds in the argument.  If no arguments are given, or if an argument is not a positive integer, then it does nothing (no error).  If multiple, positive integers are given, then it sleeps for the sum of them.
+
+### touch
+
+*Only available in input-enabled builds.*
+
+Usage: `touch (file (file ...))`
+
+For each argument, if it does not exist, it is created.  If the argument exists and is not a file, then the command fails.  **Warning:** Unlike the standard `touch` command, this will not update the modified time of the file.
+
+### trunc
+
+*Only available in input-enabled builds.*
+
+Usage: `trunc (file (file ...))`
+
+For each argument, sets the file length to 0 if the file exists, otherwise creates the file.  This is nearly identical to [touch](#touch), with the addition of setting file lengths to 0.
 
 ### signal-wait
 

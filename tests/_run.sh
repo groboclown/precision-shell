@@ -38,8 +38,8 @@ for test_name in "$@" ; do
         # Set up per-test variables.
         export TEST_DIR="${TEST_TMP_DIR}/${TEST_NAME}.d"
         echo "-------------------------------------------"
-        echo "${TEST_NAME}"
-        cat "${test_script}" | sed -n 's/# desc: \(.*\)/>> \1/p'
+        echo ">> ${TEST_NAME}"
+        cat "${test_script}" | sed -n 's/# desc: \(.*\)/\/\/ \1/p'
         # Check if the required version is being run.
         requirements="$( cat "${test_script}" | sed -n 's/# requires: \(.*\)/\1/p' )"
         # Note that this requires running the command version before it's tested...
@@ -47,7 +47,7 @@ for test_name in "$@" ; do
         if [ ! -z "${requirements}" ] ; then
             "${FS}" version | grep "${requirements}" >/dev/null 2>&1
             if [ $? -ne 0 ] ; then
-                echo "!! SKIPPED because ${FS} does not support ${requirements}"
+                echo "?? SKIPPED because ${FS} does not support ${requirements}"
                 dorun=0
             fi
         fi
@@ -55,10 +55,12 @@ for test_name in "$@" ; do
             ${RUNNER} "${here}/_before-each.sh"
             if [ $? -ne 0 ] ; then
                 FAILED=$(( FAILED + 1 ))
+                echo "!! FAILED in before"
             else
                 ( cd "${TEST_DIR}" && ${RUNNER} ${test_script} )
                 if [ $? -ne 0 ] ; then
                     FAILED=$(( FAILED + 1 ))
+                    echo "!! FAILED"
                 fi
             fi
             # Always run the after each, and ignore failures.

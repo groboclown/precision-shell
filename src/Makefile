@@ -1,7 +1,9 @@
 include ../version.txt
 
 # MINFLAGS = -g0 -static -s -O3 -fomit-frame-pointer -fno-strict-aliasing -fno-align-functions -fno-align-jumps -fno-align-loops -fno-align-labels
-MINFLAGS = -g0 -static -s -Os -fomit-frame-pointer -fno-strict-aliasing -fno-align-functions -fno-align-jumps -fno-align-loops -fno-align-labels
+MINFLAGS = -g0 -s -Os -fomit-frame-pointer -fno-strict-aliasing -fno-align-functions -fno-align-jumps -fno-align-loops -fno-align-labels
+LFLAGS = -static
+DFLAGS = -DDEBUG=1
 CFLAGS += -Wall -pedantic -DVERSION_NUMBER=\"$(VERSION)-$(LIBNAME)\"
 OUTDIR = ../out
 
@@ -27,82 +29,82 @@ clean:
 
 $(OUTDIR)/fs-shell: fs-shell.c commands.c args-argv.c
 	mkdir -p $(OUTDIR)
-	$(CC) $(CFLAGS) $(MINFLAGS) $? $(LDFLAGS) -o $@
+	$(CC) $(CFLAGS) $(LFLAGS) $(MINFLAGS) $? $(LDFLAGS) -o $@
 
 
 $(OUTDIR)/fs-shell-debug: fs-shell.c commands.c args-argv.c
 	mkdir -p $(OUTDIR)
-	$(CC) $(CFLAGS) -DDEBUG=1 -static $? $(LDFLAGS) -o $@
+	$(CC) $(CFLAGS) $(LFLAGS) $(DFLAGS) $? $(LDFLAGS) -o $@
 
 
 $(OUTDIR)/fs-shell-signal: fs-shell.c commands.c args-argv.c
 	mkdir -p $(OUTDIR)
-	$(CC) $(CFLAGS) $(MINFLAGS) -DUSE_SIGNALS=1 -static $? $(LDFLAGS) -o $@
+	$(CC) $(CFLAGS) $(LFLAGS) $(MINFLAGS) -DUSE_SIGNALS=1 $? $(LDFLAGS) -o $@
 
 
 $(OUTDIR)/fs-shell-signal-debug: fs-shell.c commands.c args-argv.c
 	mkdir -p $(OUTDIR)
-	$(CC) $(CFLAGS) -DDEBUG=1 -DUSE_SIGNALS=1 -static $? $(LDFLAGS) -o $@
+	$(CC) $(CFLAGS) $(LFLAGS) $(DFLAGS) -DUSE_SIGNALS=1 $? $(LDFLAGS) -o $@
 
 
 $(OUTDIR)/fs-shell-input: fs-shell.c commands.c args-input.c
 	mkdir -p $(OUTDIR)
-	$(CC) $(CFLAGS) $(MINFLAGS) -DUSES_INPUT=1 $? $(LDFLAGS) -o $@
+	$(CC) $(CFLAGS) $(LFLAGS) $(MINFLAGS) -DUSES_INPUT=1 $? $(LDFLAGS) -o $@
 
 
 $(OUTDIR)/fs-shell-input-debug: fs-shell.c commands.c args-input.c
 	mkdir -p $(OUTDIR)
-	$(CC) $(CFLAGS) -DDEBUG=1 -DUSES_INPUT=1 -static $? $(LDFLAGS) -o $@
+	$(CC) $(CFLAGS) $(LFLAGS) $(DFLAGS) -DUSES_INPUT=1 $? $(LDFLAGS) -o $@
 
 
 $(OUTDIR)/fs-shell-signal-input: fs-shell.c commands.c args-input.c
 	mkdir -p $(OUTDIR)
-	$(CC) $(CFLAGS) $(MINFLAGS) -DUSE_SIGNALS=1 -DUSES_INPUT=1 -static $? $(LDFLAGS) -o $@
+	$(CC) $(CFLAGS) $(LFLAGS) $(MINFLAGS) -DUSE_SIGNALS=1 -DUSES_INPUT=1 $? $(LDFLAGS) -o $@
 
 
 $(OUTDIR)/fs-shell-signal-input-debug: fs-shell.c commands.c args-input.c
 	mkdir -p $(OUTDIR)
-	$(CC) $(CFLAGS) -DDEBUG=1 -DUSE_SIGNALS=1 -DUSES_INPUT=1 -static $? $(LDFLAGS) -o $@
+	$(CC) $(CFLAGS) $(LFLAGS) $(DFLAGS) -DUSE_SIGNALS=1 -DUSES_INPUT=1 $? $(LDFLAGS) -o $@
 
 
 $(OUTDIR)/fs-shell-exec: fs-shell.c commands.c args-input.c
 	mkdir -p $(OUTDIR)
-	$(CC) $(CFLAGS) $(MINFLAGS) -DUSE_EXEC=1 $? $(LDFLAGS) -o $@
+	$(CC) $(CFLAGS) $(LFLAGS) $(MINFLAGS) -DUSE_EXEC=1 $? $(LDFLAGS) -o $@
 
 
 $(OUTDIR)/fs-shell-exec-debug: fs-shell.c commands.c args-input.c
 	mkdir -p $(OUTDIR)
-	$(CC) $(CFLAGS) -DDEBUG=1 -DUSE_EXEC=1 -static $? $(LDFLAGS) -o $@
+	$(CC) $(CFLAGS) $(LFLAGS) $(DFLAGS) -DUSE_EXEC=1 $? $(LDFLAGS) -o $@
 
 
 $(OUTDIR)/fs-shell-signal-exec: fs-shell.c commands.c args-input.c
 	mkdir -p $(OUTDIR)
-	$(CC) $(CFLAGS) $(MINFLAGS) -DUSE_SIGNALS=1 -DUSE_EXEC=1 -static $? $(LDFLAGS) -o $@
+	$(CC) $(CFLAGS) $(LFLAGS) $(MINFLAGS) -DUSE_SIGNALS=1 -DUSE_EXEC=1 $? $(LDFLAGS) -o $@
 
 
 $(OUTDIR)/fs-shell-signal-exec-debug: fs-shell.c commands.c args-input.c
 	mkdir -p $(OUTDIR)
-	$(CC) $(CFLAGS) -DDEBUG=1 -DUSE_SIGNALS=1 -DUSE_EXEC=1 -static $? $(LDFLAGS) -o $@
+	$(CC) $(CFLAGS) $(LFLAGS) $(DFLAGS) -DUSE_SIGNALS=1 -DUSE_EXEC=1 $? $(LDFLAGS) -o $@
 
 
 $(OUTDIR)/fs-shell-input-exec: fs-shell.c commands.c args-input.c
 	mkdir -p $(OUTDIR)
-	$(CC) $(CFLAGS) $(MINFLAGS) -DUSE_EXEC=1 -DUSES_INPUT=1 -static $? $(LDFLAGS) -o $@
+	$(CC) $(CFLAGS) $(LFLAGS) $(MINFLAGS) -DUSE_EXEC=1 -DUSES_INPUT=1 $? $(LDFLAGS) -o $@
 
 
 $(OUTDIR)/fs-shell-input-exec-debug: fs-shell.c commands.c args-input.c
 	mkdir -p $(OUTDIR)
-	$(CC) $(CFLAGS) -DDEBUG=1 -DUSE_EXEC=1 -DUSES_INPUT=1 -static $? $(LDFLAGS) -o $@
+	$(CC) $(CFLAGS) $(LFLAGS) $(DFLAGS) -DUSE_EXEC=1 -DUSES_INPUT=1 $? $(LDFLAGS) -o $@
 
 
 $(OUTDIR)/fs-shell-signal-input-exec: fs-shell.c commands.c args-input.c
 	mkdir -p $(OUTDIR)
-	$(CC) $(CFLAGS) $(MINFLAGS) -DUSE_SIGNALS=1 -DUSES_INPUT=1-DUSE_EXEC=1  -static $? $(LDFLAGS) -o $@
+	$(CC) $(CFLAGS) $(LFLAGS) $(MINFLAGS) -DUSE_SIGNALS=1 -DUSES_INPUT=1-DUSE_EXEC=1 $? $(LDFLAGS) -o $@
 
 
 $(OUTDIR)/fs-shell-signal-input-exec-debug: fs-shell.c commands.c args-input.c
 	mkdir -p $(OUTDIR)
-	$(CC) $(CFLAGS) -DDEBUG=1 -DUSE_SIGNALS=1 -DUSES_INPUT=1 -DUSE_EXEC=1  -static $? $(LDFLAGS) -o $@
+	$(CC) $(CFLAGS) $(LFLAGS) $(DFLAGS) -DUSE_SIGNALS=1 -DUSES_INPUT=1 -DUSE_EXEC=1 $? $(LDFLAGS) -o $@
 
 
 $(OUTDIR)/fs-shell-lean: $(OUTDIR)/fs-shell

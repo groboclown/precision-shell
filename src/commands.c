@@ -28,7 +28,7 @@ SOFTWARE.
 #include <signal.h>
 #include <errno.h>
 #include <time.h>
-#include <unistd.h>
+#include <fcntl.h>
 #include "output.h"
 #include "general.h"
 #include "args.h"
@@ -48,8 +48,11 @@ SOFTWARE.
 #define CMD_SLINK   9
 #define CMD_MV      10
 #define CMD_SLEEP   11
+#ifdef USES_INPUT
+#define CMD_TOUCH   12
+#endif
 #ifdef USE_SIGNALS
-#define CMD_PAUSE   12
+#define CMD_PAUSE   13
 #endif
 
 // USE_EXEC is handled ... differently.
@@ -189,6 +192,16 @@ int runCommands() {
                 cmd = CMD_RM;
             } else if (strequal("rmdir", cmdName)) {
                 cmd = CMD_RMDIR;
+#ifdef USES_INPUT
+            } else if (strequal("touch", cmdName)) {
+                // "touch" and "trunc" use the same logic,
+                // just different flags on open.  Flags are val1.
+                cmd = CMD_TOUCH;
+                val1 = O_WRONLY | O_CREAT;
+            } else if (strequal("trunc", cmdName)) {
+                cmd = CMD_TOUCH;
+                val1 = O_WRONLY | O_CREAT | O_TRUNC;
+#endif
             } else if (strequal("mkdir", cmdName)) {
                 cmd = CMD_MKDIR;
                 // extra argument load for the permissions
@@ -457,6 +470,23 @@ int runCommands() {
                         err = 1;
                     }
                     break;
+#ifdef USES_INPUT
+                case CMD_TOUCH:
+                    // touch/trunc, with the difference being the flags used.
+                    // flags are set in val1
+                    LOG(":: touch/trunc ");
+                    LOGLN(arg);
+                    // Currently a fixed file permission mode
+                    val2 = open(
+                        arg, val1,
+                        S_IRUSR | S_IWUSR | S_IRGRP | S_IROTH // | S_IWGRP | S_IWOTH
+                    );
+                    if (val2 == -1) {
+                        err = 1;
+                    }
+                    close(val2);
+                    break;
+#endif
 #ifdef USE_SIGNALS
                 case CMD_PAUSE:
                     // The "wait" string indicates the end of the signals.

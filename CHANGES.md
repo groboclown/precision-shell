@@ -1,4 +1,11 @@
 
+## v1.2.0
+
+* Added new commands:
+    * touch
+    * trunc
+
+
 ## v1.1.2
 
 * [0b7fd3b](0b7fd3ba4195ab7430773156fd616c133bcf5a09) - changed values to be integers instead of longs.
