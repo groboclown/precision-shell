@@ -39,7 +39,8 @@ The shell supports these commands:
 * [ln-s](#ln-s) - create a symbolic link.
 * [ln-h](#ln-h) - create a hard link.
 * [sleep](#sleep) - wait for a number of seconds.
-* [mknod](#mknod) - create a special OS node. *Only available in input-enabled builds.*
+* [mknod](#mknod) - create a FIFO or UNIX socket node. *Only available in device-enabled builds.*
+* [mkdev](#mkdev) - create a device OS node. *Only available in device-enabled builds.*
 * [touch](#touch) - Update the access and modification times of each file to the current time, or, if a file does not exist, it is created empty. *Only available in input-enabled builds.*
 * [trunc](#trunc) - Sets the file length to 0, and if the file does not exist, creates it. *Only available in input-enabled builds.*
 * [dup-r, dup-w, dup-a](#dup) - duplicates a file to a file descriptor for the remaining commands in this execution. *Only available in input-enabled builds.*
@@ -115,25 +116,25 @@ Prints the version information to stdout.  Any additional arguments generates an
 
 ### noop
 
-Usage: `noop (arg1 (arg2 ...))`
+Usage: `noop [arg1 [arg2 ...]]`
 
 Does nothing and ignores all arguments after it.
 
 ### echo
 
-Usage: `echo (str1 (str2 ...))`
+Usage: `echo [str1 [str2 ...]]`
 
 Sends to `stdout` each argument, one per line.  To have a multi-word statement on a single line, it must be passed as a single argument.
 
 ### rm
 
-Usage: `rm (file1 (file2 ...))`
+Usage: `rm [file1 [file2 ...]]`
 
 Removes each file passed as an argument.  The command will attempt to remove each file, and if any of them fail, then the whole command fails with an exit code equal to the sum of the error codes.
 
 ### rmdir
 
-Usage: `rmdir (dir1 (dir2 ...))`
+Usage: `rmdir [dir1 [dir2 ...]]`
 
 Removes each empty directory passed as an argument.  If a directory is not empty, the command will fail.  The command will attempt to remove each directory, and if any of them fail, then the whole command fails with an exit code equal to the sum of the number of failed files.
 
@@ -145,13 +146,13 @@ Renames the file referenced by the first argument to a new name referenced by th
 
 ### mkdir
 
-Usage: `mkdir (octal mode) (file1 (file2 ...))`
+Usage: `mkdir (octal mode) [file1 [file2 ...]]`
 
 Creates the listed directories with the permissions of the first argument.  The parent directory must exist, or it will generate an error.  If any creation fails, then the command fails with the number of failed directories.
 
 ### chmod
 
-Usage: `chmod (octal mode) (file1 (file2 ...))`
+Usage: `chmod (octal mode) [file1 [file2 ...]]`
 
 Changes the file permissions for each file or directory.  The mode must be passed as an octal number.
 
@@ -171,7 +172,7 @@ This command will fail if the mode value is out of range or not a number.
 
 ### chown
 
-Usage: `chown (uid) (gid) (file1 (file2 ...))`
+Usage: `chown (uid) (gid) [file1 [file2 ...]]`
 
 Changes the owner and group ID for each file, directory, or symlink argument.
 
@@ -189,23 +190,43 @@ Creates a hard link named dest file, pointing to src file.
 
 ### sleep
 
-Usage: `sleep (seconds ...)`
+Usage: `sleep [seconds [seconds ...]]`
 
 Sleeps for the number of seconds in the argument.  If no arguments are given, or if an argument is not a positive integer, then it does nothing (no error).  If multiple, positive integers are given, then it sleeps for the sum of them.
 
 ### mknod
 
-Usage: `mknod (node type) (file1 (file2 ...))`
+Usage: `mknod (node type) [file1 [file2 ...]]`
 
 Creates a special or ordinary file of the given type.  The node type is OS specific, but in general, the values supported are:
 
+* `p` - pipe (FIFO queue)
+* `s` - UNIX domain socket
 
+### mkdev
+
+Usage: `mkdev (major version) (minor version) (node type) [file1 [file2 ...]]`
+
+The node type can be one of these:
+
+* `b` - block device
+* `c` and `u` - character device
+
+The major and minor version reflect the OS kernel specific device number.
+
+For example, to create the standard `/dev/null` device, you would run:
+
+```bash
+fs-shell mkdev c 1 3 /dev/null
+```
+
+The execution of this command requires running with root level privileges, or the tool will report an error.
 
 ### touch
 
 *Only available in input-enabled builds.*
 
-Usage: `touch (file (file ...))`
+Usage: `touch [file1 [file2 ...]]`
 
 For each argument, if it does not exist, it is created.  If the argument exists and is not a file, then the command fails.  **Warning:** Unlike the standard `touch` command, this will not update the modified time of the file.
 
@@ -213,7 +234,7 @@ For each argument, if it does not exist, it is created.  If the argument exists 
 
 *Only available in input-enabled builds.*
 
-Usage: `trunc (file (file ...))`
+Usage: `trunc [file1 [file2 ...]]`
 
 For each argument, sets the file length to 0 if the file exists, otherwise creates the file.  This is nearly identical to [touch](#touch), with the addition of setting file lengths to 0.
 

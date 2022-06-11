@@ -177,6 +177,7 @@ int toUint(const char *value, int base, int maxValue) {
  *        dup-w (dest fd) (file)
  *          changes the destination file descriptor number to truncate and write to the file.
  *          Use "/dev/tty" to change to the user TTY.
+ *        mknod 
  *        signal [sig1 [sig2 ...]] [wait]
  *          if "wait" is given, waits for any of the signals to be sent to the
  *          shell's process, or for a termination signal to be sent to the
