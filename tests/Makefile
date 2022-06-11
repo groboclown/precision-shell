@@ -10,7 +10,15 @@ CMDS = fs-shell \
 	fs-shell-exec \
 	fs-shell-signal-exec \
 	fs-shell-input-exec \
-	fs-shell-signal-input-exec
+	fs-shell-signal-input-exec \
+	fs-shell-device \
+	fs-shell-signal-device \
+	fs-shell-input-device \
+	fs-shell-signal-input-device \
+	fs-shell-exec-device \
+	fs-shell-signal-exec-device \
+	fs-shell-input-exec-device \
+	fs-shell-signal-input-exec-device
 
 
 .PHONY: all clean tests $(CMDS)

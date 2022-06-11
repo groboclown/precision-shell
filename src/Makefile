@@ -17,6 +17,14 @@ all: clean \
 	$(OUTDIR)/fs-shell-signal-exec $(OUTDIR)/fs-shell-signal-exec-debug \
 	$(OUTDIR)/fs-shell-input-exec $(OUTDIR)/fs-shell-input-exec-debug \
 	$(OUTDIR)/fs-shell-signal-input-exec $(OUTDIR)/fs-shell-signal-input-exec-debug \
+	$(OUTDIR)/fs-shell-device $(OUTDIR)/fs-shell-device-debug \
+	$(OUTDIR)/fs-shell-signal-device $(OUTDIR)/fs-shell-signal-device-debug \
+	$(OUTDIR)/fs-shell-input-device $(OUTDIR)/fs-shell-input-device-debug \
+	$(OUTDIR)/fs-shell-signal-input-device $(OUTDIR)/fs-shell-signal-input-device-debug \
+	$(OUTDIR)/fs-shell-exec-device $(OUTDIR)/fs-shell-exec-device-debug \
+	$(OUTDIR)/fs-shell-signal-exec-device $(OUTDIR)/fs-shell-signal-exec-device-debug \
+	$(OUTDIR)/fs-shell-input-exec-device $(OUTDIR)/fs-shell-input-exec-device-debug \
+	$(OUTDIR)/fs-shell-signal-input-exec-device $(OUTDIR)/fs-shell-signal-input-exec-device-debug \
 	$(OUTDIR)/fs-shell-lean $(OUTDIR)/fs-shell-lean-debug \
 	$(OUTDIR)/fs-shell-fat $(OUTDIR)/fs-shell-fat-debug
 
@@ -114,13 +122,111 @@ $(OUTDIR)/fs-shell-input-exec-debug: fs-shell.c commands.c args-input.c
 $(OUTDIR)/fs-shell-signal-input-exec: fs-shell.c commands.c args-input.c
 	mkdir -p $(OUTDIR)
 	basename $@ >> $(OUTDIR)/build-inventory.txt
-	$(CC) $(CFLAGS) $(LFLAGS) $(MINFLAGS) -DUSE_SIGNALS=1 -DUSES_INPUT=1-DUSE_EXEC=1 $? $(LDFLAGS) -o $@
+	$(CC) $(CFLAGS) $(LFLAGS) $(MINFLAGS) -DUSE_SIGNALS=1 -DUSES_INPUT=1 -DUSE_EXEC=1 $? $(LDFLAGS) -o $@
 
 
 $(OUTDIR)/fs-shell-signal-input-exec-debug: fs-shell.c commands.c args-input.c
 	mkdir -p $(OUTDIR)
 	basename $@ >> $(OUTDIR)/build-inventory.txt
 	$(CC) $(CFLAGS) $(LFLAGS) $(DFLAGS) -DUSE_SIGNALS=1 -DUSES_INPUT=1 -DUSE_EXEC=1 $? $(LDFLAGS) -o $@
+
+
+
+
+$(OUTDIR)/fs-shell-device: fs-shell.c commands.c args-input.c
+	mkdir -p $(OUTDIR)
+	basename $@ >> $(OUTDIR)/build-inventory.txt
+	$(CC) $(CFLAGS) $(LFLAGS) $(MINFLAGS) -DUSES_DEVICE=1 $? $(LDFLAGS) -o $@
+
+
+$(OUTDIR)/fs-shell-device-debug: fs-shell.c commands.c args-input.c
+	mkdir -p $(OUTDIR)
+	basename $@ >> $(OUTDIR)/build-inventory.txt
+	$(CC) $(CFLAGS) $(LFLAGS) $(DFLAGS) -DUSES_DEVICE=1 $? $(LDFLAGS) -o $@
+
+
+$(OUTDIR)/fs-shell-signal-device: fs-shell.c commands.c args-input.c
+	mkdir -p $(OUTDIR)
+	basename $@ >> $(OUTDIR)/build-inventory.txt
+	$(CC) $(CFLAGS) $(LFLAGS) $(MINFLAGS) -DUSE_SIGNALS=1 -DUSES_DEVICE=1 $? $(LDFLAGS) -o $@
+
+
+$(OUTDIR)/fs-shell-signal-device-debug: fs-shell.c commands.c args-input.c
+	mkdir -p $(OUTDIR)
+	basename $@ >> $(OUTDIR)/build-inventory.txt
+	$(CC) $(CFLAGS) $(LFLAGS) $(DFLAGS) -DUSE_SIGNALS=1 -DUSES_DEVICE=1 $? $(LDFLAGS) -o $@
+
+
+$(OUTDIR)/fs-shell-input-device: fs-shell.c commands.c args-input.c
+	mkdir -p $(OUTDIR)
+	basename $@ >> $(OUTDIR)/build-inventory.txt
+	$(CC) $(CFLAGS) $(LFLAGS) $(MINFLAGS) -DUSES_DEVICE=1 -DUSES_INPUT=1 $? $(LDFLAGS) -o $@
+
+
+$(OUTDIR)/fs-shell-input-device-debug: fs-shell.c commands.c args-input.c
+	mkdir -p $(OUTDIR)
+	basename $@ >> $(OUTDIR)/build-inventory.txt
+	$(CC) $(CFLAGS) $(LFLAGS) $(DFLAGS) -DUSES_DEVICE=1 -DUSES_INPUT=1 $? $(LDFLAGS) -o $@
+
+
+$(OUTDIR)/fs-shell-signal-input-device: fs-shell.c commands.c args-input.c
+	mkdir -p $(OUTDIR)
+	basename $@ >> $(OUTDIR)/build-inventory.txt
+	$(CC) $(CFLAGS) $(LFLAGS) $(MINFLAGS) -DUSE_SIGNALS=1 -DUSES_INPUT=1 -DUSES_DEVICE=1 $? $(LDFLAGS) -o $@
+
+
+$(OUTDIR)/fs-shell-signal-input-device-debug: fs-shell.c commands.c args-input.c
+	mkdir -p $(OUTDIR)
+	basename $@ >> $(OUTDIR)/build-inventory.txt
+	$(CC) $(CFLAGS) $(LFLAGS) $(DFLAGS) -DUSE_SIGNALS=1 -DUSES_INPUT=1 -DUSES_DEVICE=1 $? $(LDFLAGS) -o $@
+
+
+$(OUTDIR)/fs-shell-exec-device: fs-shell.c commands.c args-input.c
+	mkdir -p $(OUTDIR)
+	basename $@ >> $(OUTDIR)/build-inventory.txt
+	$(CC) $(CFLAGS) $(LFLAGS) $(MINFLAGS) -DUSE_EXEC=1 -DUSES_DEVICE=1 $? $(LDFLAGS) -o $@
+
+
+$(OUTDIR)/fs-shell-exec-device-debug: fs-shell.c commands.c args-input.c
+	mkdir -p $(OUTDIR)
+	basename $@ >> $(OUTDIR)/build-inventory.txt
+	$(CC) $(CFLAGS) $(LFLAGS) $(DFLAGS) -DUSE_EXEC=1 -DUSES_DEVICE=1 $? $(LDFLAGS) -o $@
+
+
+$(OUTDIR)/fs-shell-signal-exec-device: fs-shell.c commands.c args-input.c
+	mkdir -p $(OUTDIR)
+	basename $@ >> $(OUTDIR)/build-inventory.txt
+	$(CC) $(CFLAGS) $(LFLAGS) $(MINFLAGS) -DUSE_SIGNALS=1 -DUSE_EXEC=1 -DUSES_DEVICE=1 $? $(LDFLAGS) -o $@
+
+
+$(OUTDIR)/fs-shell-signal-exec-device-debug: fs-shell.c commands.c args-input.c
+	mkdir -p $(OUTDIR)
+	basename $@ >> $(OUTDIR)/build-inventory.txt
+	$(CC) $(CFLAGS) $(LFLAGS) $(DFLAGS) -DUSE_SIGNALS=1 -DUSE_EXEC=1 -DUSES_DEVICE=1 $? $(LDFLAGS) -o $@
+
+
+$(OUTDIR)/fs-shell-input-exec-device: fs-shell.c commands.c args-input.c
+	mkdir -p $(OUTDIR)
+	basename $@ >> $(OUTDIR)/build-inventory.txt
+	$(CC) $(CFLAGS) $(LFLAGS) $(MINFLAGS) -DUSE_EXEC=1 -DUSES_INPUT=1 -DUSES_DEVICE=1 $? $(LDFLAGS) -o $@
+
+
+$(OUTDIR)/fs-shell-input-exec-device-debug: fs-shell.c commands.c args-input.c
+	mkdir -p $(OUTDIR)
+	basename $@ >> $(OUTDIR)/build-inventory.txt
+	$(CC) $(CFLAGS) $(LFLAGS) $(DFLAGS) -DUSE_EXEC=1 -DUSES_INPUT=1 -DUSES_DEVICE=1 $? $(LDFLAGS) -o $@
+
+
+$(OUTDIR)/fs-shell-signal-input-exec-device: fs-shell.c commands.c args-input.c
+	mkdir -p $(OUTDIR)
+	basename $@ >> $(OUTDIR)/build-inventory.txt
+	$(CC) $(CFLAGS) $(LFLAGS) $(MINFLAGS) -DUSE_SIGNALS=1 -DUSES_INPUT=1 -DUSE_EXEC=1 -DUSES_DEVICE=1 $? $(LDFLAGS) -o $@
+
+
+$(OUTDIR)/fs-shell-signal-input-exec-device-debug: fs-shell.c commands.c args-input.c
+	mkdir -p $(OUTDIR)
+	basename $@ >> $(OUTDIR)/build-inventory.txt
+	$(CC) $(CFLAGS) $(LFLAGS) $(DFLAGS) -DUSE_SIGNALS=1 -DUSES_INPUT=1 -DUSE_EXEC=1 -DUSES_DEVICE=1 $? $(LDFLAGS) -o $@
 
 
 $(OUTDIR)/fs-shell-lean: $(OUTDIR)/fs-shell
@@ -131,10 +237,10 @@ $(OUTDIR)/fs-shell-lean-debug: $(OUTDIR)/fs-shell-debug
 	cp $? $@
 	basename $@ >> $(OUTDIR)/build-inventory.txt
 
-$(OUTDIR)/fs-shell-fat: $(OUTDIR)/fs-shell-signal-input-exec
+$(OUTDIR)/fs-shell-fat: $(OUTDIR)/fs-shell-signal-input-exec-device
 	cp $? $@
 	basename $@ >> $(OUTDIR)/build-inventory.txt
 	
-$(OUTDIR)/fs-shell-fat-debug: $(OUTDIR)/fs-shell-signal-input-exec-debug
+$(OUTDIR)/fs-shell-fat-debug: $(OUTDIR)/fs-shell-signal-input-exec-device-debug
 	cp $? $@
 	basename $@ >> $(OUTDIR)/build-inventory.txt

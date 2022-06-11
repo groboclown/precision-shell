@@ -39,7 +39,7 @@ if [ -s out.txt ] || [ -s err.txt ] ; then
     exit 1
 fi
 
-# should have: out.txt and err.txt and a.txt
+# should have: out.txt and err.txt and a.txt and linked-a.txt
 count="$( ls -1A | wc -l )"
 if [ ${count} != 4 ] ; then
     echo "Generated unexpected files:"

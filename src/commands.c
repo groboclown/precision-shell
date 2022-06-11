@@ -29,13 +29,16 @@ SOFTWARE.
 #include <signal.h>
 #include <errno.h>
 #include <time.h>
-#include <unistd.h>
-// #include <fcntl.h>
+// #include <unistd.h>
+#include <fcntl.h>
 #include "output.h"
 #include "general.h"
 #include "args.h"
 #include "version.h"
 #include "commands.h"
+
+// Note: the "*1" to "*2" and so on
+// are importantly numbered to allow for +1
 
 #define CMD_ERR     0
 #define CMD_NOOP    1
@@ -43,29 +46,41 @@ SOFTWARE.
 #define CMD_VERSION 3
 #define CMD_RM      3
 #define CMD_RMDIR   4
-#define CMD_MKDIR   5
-#define CMD_CHMOD   6
-#define CMD_CHOWN   7
-#define CMD_HLINK   8
-#define CMD_SLINK   9
-#define CMD_MV      10
+#define CMD_MKDIR1  5
+#define CMD_MKDIR2  6
+#define CMD_CHMOD1  7
+#define CMD_CHMOD2  8
+#define CMD_CHOWN1  9
+#define CMD_CHOWN2  10
+#define CMD_CHOWN3  11
+#define CMD_HLINK1  12
+#define CMD_HLINK2  13
+#define CMD_SLINK1  14
+#define CMD_SLINK2  15
+#define CMD_MV1     16
+#define CMD_MV2     17
 
 // TODO FUTURE sleep should be under signals, but versioning
 //   prevents this from being moved until a major version change
 //   due to breaking backwards-compatibility with cmd to build
 //   relationships.
-#define CMD_SLEEP   11
+#define CMD_SLEEP   18
 
 #ifdef USES_INPUT
-#define CMD_TOUCH   12
-#define CMD_DUP     13
-#define CMD_MKDNOD  14
-#define CMD_MKSNOD  15
-#define CMD_MKXNOD  16
+#define CMD_TOUCH   19
+#define CMD_DUP1    20
+#define CMD_DUP2    21
+#endif
+#ifdef USES_DEVICE
+#define CMD_MKDNOD1 22
+#define CMD_MKDNOD2 23
+#define CMD_MKDNOD3 24
+#define CMD_MKSNOD  25
+#define CMD_MKXNOD  26
 #endif
 
 #ifdef USE_SIGNALS
-#define CMD_PAUSE   17
+#define CMD_PAUSE   27
 #endif
 
 // CMD_EXEC is handled ... differently.
@@ -234,56 +249,44 @@ int runCommands() {
                 cmd = CMD_TOUCH;
                 val1 = O_WRONLY | O_CREAT | O_TRUNC;
             } else if (strequal("dup-r", cmdName) || strequal("dup-w", cmdName) || strequal("dup-a", cmdName)) {
-                cmd = CMD_ERR;
-                if (arg != NULL) {
-                    cmd = CMD_DUP;
-                    // fd
-                    val1 = toUint(arg, 10, 0xffff);
-                    if (val1 < 0) {
-                        cmd = CMD_ERR;
-                        // and do not advance arg, because we want to report
-                        // this error.
-                    } else {
-                        arg = advanceToken();
-                    }
-                }
+                cmd = CMD_DUP1;
+#endif
+#ifdef USES_DEVICE
             } else if (strequal("mknod", cmdName)) {
                 cmd = CMD_MKSNOD;
                 // Takes an extra argument to indicate the kind of
                 // special node to make.
             } else if (strequal("mkdev", cmdName)) {
-                cmd = CMD_MKDNOD;
+                cmd = CMD_MKDNOD1;
                 // Takes an extra 2 arguments, parsed below.
                 // There is a third argument, too, which is the device type,
                 // before listing the files.  Once that argument is consumed,
                 // this is turned into a CMD_MKXNOD command.
 #endif
             } else if (strequal("mkdir", cmdName)) {
-                cmd = CMD_MKDIR;
+                cmd = CMD_MKDIR1;
                 // takes an extra argument, parsed below.
             } else if (strequal("chmod", cmdName)) {
-                cmd = CMD_CHMOD;
-                // takes an extra argument, parsed below.
+                cmd = CMD_CHMOD1;
             } else if (strequal("chown", cmdName)) {
-                cmd = CMD_CHOWN;
-                // takes 2 extra arguments, parsed below.
+                cmd = CMD_CHOWN1;
             } else if (strequal("ln-s", cmdName)) {
                 // symbolic link.  Special case where next arg is source and
                 //   the following arg is the destination.
                 // Due to the way error handling is done, the two arguments
                 //   are parsed when the first one is encountered.  That means
                 //   "ln-s && noop" is the same as "noop && noop"
-                cmd = CMD_SLINK;
+                cmd = CMD_SLINK1;
             } else if (strequal("ln-h", cmdName)) {
                 // hard link.  Special case where next arg is source and
                 //   the following arg is the destination.
                 // Due to the way error handling is done, the two arguments
                 //   are parsed when the first one is encountered.  That means
                 //   "ln-h && noop" is the same as "noop && noop"
-                cmd = CMD_HLINK;
+                cmd = CMD_HLINK1;
             } else if (strequal("mv", cmdName)) {
                 // Move file.  Similar to ln-s and ln-h.
-                cmd = CMD_MV;
+                cmd = CMD_MV1;
             } else if (strequal("sleep", cmdName)) {
                 // Sleep for a time.
                 cmd = CMD_SLEEP;
@@ -369,83 +372,6 @@ int runCommands() {
                 // not report an error if there is no argument.
             }
 
-            // Extra initial argument parsing is performed here, to unify
-            // the kinds of parsing into one place.
-
-            if (
-                    cmd == CMD_CHMOD
-                    || cmd == CMD_MKDIR
-                    || cmd == CMD_CHOWN
-#ifdef USES_INPUT
-                    || cmd == CMD_MKDNOD
-#endif
-            ) {
-                // These commands take a numeric first parameter.
-                // The value is stored in val1.
-
-                // TODO FUTURE future version will remove the
-                // mode number as an argument for mkdir, and instead default to
-                // a fixed number; if that is not desired, then the
-                // chmod can run after this to change it to the desired number.
-
-                if (arg != NULL) {
-                    if (cmd == CMD_CHMOD || cmd == CMD_MKDIR) {
-                        // file mode, which is octal in range [0, 07777].
-                        val1 = toUint(arg, 8, 07777);
-                    } else {
-                        // 16-bit numeric.
-                        val1 = toUint(arg, 10, 0xffff);
-                    }
-                    if (val1 < 0) {
-                        cmd = CMD_ERR;
-                        // and do not advance arg, because we want to report
-                        // this error.
-                    } else {
-                        arg = advanceToken();
-                    }
-                } else {
-                    cmd = CMD_ERR;
-                }
-            }
-
-            if (
-                    cmd == CMD_CHOWN
-#ifdef USES_INPUT
-                    || cmd == CMD_MKDNOD
-#endif
-            ) {
-                // These commands take a second parameter which is an integer
-                // value between 0 and 0xffff inclusive.
-                // The value is stored in val2
-
-                if (arg != NULL) {
-                    val2 = toUint(arg, 10, 0xffff);
-                    if (val2 < 0) {
-                        cmd = CMD_ERR;
-                        // and do not advance arg, because we want to report
-                        // this error.
-                    } else {
-                        arg = advanceToken();
-                    }
-                } else {
-                    cmd = CMD_ERR;
-                }
-            }
-
-            if (
-                    cmd == CMD_MV
-                    || cmd == CMD_HLINK
-                    || cmd == CMD_SLINK
-            ) {
-                // These commands require an extra string argument.
-                // These are stored in arg2.
-                arg2 = advanceToken();
-                if (arg2 == NULL) {
-                    err = 1;
-                }
-            }
-
-
             continue;
         }
 
@@ -484,76 +410,160 @@ int runCommands() {
             err = 0;
             switch (cmd) {
                 case CMD_ERR:
+                    LOG(":: error\n");
                     err = 1;
                     break;
+
+                // Extra argument processing case statements.
+                // These must be designed such that the follow-up command parsing
+                // is (current command + 1).
+                // If these encounter an error, the command case will switch
+                // to CMD_ERR to prevent the real command from running.
+                
+
+                // Commands that take a file mode value in val1
+                case CMD_MKDIR1:
+                case CMD_CHMOD1:
+                    LOG(":: Parsing arg as base 8 in val1: ");
+                    LOGLN(arg);
+
+                    // Next argument is command + 1
+                    cmd++;
+                    // file mode, which is octal in range [0, 07777].
+                    val1 = toUint(arg, 8, 07777);
+                    if (val1 < 0) {
+                        LOG("::  - Bad base 8 number, or out of range\n");
+                        err = 1;
+                        cmd = CMD_ERR;
+                        // and do not advance arg, because we want to report
+                        // this error.
+                    }
+                    break;
+
+                // Commands that take a decimal value in val1
+                case CMD_CHOWN1:
+#ifdef USES_INPUT
+                case CMD_DUP1:
+#endif
+#ifdef USES_DEVICE
+                case CMD_MKDNOD1:
+#endif
+                    LOG(":: Parsing arg as base 10 in val1: ");
+                    LOGLN(arg);
+                    cmd++;
+                    val1 = toUint(arg, 10, 0xffff);
+                    if (val1 < 0) {
+                        LOG("::  - Bad base 10 number, or out of range\n");
+                        err = 1;
+                        cmd = CMD_ERR;
+                    }
+                    break;
+
+                // Commands that take a decimal value in val2
+                case CMD_CHOWN2:
+#ifdef USES_DEVICE
+                case CMD_MKDNOD2:
+#endif
+                    LOG(":: Parsing arg as base 10 in val2: ");
+                    LOGLN(arg);
+                    cmd++;
+                    val2 = toUint(arg, 10, 0xffff);
+                    if (val2 < 0) {
+                        LOG("::  - Bad base 10 number, or out of range\n");
+                        err = 1;
+                        cmd = CMD_ERR;
+                    }
+                    break;
+
+                // Commands that take a required string in arg2
+                case CMD_SLINK1:
+                case CMD_HLINK1:
+                case CMD_MV1:
+                    LOG(":: Loading arg into arg2: ");
+                    LOGLN(arg);
+                    cmd++;
+                    arg2 = arg;
+                    break;
+
+                // Run commands
                 case CMD_ECHO:
                     LOG(":: echo ");
                     LOGLN(arg);
-
                     stdoutPLn(arg);
                     break;
+
                 case CMD_RM:
                     LOG(":: rm ");
                     LOGLN(arg);
                     err = unlink(arg);
                     break;
+
                 case CMD_RMDIR:
                     LOG(":: rmdir ");
                     LOGLN(arg);
                     err = rmdir(arg);
                     break;
-                case CMD_MKDIR:
+
+                case CMD_MKDIR2:
                     LOG(":: mkdir ");
                     LOGLN(arg);
                     err = mkdir(arg, val1);
                     break;
-                case CMD_CHOWN:
+
+                case CMD_CHOWN3:
                     LOG(":: chown ");
                     LOGLN(arg);
                     err = chown(arg, val1, val2);
                     break;
-                case CMD_CHMOD:
+
+                case CMD_CHMOD2:
                     LOG(":: chmod ");
                     LOGLN(arg);
                     err = chmod(arg, val1);
                     break;
-                case CMD_SLINK:
+
+                case CMD_SLINK2:
                     // First argument loaded into arg2
                     LOG(":: ln-s ");
-                    LOG(arg);
+                    LOG(arg2);
                     LOG(" ");
-                    LOGLN(arg2);
-                    err = symlink(arg, arg2);
+                    LOGLN(arg);
+                    err = symlink(arg2, arg);
                     // Because this command only takes 2 arguments, set the
                     // current command as err.  Because we keep the real command name
                     // in cmdName, this change doesn't affect error reporting.
                     cmd = CMD_ERR;
                     break;
-                case CMD_HLINK:
+
+                case CMD_HLINK2:
                     // First argument loaded into arg2
                     LOG(":: ln-h ");
-                    LOG(arg);
+                    LOG(arg2);
                     LOG(" ");
-                    LOGLN(arg2);
-                    err = link(arg, arg2);
+                    LOGLN(arg);
+                    err = link(arg2, arg);
                     // Because this command only takes 2 arguments, set the
                     // current command as err.  Because we keep the real command name
                     // in cmdName, this change doesn't affect error reporting.
                     cmd = CMD_ERR;
                     break;
-                case CMD_MV:
+
+                case CMD_MV2:
                     // First argument loaded into arg2
                     LOG(":: mv ");
                     LOG(arg);
                     LOG(" ");
                     LOGLN(arg2);
-                    err = rename(arg, arg2);
+                    err = rename(arg2, arg);
                     // Because this command only takes 2 arguments, set the
                     // current command as err.  Because we keep the real command name
                     // in cmdName, this change doesn't affect error reporting.
                     cmd = CMD_ERR;
                     break;
+
                 case CMD_SLEEP:
+                    LOG(":: sleep ");
+                    LOGLN(arg)
                     val1 = toUint(arg, 10, MAX_SLEEP_SECONDS);
                     if (val1 > 0) {
                         sleep(val1);
@@ -578,7 +588,8 @@ int runCommands() {
                         close(val2);
                     }
                     break;
-                case CMD_DUP:
+
+                case CMD_DUP2:
                     // This command takes 2 arguments, so any more is wrong.
                     cmd = CMD_ERR;
                     // val1 == fd to take on the role.
@@ -617,16 +628,17 @@ int runCommands() {
                     }
 
                     break;
-
-                case CMD_MKDNOD:
+#endif
+#ifdef USES_DEVICE
+                case CMD_MKDNOD3:
                     // mkdnod requires a follow-up mknod using the generated
                     // device number and mode.
-                    
+
                     // This particular part sets up the variables used to
                     // invoke mknod with the file parameter.
                     cmd = CMD_MKXNOD;
 
-                    LOG(":: makedev ");
+                    LOG(":: mkdev ");
                     LOGLN(arg);
 
                     // val1 is the major
@@ -645,6 +657,7 @@ int runCommands() {
                         val2 |= S_IFCHR;
                     } else {
                         err = 1;
+                        cmd = CMD_ERR;
                     }
 
                     break;
@@ -656,7 +669,7 @@ int runCommands() {
                     // invoke mknod with the file parameter.
                     cmd = CMD_MKXNOD;
 
-                    LOG(":: mksnod ");
+                    LOG(":: mknod type ");
                     LOGLN(arg);
 
                     // arg is the node type, either 'p' (fifo) or 's' (unix domain socket)
@@ -668,6 +681,7 @@ int runCommands() {
                         val2 |= S_IFSOCK;
                     } else {
                         err = 1;
+                        cmd = CMD_ERR;
                     }
 
                     break;
