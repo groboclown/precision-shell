@@ -4,6 +4,10 @@
 * Added new commands:
     * touch
     * trunc
+    * dup-r
+    * dup-w
+    * dup-a
+* Added a 'build-inventory.txt' file to the output directory to include all the files created.  This helps with scripts to read the list of files, rather than needing to maintain duplicate lists throught the system.
 
 
 ## v1.1.2

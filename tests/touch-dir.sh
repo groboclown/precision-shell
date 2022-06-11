@@ -12,7 +12,7 @@ if [ ${res} -ne 1 ] ; then
     exit 1
 fi
 
-if [ "$( printf "ERROR touch: a.txt\\n" )" != "$( cat err.txt )" ] ; then
+if [ "$( printf "ERROR touch: a\\n" )" != "$( cat err.txt )" ] ; then
     echo "Generated unexpected stderr"
     cat err.txt
     exit 1

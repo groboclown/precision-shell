@@ -30,11 +30,8 @@ outdir=.
 base=fs-shell
 suffix=""
 force=1
+debug=0
 image_name="$1"
-all_files=". \
-    .-signal .-input .-signal-input \
-    .-exec .-signal-exec .-input-exec .-signal-input-exec \
-    .-fat .-lean"
 shift
 
 while [ ! -z "$1" ] ; do
@@ -50,12 +47,7 @@ while [ ! -z "$1" ] ; do
             shift
             ;;
         -d)
-            # Note: using -d twice causes an error.
-            parts="${all_files}"
-            all_files=""
-            for n in ${parts} ; do
-                all_files="${all_files} ${n} ${n}-debug"
-            done
+            debug=1
             ;;
         -b)
             base="$1"
@@ -102,8 +94,24 @@ fi
 
 
 container=$( "${container_exe}" create "${image_name}" ) || exit 1
+inventory="${outdir}/build-inventory.txt"
+"${container_exe}" cp "${container}:/opt/code/out/build-inventory.txt" "${inventory}"
+all_files=""
+for name in $( cat "${inventory}" | sort | uniq ) ; do
+    if [ ${debug} = 1 ] || [ ${name} != *-debug ] ; then
+        # Either include debug files, or exclude files ending with -debug.
+        all_files="${all_files} ${name}"
+    fi
+done
+if [ -z "${all_files}" ] ; then
+    echo "No built files found in image."
+    exit 1
+fi
+
+err=0
 for part in ${all_files} ; do
-    part="${part:1}"
+    # Strip off the 'fs-shell' from the name.
+    part="${part:8}"
     src="${container}:/opt/code/out/fs-shell${part}"
     tgt="${outdir}/${base}${part}${suffix}"
     if [ ${force} = 0 ] && [ -e "${tgt}" ] ; then
@@ -111,6 +119,10 @@ for part in ${all_files} ; do
     else
         # Keep going on failure.
         "${container_exe}" cp "${src}" "${tgt}"
+        if [ $? != 0 ] ; then
+            err=1
+        fi
     fi
 done
 "${container_exe}" rm "${container}" >/dev/null
+exit ${err}

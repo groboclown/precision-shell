@@ -39,8 +39,10 @@ The shell supports these commands:
 * [ln-s](#ln-s) - create a symbolic link.
 * [ln-h](#ln-h) - create a hard link.
 * [sleep](#sleep) - wait for a number of seconds.
+* [mknod](#mknod) - create a special OS node. *Only available in input-enabled builds.*
 * [touch](#touch) - Update the access and modification times of each file to the current time, or, if a file does not exist, it is created empty. *Only available in input-enabled builds.*
 * [trunc](#trunc) - Sets the file length to 0, and if the file does not exist, creates it. *Only available in input-enabled builds.*
+* [dup-r, dup-w, dup-a](#dup) - duplicates a file to a file descriptor for the remaining commands in this execution. *Only available in input-enabled builds.*
 * [signal .. wait](#signal-wait) - wait for an OS signal before continuing. *Only available in signal-enabled builds.*
 * [exec](#exec) - switch execution to a new process. *Only available in exec-enabled builds.*
 
@@ -70,7 +72,7 @@ RUN echo Startup \
 
 * List files.
 * Copy files.
-* Modify files.
+* Modify files.  *With input-enabled builds, files can be truncated and written to.*
 * Alter file contents.
 * Process controls.
 * Report detailed error messages.
@@ -191,6 +193,14 @@ Usage: `sleep (seconds ...)`
 
 Sleeps for the number of seconds in the argument.  If no arguments are given, or if an argument is not a positive integer, then it does nothing (no error).  If multiple, positive integers are given, then it sleeps for the sum of them.
 
+### mknod
+
+Usage: `mknod (node type) (file1 (file2 ...))`
+
+Creates a special or ordinary file of the given type.  The node type is OS specific, but in general, the values supported are:
+
+
+
 ### touch
 
 *Only available in input-enabled builds.*
@@ -206,6 +216,72 @@ For each argument, if it does not exist, it is created.  If the argument exists 
 Usage: `trunc (file (file ...))`
 
 For each argument, sets the file length to 0 if the file exists, otherwise creates the file.  This is nearly identical to [touch](#touch), with the addition of setting file lengths to 0.
+
+### dup-r, dup-w, dup-a
+
+*Only available in input-enabled builds.*
+
+Usage: `dup-w (fd) (file)`
+Usage: `dup-r (fd) (file)`
+Usage: `dup-a (fd) (file)`
+
+Opens the given file in either write + truncate mode (`dup-w`), write + append mode (`dup-a`), or read mode (`dup-r`), then duplicates that file descriptor to the "fd" argument.  This duplication remains in effect for the remainder of the execution, or until another `dup` command runs for the same file descriptor.
+
+This is the equivalent of running a command like `echo > out.txt` to redirect stdout, stderr, or stdin to a file.
+
+You can also use the special files "&1" and "&2" to redirect stdout or stderr, respectively, to the file descriptor.  See examples for interesting usages.
+
+Note that this cannot be used for redirecting output from one command into another; that requires FIFO queues and job control, which this shell doesn't support.
+
+**Example 1:**
+
+Run `echo` with output sent to the file `here.txt`, appending existing text.
+
+```bash
+echo -n "foo" > here.txt
+fs-shell -c "dup-a 1 here.txt && echo ' bar text' && echo more text"
+```
+
+And the file `here.txt` will contain:
+
+```
+foo bar text
+more
+text
+```
+
+**Example 2:**
+
+Run `echo` with output sent to stderr
+
+```bash
+# These are equivalent
+fs-shell -c "dup-w 1 &2 && echo hello"
+bash -c "echo hello 1>&2"
+```
+
+**Example 3:**
+
+Run `find` command with stdout redirected to file `out.txt` and stderr redirected to file `err.txt`
+
+```bash
+# These are equivalent
+fs-shell -c "dup-w 1 out.txt && dup-w 2 err.txt && exec /usr/sbin/find /var -type f"
+bash -c "find /var -type f >out.txt 2>err.txt"
+```
+
+**Example 4:**
+
+Generate some text to a file named `contents.txt`, then and sort it into another file named `sorted.txt`.
+
+```bash
+fs-shell -c "dup-w 1 contents.txt \
+    && echo foo bar baz \
+    && dup-w 1 sorted.txt \
+    && dup-r 0 contents.txt \
+    && exec /usr/sbin/sort"
+```
+
 
 ### signal-wait
 
@@ -333,6 +409,14 @@ To bump the version number, change the [version.txt](version.txt) file.  Version
 ## Contributing
 
 To contribute to the project, submit a PR or open a bug.  All code submitted must be licensed under the MIT license.
+
+
+## Some Future Items
+
+Future versions will have some backwards-incompatible changes:
+
+* `sleep` will be put under the "signal" category of commands.
+* `mkdir` will no longer take a mode argument and instead use a default one; users who want a non-standard mode will need to run `chmod` afterwards to set the mode.
 
 
 ## License
