@@ -7,34 +7,15 @@
 #define _VERSION_DEBUG
 #endif
 
-#ifdef USE_SIGNALS
-#define _VERSION_SIGNALS " +signals"
-#else
-#define _VERSION_SIGNALS
-#endif
-
-#ifdef USES_INPUT
+#ifdef USE_STREAMING_INPUT
 #define _VERSION_INPUT " +input"
 #else
-#define _VERSION_INPUT
-#endif
-
-#ifdef USES_DEVICE
-#define _VERSION_DEVICE " +device"
-#else
-#define _VERSION_DEVICE
-#endif
-
-#ifdef USE_EXEC
-#define _VERSION_EXEC " +exec"
-#else
-#define _VERSION_EXEC
+#define _VERSION_INPUT ""
 #endif
 
 static const char *VERSION_STR =
     // The "fs-shell" should come from the arg0, but we lose that
     // in the argument processing.
-    "fs-shell " VERSION_NUMBER
-    _VERSION_SIGNALS _VERSION_INPUT _VERSION_EXEC _VERSION_DEVICE _VERSION_DEBUG "\n";
+    " " VERSION_NUMBER _VERSION_INPUT _VERSION_DEBUG " with commands: ";
 
-#endif
+#endif /* _FS_SHELL_VERSION_ */

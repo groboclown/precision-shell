@@ -32,15 +32,24 @@ SOFTWARE.
  * See "commands.c" for a list of supported commands.
  */
 #include <stddef.h>
+#include "globals.h"
 #include "args.h"
-#include "commands.h"
+#include "command_runner.h"
 
 
-int main(const int srcArgc, char *srcArgv[]) {
-    int ret = setupTokenizer(srcArgc, srcArgv);
+int main(const int argc, char *argv[]) {
+    // Set the invoked name now, before the parser loses it.
+    global_invoked_name = argv[0];
+
+    // Initialize the argument parser.
+    int ret = args_setup_tokenizer(argc, argv);
     if (!ret) {
-        ret = runCommands();
+        // Run all the commands
+        ret = command_runner();
     }
-    ret += closeTokenizer();
+    // Close the tokenizer, capturing any additional errors along the way.
+    ret += args_close_tokenizer();
+
+    // Exit code.
     return ret;
 }

@@ -21,32 +21,34 @@ LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
 */
-#ifndef FS_SHELL_ARGS
-#define FS_SHELL_ARGS
 
-/**
- * @brief Parse the shell execution request into tokens.
- * 
- * After calling this and all advanceToken calls, "closeTokenizer()" must be called.
- * 
- * @return 0 if okay, != 0 if problem.
- */
-int args_setup_tokenizer(const int srcArgc, char *srcArgv[]);
+#include "uses.h"
 
-/**
- * @brief advance to the next token.
- * 
- * "tokenize" must be called first.
- * 
- * @return const char* 
- */
-const char *args_advance_token();
+#ifdef USES_FMODE
 
-/**
- * @brief Clean out the tokenizer after using it.
- * 
- * @return int 0 if okay, non-zero if error.
- */
-int args_close_tokenizer();
+#include "globals.h"
+#include "command_list.h"
+#include "helpers.h"
 
+
+int cmd_fmode_run() {
+    // File mode is only up to the first 3 nybbles.
+    // Due to error checking, this will not change fmode unless it's okay.
+    int val = helper_arg_to_uint(8, 0777);
+    if (val < 0) {
+        // error
+        return 1;
+    }
+    global_fmode = val;
+
+    // Nothing must run after this.
+    global_cmd = COMMAND_INDEX__ERR;
+
+    // No error.
+    return 0;
+}
+
+#else /* USES_FMODE */
+// disable pedantic warning
+typedef int iso_translation_unit_FMODE;
 #endif

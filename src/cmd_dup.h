@@ -21,32 +21,33 @@ LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
 */
-#ifndef FS_SHELL_ARGS
-#define FS_SHELL_ARGS
 
-/**
- * @brief Parse the shell execution request into tokens.
- * 
- * After calling this and all advanceToken calls, "closeTokenizer()" must be called.
- * 
- * @return 0 if okay, != 0 if problem.
- */
-int args_setup_tokenizer(const int srcArgc, char *srcArgv[]);
+#ifndef _FS_SHELL__CMD_DUP_
 
-/**
- * @brief advance to the next token.
- * 
- * "tokenize" must be called first.
- * 
- * @return const char* 
- */
-const char *args_advance_token();
+#include "uses.h"
 
-/**
- * @brief Clean out the tokenizer after using it.
- * 
- * @return int 0 if okay, non-zero if error.
- */
-int args_close_tokenizer();
 
-#endif
+#ifdef USE_CMD_DUP_A
+// cmd_dup_a_setup sets up the dup command
+int cmd_dup_a_setup();
+#endif /* USE_CMD_DUP_A */
+
+#ifdef USE_CMD_DUP_W
+// cmd_dup_w_setup sets up the dup command
+int cmd_dup_w_setup();
+#endif /* USE_CMD_DUP_W */
+
+#ifdef USE_CMD_DUP_R
+// cmd_dup_r_setup sets up the dup command
+int cmd_dup_r_setup();
+#endif /* USE_CMD_DUP_R */
+
+
+#ifdef USES_DUP
+
+// run the dup command
+int cmd_dup_run();
+
+#endif /* USES_DUP */
+
+#endif /* _FS_SHELL__CMD_DUP_ */

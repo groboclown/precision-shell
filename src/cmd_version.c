@@ -22,10 +22,25 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
 */
 
-#ifndef FS_SHELL_GENERAL
-#define FS_SHELL_GENERAL
+// version is universal and does not have a ifdef
 
-// simplified semantics on strcmp.
-#define strequal(a, b) (strcmp((a), (b)) == 0)
+#include "version.h"
+#include "output.h"
+#include "globals.h"
+#include "command_list.h"
 
-#endif
+
+int cmd_version_setup(int idx) {
+    stdoutP(global_invoked_name);
+    stdoutP(VERSION_STR);
+    for (idx = COMMAND_INDEX__NOOP; idx < COMMAND_INDEX__ERR; idx++) {
+        // Only output included commands that are not virtual.
+        if (command_list_names[idx][0] != 0) {
+            stdoutP(" ");
+            stdoutP(command_list_names[idx]);
+        }
+    }
+    stdoutP("\n");
+    // should be no arguments, so immediately switch to error mode.
+    return COMMAND_INDEX__ERR;
+}

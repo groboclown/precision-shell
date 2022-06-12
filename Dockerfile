@@ -17,7 +17,7 @@ RUN \
 # The real image.
 FROM scratch
 LABEL name="local/fs-shell" \
-      version="1.1.2"
+      version="2.0.0"
 
 # Set the executable under the file "/bin/sh", so that
 #   docker will use it as the default shell when it encounters

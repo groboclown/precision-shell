@@ -22,10 +22,12 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
 */
 
+#ifndef USE_STREAMING_INPUT
+
 #include <stdlib.h>
 #include <string.h>
 #include "output.h"
-#include "general.h"
+#include "helpers.h"
 #include "args.h"
 
 #define PARSE_SEARCH 0
@@ -40,7 +42,7 @@ static int _argi = 0;
 static int _allocated = 0;
 
 
-const char *advanceToken() {
+const char *args_advance_token() {
     if (_argi < _argc) {
         return _argv[_argi++];
     }
@@ -48,7 +50,7 @@ const char *advanceToken() {
 }
 
 
-int setupTokenizer(const int srcArgc, char *srcArgv[]) {
+int args_setup_tokenizer(const int srcArgc, char *srcArgv[]) {
     _argc = srcArgc;
     _argv = srcArgv;
     _argi = 1;
@@ -207,7 +209,7 @@ int setupTokenizer(const int srcArgc, char *srcArgv[]) {
     return 0;
 }
 
-int closeTokenizer() {
+int args_close_tokenizer() {
     // not needed, but we're nice.
     if (_allocated == 1) {
         free(_argv);
@@ -215,3 +217,8 @@ int closeTokenizer() {
     }
     return 0;
 }
+
+#else /* USE_STREAMING_INPUT */
+// disable pedantic warning
+typedef int iso_translation_unit_ARGS_ARGV;
+#endif

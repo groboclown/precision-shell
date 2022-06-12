@@ -21,32 +21,45 @@ LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
 */
-#ifndef FS_SHELL_ARGS
-#define FS_SHELL_ARGS
+#ifndef _FS_SHELL__USES_
+#define _FS_SHELL__USES_
 
-/**
- * @brief Parse the shell execution request into tokens.
- * 
- * After calling this and all advanceToken calls, "closeTokenizer()" must be called.
- * 
- * @return 0 if okay, != 0 if problem.
- */
-int args_setup_tokenizer(const int srcArgc, char *srcArgv[]);
+// The first includes.
 
-/**
- * @brief advance to the next token.
- * 
- * "tokenize" must be called first.
- * 
- * @return const char* 
- */
-const char *args_advance_token();
 
-/**
- * @brief Clean out the tokenizer after using it.
- * 
- * @return int 0 if okay, non-zero if error.
- */
-int args_close_tokenizer();
+// USES_SIGNALS - signal processing and special global variables are used.
+#ifdef USE_CMD_SIGNAL
+
+#define USES_SIGNALS 1
 
 #endif
+
+
+// USES_DUP - uses at least one of the file descriptor dup commands.
+#if defined(USE_CMD_DUP_A) || defined(USE_CMD_DUP_R) || defined(USE_CMD_DUP_W)
+
+#define USES_DUP 1
+
+#endif
+
+
+#if defined(USE_CMD_MKNOD) || defined(USE_CMD_MKDEV)
+
+#define USES_MKNOD 1
+
+#endif
+
+
+// USES_FMODE - special file mode processing and handling.
+//   Note that chmod does not use this!
+#if    defined(USE_CMD_MKDIR) \
+    || defined(USE_CMD_MKNOD) \
+    || defined(USE_CMD_MKDEV) \
+    || defined(USES_DUP)
+
+#define USES_FMODE 1
+
+#endif
+
+
+#endif /* _FS_SHELL__USES_ */

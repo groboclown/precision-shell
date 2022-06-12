@@ -22,6 +22,8 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
 */
 
+#ifdef USE_STREAMING_INPUT
+
 #include <string.h>
 #include <stdlib.h>
 #include <stdio.h>
@@ -72,12 +74,12 @@ static int _inputBufferTarget = 0;
 static int _parseState = PARSE_SEARCH;
 
 
-void tokenizeBuffer(int);
+void args_tokenize_buffer(int);
 
 // ---------------------------------------------
 // Close function
 
-int closeTokenizer() {
+int args_close_tokenizer() {
     int ret = 0;
     if (_inputBuffer != NULL && _inputBufferAllocated) {
         free(_inputBuffer);
@@ -100,19 +102,19 @@ int closeTokenizer() {
 // Tokenize functions
 
 /** Everything is already parsed. */
-const char *advancePreParsed() {
+const char *args_advance_pre_parsed() {
     if (_parsedArgPos < _parsedArgLen) {
         return _parsedArgs[_parsedArgPos++];
     }
     return NULL;
 }
 
-const char *advanceToken() {
+const char *args_advance_token() {
     int i, j;
     int closed = 0;
 
     // Read from the FD -> the buffer -> the parser args.
-    const char *ret = advancePreParsed();
+    const char *ret = args_advance_pre_parsed();
     if (ret == NULL && _inputFD != INPUT_FD_FREED) {
         // Read the buffer, tokenize the buffer, then advance parser args.
         
@@ -148,8 +150,8 @@ const char *advanceToken() {
         }
         _inputBufferLen = j + i;
 
-        tokenizeBuffer(closed);
-        ret = advancePreParsed();
+        args_tokenize_buffer(closed);
+        ret = args_advance_pre_parsed();
     }
     return ret;
 }
@@ -169,7 +171,7 @@ const char *advanceToken() {
  * _parsedArgPos and _parsedArgLen are expected to be 0 when this starts, but it
  * will still work even if they aren't.
  */
-void tokenizeBuffer(int isComplete) {
+void args_tokenize_buffer(int isComplete) {
     while (
             _parsedArgLen < _parsedArgSize
             && _inputBufferSource < _inputBufferLen
@@ -349,7 +351,7 @@ void tokenizeBuffer(int isComplete) {
 // ----------------------------------------------
 // Creator
 
-int setupTokenizer(const int srcArgc, char *srcArgv[]) {
+int args_setup_tokenizer(const int srcArgc, char *srcArgv[]) {
     if (srcArgc < 2) {
         // no argument worth noting.
         _parsedArgPos = 0;
@@ -412,7 +414,7 @@ int setupTokenizer(const int srcArgc, char *srcArgv[]) {
         _inputFD = INPUT_FD_FREED;
 
         // Just tokenize one time.
-        tokenizeBuffer(1);
+        args_tokenize_buffer(1);
     } else {
         // process the args as-is.
         _parsedArgPos = 1;
@@ -421,3 +423,8 @@ int setupTokenizer(const int srcArgc, char *srcArgv[]) {
     }
     return 0;
 }
+
+#else /* USE_STREAMING_INPUT */
+// disable pedantic warning
+typedef int iso_translation_unit_ARGS_INPUT;
+#endif
