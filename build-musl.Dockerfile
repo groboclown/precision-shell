@@ -10,7 +10,7 @@ RUN \
     && apk add build-base=0.5-r1 "bash=~5" \
     && rm -rf /tmp/* /var/cache/apk/*
 
-COPY Makefile version.txt .
+COPY Makefile version.txt ./
 COPY src/ src/
 COPY tests/ tests/
 

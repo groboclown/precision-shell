@@ -15,7 +15,7 @@ RUN \
     && ( cd /opt/dietlibc && make && install bin-x86_64/diet /usr/local/bin ) \
     && rm -rf /tmp/* /var/cache/apk/*
 
-COPY Makefile version.txt .
+COPY Makefile version.txt ./
 COPY src/ src/
 COPY tests/ tests/
 
