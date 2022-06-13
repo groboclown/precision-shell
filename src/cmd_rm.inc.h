@@ -13,7 +13,7 @@ furnished to do so, subject to the following conditions:
 The above copyright notice and this permission notice shall be included in all
 copies or substantial portions of the Software.
 
-THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, ERMPRESS OR
 IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
 FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
 AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
@@ -22,14 +22,25 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
 */
 
-#ifndef _FS_SHELL__CMD_VERSION_
+#ifndef _FS_SHELL__CMD_RM_
 
-// version is universal and does not have a ifdef
+// No startup ermecution
+#define STARTUP__COMMAND_INDEX__RM
 
 
-// cmd_version_setup display the current version and switch to error mode.
-int cmd_version_setup();
+#ifdef USE_CMD_RM
 
-// there is no runner for version.
+#define CASE__COMMAND_INDEX__RM \
+case COMMAND_INDEX__RM: \
+    LOG(":: rm "); \
+    LOGLN(global_arg); \
+    global_err = unlink(global_arg); \
+    break;
 
-#endif /* _FS_SHELL__CMD_VERSION_ */
+#else /* USE_CMD_RM */
+
+#define CASE__COMMAND_INDEX__RM
+
+
+#endif /* USE_CMD_RM */
+#endif /* _FS_SHELL__CMD_RM_ */

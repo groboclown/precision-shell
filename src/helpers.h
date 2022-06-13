@@ -31,7 +31,7 @@ SOFTWARE.
 #define strequal(a, b) (strcmp((a), (b)) == 0)
 
 // convert global_arg to an integer value.
-int helper_arg_to_uint(int base, int maxValue);
+int helper_arg_to_uint(const char *arg, int base, int maxValue);
 
 
 #endif /* _FS_SHELL__HELPERS_ */

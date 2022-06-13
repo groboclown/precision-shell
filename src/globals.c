@@ -25,24 +25,5 @@ SOFTWARE.
 #include "globals.h"
 
 
-// Global variable defintions.
-
-int global_arg1_i = 0;
-int global_arg2_i = 0;
-
+// Global variable storage.
 const char *global_invoked_name;
-const char *global_cmd_name;
-const char *global_arg;
-const char *global_arg_cached;
-int global_cmd; // initialized when command_runner is run.
-
-
-// Standard file mode.
-#ifdef USES_FMODE
-int global_fmode;
-#endif
-
-// Global signal set.
-#ifdef USES_SIGNALS
-sigset_t global_signal_set;
-#endif

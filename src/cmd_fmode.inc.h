@@ -13,7 +13,7 @@ furnished to do so, subject to the following conditions:
 The above copyright notice and this permission notice shall be included in all
 copies or substantial portions of the Software.
 
-THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EFMODEPRESS OR
 IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
 FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
 AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
@@ -22,46 +22,34 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
 */
 
-#include "uses.h"
+#ifndef _FS_SHELL__CMD_FMODE_
 
-#ifdef USE_CMD_CHMOD
-
-#include <sys/stat.h>
-#include "output.h"
-#include "globals.h"
-#include "command_list.h"
-#include "helpers.h"
+// No startup execution
+#define STARTUP__COMMAND_INDEX__FMODE
 
 
-int cmd_chmod_mod_arg() {
-    // chmod has a special usage that allows for the 4 nybbles to be used.
+#ifdef USES_FMODE
 
-    LOG(":: Parsing arg as base 8 in val1: ");
-    LOGLN(global_arg);
-
-    // file mode, which is octal in range [0, 07777].
-    global_arg1_i = helper_arg_to_uint(8, 07777);
-    if (global_arg1_i < 0) {
-        LOG("::  - Bad base 8 number, or out of range\n");
-        global_cmd = COMMAND_INDEX__ERR;
-        return 1;
-    }
-
-    // Next argument is command + 1
-    global_cmd++;
-
-    return 0;
-}
+#define CASE__COMMAND_INDEX__FMODE \
+case COMMAND_INDEX__FMODE: \
+    /* File mode is only up to the first 3 nybbles. */
+    /* Due to error checking, this will not change fmode unless it's okay. */
+    int val = helper_arg_to_uint(global_arg, 8, 0777); \
+    if (val < 0) { \
+        global_err = 1; \
+        break; \
+    } \
+    global_fmode = val; \
+    \
+    /* Nothing must run after this. */ \
+    global_cmd = COMMAND_INDEX__ERR; \
+    break;
 
 
-int cmd_chmod_run() {
-    LOG(":: chmod ");
-    LOGLN(global_arg);
-    return chmod(global_arg, global_arg1_i);
-}
+#else /* USES_FMODE */
+
+#define CASE__COMMAND_INDEX__FMODE
 
 
-#else /* USE_CMD_CHMOD */
-// disable pedantic warning
-typedef int iso_translation_unit_CHMOD;
-#endif
+#endif /* USES_FMODE */
+#endif /* _FS_SHELL__CMD_FMODE_ */

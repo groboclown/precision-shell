@@ -34,8 +34,14 @@ enum CommandIndex {
     // Each of these values is an index into the command list.
 
     // Required commands (not optionally built)
-    // noop is always the first entry.
-    COMMAND_INDEX__NOOP = 0,
+
+    // Find command is always the first entry, and, because
+    // its string match is "" (empty), it means it always prevents the
+    // virtual commands from matching.
+    COMMAND_INDEX__FIND_CMD = 0,
+
+    // Real commands
+    COMMAND_INDEX__NOOP,
     COMMAND_INDEX__VERSION,
 
 #ifdef USES_FMODE
@@ -166,24 +172,9 @@ enum CommandIndex {
     COMMAND_INDEX__ERR
 };
 
-// Each command's name, for input parsing.  If a command entry is not entrant
-//   from the CLI (e.g. it only runs after initial processing from earlier commands),
-//   then it has a zero-length entry.
+
+// index -> command name for parsing ease.
 extern const char *command_list_names[];
-
-// The type definition for a command setup function.
-//   This takes the command index requested by the user, performs processing, and returns
-//   the command index to use for the first argument processing.  Usually, this is 1-to-1.
-typedef int (*CommandSetup)(int);
-
-// Each command's callback, for execution on the current argument.
-extern CommandSetup command_setup[];
-
-// The type definition for a command function.
-typedef int (*CommandFunc)();
-
-// Each command's callback, for execution on the current argument.
-extern CommandFunc command_function[];
 
 
 #endif /* _FS_SHELL_COMMANDS_ */

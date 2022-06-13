@@ -22,33 +22,13 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
 */
 
-#include "uses.h"
+#ifndef _FS_SHELL__CMD_NOOP_
 
-#ifdef USES_FMODE
+// Noop is always included, so no ifdef/else around it.
+// But notice that the commands are... nothing.
+// TODO add a debug variation.
 
-#include "globals.h"
-#include "command_list.h"
-#include "helpers.h"
+#define STARTUP__COMMAND_INDEX__NOOP
+#define CASE__COMMAND_INDEX__NOOP
 
-
-int cmd_fmode_run() {
-    // File mode is only up to the first 3 nybbles.
-    // Due to error checking, this will not change fmode unless it's okay.
-    int val = helper_arg_to_uint(8, 0777);
-    if (val < 0) {
-        // error
-        return 1;
-    }
-    global_fmode = val;
-
-    // Nothing must run after this.
-    global_cmd = COMMAND_INDEX__ERR;
-
-    // No error.
-    return 0;
-}
-
-#else /* USES_FMODE */
-// disable pedantic warning
-typedef int iso_translation_unit_FMODE;
-#endif
+#endif /* _FS_SHELL__CMD_X_ */

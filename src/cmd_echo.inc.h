@@ -13,7 +13,7 @@ furnished to do so, subject to the following conditions:
 The above copyright notice and this permission notice shall be included in all
 copies or substantial portions of the Software.
 
-THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EECHOPRESS OR
 IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
 FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
 AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
@@ -22,21 +22,26 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
 */
 
-#include "uses.h"
+#ifndef _FS_SHELL__CMD_ECHO_
 
-#ifdef USE_CMD_X
-
-#include "output.h"
-#include "globals.h"
-#include "helpers.h"
+// No startup execution
+#define STARTUP__COMMAND_INDEX__ECHO
 
 
-int cmd_X_run() {
-    // No error.
-    return 0;
-}
+#ifdef USE_CMD_ECHO
 
-#else
-// disable pedantic warning
-typedef int iso_translation_unit_X;
-#endif /* USE_CMD_X */
+#define CASE__COMMAND_INDEX__ECHO \
+case COMMAND_INDEX__ECHO: \
+    LOG(":: echo "); \
+    LOGLN(global_arg); \
+    stdoutPLn(global_arg); \
+    break;
+
+
+#else /* USE_CMD_ECHO */
+
+#define CASE__COMMAND_INDEX__ECHO
+
+
+#endif /* USE_CMD_ECHO */
+#endif /* _FS_SHELL__CMD_ECHO_ */

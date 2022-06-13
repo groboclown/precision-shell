@@ -27,19 +27,19 @@ SOFTWARE.
 #include "globals.h"
 
 
-// argToUint Converts the global_arg to an integer value
+// argToUint Converts the arg to an integer value
 //   base is the integer base (8 10 or 16)
 //   maxValue is the maximum value allowed.
 //   implied minimum value is 0.
 //   returns -1 on error.
-int helper_arg_to_uint(int base, int max_value) {
+int helper_arg_to_uint(const char *arg, int base, int max_value) {
     char *end_ptr;
     errno = 0;
-    unsigned long ret = strtoul(global_arg, &end_ptr, base);
+    unsigned long ret = strtoul(arg, &end_ptr, base);
     if (
             // nothing was parsed.  This can happen while end_ptr[0] == 0 if the argument
             //   has length 0.
-            global_arg == end_ptr
+            arg == end_ptr
 
             // the argument had non-numeric stuff after the first numbers.
             || end_ptr[0] != 0

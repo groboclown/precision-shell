@@ -28,12 +28,7 @@ LFLAGS = -static -static-libgcc
 DFLAGS = -DDEBUG=1
 CFLAGS += -Wall -pedantic -DVERSION_NUMBER=\"$(VERSION)-$(LIBNAME)\"
 OUTDIR = ../out
-SRC = main.c helpers.c globals.c command_runner.c command_list.c args-argv.c args-input.c globals.c \
-	cmd_chmod.c \
-	cmd_dup.c \
-	cmd_echo.c \
-	cmd_fmode.c \
-	cmd_version.c
+SRC = main.c helpers.c globals.c command_runner.c command_list.c args-argv.c args-input.c globals.c
 ALL_CMDS = \
 	-DUSE_CMD_CHMOD=1 \
 	-DUSE_CMD_CHOWN=1 \

@@ -22,23 +22,46 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
 */
 
-#include "uses.h"
+#ifndef _FS_SHELL__CMD_CHMOD_
 
-#ifdef USE_CMD_ECHO
+// no startup
+#define STARTUP__COMMAND_INDEX__CHMOD
+#define STARTUP__COMMAND_INDEX___CHMOD__RUN
 
-#include "output.h"
-#include "globals.h"
-#include "helpers.h"
+#ifdef USE_CMD_CHMOD
+
+#define CASE__COMMAND_INDEX__CHMOD \
+case COMMAND_INDEX__CHMOD: \
+    LOG(":: Parsing arg as base 8 in val1: "); \
+    LOGLN(global_arg); \
+    \
+    /* file mode, which is octal in range [0, 07777]. */ \
+    global_arg1_i = helper_arg_to_uint(8, 07777); \
+    if (global_arg1_i < 0) { \
+        LOG("::  - Bad base 8 number, or out of range\n"); \
+        global_cmd = COMMAND_INDEX__ERR; \
+        global_err = 1; \
+        break; \
+    } \
+
+    /* Next argument is command + 1 */ \
+    global_cmd++; \
+    break;
 
 
-int cmd_echo_run() {
-    LOG(":: echo ");
-    LOGLN(global_arg);
-    stdoutPLn(global_arg);
-    return 0;
-}
+#define CASE__COMMAND_INDEX__CHMOD__RUN \
+case COMMAND_INDEX__CHMOD__RUN: \
+    LOG(":: chmod "); \
+    LOGLN(global_arg); \
+    global_err = chmod(global_arg, global_arg1_i); \
+    break;
 
-#else
-// disable pedantic warning
-typedef int iso_translation_unit_ECHO;
-#endif /* USE_CMD_ECHO */
+
+#else /* USE_CMD_CHMOD */
+
+#define CASE__COMMAND_INDEX__CHMOD
+#define CASE__COMMAND_INDEX__CHMOD__RUN
+
+#endif /* USE_CMD_CHMOD */
+
+#endif /* _FS_SHELL__CMD_CHMOD_ */

@@ -25,45 +25,8 @@ SOFTWARE.
 #define _FS_SHELL__GLOBALS_
 
 
-#include "uses.h"
-
-#ifdef USES_SIGNALS
-#include <signal.h>
-#endif
-
-// Global variables loaded by special argument parsing functions and shread
-//   by commands.
-
-// General use argument -> integer values.
-extern int global_arg1_i;
-extern int global_arg2_i;
-
-// General use argument storage value
-extern const char *global_arg_cached;
-
 // Name of the program running
 extern const char *global_invoked_name;
-
-// Current command name.
-extern const char *global_cmd_name;
-
-// Current argument value
-extern const char *global_arg;
-
-// Current command index.
-//   This can change while the cmd_name should remain the same.
-extern int global_cmd;
-
-
-// Global file mode.  Set by the fmode command, but used by all kinds of
-//   commands.
-#ifdef USES_FMODE
-extern int global_fmode;
-#endif
-
-#ifdef USES_SIGNALS
-extern sigset_t global_signal_set;
-#endif
 
 
 #endif /* _FS_SHELL__GLOBALS_ */

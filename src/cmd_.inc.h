@@ -22,15 +22,22 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
 */
 
-#ifndef _FS_SHELL__CMD_X_
+#ifndef _FS_SHELL__CMD_XX_
 
-#include "uses.h"
+// No startup execution
+#define STARTUP__COMMAND_INDEX__XX
 
 
-#ifdef USE_CMD_X
+#ifdef USE_CMD_XX
 
-// cmd_X_run runs the X command
-int cmd_X_run();
+#define CASE__COMMAND_INDEX__XX \
+case COMMAND_INDEX__XX: \
+    break;
 
-#endif /* USE_CMD_X */
-#endif /* _FS_SHELL__CMD_X_ */
+#else /* USE_CMD_XX */
+
+#define CASE__COMMAND_INDEX__XX
+
+
+#endif /* USE_CMD_XX */
+#endif /* _FS_SHELL__CMD_XX_ */

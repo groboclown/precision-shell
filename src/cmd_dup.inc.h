@@ -21,47 +21,54 @@ LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
 */
-#ifndef _FS_SHELL__USES_
-#define _FS_SHELL__USES_
 
-// The first includes.
+#ifndef _FS_SHELL__CMD_DUP_
 
+#define STARTUP__COMMAND_INDEX__DUP__FD
+#define STARTUP__COMMAND_INDEX__DUP__TGT
 
-// USES_SIGNALS - signal processing and special global variables are used.
-#ifdef USE_CMD_SIGNAL
+// Setup prepares for the execution
+#ifdef USE_CMD_DUP_A
 
-#define USES_SIGNALS 1
+#define STARTUP__COMMAND_INDEX__DUP_A
 
-#endif
+#else /* USE_CMD_DUP_A */
 
+#define STARTUP__COMMAND_INDEX__DUP_A
 
-// USES_DUP - uses at least one of the file descriptor dup commands.
-#if defined(USE_CMD_DUP_A) || defined(USE_CMD_DUP_R) || defined(USE_CMD_DUP_W)
+#endif /* USE_CMD_DUP_A */
 
-#define USES_DUP 1
+#ifdef USE_CMD_DUP_W
 
-#endif
+#define STARTUP__COMMAND_INDEX__DUP_W
 
+#else /* USE_CMD_DUP_W */
 
-#if defined(USE_CMD_MKNOD) || defined(USE_CMD_MKDEV)
+#define STARTUP__COMMAND_INDEX__DUP_W
 
-#define USES_MKNOD 1
+#endif /* USE_CMD_DUP_W */
 
-#endif
+#ifdef USE_CMD_DUP_R
 
+#define STARTUP__COMMAND_INDEX__DUP_R
 
-// USES_FMODE - special file mode processing and handling.
-//   Note that chmod does not use this!
-#if    defined(USE_CMD_MKDIR) \
-    || defined(USE_CMD_MKNOD) \
-    || defined(USE_CMD_MKDEV) \
-    || defined(USE_CMD_TOUCH) \
-    || defined(USE_CMD_TRUNC) \
-    || defined(USES_DUP)
+#else /* USE_CMD_DUP_R */
 
-#define USES_FMODE 1
+#define STARTUP__COMMAND_INDEX__DUP_R
 
-#endif
+#endif /* USE_CMD_DUP_R */
 
+// Execution runs the same across all these commands.
+#if defined(USE_CMD_DUP_A) || defined(USE_CMD_DUP_W) || defined(USE_CMD_DUP_R)
 
-#endif /* _FS_SHELL__USES_ */
+#define CASE__COMMAND_INDEX__DUP__FD
+#define CASE__COMMAND_INDEX__DUP__TGT
+
+#else /* defined(USE_CMD_DUP_A) || defined(USE_CMD_DUP_W) || defined(USE_CMD_DUP_R) */
+
+#define CASE__COMMAND_INDEX__DUP__FD
+#define CASE__COMMAND_INDEX__DUP__TGT
+
+#endif /* defined(USE_CMD_DUP_A) || defined(USE_CMD_DUP_W) || defined(USE_CMD_DUP_R) */
+
+#endif /* _FS_SHELL__CMD_DUP_ */

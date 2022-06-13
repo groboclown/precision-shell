@@ -22,25 +22,27 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
 */
 
-// version is universal and does not have a ifdef
+#ifndef _FS_SHELL__CMD_VERSION_
 
-#include "version.h"
-#include "output.h"
-#include "globals.h"
-#include "command_list.h"
+// Version is always included, so no ifdef/else around it.
 
+#define STARTUP__COMMAND_INDEX__VERSION \
+case COMMAND_INDEX__VERSION: \
+    stdoutP(global_invoked_name); \
+    stdoutP(VERSION_STR); \
+    for (idx = COMMAND_INDEX__NOOP; idx < COMMAND_INDEX__ERR; idx++) { \
+        /* Only output included commands that are not virtual. */ \
+        if (command_list_names[idx][0] != 0) { \
+            stdoutP(" "); \
+            stdoutP(command_list_names[idx]); \
+        } \
+    } \
+    stdoutP("\n"); \
+    /* should be no arguments, so immediately switch to error mode. */ \
+    global_cmd = COMMAND_INDEX__ERR; \
+    break;
 
-int cmd_version_setup(int idx) {
-    stdoutP(global_invoked_name);
-    stdoutP(VERSION_STR);
-    for (idx = COMMAND_INDEX__NOOP; idx < COMMAND_INDEX__ERR; idx++) {
-        // Only output included commands that are not virtual.
-        if (command_list_names[idx][0] != 0) {
-            stdoutP(" ");
-            stdoutP(command_list_names[idx]);
-        }
-    }
-    stdoutP("\n");
-    // should be no arguments, so immediately switch to error mode.
-    return COMMAND_INDEX__ERR;
-}
+// No case execution
+#define CASE__COMMAND_INDEX__VERSION
+
+#endif /* _FS_SHELL__CMD_VERSION_ */
