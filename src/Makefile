@@ -1,8 +1,30 @@
 include ../version.txt
 
-# MINFLAGS = -g0 -static -s -O3 -fomit-frame-pointer -fno-strict-aliasing -fno-align-functions -fno-align-jumps -fno-align-loops -fno-align-labels
-MINFLAGS = -g0 -s -Os -fomit-frame-pointer -fno-strict-aliasing -fno-align-functions -fno-align-jumps -fno-align-loops -fno-align-labels
-LFLAGS = -static
+# MINFLAGS = -g0 -s -Oz -Os -fomit-frame-pointer -fno-strict-aliasing -fno-align-functions -fno-align-jumps -fno-align-loops -fno-align-labels
+MINFLAGS = \
+	-finline-limit=0 \
+	-fno-builtin-strlen \
+	-fomit-frame-pointer \
+	-ffunction-sections \
+	-fdata-sections \
+	-fno-guess-branch-probability \
+	-funsigned-char \
+	-falign-functions=1 \
+	-falign-jumps=1 \
+	-falign-labels=1 \
+	-falign-loops=1 \
+	-fno-unwind-tables \
+	-fno-asynchronous-unwind-tables \
+	-fno-builtin-printf \
+	-Os \
+	-fvisibility=hidden
+
+# -O2 \
+# -Oz \
+# -fno-string-plus-int \
+# -fno-constant-logical-operand \
+# -fsanitize=address -fsanitize=leak -fsanitize=undefined
+LFLAGS = -static -static-libgcc
 DFLAGS = -DDEBUG=1
 CFLAGS += -Wall -pedantic -DVERSION_NUMBER=\"$(VERSION)-$(LIBNAME)\"
 OUTDIR = ../out
@@ -36,8 +58,16 @@ ALL_CMDS = \
 	-DUSE_STREAMING_INPUT=1
 
 .PHONY: all
-all: clean \
-	$(OUTDIR)/fs-shell $(OUTDIR)/fs-shell-debug
+all: clean src debug
+
+
+.PHONY: src
+src: \
+	$(OUTDIR)/fs-shell
+
+.PHONY: debug
+debug: \
+	$(OUTDIR)/fs-shell-debug
 
 
 # Note that the arguments to the rm match the all parameters.

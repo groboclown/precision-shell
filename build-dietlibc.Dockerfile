@@ -15,7 +15,10 @@ RUN \
     && ( cd /opt/dietlibc && make && install bin-x86_64/diet /usr/local/bin ) \
     && rm -rf /tmp/* /var/cache/apk/*
 
-COPY Makefile version.txt ./
+ENV CC="diet cc"
+
+COPY experiments/ experiments/
+COPY Makefile version.txt internal-docker-make.sh ./
 COPY src/ src/
 COPY tests/ tests/
 
@@ -24,8 +27,8 @@ ENV \
     UID1=1 \
     UID2=2 \
     GID1=1 \
-    GID2=2
+    GID2=2 \
+    BUILD_MODE=size-check
 
 RUN    echo 'LIBNAME=dietlibc' >> version.txt \
-    && CC="diet cc" make src \
-    && ls -lA out/fs-shell*
+    && ./internal-docker-make.sh

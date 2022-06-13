@@ -9,10 +9,10 @@ COPY out/fs-shell /bin/sh
 
 # Example setting up files and performing some file manipulations
 # on them.
-COPY tests/ /opt/tests/
+COPY extract-executables.sh CHANGES.md /tmp/
 
 RUN echo Test3
-RUN rm /opt/tests/_all.sh \
-    && rm /opt/tests/unknown-no-args.sh \
+RUN chmod 755 /tmp/extract-executables.sh \
+    && rm /tmp/CHANGES.md \
     && mkdir 777 /opt/special \
     && echo "All done."

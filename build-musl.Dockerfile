@@ -10,7 +10,8 @@ RUN \
     && apk add build-base=0.5-r1 "bash=~5" \
     && rm -rf /tmp/* /var/cache/apk/*
 
-COPY Makefile version.txt ./
+COPY experiments/ experiments/
+COPY Makefile version.txt internal-docker-make.sh ./
 COPY src/ src/
 COPY tests/ tests/
 
@@ -22,5 +23,4 @@ ENV \
     GID2=2
 
 RUN    echo 'LIBNAME=musl' >> version.txt \
-    && make \
-    && ls -lA out/fs-shell*
+    && ./internal-docker-make.sh
