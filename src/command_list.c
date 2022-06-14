@@ -105,7 +105,10 @@ const char intern__exec[] = "exec";
 const char *intern_all_names[COMMAND_INDEX__ERR];
 
 const char ** get_command_list_names() {
-    intern_all_names[COMMAND_INDEX__FIND_CMD] = intern__empty;
+    for (int i = 0; i < COMMAND_INDEX__ERR; i++) {
+        intern_all_names[i] = intern__empty;
+    }
+    // intern_all_names[COMMAND_INDEX__FIND_CMD] = intern__empty;
     intern_all_names[COMMAND_INDEX__NOOP] = intern__noop;
     intern_all_names[COMMAND_INDEX__VERSION] = intern__version;
 
@@ -135,7 +138,7 @@ const char ** get_command_list_names() {
 #endif
 #if defined(USE_CMD_TOUCH) || defined(USE_CMD_TRUNC)
     // ;
-    intern_all_names[COMMAND_INDEX__TRUNC_TOUCH__RUN] = intern__empty;
+    //intern_all_names[COMMAND_INDEX__TRUNC_TOUCH__RUN] = intern__empty;
 #endif
 
 #ifdef USE_CMD_DUP_R
@@ -155,9 +158,9 @@ const char ** get_command_list_names() {
 
 #ifdef USES_DUP
     // ;
-    intern_all_names[COMMAND_INDEX__DUP__FD] = intern__empty;
+    //intern_all_names[COMMAND_INDEX__DUP__FD] = intern__empty;
     // ;
-    intern_all_names[COMMAND_INDEX__DUP__TGT] = intern__empty;
+    //intern_all_names[COMMAND_INDEX__DUP__TGT] = intern__empty;
 #endif
 
 #ifdef USE_CMD_MKNOD
@@ -168,13 +171,13 @@ const char ** get_command_list_names() {
     // ;
     intern_all_names[COMMAND_INDEX__MKDEV] = intern__mkdev;
     // ;
-    intern_all_names[COMMAND_INDEX__MKDEV__MINOR] = intern__empty;
+    // intern_all_names[COMMAND_INDEX__MKDEV__MINOR] = intern__empty;
 #endif
 #ifdef USES_MKNOD
     // ;
-    intern_all_names[COMMAND_INDEX__MKNOD_DEV__TYPE] = intern__empty;
+    //intern_all_names[COMMAND_INDEX__MKNOD_DEV__TYPE] = intern__empty;
     // ;
-    intern_all_names[COMMAND_INDEX__MKNOD_DEV__RUN] = intern__empty;
+    //intern_all_names[COMMAND_INDEX__MKNOD_DEV__RUN] = intern__empty;
 #endif
 
 #ifdef USE_CMD_MKDIR
@@ -186,16 +189,16 @@ const char ** get_command_list_names() {
     // ;
     intern_all_names[COMMAND_INDEX__CHOWN] = intern__chown;
     // ;
-    intern_all_names[COMMAND_INDEX__CHOWN__GROUP] = intern__empty;
+    // intern_all_names[COMMAND_INDEX__CHOWN__GROUP] = intern__empty;
     // ;
-    intern_all_names[COMMAND_INDEX__CHOWN__RUN] = intern__empty;
+    // intern_all_names[COMMAND_INDEX__CHOWN__RUN] = intern__empty;
 #endif
 
 #ifdef USE_CMD_CHMOD
     // ;
     intern_all_names[COMMAND_INDEX__CHMOD] = intern__chmod;
     // ;
-    intern_all_names[COMMAND_INDEX__CHMOD__RUN] = intern__empty;
+    // intern_all_names[COMMAND_INDEX__CHMOD__RUN] = intern__empty;
 #endif
 
 #ifdef USE_CMD_LN_S

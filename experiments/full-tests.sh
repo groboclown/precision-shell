@@ -57,7 +57,7 @@ while [ ${running} = 1 ] ; do
         exit 1
     fi
 
-    ( cd .. && make tests )
+    ( cd .. && QUIET=1 make tests )
 
     # change commands
     remainder=1
