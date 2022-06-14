@@ -25,17 +25,17 @@ SOFTWARE.
 #ifndef _FS_SHELL__CMD_XX_
 
 #include "uses.h"
+
+#ifdef USE_CMD_XX
+
 #include "command_def.h"
 #include "command_common.h"
 
 
-#ifdef USE_CMD_XX
-
-
 extern const char *command_name_xx;
-extern const CommandFunc cmd_xx_init;
-extern const CommandSetup cmd_xx_setup;
-extern const CommandFunc cmd_xx_run;
+int cmd_xx_init();
+int cmd_xx_setup(int);
+int cmd_xx_run();
 
 
 // Note trailing commas and weird syntax here.
@@ -54,16 +54,16 @@ extern const CommandFunc cmd_xx_run;
 #define NAME_TC__CMD_XX     NAME__CMD_XX,
 #define NAME_VC__CMD_XX     NAMEVAR__CMD_XX,
 #define NAME_VS__CMD_XX     names[COMMAND_INDEX__XX] = NAMEVAR__CMD_XX;
-#define SETUP_C__CMD_XX     SETUP__CMD_XX,
-#define SETUP_S__CMD_XX     setups[COMMAND_INDEX__XX] = SETUP__CMD_XX;
-#define RUN_C__CMD_XX       RUN__CMD_XX,
-#define RUN_S__CMD_XX       runs[COMMAND_INDEX__XX] = RUN__CMD_XX,
+#define SETUP_C__CMD_XX     &SETUP__CMD_XX,
+#define SETUP_S__CMD_XX     setups[COMMAND_INDEX__XX] = &SETUP__CMD_XX;
+#define RUN_C__CMD_XX       &RUN__CMD_XX,
+#define RUN_S__CMD_XX       runs[COMMAND_INDEX__XX] = &RUN__CMD_XX;
 #define CALL_INIT__CMD_XX   err += INIT__CMD_XX();
 
 
 
 
-#endif /* USE_CMD_X */
+#else /* USE_CMD_XX */
 #define ENUM_LIST__CMD_XX
 #define NAME_TC__CMD_XX
 #define NAME_VC__CMD_XX
@@ -73,4 +73,5 @@ extern const CommandFunc cmd_xx_run;
 #define RUN_C__CMD_XX
 #define RUN_S__CMD_XX
 #define CALL_INIT__CMD_XX
-#endif /* _FS_SHELL__CMD_X_ */
+#endif /* USE_CMD_XX */
+#endif /* _FS_SHELL__CMD_XX_ */

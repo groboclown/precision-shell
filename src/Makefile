@@ -35,8 +35,11 @@ DFLAGS = -DDEBUG=1 -g
 
 CFLAGS += -Wall -pedantic
 OUTDIR = ../out
-SRC = main.c helpers.c globals.c command_runner.c command_list.c args-argv.c args-input.c \
-	cmd_noop.c
+SRC = main.c helpers.c globals.c command_runner.c command_list.c command_common.c args-argv.c args-input.c \
+	cmd_find_cmd.c \
+	cmd_err.c \
+	cmd_noop.c \
+	cmd_version.c
 
 
 .PHONY: all

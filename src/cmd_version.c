@@ -24,13 +24,34 @@ SOFTWARE.
 
 #include "uses.h"
 
+// version is required
+
 #include "output.h"
 #include "globals.h"
 #include "helpers.h"
+#include "command_list.h"
 #include "command_common.h"
-#include "cmd_err.h"
+#include "cmd_version.h"
+#include "version.h"
 
 
-int cmd_err_run() {
-    return 1;
+const char NAMEVAR__CMD_VERSION[] = NAME__CMD_VERSION;
+
+
+int cmd_version_setup(int idx) {
+    const char **command_list_names = get_command_list_names();
+
+    // stdoutP(global_invoked_name);
+    stdoutP("fs-shell");
+    stdoutP(VERSION_STR);
+    for (int idx = COMMAND_INDEX__FIND_CMD; idx < COMMAND_INDEX__ERR; idx++) {
+        // Only output included commands that are not virtual.
+        if (command_list_names[idx][0] != 0) {
+            stdoutP(" +");
+            stdoutP(command_list_names[idx]);
+        }
+    }
+    stdoutP("\n");
+    // should be no arguments, so immediately switch to error mode.
+    return COMMAND_INDEX__ERR;
 }

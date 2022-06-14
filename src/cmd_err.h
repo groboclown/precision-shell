@@ -30,7 +30,7 @@ SOFTWARE.
 
 // err is always included
 
-extern const CommandFunc cmd_err_run;
+int cmd_err_run();
 
 
 // Note trailing commas and weird syntax here.
@@ -49,10 +49,10 @@ extern const CommandFunc cmd_err_run;
 #define NAME_TC__CMD_ERR     NAME__CMD_ERR,
 #define NAME_VC__CMD_ERR     NAMEVAR__CMD_ERR,
 #define NAME_VS__CMD_ERR     names[COMMAND_INDEX__ERR] = NAMEVAR__CMD_ERR;
-#define SETUP_C__CMD_ERR     SETUP__CMD_ERR,
-#define SETUP_S__CMD_ERR     setups[COMMAND_INDEX__ERR] = SETUP__CMD_ERR;
-#define RUN_C__CMD_ERR       RUN__CMD_ERR,
-#define RUN_S__CMD_ERR       runs[COMMAND_INDEX__ERR] = RUN__CMD_ERR,
+#define SETUP_C__CMD_ERR     &SETUP__CMD_ERR,
+#define SETUP_S__CMD_ERR     setups[COMMAND_INDEX__ERR] = &SETUP__CMD_ERR;
+#define RUN_C__CMD_ERR       &RUN__CMD_ERR,
+#define RUN_S__CMD_ERR       runs[COMMAND_INDEX__ERR] = &RUN__CMD_ERR;
 #define CALL_INIT__CMD_ERR
 
 

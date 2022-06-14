@@ -30,11 +30,11 @@ SOFTWARE.
 #include "command_def.h"
 
 #define EMPTY_STRING ""
-extern const char *command_common_empty_name;
-extern const CommandSetup command_common_setup_identity;
-extern const CommandFunc command_common_run_toint10;
-extern const CommandFunc command_common_run_store_arg;
-extern const CommandFunc command_common_run_ok;
+extern const char command_common_empty_name[];
+int command_common_setup_identity(int);
+int command_common_run_toint10();
+int command_common_run_store_arg();
+int command_common_run_ok();
 
 
 #endif /* _FS_SHELL_COMMAND_COMMON_ */

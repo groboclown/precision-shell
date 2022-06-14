@@ -22,53 +22,42 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
 */
 
-#ifndef _FS_SHELL__CMD_NOOP_
+#ifndef _FS_SHELL__CMD_VERSION_
+#define _FS_SHELL__CMD_VERSION_
 
 #include "uses.h"
 #include "command_def.h"
 #include "command_common.h"
 
+// version is required
 
-#ifdef USE_CMD_NOOP
-
-
-extern const char command_name_noop[];
+extern const char command_name_version[];
+int cmd_version_setup(int);
 
 
 // Note trailing commas and weird syntax here.
 // These are used by command_list for different setups.
-#define ENUM__CMD_NOOP        COMMAND_INDEX__NOOP
-#define NAME__CMD_NOOP        "noop"
-#define NAMEVAR__CMD_NOOP     command_name_noop
-#define SETUP__CMD_NOOP       command_common_setup_identity
-#define RUN__CMD_NOOP         command_common_run_ok
-#define INIT__CMD_NOOP
+#define ENUM__CMD_VERSION        COMMAND_INDEX__VERSION
+#define NAME__CMD_VERSION        "version"
+#define NAMEVAR__CMD_VERSION     command_name_version
+#define SETUP__CMD_VERSION       cmd_version_setup
+#define RUN__CMD_VERSION         command_common_run_ok
+#define INIT__CMD_VERSION
 
 
 // Extrapolated defines
-#define ENUM_LIST__CMD_NOOP   ENUM__CMD_NOOP,
-#define NAME_TC__CMD_NOOP     NAME__CMD_NOOP,
-#define NAME_VC__CMD_NOOP     NAMEVAR__CMD_NOOP,
-#define NAME_VS__CMD_NOOP     names[COMMAND_INDEX__NOOP] = NAMEVAR__CMD_NOOP;
-#define SETUP_C__CMD_NOOP     &SETUP__CMD_NOOP,
-#define SETUP_S__CMD_NOOP     setups[COMMAND_INDEX__NOOP] = &SETUP__CMD_NOOP;
-#define RUN_C__CMD_NOOP       &RUN__CMD_NOOP,
-#define RUN_S__CMD_NOOP       runs[COMMAND_INDEX__NOOP] = &RUN__CMD_NOOP,
-#define CALL_INIT__CMD_NOOP
+#define ENUM_LIST__CMD_VERSION   ENUM__CMD_VERSION,
+#define NAME_T__CMD_VERSION      NAME__CMD_VERSION
+#define NAME_TC__CMD_VERSION     NAME__CMD_VERSION,
+#define NAME_VC__CMD_VERSION     NAMEVAR__CMD_VERSION,
+#define NAME_VS__CMD_VERSION     names[COMMAND_INDEX__VERSION] = NAMEVAR__CMD_VERSION;
+#define SETUP_C__CMD_VERSION     &SETUP__CMD_VERSION,
+#define SETUP_S__CMD_VERSION     setups[COMMAND_INDEX__VERSION] = &SETUP__CMD_VERSION;
+#define RUN_C__CMD_VERSION       &RUN__CMD_VERSION,
+#define RUN_S__CMD_VERSION       runs[COMMAND_INDEX__VERSION] = &RUN__CMD_VERSION,
+#define CALL_INIT__CMD_VERSION
 
 
 
 
-#else /* USE_CMD_NOOP */
-#define ENUM_LIST__CMD_NOOP
-#define NAME_TC__CMD_NOOP
-#define NAME_VC__CMD_NOOP
-#define NAME_VS__CMD_NOOP
-#define SETUP_C__CMD_NOOP
-#define SETUP_S__CMD_NOOP
-#define RUN_C__CMD_NOOP
-#define RUN_S__CMD_NOOP
-#define CALL_INIT__CMD_NOOP
-#endif /* USE_CMD_NOOP */
-
-#endif /* _FS_SHELL__CMD_NOOP_ */
+#endif /* _FS_SHELL__CMD_VERSION_ */

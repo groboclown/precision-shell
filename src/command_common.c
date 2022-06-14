@@ -25,24 +25,24 @@ SOFTWARE.
 #include "globals.h"
 #include "output.h"
 #include "command_common.h"
+#include "helpers.h"
 
-const char *command_common_empty_name = EMPTY_STRING;
+
+const char command_common_empty_name[] = EMPTY_STRING;
 
 // command_common_setup_identity a common setup that uses the invoked command index.
-int command_common_setup_identity__func(int idx) {
+int command_common_setup_identity(int idx) {
     LOG(":: setup ");
     LOGLN(global_arg);
     return idx;
 }
-
-const CommandSetup command_common_setup_identity = &command_common_setup_identity__func;
 
 
 // command_common_run_toint10 Useful command magic.
 //   - Shuffles global_arg1_i to global_arg2_i
 //   - parses global_arg as a base 10 integer into global_arg1_i, with error checking.
 //   - increments global_cmd
-int command_common_run_toint10__func() {
+int command_common_run_toint10() {
     LOG(":: ");
     LOG(global_cmd_name);
     LOG(" arg to base10 int ");
@@ -57,13 +57,11 @@ int command_common_run_toint10__func() {
     return 0;
 }
 
-const CommandFunc command_common_run_toint10 = &command_common_run_toint10__func;
-
 
 // command_common_run_store_arg Use command magic.
 //   - sets global_arg_cached to the current argument
 //   - increments global_cmd
-int command_common_run_store_arg__func() {
+int command_common_run_store_arg() {
     LOG(":: ");
     LOG(global_cmd_name);
     LOG(" storing argument ");
@@ -73,16 +71,12 @@ int command_common_run_store_arg__func() {
     return 0;
 }
 
-const CommandFunc command_common_run_store_arg = &command_common_run_store_arg__func;
-
 
 // command_common_run_ok a command runner that just returns no-error.
-int command_common_run_ok__func() {
+int command_common_run_ok() {
     LOG(":: ");
     LOG(global_cmd_name);
     LOG(" skipping ");
     LOGLN(global_arg);
     return 0;
 }
-
-const CommandFunc command_common_run_ok = &command_common_run_ok__func;

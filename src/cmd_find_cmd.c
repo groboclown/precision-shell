@@ -33,9 +33,11 @@ SOFTWARE.
 #include "command_list.h"
 #include "cmd_find_cmd.h"
 
+const char command_name_find_cmd[] = NAME__CMD_FIND_CMD;
+
 
 // cmd_find_cmd_run__func match the current arg against the command list.
-int cmd_find_cmd_run__func() {
+int cmd_find_cmd_run() {
     const char **command_list_names = get_command_list_names();
     const CommandSetup *command_setup = get_command_setup();
 
@@ -53,5 +55,3 @@ int cmd_find_cmd_run__func() {
     global_cmd = COMMAND_INDEX__ERR;
     return 1;
 }
-
-extern const CommandFunc cmd_find_cmd_run = &cmd_find_cmd_run__func;

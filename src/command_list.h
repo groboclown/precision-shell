@@ -31,6 +31,7 @@ SOFTWARE.
 // Include each command.  It already has ifdefs around it internally.
 #include "cmd_find_cmd.h"
 #include "cmd_noop.h"
+#include "cmd_version.h"
 #include "cmd_err.h"
 
 
@@ -45,13 +46,12 @@ enum CommandIndex {
     // virtual commands from matching.
     ENUM_LIST__CMD_FIND_CMD
 
-    // The enum name entry, which, if the command is included, will
-    // include the trailing comma.  Can include 0 or more items.
     ENUM_LIST__CMD_NOOP
+    ENUM_LIST__CMD_VERSION
 
     // The error command is always penultimate; it's a signal for the number of entries in the index.
     //   It also prevents odd errors for trailing commas.
-    COMMAND_INDEX__ERR,
+    ENUM_LIST__CMD_ERR
 
     // Final index is essentially the count
     COMMAND_INDEX__FINAL_INDEX
@@ -66,10 +66,10 @@ int initialize_commands();
 const char **get_command_list_names();
 
 // Each command's callback, for execution on the current argument.
-CommandSetup *get_command_setup();
+const CommandSetup *get_command_setup();
 
 // Each command's callback, for execution on the current argument.
-CommandFunc *get_command_function();
+const CommandFunc *get_command_function();
 
 
 #endif /* _FS_SHELL_COMMAND_LIST_ */

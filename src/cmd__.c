@@ -44,8 +44,8 @@ int cmd_xx_run__func() {
     return 0;
 }
 
-extern const CommandSetup SETUP__CMD_XX = &cmd_xx_setup__func;
-extern const CommandFunc RUN__CMD_XX = &cmd_xx_run__func;
+const CommandSetup SETUP__CMD_XX = &cmd_xx_setup__func;
+const CommandFunc RUN__CMD_XX = &cmd_xx_run__func;
 
 
 

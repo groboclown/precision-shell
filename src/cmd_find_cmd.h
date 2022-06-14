@@ -32,7 +32,7 @@ SOFTWARE.
 #include "command_common.h"
 
 
-extern const CommandFunc cmd_find_cmd_run;
+int cmd_find_cmd_run();
 
 
 // Note trailing commas and weird syntax here.
@@ -46,19 +46,18 @@ extern const CommandFunc cmd_find_cmd_run;
 
 
 // Extrapolated defines
-#define ENUM_LIST__CMD_FIND_CMD   ENUM__CMD_FIND_CMD,
+#define ENUM_LIST__CMD_FIND_CMD   ENUM__CMD_FIND_CMD = 0,
 #define NAME_TC__CMD_FIND_CMD     NAME__CMD_FIND_CMD,
 #define NAME_VC__CMD_FIND_CMD     NAMEVAR__CMD_FIND_CMD,
 #define NAME_VS__CMD_FIND_CMD     names[COMMAND_INDEX__FIND_CMD] = NAMEVAR__CMD_FIND_CMD;
-#define SETUP_C__CMD_FIND_CMD     SETUP__CMD_FIND_CMD,
-#define SETUP_S__CMD_FIND_CMD     setups[COMMAND_INDEX__FIND_CMD] = SETUP__CMD_FIND_CMD;
-#define RUN_C__CMD_FIND_CMD       RUN__CMD_FIND_CMD,
-#define RUN_S__CMD_FIND_CMD       runs[COMMAND_INDEX__FIND_CMD] = RUN__CMD_FIND_CMD,
+#define SETUP_C__CMD_FIND_CMD     &SETUP__CMD_FIND_CMD,
+#define SETUP_S__CMD_FIND_CMD     setups[COMMAND_INDEX__FIND_CMD] = &SETUP__CMD_FIND_CMD;
+#define RUN_C__CMD_FIND_CMD       &RUN__CMD_FIND_CMD,
+#define RUN_S__CMD_FIND_CMD       runs[COMMAND_INDEX__FIND_CMD] = &RUN__CMD_FIND_CMD,
 #define CALL_INIT__CMD_FIND_CMD
 
 
 
-extern const char *command_name_find_cmd;
-extern const CommandFunc cmd_find_cmd_run;
+extern const char command_name_find_cmd[];
 
 #endif /* _FS_SHELL__CMD_FIND_CMD_ */

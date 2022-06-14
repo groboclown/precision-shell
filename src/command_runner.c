@@ -49,6 +49,7 @@ int command_runner() {
     global_arg = args_advance_token();
     while (global_arg != NULL) {
         // This is a long if/else block until error checking.
+        err = 0;
 
         // ==================================================================
         // Check end-of-command first.
@@ -69,9 +70,14 @@ int command_runner() {
             LOG(":: ;\n");
             err_count = 0;
             global_cmd = COMMAND_INDEX__FIND_CMD;
-        } else {
+        } else
+        
+        {
             // ==================================================================
             // Run the currently active command.
+            #ifdef DEBUG
+            printf(":: handling argument %s with cmd index %d\n", global_arg, global_cmd);
+            #endif
             err = command_functions[global_cmd]();
         }
 
