@@ -24,6 +24,8 @@ SOFTWARE.
 
 #ifndef _FS_SHELL__CMD_SLEEP_
 
+#define NAME__SLEEP "sleep"
+
 // No startup execution
 #define STARTUP__COMMAND_INDEX__SLEEP
 

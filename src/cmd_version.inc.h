@@ -24,6 +24,8 @@ SOFTWARE.
 
 #ifndef _FS_SHELL__CMD_VERSION_
 
+#define NAME__VERSION "version"
+
 // Version is always included, so no ifdef/else around it.
 
 #define STARTUP__COMMAND_INDEX__VERSION \

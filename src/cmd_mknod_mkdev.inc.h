@@ -24,6 +24,12 @@ SOFTWARE.
 
 #ifndef _FS_SHELL__CMD_MKNOD_MKDEV_
 
+#define NAME__MKNOD "mknod"
+#define NAME__MKDEV "mkdev"
+#define NAME__MKDEV__MINOR ""
+#define NAME__MKNOD_DEV__TYPE ""
+#define NAME__MKNOD_DEV__RUN ""
+
 // mknod and mkdev work with shared data to make them compiled together more efficient.
 
 // mknod itself doesn't have any execution for mknod; instead,

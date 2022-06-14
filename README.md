@@ -1,4 +1,5 @@
 # fs-shell
+
 Minimal, non-interactive file manipulation shell
 
 Sometimes, you just don't need a shell.  You just need minimal file system operations.
@@ -16,9 +17,9 @@ Last build size:
     * musl: 22,024 bytes
     * dietlibc: 13,256 bytes
 * Full build:
-    * glibc: 827,848 bytes
-    * musl: 26,120 bytes
-    * dietlibc: 17,424 bytes
+    * glibc: 901,048 bytes
+    * musl: 151,168 bytes
+    * dietlibc: 24,192 bytes
 
 *At some point, a decision should be made whether to keep these separate or just join them into a single executable.*
 
@@ -32,6 +33,7 @@ The shell supports these commands:
 * [version](#version) - prints the current version.
 * [noop](#noop) - do nothing.
 * [echo](#echo) - send text to `stdout`.
+* [fmode](#fmode) - set the octal file mode for other commands.
 * [rm](#rm) - remove files.
 * [rmdir](#rmdir) - remove empty directories.
 * [mv](#mv) - move a file from one name to another.
@@ -41,13 +43,13 @@ The shell supports these commands:
 * [ln-s](#ln-s) - create a symbolic link.
 * [ln-h](#ln-h) - create a hard link.
 * [sleep](#sleep) - wait for a number of seconds.
-* [mknod](#mknod) - create a FIFO or UNIX socket node. *Only available in device-enabled builds.*
-* [mkdev](#mkdev) - create a device OS node. *Only available in device-enabled builds.*
-* [touch](#touch) - Update the access and modification times of each file to the current time, or, if a file does not exist, it is created empty. *Only available in input-enabled builds.*
-* [trunc](#trunc) - Sets the file length to 0, and if the file does not exist, creates it. *Only available in input-enabled builds.*
-* [dup-r, dup-w, dup-a](#dup) - duplicates a file to a file descriptor for the remaining commands in this execution. *Only available in input-enabled builds.*
-* [signal .. wait](#signal-wait) - wait for an OS signal before continuing. *Only available in signal-enabled builds.*
-* [exec](#exec) - switch execution to a new process. *Only available in exec-enabled builds.*
+* [mknod](#mknod) - create a FIFO or UNIX socket node.
+* [mkdev](#mkdev) - create a device OS node.
+* [touch](#touch) - Update the access and modification times of each file to the current time, or, if a file does not exist, it is created empty.
+* [trunc](#trunc) - Sets the file length to 0, and if the file does not exist, creates it.
+* [dup-r, dup-w, dup-a](#dup) - duplicates a file to a file descriptor for the remaining commands in this execution.
+* [signal .. wait](#signal-wait) - wait for an OS signal before continuing.
+* [exec](#exec) - switch execution to a new process.
 
 It also supports:
 * [Chaining commands](#command-chaining) together with `&&` and `;`.
@@ -93,7 +95,9 @@ RUN echo Startup \
 
 ## Why Would I Need It?
 
-The tool was built with Docker images that use minimal OS resources.  If something like busybox is too big for you, but you need some simple file manipulation because you built upon another image, then this is right for you.
+The tool was built with Docker images that use minimal OS resources.  If something like Busybox is too big for you, but you need some simple file manipulation because you built upon another image, then this is right for you.
+
+Additionally, you can build the tool with exactly the commands you need to run.  This limits the attack surface, making your install just that much safer.
 
 See [sample.Dockerfile](sample.Dockerfile) for an example of using it with Docker and a `FROM scratch`, to show that no OS setup is necessary to run the shell.
 

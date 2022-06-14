@@ -24,6 +24,8 @@ SOFTWARE.
 
 #ifndef _FS_SHELL__CMD_RMDIR_
 
+#define NAME__RMDIR "rmdir"
+
 // No startup ermdirecution
 #define STARTUP__COMMAND_INDEX__RMDIR
 

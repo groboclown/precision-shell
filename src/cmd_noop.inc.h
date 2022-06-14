@@ -24,6 +24,8 @@ SOFTWARE.
 
 #ifndef _FS_SHELL__CMD_NOOP_
 
+#define NAME__NOOP "noop"
+
 // Noop is always included, so no ifdef/else around it.
 // But notice that the commands are... nothing.
 

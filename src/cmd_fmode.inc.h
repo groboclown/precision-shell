@@ -24,6 +24,8 @@ SOFTWARE.
 
 #ifndef _FS_SHELL__CMD_FMODE_
 
+#define NAME__FMODE "fmode"
+
 // No startup execution
 #define STARTUP__COMMAND_INDEX__FMODE
 

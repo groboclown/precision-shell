@@ -24,6 +24,8 @@ SOFTWARE.
 
 #ifndef _FS_SHELL__CMD_ECHO_
 
+#define NAME__ECHO "echo"
+
 // No startup execution
 #define STARTUP__COMMAND_INDEX__ECHO
 

@@ -1,7 +1,7 @@
 #!/bin/bash
 
 # desc: chmod run with permission number larger than allowed.
-# requires: +chown
+# requires: +chmod
 
 echo "a.txt" > a.txt
 chmod 000 a.txt

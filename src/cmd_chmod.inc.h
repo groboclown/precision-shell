@@ -24,6 +24,8 @@ SOFTWARE.
 
 #ifndef _FS_SHELL__CMD_CHMOD_
 
+#define NAME__CHMOD "chmod"
+
 // no startup
 #define STARTUP__COMMAND_INDEX__CHMOD
 #define STARTUP__COMMAND_INDEX__CHMOD__RUN

@@ -24,6 +24,12 @@ SOFTWARE.
 
 #ifndef _FS_SHELL__CMD_DUP_
 
+#define NAME__DUP_A "dup-a"
+#define NAME__DUP_W "dup-w"
+#define NAME__DUP_R "dup-r"
+#define NAME__DUP__FD ""
+#define NAME__DUP__TGT ""
+
 // No startup for these
 #define STARTUP__COMMAND_INDEX__DUP__FD
 #define STARTUP__COMMAND_INDEX__DUP__TGT

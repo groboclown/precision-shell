@@ -48,16 +48,19 @@ while [ ${running} = 1 ] ; do
     echo "XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX"
     echo "${cmdarg}"
 
-    # ( cd .. && make ${cmdarg} src >/dev/null 2>&1 )
-    ( cd .. && make "${cmdarg}" src )
+    mkout=/tmp/fs-shell-$$.txt
+    ( cd ../src && make "${cmdarg}" >"${mkout}" 2>&1 )
     if [ $? != 0 ] ; then
         # compile failure is just bad
         echo "Build failure with:"
         echo "${cmdarg}"
+        cat "${mkout}"
+        rm "${mkout}"
         exit 1
     fi
+    rm "${mkout}"
 
-    ( cd .. && QUIET=1 make tests )
+    ( cd ../tests && QUIET=1 make tests )
 
     # change commands
     remainder=1

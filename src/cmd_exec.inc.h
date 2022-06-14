@@ -24,6 +24,8 @@ SOFTWARE.
 
 #ifndef _FS_SHELL__CMD_EXEC_
 
+#define NAME__EXEC "exec"
+
 // No case execution
 #define CASE__COMMAND_INDEX__EXEC
 

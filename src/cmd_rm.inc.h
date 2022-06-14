@@ -24,6 +24,8 @@ SOFTWARE.
 
 #ifndef _FS_SHELL__CMD_RM_
 
+#define NAME__RM "rm"
+
 // No startup ermecution
 #define STARTUP__COMMAND_INDEX__RM
 

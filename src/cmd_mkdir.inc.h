@@ -24,6 +24,8 @@ SOFTWARE.
 
 #ifndef _FS_SHELL__CMD_MKDIR_
 
+#define NAME__MKDIR "mkdir"
+
 // No startup execution
 #define STARTUP__COMMAND_INDEX__MKDIR
 

@@ -1,7 +1,7 @@
 #!/bin/bash
 
 # desc: dup-w to redirect stdout to stderr for the echo command
-# requires: +dup-w
+# requires: +dup-w +echo
 
 "${FS}" dup-w 1 "&2" "&&" echo hello everyone >out.txt 2>err.txt
 res=$?

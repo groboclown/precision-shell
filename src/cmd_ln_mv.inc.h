@@ -24,6 +24,13 @@ SOFTWARE.
 
 #ifndef _FS_SHELL__CMD_LN_MV_
 
+#define NAME__LN_S "ln-s"
+#define NAME__LN_S__RUN ""
+#define NAME__LN_H "ln-h"
+#define NAME__LN_H__RUN ""
+#define NAME__MV "mv"
+#define NAME__MV__RUN ""
+
 // No startup execution
 #define STARTUP__COMMAND_INDEX__LN_S
 #define STARTUP__COMMAND_INDEX__LN_S__RUN

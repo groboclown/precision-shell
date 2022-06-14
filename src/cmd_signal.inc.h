@@ -24,6 +24,7 @@ SOFTWARE.
 
 #ifndef _FS_SHELL__CMD_SIGNAL_
 
+#define NAME__SIGNAL "signal"
 
 #ifdef USE_CMD_SIGNAL
 

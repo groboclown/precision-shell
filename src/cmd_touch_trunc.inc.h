@@ -24,6 +24,10 @@ SOFTWARE.
 
 #ifndef _FS_SHELL__CMD_TOUCH_
 
+#define NAME__TOUCH "touch"
+#define NAME__TRUNC "trunc"
+#define NAME__TRUNC_TOUCH__RUN ""
+
 // Execution is not defined
 
 #define CASE__COMMAND_INDEX__TOUCH

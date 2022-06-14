@@ -10,12 +10,12 @@ all: clean $(CMDS)
 
 
 clean:
-	test -d $(OUTDIR) && rm -rf $(OUTDIR) || echo "."
+	test -d $(OUTDIR) && rm -rf $(OUTDIR) 2>/dev/null || echo ""
 
 
 tests: $(CMDS)
 
 
 $(CMDS):
-	mkdir -p $(OUTDIR)/$@
-	TEST_TMP_DIR=$(OUTDIR)/$@ FS_SHELL=$(BINDIR)/$@ $(CURDIR)/_all.sh
+	@mkdir -p $(OUTDIR)/$@
+	@TEST_TMP_DIR=$(OUTDIR)/$@ FS_SHELL=$(BINDIR)/$@ $(CURDIR)/_all.sh

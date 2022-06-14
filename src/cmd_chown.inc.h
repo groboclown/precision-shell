@@ -24,6 +24,8 @@ SOFTWARE.
 
 #ifndef _FS_SHELL__CMD_CHOWN_
 
+#define NAME__CHOWN "chown"
+
 // No startup execution
 #define STARTUP__COMMAND_INDEX__CHOWN
 #define STARTUP__COMMAND_INDEX__CHOWN__GROUP
