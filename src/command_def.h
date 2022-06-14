@@ -22,22 +22,17 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
 */
 
-#ifndef _FS_SHELL__CMD_XX_
+#ifndef _FS_SHELL_COMMAND_DEF_
+#define _FS_SHELL_COMMAND_DEF_
 
-#include "uses.h"
+
+// The type definition for a command setup function.
+//   This takes the command index requested by the user, performs processing, and returns
+//   the command index to use for the first argument processing.  Usually, this is 1-to-1.
+typedef int (*CommandSetup)(int);
+
+// The type definition for a command function.
+typedef int (*CommandFunc)();
 
 
-#ifdef USE_CMD_XX
-
-// note trailing comma
-#define ENUM_LIST__CMD_XX  COMMAND_INDEX__XX,
-#define NAME__CMD_XX       command_name_XX
-
-extern const char *command_name_XX;
-
-// cmd_run_XX runs the XX command
-extern int cmd_run_XX();
-
-#endif /* USE_CMD_X */
-#define ENUM_LIST__CMD_XX
-#endif /* _FS_SHELL__CMD_X_ */
+#endif /* _FS_SHELL_COMMAND_DEF_ */
