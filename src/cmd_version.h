@@ -47,7 +47,6 @@ int cmd_version_setup(int);
 
 // Extrapolated defines
 #define ENUM_LIST__CMD_VERSION   ENUM__CMD_VERSION,
-#define NAME_T__CMD_VERSION      NAME__CMD_VERSION
 #define NAME_TC__CMD_VERSION     NAME__CMD_VERSION,
 #define NAME_VC__CMD_VERSION     NAMEVAR__CMD_VERSION,
 #define NAME_VS__CMD_VERSION     names[COMMAND_INDEX__VERSION] = NAMEVAR__CMD_VERSION;

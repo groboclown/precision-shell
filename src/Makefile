@@ -39,7 +39,11 @@ SRC = main.c helpers.c globals.c command_runner.c command_list.c command_common.
 	cmd_find_cmd.c \
 	cmd_err.c \
 	cmd_noop.c \
-	cmd_version.c
+	cmd_version.c \
+	cmd_chmod.c \
+	cmd_chown.c \
+	cmd_dup.c \
+	cmd_echo.c
 
 
 .PHONY: all

@@ -22,37 +22,53 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
 */
 
-#ifndef _FS_SHELL__CMD_ERR_
+#ifndef _FS_SHELL__CMD_ECHO_
 
 #include "uses.h"
+
+#ifdef USE_CMD_ECHO
+
 #include "command_def.h"
 #include "command_common.h"
 
-// err is always included
 
-int cmd_err_run();
+extern const char command_name_echo[];
+int cmd_echo_run();
 
 
 // Note trailing commas and weird syntax here.
 // These are used by command_list for different setups.
-#define ENUM__CMD_ERR        COMMAND_INDEX__ERR
-#define NAME__CMD_ERR        EMPTY_STRING
-#define NAMEVAR__CMD_ERR     command_common_empty_name
-#define SETUP__CMD_ERR       command_common_setup_identity
-#define RUN__CMD_ERR         cmd_err_run
-#define INIT__CMD_ERR
+#define ENUM__CMD_ECHO        COMMAND_INDEX__ECHO
+#define NAME__CMD_ECHO        "echo"
+#define NAMEVAR__CMD_ECHO     command_name_echo
+#define SETUP__CMD_ECHO       command_common_setup_identity
+#define RUN__CMD_ECHO         cmd_echo_run
+#define INIT__CMD_ECHO
 
 
 // Extrapolated defines
-#define ENUM_LIST__CMD_ERR   ENUM__CMD_ERR,
-#define NAME_TC__CMD_ERR     NAME__CMD_ERR,
-#define NAME_VC__CMD_ERR     NAMEVAR__CMD_ERR,
-#define NAME_VS__CMD_ERR     names[COMMAND_INDEX__ERR] = NAMEVAR__CMD_ERR;
-#define SETUP_C__CMD_ERR     &SETUP__CMD_ERR,
-#define SETUP_S__CMD_ERR     setups[COMMAND_INDEX__ERR] = &SETUP__CMD_ERR;
-#define RUN_C__CMD_ERR       &RUN__CMD_ERR,
-#define RUN_S__CMD_ERR       runs[COMMAND_INDEX__ERR] = &RUN__CMD_ERR;
-#define CALL_INIT__CMD_ERR
+#define ENUM_LIST__CMD_ECHO   ENUM__CMD_ECHO,
+#define NAME_TC__CMD_ECHO     NAME__CMD_ECHO,
+#define NAME_VC__CMD_ECHO     NAMEVAR__CMD_ECHO,
+#define NAME_VS__CMD_ECHO     names[COMMAND_INDEX__ECHO] = NAMEVAR__CMD_ECHO;
+#define SETUP_C__CMD_ECHO     &SETUP__CMD_ECHO,
+#define SETUP_S__CMD_ECHO     setups[COMMAND_INDEX__ECHO] = &SETUP__CMD_ECHO;
+#define RUN_C__CMD_ECHO       &RUN__CMD_ECHO,
+#define RUN_S__CMD_ECHO       runs[COMMAND_INDEX__ECHO] = &RUN__CMD_ECHO;
+#define CALL_INIT__CMD_ECHO
 
 
-#endif /* _FS_SHELL__CMD_X_ */
+
+
+#else /* USE_CMD_ECHO */
+#define ENUM_LIST__CMD_ECHO
+#define NAME_TC__CMD_ECHO
+#define NAME_VC__CMD_ECHO
+#define NAME_VS__CMD_ECHO
+#define SETUP_C__CMD_ECHO
+#define SETUP_S__CMD_ECHO
+#define RUN_C__CMD_ECHO
+#define RUN_S__CMD_ECHO
+#define CALL_INIT__CMD_ECHO
+#endif /* USE_CMD_ECHO */
+#endif /* _FS_SHELL__CMD_ECHO_ */

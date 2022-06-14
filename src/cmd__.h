@@ -32,7 +32,7 @@ SOFTWARE.
 #include "command_common.h"
 
 
-extern const char *command_name_xx;
+extern const char command_name_xx[];
 int cmd_xx_init();
 int cmd_xx_setup(int);
 int cmd_xx_run();
@@ -50,7 +50,6 @@ int cmd_xx_run();
 
 // Extrapolated defines
 #define ENUM_LIST__CMD_XX   ENUM__CMD_XX,
-#define NAME_T__CMD_XX      NAME__CMD_XX
 #define NAME_TC__CMD_XX     NAME__CMD_XX,
 #define NAME_VC__CMD_XX     NAMEVAR__CMD_XX,
 #define NAME_VS__CMD_XX     names[COMMAND_INDEX__XX] = NAMEVAR__CMD_XX;

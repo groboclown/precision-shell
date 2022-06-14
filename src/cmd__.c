@@ -36,16 +36,13 @@ SOFTWARE.
 const char NAMEVAR__CMD_XX[] = NAME__CMD_XX;
 
 
-int cmd_xx_setup__func(int idx) {
+int cmd_xx_setup(int idx) {
     return idx;
 }
 
-int cmd_xx_run__func() {
+int cmd_xx_run() {
     return 0;
 }
-
-const CommandSetup SETUP__CMD_XX = &cmd_xx_setup__func;
-const CommandFunc RUN__CMD_XX = &cmd_xx_run__func;
 
 
 

@@ -21,50 +21,45 @@ LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
 */
-#ifndef _FS_SHELL__GLOBALS_
-#define _FS_SHELL__GLOBALS_
-
 
 #include "uses.h"
 
-#ifdef USES_SIGNALS
-#include <signal.h>
-#endif
+#ifdef USE_CMD_CHMOD
 
-// Global variables loaded by special argument parsing functions and shread
-//   by commands.
+#include <sys/stat.h>
+#include <fcntl.h>
 
-// General use argument -> integer values.
-extern int global_arg1_i;
-extern int global_arg2_i;
-extern int global_arg3_i;
-
-// General use argument storage value
-extern const char *global_arg_cached;
-
-// Name of the program running
-extern const char *global_invoked_name;
-
-// Current command name.
-extern const char *global_cmd_name;
-
-// Current argument value
-extern const char *global_arg;
-
-// Current command index.
-//   This can change while the cmd_name should remain the same.
-extern int global_cmd;
+#include "output.h"
+#include "globals.h"
+#include "helpers.h"
+#include "command_common.h"
+#include "command_list.h"
+#include "cmd_chmod.h"
 
 
-// Global file mode.  Set by the fmode command, but used by all kinds of
-//   commands.
-#ifdef USES_FMODE
-extern int global_fmode;
-#endif
+const char NAMEVAR__CMD_CHMOD[] = NAME__CMD_CHMOD;
 
-#ifdef USES_SIGNALS
-extern sigset_t global_signal_set;
-#endif
+int cmd_chmod_run() {
+    global_arg1_i = helper_arg_to_uint(8, 07777);
+    if (global_arg1_i < 0) {
+        LOG("::  - Bad base 8 number, or out of range\n");
+        global_cmd = COMMAND_INDEX__ERR;
+        return 1;
+    }
+
+    // Next argument is command + 1
+    global_cmd++;
+    return 0;
+}
+
+int cmd_chmod_run__file() {
+    LOG(":: chmod ");
+    LOGLN(global_arg);
+    return chmod(global_arg, global_arg1_i);
+}
 
 
-#endif /* _FS_SHELL__GLOBALS_ */
+#else
+// disable pedantic warning
+typedef int iso_translation_unit__chmod;
+#endif /* USE_CMD_CHMOD */

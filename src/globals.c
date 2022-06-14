@@ -29,6 +29,7 @@ SOFTWARE.
 
 int global_arg1_i = 0;
 int global_arg2_i = 0;
+int global_arg3_i = 0;
 
 const char *global_invoked_name;
 const char *global_cmd_name;

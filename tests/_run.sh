@@ -47,13 +47,16 @@ for test_name in "$@" ; do
         # Note that this requires running the command version before it's tested...
         dorun=1
         if [ ! -z "${requirements}" ] ; then
-            "${FS}" version | grep "${requirements}" >/dev/null 2>&1
-            if [ $? -ne 0 ] ; then
-                if [ "${QUIET}" != 1 ]; then
-                    echo "?? SKIPPED because ${FS} does not support ${requirements}"
+            for req_name in ${requirements} ; do
+                "${FS}" version | grep "${req_name}" >/dev/null 2>&1
+                if [ $? -ne 0 ] ; then
+                    if [ "${QUIET}" != 1 ]; then
+                        echo "?? SKIPPED because ${FS} does not support ${requirements} (missing ${req_name})"
+                    fi
+                    dorun=0
+                    break
                 fi
-                dorun=0
-            fi
+            done
         fi
         if [ "${dorun}" == 1 ] ; then
             logs="${TEST_TMP_DIR}/run.log"
