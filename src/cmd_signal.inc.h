@@ -35,9 +35,10 @@ void signal_empty_handler(int signal) {
 }
 
 #define STARTUP__COMMAND_INDEX__SIGNAL \
-case COMMAND_INDEX__SIGNAL: \
+else if (strequal(global_arg, NAME__SIGNAL)) { \
+    global_cmd = COMMAND_INDEX__SIGNAL; \
     sigemptyset(&global_signal_set); \
-    break;
+}
 
 
 #define CASE__COMMAND_INDEX__SIGNAL \

@@ -49,11 +49,11 @@ SOFTWARE.
 #ifdef USE_CMD_MKNOD
 
 #define STARTUP__COMMAND_INDEX__MKNOD \
-case COMMAND_INDEX__MKNOD: \
+else if (strequal(global_arg, NAME__MKNOD)) { \
     LOG(":: mknod setup\n"); \
     global_cmd = COMMAND_INDEX__MKNOD_DEV__TYPE; \
     global_arg1_i = 0; \
-    break;
+}
 
 #else /* USE_CMD_MKNOD */
 #define STARTUP__COMMAND_INDEX__MKNOD
@@ -63,6 +63,12 @@ case COMMAND_INDEX__MKNOD: \
 
 #ifdef USE_CMD_MKDEV
 #include <sys/sysmacros.h>
+
+#define STARTUP__COMMAND_INDEX__MKDEV \
+else if (strequal(global_arg, NAME__MKDEV)) { \
+    global_cmd = COMMAND_INDEX__MKDEV; \
+}
+
 
 // Store up the read-in major/minor in arg2 and arg3, then
 // store the device number in shared arg1 for the next __type call.
@@ -98,6 +104,7 @@ case COMMAND_INDEX__MKDEV__MINOR: \
 
 
 #else /* USE_CMD_MKDEV */
+#define STARTUP__COMMAND_INDEX__MKDEV
 #define CASE__COMMAND_INDEX__MKDEV
 #define CASE__COMMAND_INDEX__MKDEV__MINOR
 #endif /* USE_CMD_MKDEV */

@@ -27,12 +27,17 @@ SOFTWARE.
 #define NAME__CHMOD "chmod"
 
 // no startup
-#define STARTUP__COMMAND_INDEX__CHMOD
 #define STARTUP__COMMAND_INDEX__CHMOD__RUN
 
 #ifdef USE_CMD_CHMOD
 #include <sys/stat.h>
 #include <fcntl.h>
+
+#define STARTUP__COMMAND_INDEX__CHMOD \
+else if (strequal(global_arg, NAME__CHMOD)) { \
+    global_cmd = COMMAND_INDEX__CHMOD; \
+}
+
 
 #define CASE__COMMAND_INDEX__CHMOD \
 case COMMAND_INDEX__CHMOD: \
@@ -62,10 +67,9 @@ case COMMAND_INDEX__CHMOD__RUN: \
 
 
 #else /* USE_CMD_CHMOD */
-
+#define STARTUP__COMMAND_INDEX__CHMOD
 #define CASE__COMMAND_INDEX__CHMOD
 #define CASE__COMMAND_INDEX__CHMOD__RUN
-
 #endif /* USE_CMD_CHMOD */
 
 #endif /* _FS_SHELL__CMD_CHMOD_ */

@@ -26,13 +26,16 @@ SOFTWARE.
 
 #define NAME__MKDIR "mkdir"
 
-// No startup execution
-#define STARTUP__COMMAND_INDEX__MKDIR
-
 
 #ifdef USE_CMD_MKDIR
 
 #include <fcntl.h>
+
+#define STARTUP__COMMAND_INDEX__MKDIR \
+else if (strequal(global_arg, NAME__MKDIR)) { \
+    global_cmd = COMMAND_INDEX__MKDIR; \
+}
+
 
 #define CASE__COMMAND_INDEX__MKDIR \
 case COMMAND_INDEX__MKDIR: \
@@ -44,9 +47,7 @@ case COMMAND_INDEX__MKDIR: \
     break;
 
 #else /* USE_CMD_MKDIR */
-
+#define STARTUP__COMMAND_INDEX__MKDIR
 #define CASE__COMMAND_INDEX__MKDIR
-
-
 #endif /* USE_CMD_MKDIR */
 #endif /* _FS_SHELL__CMD_MKDIR_ */

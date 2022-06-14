@@ -32,11 +32,8 @@ SOFTWARE.
 #define NAME__MV__RUN ""
 
 // No startup execution
-#define STARTUP__COMMAND_INDEX__LN_S
 #define STARTUP__COMMAND_INDEX__LN_S__RUN
-#define STARTUP__COMMAND_INDEX__LN_H
 #define STARTUP__COMMAND_INDEX__LN_H__RUN
-#define STARTUP__COMMAND_INDEX__MV
 #define STARTUP__COMMAND_INDEX__MV__RUN
 
 
@@ -65,6 +62,12 @@ SOFTWARE.
 
 #ifdef USE_CMD_LN_S
 
+#define STARTUP__COMMAND_INDEX__LN_S \
+else if (strequal(global_arg, NAME__LN_S)) { \
+    global_cmd = COMMAND_INDEX__LN_S; \
+}
+
+
 #define CASE__COMMAND_INDEX__LN_S \
 case COMMAND_INDEX__LN_S:
 
@@ -78,6 +81,7 @@ case COMMAND_INDEX__LN_S:
     }
 
 #else /* USE_CMD_LN_S */
+#define STARTUP__COMMAND_INDEX__LN_S
 #define CASE__COMMAND_INDEX__LN_S
 #define CASE__COMMAND_INDEX__LN_S_BODY
 #endif /* USE_CMD_LN_S */
@@ -85,11 +89,16 @@ case COMMAND_INDEX__LN_S:
 
 #ifdef USE_CMD_LN_H
 
+#define STARTUP__COMMAND_INDEX__LN_H \
+else if (strequal(global_arg, NAME__LN_H)) { \
+    global_cmd = COMMAND_INDEX__LN_H; \
+}
+
 #define CASE__COMMAND_INDEX__LN_H \
 case COMMAND_INDEX__LN_H:
 
 #define CASE__COMMAND_INDEX__LN_H_BODY \
-    if (global_cmd == COMMAND_INDEX__LN_H) { \
+if (global_cmd == COMMAND_INDEX__LN_H) { \
         LOG(":: hard link "); \
         LOG(global_arg_cached); \
         LOG(" to "); \
@@ -98,6 +107,7 @@ case COMMAND_INDEX__LN_H:
     }
 
 #else /* USE_CMD_LN_H */
+#define STARTUP__COMMAND_INDEX__LN_H
 #define CASE__COMMAND_INDEX__LN_H
 #define CASE__COMMAND_INDEX__LN_H_BODY
 #endif /* USE_CMD_LN_H */
@@ -105,11 +115,16 @@ case COMMAND_INDEX__LN_H:
 
 #ifdef USE_CMD_MV
 
+#define STARTUP__COMMAND_INDEX__MV \
+else if (strequal(global_arg, NAME__MV)) { \
+    global_cmd = COMMAND_INDEX__MV; \
+}
+
 #define CASE__COMMAND_INDEX__MV \
 case COMMAND_INDEX__MV:
 
 #define CASE__COMMAND_INDEX__MV_BODY \
-    if (global_cmd == COMMAND_INDEX__MV) { \
+if (global_cmd == COMMAND_INDEX__MV) { \
         LOG(":: mv "); \
         LOG(global_arg_cached); \
         LOG(" to "); \
@@ -118,6 +133,7 @@ case COMMAND_INDEX__MV:
     }
 
 #else /* USE_CMD_MV */
+#define STARTUP__COMMAND_INDEX__MV
 #define CASE__COMMAND_INDEX__MV
 #define CASE__COMMAND_INDEX__MV_BODY
 #endif /* USE_CMD_MV */

@@ -26,11 +26,14 @@ SOFTWARE.
 
 #define NAME__SLEEP "sleep"
 
-// No startup execution
-#define STARTUP__COMMAND_INDEX__SLEEP
-
 
 #ifdef USE_CMD_SLEEP
+
+#define STARTUP__COMMAND_INDEX__SLEEP \
+else if (strequal(global_arg, NAME__SLEEP)) { \
+    global_cmd = COMMAND_INDEX__SLEEP; \
+}
+
 
 #define CASE__COMMAND_INDEX__SLEEP \
 case COMMAND_INDEX__SLEEP: \
@@ -45,6 +48,7 @@ case COMMAND_INDEX__SLEEP: \
     break;
 
 #else /* USE_CMD_SLEEP */
+#define STARTUP__COMMAND_INDEX__SLEEP
 #define CASE__COMMAND_INDEX__SLEEP
 #endif /* USE_CMD_SLEEP */
 

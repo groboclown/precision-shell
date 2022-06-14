@@ -29,12 +29,13 @@ SOFTWARE.
 // Noop is always included, so no ifdef/else around it.
 // But notice that the commands are... nothing.
 
-#ifdef DEBUG
-
 #define STARTUP__COMMAND_INDEX__NOOP \
-case COMMAND_INDEX__NOOP: \
+else if (strequal(global_arg, NAME__NOOP)) { \
     LOGLN(":: noop"); \
-    break;
+    global_cmd = COMMAND_INDEX__NOOP; \
+}
+
+#ifdef DEBUG
 
 #define CASE__COMMAND_INDEX__NOOP \
 case COMMAND_INDEX__NOOP: \
@@ -43,7 +44,6 @@ case COMMAND_INDEX__NOOP: \
     break;
 
 #else /* DEBUG */
-#define STARTUP__COMMAND_INDEX__NOOP
 #define CASE__COMMAND_INDEX__NOOP
 #endif /* DEBUG */
 

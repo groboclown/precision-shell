@@ -24,13 +24,18 @@ SOFTWARE.
 
 #ifndef _FS_SHELL__CMD_RM_
 
+
 #define NAME__RM "rm"
 
-// No startup ermecution
-#define STARTUP__COMMAND_INDEX__RM
-
-
 #ifdef USE_CMD_RM
+
+#include <stdio.h>
+
+#define STARTUP__COMMAND_INDEX__RM \
+else if (strequal(global_arg, NAME__RM)) { \
+    global_cmd = COMMAND_INDEX__RM; \
+}
+
 
 #define CASE__COMMAND_INDEX__RM \
 case COMMAND_INDEX__RM: \
@@ -40,9 +45,8 @@ case COMMAND_INDEX__RM: \
     break;
 
 #else /* USE_CMD_RM */
-
+#define STARTUP__COMMAND_INDEX__RM
 #define CASE__COMMAND_INDEX__RM
-
-
 #endif /* USE_CMD_RM */
+
 #endif /* _FS_SHELL__CMD_RM_ */

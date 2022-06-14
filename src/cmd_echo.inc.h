@@ -27,10 +27,14 @@ SOFTWARE.
 #define NAME__ECHO "echo"
 
 // No startup execution
-#define STARTUP__COMMAND_INDEX__ECHO
 
 
 #ifdef USE_CMD_ECHO
+
+#define STARTUP__COMMAND_INDEX__ECHO \
+else if (strequal(global_arg, NAME__ECHO)) { \
+    global_cmd = COMMAND_INDEX__ECHO; \
+}
 
 #define CASE__COMMAND_INDEX__ECHO \
 case COMMAND_INDEX__ECHO: \
@@ -41,9 +45,8 @@ case COMMAND_INDEX__ECHO: \
 
 
 #else /* USE_CMD_ECHO */
-
+#define STARTUP__COMMAND_INDEX__ECHO
 #define CASE__COMMAND_INDEX__ECHO
-
-
 #endif /* USE_CMD_ECHO */
+
 #endif /* _FS_SHELL__CMD_ECHO_ */

@@ -47,11 +47,11 @@ SOFTWARE.
 #ifdef USE_CMD_DUP_A
 
 #define STARTUP__COMMAND_INDEX__DUP_A \
-case COMMAND_INDEX__DUP_A: \
+else if (strequal(global_arg, NAME__DUP_A)) { \
     LOG(":: preparing dup-a\n"); \
     global_arg1_i = O_WRONLY | O_CREAT | O_APPEND; \
     global_cmd = COMMAND_INDEX__DUP__FD; \
-    break;
+}
 
 #else /* USE_CMD_DUP_A */
 #define STARTUP__COMMAND_INDEX__DUP_A
@@ -61,11 +61,11 @@ case COMMAND_INDEX__DUP_A: \
 #ifdef USE_CMD_DUP_W
 
 #define STARTUP__COMMAND_INDEX__DUP_W \
-case COMMAND_INDEX__DUP_W: \
-    LOG(":: preparing dup-w\n"); \
+else if (strequal(global_arg, NAME__DUP_W)) { \
+     LOG(":: preparing dup-w\n"); \
     global_arg1_i = O_WRONLY | O_CREAT | O_TRUNC; \
     global_cmd = COMMAND_INDEX__DUP__FD; \
-    break;
+}
 
 
 #else /* USE_CMD_DUP_W */
@@ -76,11 +76,11 @@ case COMMAND_INDEX__DUP_W: \
 #ifdef USE_CMD_DUP_R
 
 #define STARTUP__COMMAND_INDEX__DUP_R \
-case COMMAND_INDEX__DUP_R: \
+else if (strequal(global_arg, NAME__DUP_R)) { \
     LOG(":: preparing dup-r\n"); \
     global_arg1_i = O_RDONLY; \
     global_cmd = COMMAND_INDEX__DUP__FD; \
-    break;
+}
 
 
 #else /* USE_CMD_DUP_R */

@@ -27,13 +27,17 @@ SOFTWARE.
 #define NAME__CHOWN "chown"
 
 // No startup execution
-#define STARTUP__COMMAND_INDEX__CHOWN
 #define STARTUP__COMMAND_INDEX__CHOWN__GROUP
 #define STARTUP__COMMAND_INDEX__CHOWN__RUN
 
 
 #ifdef USE_CMD_CHOWN
 #include <sys/stat.h>
+
+#define STARTUP__COMMAND_INDEX__CHOWN \
+else if (strequal(global_arg, NAME__CHOWN)) { \
+    global_cmd = COMMAND_INDEX__CHOWN; \
+}
 
 // store user in arg1, group in arg2
 
@@ -69,6 +73,7 @@ case COMMAND_INDEX__CHOWN__RUN: \
     break;
 
 #else /* USE_CMD_CHOWN */
+#define STARTUP__COMMAND_INDEX__CHOWN
 #define CASE__COMMAND_INDEX__CHOWN
 #define CASE__COMMAND_INDEX__CHOWN__GROUP
 #define CASE__COMMAND_INDEX__CHOWN__RUN

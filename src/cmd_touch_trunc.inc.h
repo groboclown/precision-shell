@@ -40,11 +40,11 @@ SOFTWARE.
 #ifdef USE_CMD_TOUCH
 
 #define STARTUP__COMMAND_INDEX__TOUCH \
-case COMMAND_INDEX__TOUCH: \
+else if (strequal(global_arg, NAME__TOUCH)) { \
     LOG(":: preparing touch\n"); \
     global_arg1_i = O_WRONLY | O_CREAT; \
     global_cmd = COMMAND_INDEX__TRUNC_TOUCH__RUN; \
-    break;
+}
 
 #else /* USE_CMD_TOUCH */
 #define STARTUP__COMMAND_INDEX__TOUCH
@@ -54,11 +54,11 @@ case COMMAND_INDEX__TOUCH: \
 #ifdef USE_CMD_TRUNC
 
 #define STARTUP__COMMAND_INDEX__TRUNC \
-case COMMAND_INDEX__TRUNC: \
+else if (strequal(global_arg, NAME__TRUNC)) { \
     LOG(":: preparing trunc\n"); \
     global_arg1_i = O_WRONLY | O_CREAT | O_TRUNC; \
     global_cmd = COMMAND_INDEX__TRUNC_TOUCH__RUN; \
-    break;
+}
 
 #else /* USE_CMD_TRUNC */
 #define STARTUP__COMMAND_INDEX__TRUNC

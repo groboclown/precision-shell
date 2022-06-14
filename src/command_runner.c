@@ -137,60 +137,52 @@ int command_runner() {
                 case COMMAND_INDEX__FIND_CMD:
                     global_cmd_name = global_arg;
 
-                    // Assume that this will fail...
-                    global_cmd = COMMAND_INDEX__ERR;
-                    global_err = 1;
+                    if (global_arg[0] == 0) {
+                        // special placeholder
+                        global_cmd = COMMAND_INDEX__FIND_CMD;
+                    }
 
-                    for (_idx = COMMAND_INDEX__NOOP; _idx < COMMAND_INDEX__ERR; _idx++) {
-                        if (strequal(global_arg, command_list_names[_idx])) {
-                            LOG(":: starting command processing for ");
-                            LOGLN(global_arg);
-                            global_err = 0;
-                            global_cmd = _idx;
-                            switch (_idx) {
-                                // Run the setup command.
-                                
-                                // Virtual command, never exists here.
-                                // STARTUP__COMMAND_INDEX__FIND_CMD
-
-                                STARTUP__COMMAND_INDEX__NOOP
-                                STARTUP__COMMAND_INDEX__VERSION
-                                STARTUP__COMMAND_INDEX__FMODE
-                                STARTUP__COMMAND_INDEX__ECHO
-                                STARTUP__COMMAND_INDEX__RM
-                                STARTUP__COMMAND_INDEX__RMDIR
-                                STARTUP__COMMAND_INDEX__TOUCH
-                                STARTUP__COMMAND_INDEX__TRUNC
-                                STARTUP__COMMAND_INDEX__TRUNC_TOUCH__RUN
-                                STARTUP__COMMAND_INDEX__DUP_R
-                                STARTUP__COMMAND_INDEX__DUP_W
-                                STARTUP__COMMAND_INDEX__DUP_A
-                                STARTUP__COMMAND_INDEX__DUP__FD
-                                STARTUP__COMMAND_INDEX__DUP__TGT
-                                STARTUP__COMMAND_INDEX__MKNOD
-                                STARTUP__COMMAND_INDEX__MKDEV
-                                STARTUP__COMMAND_INDEX__MKDEV__MINOR
-                                STARTUP__COMMAND_INDEX__MKNOD_DEV__TYPE
-                                STARTUP__COMMAND_INDEX__MKNOD_DEV__RUN
-                                STARTUP__COMMAND_INDEX__MKDIR
-                                STARTUP__COMMAND_INDEX__CHOWN
-                                STARTUP__COMMAND_INDEX__CHOWN__GROUP
-                                STARTUP__COMMAND_INDEX__CHOWN__RUN
-                                STARTUP__COMMAND_INDEX__CHMOD
-                                STARTUP__COMMAND_INDEX__CHMOD__RUN
-                                STARTUP__COMMAND_INDEX__LN_S
-                                STARTUP__COMMAND_INDEX__LN_S__RUN
-                                STARTUP__COMMAND_INDEX__LN_H
-                                STARTUP__COMMAND_INDEX__LN_H__RUN
-                                STARTUP__COMMAND_INDEX__MV
-                                STARTUP__COMMAND_INDEX__MV__RUN
-                                STARTUP__COMMAND_INDEX__SLEEP
-                                STARTUP__COMMAND_INDEX__SIGNAL
-                                STARTUP__COMMAND_INDEX__EXEC
-                                // STARTUP__COMMAND_INDEX__ERR
-                            }
-                            break;
-                        }
+                    STARTUP__COMMAND_INDEX__NOOP
+                    STARTUP__COMMAND_INDEX__VERSION
+                    STARTUP__COMMAND_INDEX__FMODE
+                    STARTUP__COMMAND_INDEX__ECHO
+                    STARTUP__COMMAND_INDEX__RM
+                    STARTUP__COMMAND_INDEX__RMDIR
+                    STARTUP__COMMAND_INDEX__TOUCH
+                    STARTUP__COMMAND_INDEX__TRUNC
+                    STARTUP__COMMAND_INDEX__TRUNC_TOUCH__RUN
+                    STARTUP__COMMAND_INDEX__DUP_R
+                    STARTUP__COMMAND_INDEX__DUP_W
+                    STARTUP__COMMAND_INDEX__DUP_A
+                    STARTUP__COMMAND_INDEX__DUP__FD
+                    STARTUP__COMMAND_INDEX__DUP__TGT
+                    STARTUP__COMMAND_INDEX__MKNOD
+                    STARTUP__COMMAND_INDEX__MKDEV
+                    STARTUP__COMMAND_INDEX__MKDEV__MINOR
+                    STARTUP__COMMAND_INDEX__MKNOD_DEV__TYPE
+                    STARTUP__COMMAND_INDEX__MKNOD_DEV__RUN
+                    STARTUP__COMMAND_INDEX__MKDIR
+                    STARTUP__COMMAND_INDEX__CHOWN
+                    STARTUP__COMMAND_INDEX__CHOWN__GROUP
+                    STARTUP__COMMAND_INDEX__CHOWN__RUN
+                    STARTUP__COMMAND_INDEX__CHMOD
+                    STARTUP__COMMAND_INDEX__CHMOD__RUN
+                    STARTUP__COMMAND_INDEX__LN_S
+                    STARTUP__COMMAND_INDEX__LN_S__RUN
+                    STARTUP__COMMAND_INDEX__LN_H
+                    STARTUP__COMMAND_INDEX__LN_H__RUN
+                    STARTUP__COMMAND_INDEX__MV
+                    STARTUP__COMMAND_INDEX__MV__RUN
+                    STARTUP__COMMAND_INDEX__SLEEP
+                    STARTUP__COMMAND_INDEX__SIGNAL
+                    STARTUP__COMMAND_INDEX__EXEC
+                    // STARTUP__COMMAND_INDEX__ERR
+                    
+                    else {
+                        LOG(":: command not matched: ");
+                        LOGLN(global_arg);
+                        global_cmd = COMMAND_INDEX__ERR;
+                        global_err = 1;
                     }
                     break;
 

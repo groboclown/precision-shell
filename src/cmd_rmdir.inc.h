@@ -26,11 +26,15 @@ SOFTWARE.
 
 #define NAME__RMDIR "rmdir"
 
-// No startup ermdirecution
-#define STARTUP__COMMAND_INDEX__RMDIR
-
 
 #ifdef USE_CMD_RMDIR
+
+#include <stdio.h>
+
+#define STARTUP__COMMAND_INDEX__RMDIR \
+else if (strequal(global_arg, NAME__RMDIR)) { \
+    global_cmd = COMMAND_INDEX__RMDIR; \
+}
 
 #define CASE__COMMAND_INDEX__RMDIR \
 case COMMAND_INDEX__RMDIR: \
@@ -40,9 +44,7 @@ case COMMAND_INDEX__RMDIR: \
     break;
 
 #else /* USE_CMD_RMDIR */
-
+#define STARTUP__COMMAND_INDEX__RMDIR
 #define CASE__COMMAND_INDEX__RMDIR
-
-
 #endif /* USE_CMD_RMDIR */
 #endif /* _FS_SHELL__CMD_RMDIR_ */

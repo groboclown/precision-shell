@@ -29,7 +29,7 @@ SOFTWARE.
 // Version is always included, so no ifdef/else around it.
 
 #define STARTUP__COMMAND_INDEX__VERSION \
-case COMMAND_INDEX__VERSION: \
+else if (strequal(global_arg, NAME__VERSION)) { \
     /* stdoutP(global_invoked_name); */ \
     stdoutP("fs-shell"); \
     stdoutP(VERSION_STR); \
@@ -43,7 +43,7 @@ case COMMAND_INDEX__VERSION: \
     stdoutP("\n"); \
     /* should be no arguments, so immediately switch to error mode. */ \
     global_cmd = COMMAND_INDEX__ERR; \
-    break;
+}
 
 // No case execution
 #define CASE__COMMAND_INDEX__VERSION

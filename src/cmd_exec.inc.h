@@ -68,7 +68,7 @@ SOFTWARE.
 #endif
 
 #define STARTUP__COMMAND_INDEX__EXEC \
-case COMMAND_INDEX__EXEC: \
+else if (strequal(global_arg, NAME__EXEC)) { \
     /* add a trailing + 1 for the final 0, if necessary */ \
     exec_argv = malloc((sizeof(const char *) * MAX_EXEC_ARGS) + 1); \
     if (exec_argv == NULL) { \
@@ -117,9 +117,9 @@ case COMMAND_INDEX__EXEC: \
     } \
     EXEC_DEBUG_REPORT \
     /* This launches a new executable and terminates this one immediately. */ \
-    execvp(exec_argv[0], (char * const*) exec_argv);
+    execvp(exec_argv[0], (char * const*) exec_argv); \
+}
 
-    // trailing break isn't necessary here.
 
 #else /* USE_CMD_EXEC */
 

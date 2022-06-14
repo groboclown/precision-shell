@@ -26,11 +26,15 @@ SOFTWARE.
 
 #define NAME__FMODE "fmode"
 
-// No startup execution
-#define STARTUP__COMMAND_INDEX__FMODE
-
 
 #ifdef USES_FMODE
+
+#define STARTUP__COMMAND_INDEX__FMODE \
+else if (strequal(global_arg, NAME__FMODE)) { \
+    global_cmd = COMMAND_INDEX__FMODE; \
+}
+
+
 
 #define CASE__COMMAND_INDEX__FMODE \
 case COMMAND_INDEX__FMODE: \
@@ -51,9 +55,8 @@ case COMMAND_INDEX__FMODE: \
 
 
 #else /* USES_FMODE */
-
 #define CASE__COMMAND_INDEX__FMODE
-
-
+#define STARTUP__COMMAND_INDEX__FMODE
 #endif /* USES_FMODE */
+
 #endif /* _FS_SHELL__CMD_FMODE_ */
