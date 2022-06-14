@@ -1,7 +1,7 @@
 #!/bin/bash
 
 # desc: trunc with no arguments
-# requires: +input
+# requires: +trunc
 
 "${FS}" trunc >out.txt 2>err.txt
 res=$?

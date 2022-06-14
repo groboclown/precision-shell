@@ -1,6 +1,7 @@
 #!/bin/bash
 
 # desc: noop run with no arguments.
+# requires: +noop
 
 "${FS}" noop > out.txt 2>err.txt
 res=$?

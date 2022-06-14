@@ -1,6 +1,7 @@
 #!/bin/bash
 
 # desc: sleep with 1 argument
+# requires: +sleep
 
 # UTC time, seconds since epoc
 "${FS}" sleep foo >out.txt 2>err.txt

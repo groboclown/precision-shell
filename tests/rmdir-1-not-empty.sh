@@ -1,6 +1,7 @@
 #!/bin/bash
 
 # desc: rmdir against a directory that contains files
+# requires: +rmdir
 
 mkdir a
 echo "a.txt" > a/a.txt

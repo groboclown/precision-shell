@@ -1,7 +1,7 @@
 #!/bin/bash
 
 # desc: run mknod but with a bad node char.
-# requires: +device
+# requires: +mknod
 
 "${FS}" mknod q a.txt > out.txt 2>err.txt
 res=$?
@@ -17,7 +17,7 @@ if [ -e a.txt ] ; then
     exit 1
 fi
 
-if [ "$( printf "ERROR: mknod q\\nERROR: mknod a.txt\\n" )" != $( cat err.txt ) ] ; then
+if [ "$( printf "ERROR mknod: q\\nERROR mknod: a.txt\\n" )" != "$( cat err.txt )" ] ; then
     echo "Incorrect stderr output"
     cat err.txt
     exit 1

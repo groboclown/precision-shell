@@ -1,6 +1,7 @@
 #!/bin/bash
 
 # desc: rm against a directory
+# requires: +rm
 
 mkdir b
 "${FS}" rm b >out.txt 2>err.txt

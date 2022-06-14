@@ -1,7 +1,7 @@
 #!/bin/bash
 
 # desc: touch with no arguments
-# requires: +input
+# requires: +touch
 
 "${FS}" touch >out.txt 2>err.txt
 res=$?

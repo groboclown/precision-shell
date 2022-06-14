@@ -28,13 +28,14 @@ SOFTWARE.
 
 #define STARTUP__COMMAND_INDEX__VERSION \
 case COMMAND_INDEX__VERSION: \
-    stdoutP(global_invoked_name); \
+    /* stdoutP(global_invoked_name); */ \
+    stdoutP("fs-shell"); \
     stdoutP(VERSION_STR); \
-    for (idx = COMMAND_INDEX__NOOP; idx < COMMAND_INDEX__ERR; idx++) { \
+    for (global_arg1_i = COMMAND_INDEX__NOOP; global_arg1_i < COMMAND_INDEX__ERR; global_arg1_i++) { \
         /* Only output included commands that are not virtual. */ \
-        if (command_list_names[idx][0] != 0) { \
-            stdoutP(" "); \
-            stdoutP(command_list_names[idx]); \
+        if (command_list_names[global_arg1_i][0] != 0) { \
+            stdoutP(" +"); \
+            stdoutP(command_list_names[global_arg1_i]); \
         } \
     } \
     stdoutP("\n"); \

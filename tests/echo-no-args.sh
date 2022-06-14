@@ -1,6 +1,7 @@
 #!/bin/bash
 
 # desc: echo with no arguments outputs nothing.
+# requires: +echo
 
 "${FS}" echo > out.txt 2>err.txt
 res=$?

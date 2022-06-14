@@ -1,6 +1,7 @@
 #!/bin/bash
 
 # desc: ln-h for an existing file to a non-existing file.
+# requires: +ln-h
 
 echo "a.txt" > a.txt
 "${FS}" ln-h a.txt linked-a.txt >out.txt 2>err.txt

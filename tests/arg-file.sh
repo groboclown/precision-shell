@@ -1,7 +1,7 @@
 #!/bin/bash
 
 # desc: argument parsing with commands from stdin
-# requires: +input
+# requires: +input +echo
 
 printf "echo a b 123 a123\\necho \"a b c\" def" > test-script.txt
 "${FS}" -f test-script.txt > out.txt 2>err.txt

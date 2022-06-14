@@ -1,6 +1,7 @@
 #!/bin/bash
 
 # desc: chmod run with not-a-number permissions.
+# requires: +chmod
 
 echo "a.txt" > a.txt
 chmod 000 a.txt

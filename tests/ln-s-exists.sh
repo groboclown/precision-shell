@@ -1,6 +1,7 @@
 #!/bin/bash
 
 # desc: ln-s for an existing file to a non-existing file.
+# requires: +ln-s
 
 echo "a.txt" > a.txt
 "${FS}" ln-s a.txt linked-a.txt >out.txt 2>err.txt

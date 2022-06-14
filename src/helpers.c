@@ -25,6 +25,7 @@ SOFTWARE.
 #include <stdlib.h>
 #include <errno.h>
 #include "globals.h"
+#include "helpers.h"
 
 
 // argToUint Converts the arg to an integer value

@@ -32,8 +32,6 @@ SOFTWARE.
 #include "helpers.h"
 #include "version.h"
 
-#define CMD_SEARCH_MODE -1
-
 // ==========================================================================
 // Each supported command 
 #include "cmd_noop.inc.h"
@@ -44,26 +42,14 @@ SOFTWARE.
 #include "cmd_rmdir.inc.h"
 #include "cmd_touch_trunc.inc.h"
 #include "cmd_dup.inc.h"
-//                                STARTUP__COMMAND_INDEX__MKNOD
-//                                STARTUP__COMMAND_INDEX__MKNOD__RUN
-//                                STARTUP__COMMAND_INDEX__MKDEV
-//                                STARTUP__COMMAND_INDEX__MKDEV__MAJOR
-//                                STARTUP__COMMAND_INDEX__MKDEV__MINOR
-//                                STARTUP__COMMAND_INDEX__MKDEV__RUN
-//                                STARTUP__COMMAND_INDEX__MKDIR
-//                                STARTUP__COMMAND_INDEX__CHOWN
-//                                STARTUP__COMMAND_INDEX__CHOWN__GROUP
-//                                STARTUP__COMMAND_INDEX__CHOWN__RUN
+#include "cmd_mknod_mkdev.inc.h"
+#include "cmd_mkdir.inc.h"
+#include "cmd_chown.inc.h"
 #include "cmd_chmod.inc.h"
-//                                STARTUP__COMMAND_INDEX__LN_S
-//                                STARTUP__COMMAND_INDEX__LN_S__RUN
-//                                STARTUP__COMMAND_INDEX__LN_H
-//                                STARTUP__COMMAND_INDEX__LN_H__RUN
-//                                STARTUP__COMMAND_INDEX__MV
-//                                STARTUP__COMMAND_INDEX__MV__RUN
-//                                STARTUP__COMMAND_INDEX__SLEEP
-//                                STARTUP__COMMAND_INDEX__SIGNAL
-//                                STARTUP__COMMAND_INDEX__EXEC
+#include "cmd_ln_mv.inc.h"
+#include "cmd_sleep.inc.h"
+#include "cmd_signal.inc.h"
+#include "cmd_exec.inc.h"
 
 
 // command_runner runs the commands over the parsed arguments.
@@ -78,20 +64,24 @@ int command_runner() {
     // "global" variables
     //    These are shared between the command runner and the commands.
     int global_err = 0;
-    int global_arg1_i;
-    int global_arg2_i;
-    int global_arg3_i;
+    int global_arg1_i = 0;
+    int global_arg2_i = 0;
+    int global_arg3_i = 0;
 
     // General use argument storage value
-    const char *global_arg_cached;
+    const char *global_arg_cached = NULL;
 
     // there is also the "true" global const char *global_invoked_name;
 
-    // Current command name.
-    const char *global_cmd_name;
-
     // Current argument value
     const char *global_arg;
+
+#ifdef USES_SIGNALS
+    sigset_t global_signal_set;
+#endif
+
+    // Current command name.
+    const char *global_cmd_name = NULL;
 
     // Current command index.
     //   This can change while the cmd_name should remain the same.
@@ -104,9 +94,11 @@ int command_runner() {
     int global_fmode = 0644;
 #endif
 
-#ifdef USES_SIGNALS
-    sigset_t global_signal_set;
+#ifdef USE_CMD_EXEC
+    char *exec_arg3 = NULL;
+    const char **exec_argv = NULL;
 #endif
+
 
     // ======================================================================
     // Argument Parsing Loop
@@ -125,14 +117,14 @@ int command_runner() {
                 break;
             }
             LOG(":: &&\n");
-            global_cmd = CMD_SEARCH_MODE;
+            global_cmd = COMMAND_INDEX__FIND_CMD;
         } else
 
         if (strequal(";", global_arg)) {
             // ";" ignores any errors, resetting the error count.
             LOG(":: ;\n");
             _err_count = 0;
-            global_cmd = CMD_SEARCH_MODE;
+            global_cmd = COMMAND_INDEX__FIND_CMD;
         } else {
             // Default to no error.
             global_err = 0;
@@ -149,10 +141,16 @@ int command_runner() {
 
                     for (_idx = COMMAND_INDEX__NOOP; _idx < COMMAND_INDEX__ERR; _idx++) {
                         if (strequal(global_arg, command_list_names[_idx])) {
+                            LOG(":: starting command processing for ");
+                            LOGLN(global_arg);
                             global_err = 0;
+                            global_cmd = _idx;
                             switch (_idx) {
                                 // Run the setup command.
+                                
+                                // Virtual command, never exists here.
                                 // STARTUP__COMMAND_INDEX__FIND_CMD
+
                                 STARTUP__COMMAND_INDEX__NOOP
                                 STARTUP__COMMAND_INDEX__VERSION
                                 STARTUP__COMMAND_INDEX__FMODE
@@ -161,17 +159,17 @@ int command_runner() {
                                 STARTUP__COMMAND_INDEX__RMDIR
                                 STARTUP__COMMAND_INDEX__TOUCH
                                 STARTUP__COMMAND_INDEX__TRUNC
+                                STARTUP__COMMAND_INDEX__TRUNC_TOUCH__RUN
                                 STARTUP__COMMAND_INDEX__DUP_R
                                 STARTUP__COMMAND_INDEX__DUP_W
                                 STARTUP__COMMAND_INDEX__DUP_A
                                 STARTUP__COMMAND_INDEX__DUP__FD
                                 STARTUP__COMMAND_INDEX__DUP__TGT
                                 STARTUP__COMMAND_INDEX__MKNOD
-                                STARTUP__COMMAND_INDEX__MKNOD__RUN
                                 STARTUP__COMMAND_INDEX__MKDEV
-                                STARTUP__COMMAND_INDEX__MKDEV__MAJOR
                                 STARTUP__COMMAND_INDEX__MKDEV__MINOR
-                                STARTUP__COMMAND_INDEX__MKDEV__RUN
+                                STARTUP__COMMAND_INDEX__MKNOD_DEV__TYPE
+                                STARTUP__COMMAND_INDEX__MKNOD_DEV__RUN
                                 STARTUP__COMMAND_INDEX__MKDIR
                                 STARTUP__COMMAND_INDEX__CHOWN
                                 STARTUP__COMMAND_INDEX__CHOWN__GROUP
@@ -193,7 +191,10 @@ int command_runner() {
                         }
                     }
                     break;
+
+                // Virtual command, never exists here.
                 // CASE__COMMAND_INDEX__FIND_CMD
+
                 CASE__COMMAND_INDEX__NOOP
                 CASE__COMMAND_INDEX__VERSION
                 CASE__COMMAND_INDEX__FMODE
@@ -202,34 +203,43 @@ int command_runner() {
                 CASE__COMMAND_INDEX__RMDIR
                 CASE__COMMAND_INDEX__TOUCH
                 CASE__COMMAND_INDEX__TRUNC
+                CASE__COMMAND_INDEX__TRUNC_TOUCH__RUN
                 CASE__COMMAND_INDEX__DUP_R
                 CASE__COMMAND_INDEX__DUP_W
                 CASE__COMMAND_INDEX__DUP_A
                 CASE__COMMAND_INDEX__DUP__FD
                 CASE__COMMAND_INDEX__DUP__TGT
                 CASE__COMMAND_INDEX__MKNOD
-                CASE__COMMAND_INDEX__MKNOD__RUN
                 CASE__COMMAND_INDEX__MKDEV
-                CASE__COMMAND_INDEX__MKDEV__MAJOR
                 CASE__COMMAND_INDEX__MKDEV__MINOR
-                CASE__COMMAND_INDEX__MKDEV__RUN
+                CASE__COMMAND_INDEX__MKNOD_DEV__TYPE
+                CASE__COMMAND_INDEX__MKNOD_DEV__RUN
                 CASE__COMMAND_INDEX__MKDIR
                 CASE__COMMAND_INDEX__CHOWN
                 CASE__COMMAND_INDEX__CHOWN__GROUP
                 CASE__COMMAND_INDEX__CHOWN__RUN
                 CASE__COMMAND_INDEX__CHMOD
                 CASE__COMMAND_INDEX__CHMOD__RUN
+
+                // ln-s, ln-h, and mv have a common body
+                //   without this, there's a terrible complexity
+                //   that happens in the code.
                 CASE__COMMAND_INDEX__LN_S
-                CASE__COMMAND_INDEX__LN_S__RUN
                 CASE__COMMAND_INDEX__LN_H
-                CASE__COMMAND_INDEX__LN_H__RUN
                 CASE__COMMAND_INDEX__MV
-                CASE__COMMAND_INDEX__MV__RUN
+                CASE__COMMAND_INDEX__LN_MV_COMMON_BODY
+                CASE__COMMAND_INDEX__LN_S_BODY
+                CASE__COMMAND_INDEX__LN_H_BODY
+                CASE__COMMAND_INDEX__MV_BODY
+                CASE__COMMAND_INDEX__LN_MV_COMMON_BODY_END
+
                 CASE__COMMAND_INDEX__SLEEP
                 CASE__COMMAND_INDEX__SIGNAL
                 CASE__COMMAND_INDEX__EXEC
-                // CASE__COMMAND_INDEX__ERR
 
+                case COMMAND_INDEX__ERR:
+                    global_err = 1;
+                    break;
             }
         }
 

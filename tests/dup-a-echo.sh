@@ -1,7 +1,7 @@
 #!/bin/bash
 
 # desc: dup-a echoing to a file
-# requires: +input
+# requires: +dup-a +echo
 
 echo "tuna" > a.txt
 "${FS}" dup-a 1 a.txt "&&" echo is yummy  > out.txt 2>err.txt

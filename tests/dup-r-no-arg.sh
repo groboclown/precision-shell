@@ -1,7 +1,7 @@
 #!/bin/bash
 
 # desc: dup-r with no arguments
-# requires: +input
+# requires: +dup-r
 
 "${FS}" dup-r > out.txt 2>err.txt
 res=$?

@@ -1,6 +1,6 @@
 SUBDIRS = src tests
 
-.PHONY: all clean subdirs $(SUBDIRS)
+.PHONY: all clean subdirs $(SUBDIRS) help
 
 subdirs: $(SUBDIRS)
 
@@ -11,3 +11,10 @@ clean:
 
 $(SUBDIRS):
 	$(MAKE) -C $@
+
+help:
+	@echo "Compiles and tests the program."
+	@echo "  By default, the shell compiles with no commands."
+	@echo "  In order to select commands to include, you must set 'COMMAND_FLAGS'"
+	@echo "  to include the commands to build; for example:"
+	@echo "     make COMMAND_FLAGS='\$$CMD_CHMOD \$$CMD_CHOWN'"

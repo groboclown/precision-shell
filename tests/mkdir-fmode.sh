@@ -1,9 +1,9 @@
 #!/bin/bash
 
-# desc: mkdir with 1 directory that does not exist.
+# desc: mkdir with an explicit fmode
 # requires: +mkdir
 
-"${FS}" mkdir abc > out.txt 2>err.txt
+"${FS}" fmode 200 "&&" mkdir a12 > out.txt 2>err.txt
 res=$?
 
 if [ ${res} -ne 0 ] ; then
@@ -12,13 +12,14 @@ if [ ${res} -ne 0 ] ; then
 fi
 
 # -d : directory exists
-if [ ! -d abc ] ; then
+if [ ! -d a12 ] ; then
     echo "Directory not created."
     exit 1
 fi
 
-flags=$( stat -c '%A' abc )
-if [ "${flags}" != "drwxr-xr-x" ] ; then
+# mkdir auto-adds execute permission to all the fields.
+flags=$( stat -c '%A' a12 )
+if [ "${flags}" != "d-wx--x--x" ] ; then
     echo "Incorrect permissions: ${flags}"
     exit 1
 fi
@@ -33,7 +34,7 @@ if [ -s out.txt ] || [ -s err.txt ] ; then
     exit 1
 fi
 
-# should have: out.txt and err.txt and abc
+# should have: out.txt and err.txt and a12
 count="$( ls -1A | wc -l )"
 if [ ${count} != 3 ] ; then
     echo "Generated unexpected files:"

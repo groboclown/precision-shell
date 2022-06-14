@@ -1,6 +1,7 @@
 #!/bin/bash
 
 # desc: rmdir against a file
+# requires: +rmdir
 
 echo "a.txt" > a.txt
 "${FS}" rmdir a.txt >out.txt 2>err.txt

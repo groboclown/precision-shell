@@ -1,7 +1,7 @@
 #!/bin/bash
 
 # desc: create the given files
-# requires: +input
+# requires: +trunc
 
 "${FS}" trunc a.txt b.txt >out.txt 2>err.txt
 res=$?

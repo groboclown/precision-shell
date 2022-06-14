@@ -1,7 +1,7 @@
 #!/bin/bash
 
 # desc: create the given files
-# requires: +input
+# requires: +touch
 
 "${FS}" touch a.txt b.txt >out.txt 2>err.txt
 res=$?

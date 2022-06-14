@@ -24,45 +24,109 @@ SOFTWARE.
 
 #ifndef _FS_SHELL__CMD_DUP_
 
+// No startup for these
 #define STARTUP__COMMAND_INDEX__DUP__FD
 #define STARTUP__COMMAND_INDEX__DUP__TGT
+
+// And the dup commands have no case because they fall directly into the fd.
+#define CASE__COMMAND_INDEX__DUP_A
+#define CASE__COMMAND_INDEX__DUP_W
+#define CASE__COMMAND_INDEX__DUP_R
+
+
+// These commands at startup set global_arg1 to the file open mode.
+// The fd stores the file descriptor in global_arg2
 
 // Setup prepares for the execution
 #ifdef USE_CMD_DUP_A
 
-#define STARTUP__COMMAND_INDEX__DUP_A
+#define STARTUP__COMMAND_INDEX__DUP_A \
+case COMMAND_INDEX__DUP_A: \
+    LOG(":: preparing dup-a\n"); \
+    global_arg1_i = O_WRONLY | O_CREAT | O_APPEND; \
+    global_cmd = COMMAND_INDEX__DUP__FD; \
+    break;
 
 #else /* USE_CMD_DUP_A */
-
 #define STARTUP__COMMAND_INDEX__DUP_A
-
 #endif /* USE_CMD_DUP_A */
+
 
 #ifdef USE_CMD_DUP_W
 
-#define STARTUP__COMMAND_INDEX__DUP_W
+#define STARTUP__COMMAND_INDEX__DUP_W \
+case COMMAND_INDEX__DUP_W: \
+    LOG(":: preparing dup-w\n"); \
+    global_arg1_i = O_WRONLY | O_CREAT | O_TRUNC; \
+    global_cmd = COMMAND_INDEX__DUP__FD; \
+    break;
+
 
 #else /* USE_CMD_DUP_W */
-
 #define STARTUP__COMMAND_INDEX__DUP_W
-
 #endif /* USE_CMD_DUP_W */
+
 
 #ifdef USE_CMD_DUP_R
 
-#define STARTUP__COMMAND_INDEX__DUP_R
+#define STARTUP__COMMAND_INDEX__DUP_R \
+case COMMAND_INDEX__DUP_R: \
+    LOG(":: preparing dup-r\n"); \
+    global_arg1_i = O_RDONLY; \
+    global_cmd = COMMAND_INDEX__DUP__FD; \
+    break;
+
 
 #else /* USE_CMD_DUP_R */
-
 #define STARTUP__COMMAND_INDEX__DUP_R
-
 #endif /* USE_CMD_DUP_R */
 
+
 // Execution runs the same across all these commands.
+// should be ifdef USES_DUP
 #if defined(USE_CMD_DUP_A) || defined(USE_CMD_DUP_W) || defined(USE_CMD_DUP_R)
 
-#define CASE__COMMAND_INDEX__DUP__FD
-#define CASE__COMMAND_INDEX__DUP__TGT
+#include <fcntl.h>
+
+#define CASE__COMMAND_INDEX__DUP__FD \
+case COMMAND_INDEX__DUP__FD: \
+    LOG(":: dup fd read\n"); \
+    global_arg2_i = helper_arg_to_uint(global_arg, 10, 0xffff); \
+    if (global_arg2_i < 0) { \
+        global_err = 1; \
+        global_cmd = COMMAND_INDEX__ERR; \
+    } \
+    global_cmd = COMMAND_INDEX__DUP__TGT; \
+    break;
+
+#define CASE__COMMAND_INDEX__DUP__TGT \
+case COMMAND_INDEX__DUP__TGT: \
+    LOG(":: dup "); \
+    if (strequal("&2", global_arg)) { \
+        LOG(" stderr\n"); \
+        global_arg3_i = STDERR_FILENO; \
+    } else if (strequal("&1", global_arg)) { \
+        LOG(" stdout\n"); \
+        global_arg3_i = STDOUT_FILENO; \
+    } else if (strequal("&0", global_arg)) { \
+        LOG(" stdin\n"); \
+        global_arg3_i = STDIN_FILENO; \
+    } else { \
+        LOGLN(global_arg); \
+        global_arg3_i = open( \
+            global_arg, global_arg1_i, global_fmode \
+        ); \
+    } \
+    if (global_arg3_i == -1) { \
+        global_err = -1; \
+    } else { \
+        if (dup2(global_arg3_i, global_arg2_i) == -1) { \
+            global_err = 1; \
+        } \
+    } \
+    /* Do not allow another target; it doesn't make sense */ \
+    global_cmd = COMMAND_INDEX__ERR; \
+    break;
 
 #else /* defined(USE_CMD_DUP_A) || defined(USE_CMD_DUP_W) || defined(USE_CMD_DUP_R) */
 

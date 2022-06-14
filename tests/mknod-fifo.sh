@@ -1,7 +1,7 @@
 #!/bin/bash
 
 # desc: run mknod to create a FIFO file
-# requires: +device
+# requires: +mknod
 
 "${FS}" mknod p a.fifo > out.txt 2>err.txt
 res=$?

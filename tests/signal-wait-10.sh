@@ -1,7 +1,7 @@
 #!/bin/bash
 
 # desc: signal wait with signal numbers.
-# requires: +signals
+# requires: +signal
 
 # make sure we use the kill program, not the Bash built-in kill.
 kill_exec="$( which kill )"

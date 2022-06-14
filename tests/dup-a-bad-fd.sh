@@ -1,7 +1,7 @@
 #!/bin/bash
 
 # desc: dup-a with a bad fd value
-# requires: +input
+# requires: +dup-a
 
 echo "tuna" > a.txt
 "${FS}" dup-a xyz a.txt > out.txt 2>err.txt

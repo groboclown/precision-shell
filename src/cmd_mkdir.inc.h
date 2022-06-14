@@ -22,16 +22,29 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
 */
 
-#ifndef _FS_SHELL__HELPERS_
-#define _FS_SHELL__HELPERS_
+#ifndef _FS_SHELL__CMD_MKDIR_
 
-// This core dumps on dietlibc.
-#define strequal(a, b) (strcmp((a), (b)) == 0)
-// simplified semantics on strcmp.
-// int strequal(const char *a, const char *b);
-
-// convert global_arg to an integer value.
-int helper_arg_to_uint(const char *arg, int base, int maxValue);
+// No startup execution
+#define STARTUP__COMMAND_INDEX__MKDIR
 
 
-#endif /* _FS_SHELL__HELPERS_ */
+#ifdef USE_CMD_MKDIR
+
+#include <fcntl.h>
+
+#define CASE__COMMAND_INDEX__MKDIR \
+case COMMAND_INDEX__MKDIR: \
+    LOG(":: mkdir "); \
+    LOGLN(global_arg); \
+    /* For now, assume that execution is enabled for all modes. */ \
+    global_arg1_i = global_fmode | S_IXUSR | S_IXGRP | S_IXOTH; \
+    global_err = mkdir(global_arg, global_arg1_i); \
+    break;
+
+#else /* USE_CMD_MKDIR */
+
+#define CASE__COMMAND_INDEX__MKDIR
+
+
+#endif /* USE_CMD_MKDIR */
+#endif /* _FS_SHELL__CMD_MKDIR_ */

@@ -22,32 +22,28 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
 */
 
-#ifndef _FS_SHELL__CMD_DUP_
+#ifndef _FS_SHELL__CMD_SLEEP_
 
-#include "uses.h"
-
-
-#ifdef USE_CMD_DUP_A
-// cmd_dup_a_setup sets up the dup command
-int cmd_dup_a_setup();
-#endif /* USE_CMD_DUP_A */
-
-#ifdef USE_CMD_DUP_W
-// cmd_dup_w_setup sets up the dup command
-int cmd_dup_w_setup();
-#endif /* USE_CMD_DUP_W */
-
-#ifdef USE_CMD_DUP_R
-// cmd_dup_r_setup sets up the dup command
-int cmd_dup_r_setup();
-#endif /* USE_CMD_DUP_R */
+// No startup execution
+#define STARTUP__COMMAND_INDEX__SLEEP
 
 
-#ifdef USES_DUP
+#ifdef USE_CMD_SLEEP
 
-// run the dup command
-int cmd_dup_run();
+#define CASE__COMMAND_INDEX__SLEEP \
+case COMMAND_INDEX__SLEEP: \
+    LOG(":: sleep "); \
+    LOGLN(global_arg); \
+    global_arg1_i = helper_arg_to_uint(global_arg, 10, 0xffff); \
+    if (global_arg1_i < 0) { \
+        global_err = 1; \
+    } else if (global_arg1_i > 0) { \
+        sleep(global_arg1_i); \
+    } \
+    break;
 
-#endif /* USES_DUP */
+#else /* USE_CMD_SLEEP */
+#define CASE__COMMAND_INDEX__SLEEP
+#endif /* USE_CMD_SLEEP */
 
-#endif /* _FS_SHELL__CMD_DUP_ */
+#endif /* _FS_SHELL__CMD_SLEEP_ */

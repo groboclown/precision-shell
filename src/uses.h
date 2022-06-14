@@ -53,10 +53,9 @@ SOFTWARE.
 // USES_FMODE - special file mode processing and handling.
 //   Note that chmod does not use this!
 #if    defined(USE_CMD_MKDIR) \
-    || defined(USE_CMD_MKNOD) \
-    || defined(USE_CMD_MKDEV) \
     || defined(USE_CMD_TOUCH) \
     || defined(USE_CMD_TRUNC) \
+    || defined(USES_MKNOD) \
     || defined(USES_DUP)
 
 #define USES_FMODE 1

@@ -1,7 +1,7 @@
 #!/bin/bash
 
 # desc: touch for a directory
-# requires: +input
+# requires: +touch
 
 mkdir a
 "${FS}" touch a >out.txt 2>err.txt

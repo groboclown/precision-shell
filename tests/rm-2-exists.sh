@@ -1,6 +1,7 @@
 #!/bin/bash
 
 # desc: rm run with two files that exist
+# requires: +rm
 
 touch a.txt
 touch b.txt

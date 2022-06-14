@@ -1,0 +1,83 @@
+# Definition for which commands to include in fs-shell
+COMMAND_FLAGS =
+
+# This is a complete list of command names and the flags that trigger them.
+#   Carefully built so that only the command flags start with CMD_.
+
+CMD_CHMOD = -DUSE_CMD_CHMOD=1
+CMD_CHOWN = -DUSE_CMD_CHOWN=1
+CMD_DUP_R = -DUSE_CMD_DUP_R=1
+CMD_DUP_W = -DUSE_CMD_DUP_W=1
+CMD_DUP_A = -DUSE_CMD_DUP_A=1
+CMD_ECHO = -DUSE_CMD_ECHO=1
+CMD_EXEC = -DUSE_CMD_EXEC=1
+CMD_LN_H = -DUSE_CMD_LN_H=1
+CMD_LN_S = -DUSE_CMD_LN_S=1
+CMD_MKDEV = -DUSE_CMD_MKDEV=1
+CMD_MKDIR = -DUSE_CMD_MKDIR=1
+CMD_MKNOD = -DUSE_CMD_MKNOD=1
+CMD_MV = -DUSE_CMD_MV=1
+CMD_RM = -DUSE_CMD_RM=1
+CMD_RMDIR = -DUSE_CMD_RMDIR=1
+CMD_SIGNAL = -DUSE_CMD_SIGNAL=1
+CMD_SLEEP = -DUSE_CMD_SLEEP=1
+CMD_TOUCH = -DUSE_CMD_TOUCH=1
+CMD_TRUNC = -DUSE_CMD_TRUNC=1
+
+# These flags indicate additional features that aren't commands.
+STREAMING_INPUT = -DUSE_STREAMING_INPUT=1
+
+# END LIST
+
+
+ifdef INCLUDE_ALL_COMMANDS
+	COMMAND_FLAGS += \
+		$(CMD_CHMOD) \
+		$(CMD_CHOWN) \
+		$(CMD_DUP_R) \
+		$(CMD_DUP_W) \
+		$(CMD_DUP_A) \
+		$(CMD_ECHO) \
+		$(CMD_EXEC) \
+		$(CMD_LN_H) \
+		$(CMD_LN_S) \
+		$(CMD_MKDEV) \
+		$(CMD_MKDIR) \
+		$(CMD_MKNOD) \
+		$(CMD_MV) \
+		$(CMD_RM) \
+		$(CMD_RMDIR) \
+		$(CMD_SIGNAL) \
+		$(CMD_SLEEP) \
+		$(CMD_TOUCH) \
+		$(CMD_TRUNC) \
+		$(STREAMING_INPUT)
+endif
+
+ifdef INCLUDE_MINIMAL_COMMANDS
+	COMMAND_FLAGS += \
+		$(CMD_CHMOD) \
+		$(CMD_CHOWN) \
+		$(CMD_ECHO) \
+		$(CMD_LN_S) \
+		$(CMD_MKDIR)
+endif
+
+ifdef INCLUDE_STANDARD_COMMANDS
+	COMMAND_FLAGS += \
+		$(CMD_CHMOD) \
+		$(CMD_CHOWN) \
+		$(CMD_ECHO) \
+		$(CMD_EXEC) \
+		$(CMD_LN_H) \
+		$(CMD_LN_S) \
+		$(CMD_MKDIR) \
+		$(CMD_MV) \
+		$(CMD_RM) \
+		$(CMD_RMDIR) \
+		$(CMD_SIGNAL) \
+		$(CMD_SLEEP) \
+		$(CMD_TOUCH) \
+		$(CMD_TRUNC) \
+		$(STREAMING_INPUT)
+endif

@@ -1,7 +1,7 @@
 #!/bin/bash
 
 # desc: truncate a file that is already at length 0
-# requires: +input
+# requires: +trunc
 
 # Use real touch to create the file, and set its time to earlier.
 touch a.txt

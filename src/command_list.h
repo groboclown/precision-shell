@@ -59,14 +59,19 @@ enum CommandIndex {
     // Each argument to rmdir is a directory to remove
     COMMAND_INDEX__RMDIR,
 #endif
+
 #ifdef USE_CMD_TOUCH
-    // Each argument to touch is a file to create.
+    // The start sets up the execution, then runs the shared __RUN
     COMMAND_INDEX__TOUCH,
 #endif
 #ifdef USE_CMD_TRUNC
-    // Each argument to trunc is a file to create / truncate.
+    // The start sets up the execution, then runs the shared __RUN
     COMMAND_INDEX__TRUNC,
 #endif
+#if defined(USE_CMD_TOUCH) || defined(USE_CMD_TRUNC)
+    COMMAND_INDEX__TRUNC_TOUCH__RUN,
+#endif
+
 #ifdef USE_CMD_DUP_R
     // This runs the same as all other dup commands.
     //   - The setup creates the mode, then returns
@@ -98,21 +103,24 @@ enum CommandIndex {
 #endif
 
 #ifdef USE_CMD_MKNOD
-    // mknod first reads the node type argument
+    // mknod first reads the node type argument, but
+    // that's under COMMAND_INDEX__MKNOD_DEV__TYPE
     COMMAND_INDEX__MKNOD,
-    // then creates the given file, for each file argument.
-    COMMAND_INDEX__MKNOD__RUN,
 #endif
 #ifdef USE_CMD_MKDEV
-    // mkdev first reads the node type argument
+    // reads the device major
     COMMAND_INDEX__MKDEV,
-    // then reads the device major
-    COMMAND_INDEX__MKDEV__MAJOR,
     // then device minor
     COMMAND_INDEX__MKDEV__MINOR,
-    // then creates the node for each given file.
-    COMMAND_INDEX__MKDEV__RUN,
+    // this then moves over to COMMAND_INDEX__MKNOD_DEV__TYPE
 #endif
+#ifdef USES_MKNOD
+    // get the device type
+    COMMAND_INDEX__MKNOD_DEV__TYPE,
+    // create the node for each given file.
+    COMMAND_INDEX__MKNOD_DEV__RUN,
+#endif
+
 #ifdef USE_CMD_MKDIR
     // mkdir creates each directory argument.
     COMMAND_INDEX__MKDIR,
@@ -131,27 +139,23 @@ enum CommandIndex {
     // then changes the mode for each file
     COMMAND_INDEX__CHMOD__RUN,
 #endif
+
 #ifdef USE_CMD_LN_S
-    // ln-s reads the source of the link
+    // ln-s reads the source of the link then advances on its own for
+    //   proper error detection on argument count.
     COMMAND_INDEX__LN_S,
-    // then creates the link for the target argument, and
-    //   errors if there are more than 2 arguments.
-    COMMAND_INDEX__LN_S__RUN,
 #endif
 #ifdef USE_CMD_LN_H
-    // ln-h reads the source of the link
+    // ln-h reads the source of the link then advances on its own for
+    //   proper error detection on argument count.
     COMMAND_INDEX__LN_H,
-    // then creates the link for the target argument, and
-    //   errors if there are more than 2 arguments.
-    COMMAND_INDEX__LN_H__RUN,
 #endif
 #ifdef USE_CMD_MV
-    // mv reads the source of the link
+    // mv reads the source of the move then advances on its own for
+    //   proper error detection on argument count.
     COMMAND_INDEX__MV,
-    // then moves the source to the target argument, and
-    //   errors if there are more than 2 arguments.
-    COMMAND_INDEX__MV__RUN,
 #endif
+
 #ifdef USE_CMD_SLEEP
     // sleep parses the argument as a numeric, and sleeps for that long.
     COMMAND_INDEX__SLEEP,
@@ -174,7 +178,12 @@ enum CommandIndex {
 
 
 // index -> command name for parsing ease.
-extern const char *command_list_names[];
+// Some compilers generate bad memory addresses when this is a const char *[].
+//   This fixed Nx9 array means there's wasted space for many commands, but it builds a
+//   really easy structure for things to parse.  The alternative is a bit more memory
+//   conservative, but is really funky to create correctly (at least I couldn't do it with
+//   dietlibc).
+extern const char command_list_names[][9];
 
 
 #endif /* _FS_SHELL_COMMANDS_ */

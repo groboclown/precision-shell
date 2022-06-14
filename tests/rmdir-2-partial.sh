@@ -1,6 +1,7 @@
 #!/bin/bash
 
 # desc: rmdir against some directories that exist and some that don't.
+# requires: +rmdir
 
 mkdir aa
 mkdir dd

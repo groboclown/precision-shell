@@ -1,6 +1,7 @@
 #!/bin/bash
 
-# desc: ln-h with no arguments
+# desc: ln-s with no arguments
+# requires: +ln-s
 
 "${FS}" ln-s >out.txt 2>err.txt
 res=$?

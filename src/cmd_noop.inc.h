@@ -26,9 +26,23 @@ SOFTWARE.
 
 // Noop is always included, so no ifdef/else around it.
 // But notice that the commands are... nothing.
-// TODO add a debug variation.
 
+#ifdef DEBUG
+
+#define STARTUP__COMMAND_INDEX__NOOP \
+case COMMAND_INDEX__NOOP: \
+    LOGLN(":: noop"); \
+    break;
+
+#define CASE__COMMAND_INDEX__NOOP \
+case COMMAND_INDEX__NOOP: \
+    LOG(":: ignore"); \
+    LOGLN(global_arg); \
+    break;
+
+#else /* DEBUG */
 #define STARTUP__COMMAND_INDEX__NOOP
 #define CASE__COMMAND_INDEX__NOOP
+#endif /* DEBUG */
 
 #endif /* _FS_SHELL__CMD_X_ */

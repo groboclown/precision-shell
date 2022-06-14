@@ -1,6 +1,7 @@
 #!/bin/bash
 
 # desc: mv an existing file to a new name.
+# requires: +mv
 
 echo "a.txt" > a.txt
 

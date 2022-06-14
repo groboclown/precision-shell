@@ -1,7 +1,7 @@
 #!/bin/bash
 
 # desc: run mknod to create a socket
-# requires: +device
+# requires: +mknod
 
 "${FS}" mknod s a.sock > out.txt 2>err.txt
 res=$?

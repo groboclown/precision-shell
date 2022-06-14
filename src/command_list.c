@@ -37,7 +37,8 @@ SOFTWARE.
 
 // ==========================================================================
 // Names of each command.
-const char *command_list_names[] = {
+
+const char command_list_names[][9] = {
     // COMMAND_INDEX__FIND_CMD
     "",
 
@@ -76,6 +77,10 @@ const char *command_list_names[] = {
     // COMMAND_INDEX__TRUNC,
     "trunc",
 #endif
+#if defined(USE_CMD_TOUCH) || defined(USE_CMD_TRUNC)
+    // COMMAND_INDEX__TRUNC_TOUCH__RUN,
+    "",  // phoney
+#endif
 
 #ifdef USE_CMD_DUP_R
     // COMMAND_INDEX__DUP_R,
@@ -102,19 +107,18 @@ const char *command_list_names[] = {
 #ifdef USE_CMD_MKNOD
     // COMMAND_INDEX__MKNOD,
     "mknod",
-    // COMMAND_INDEX__MKNOD__RUN,
-    "",  // phoney
 #endif
-
 #ifdef USE_CMD_MKDEV
     // COMMAND_INDEX__MKDEV,
     "mkdev",
-    // COMMAND_INDEX__MKDEV__MAJOR,
-    "",  // phoney
     // COMMAND_INDEX__MKDEV__MINOR,
-    "",  // phoney
-    // COMMAND_INDEX__MKDEV__RUN,
-    "",  // phoney
+    "",
+#endif
+#ifdef USES_MKNOD
+    // COMMAND_INDEX__MKNOD_DEV__TYPE,
+    "",
+    // COMMAND_INDEX__MKNOD_DEV__RUN,
+    "",
 #endif
 
 #ifdef USE_CMD_MKDIR
@@ -141,22 +145,16 @@ const char *command_list_names[] = {
 #ifdef USE_CMD_LN_S
     // COMMAND_INDEX__LN_S,
     "ln-s",
-    // COMMAND_INDEX__LN_S__RUN,
-    "",  // phoney
 #endif
 
 #ifdef USE_CMD_LN_H
     // COMMAND_INDEX__LN_H,
     "ln-h",
-    // COMMAND_INDEX__LN_H__RUN,
-    "",  // phoney
 #endif
 
 #ifdef USE_CMD_MV
     // COMMAND_INDEX__MV,
     "mv",
-    // COMMAND_INDEX__MV__RUN,
-    "",  // phoney
 #endif
 
 #ifdef USE_CMD_SLEEP

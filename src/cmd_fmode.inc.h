@@ -32,14 +32,16 @@ SOFTWARE.
 
 #define CASE__COMMAND_INDEX__FMODE \
 case COMMAND_INDEX__FMODE: \
-    /* File mode is only up to the first 3 nybbles. */
-    /* Due to error checking, this will not change fmode unless it's okay. */
-    int val = helper_arg_to_uint(global_arg, 8, 0777); \
-    if (val < 0) { \
+    LOG(":: fmode "); \
+    LOGLN(global_arg); \
+    /* File mode is only up to the first 3 nybbles. */ \
+    /* Due to error checking, this will not change fmode unless it's okay. */ \
+    global_arg1_i = helper_arg_to_uint(global_arg, 8, 0777); \
+    if (global_arg1_i < 0) { \
         global_err = 1; \
         break; \
     } \
-    global_fmode = val; \
+    global_fmode = global_arg1_i; \
     \
     /* Nothing must run after this. */ \
     global_cmd = COMMAND_INDEX__ERR; \

@@ -22,48 +22,54 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
 */
 
-#ifndef _FS_SHELL__CMD_CHMOD_
+#ifndef _FS_SHELL__CMD_CHOWN_
 
-// no startup
-#define STARTUP__COMMAND_INDEX__CHMOD
-#define STARTUP__COMMAND_INDEX__CHMOD__RUN
+// No startup execution
+#define STARTUP__COMMAND_INDEX__CHOWN
+#define STARTUP__COMMAND_INDEX__CHOWN__GROUP
+#define STARTUP__COMMAND_INDEX__CHOWN__RUN
 
-#ifdef USE_CMD_CHMOD
+
+#ifdef USE_CMD_CHOWN
 #include <sys/stat.h>
-#include <fcntl.h>
 
-#define CASE__COMMAND_INDEX__CHMOD \
-case COMMAND_INDEX__CHMOD: \
-    LOG(":: Parsing arg as base 8 in val1: "); \
+// store user in arg1, group in arg2
+
+#define CASE__COMMAND_INDEX__CHOWN \
+case COMMAND_INDEX__CHOWN: \
+    LOG(":: chown reading owner id "); \
     LOGLN(global_arg); \
-    \
-    /* file mode, which is octal in range [0, 07777]. */ \
-    global_arg1_i = helper_arg_to_uint(global_arg, 8, 07777); \
-    if (global_arg1_i < 0) { \
-        LOG("::  - Bad base 8 number, or out of range\n"); \
-        global_cmd = COMMAND_INDEX__ERR; \
-        global_err = 1; \
-        break; \
-    } \
-    \
-    /* Next argument is command + 1 */ \
     global_cmd++; \
+    global_arg1_i = helper_arg_to_uint(global_arg, 10, 0xffff); \
+    if (global_arg1_i < 0) { \
+        global_err = 1; \
+        global_cmd = COMMAND_INDEX__ERR; \
+    } \
     break;
 
-
-#define CASE__COMMAND_INDEX__CHMOD__RUN \
-case COMMAND_INDEX__CHMOD__RUN: \
-    LOG(":: chmod "); \
+#define CASE__COMMAND_INDEX__CHOWN__GROUP \
+case COMMAND_INDEX__CHOWN__GROUP: \
+    LOG(":: chown reading group id "); \
     LOGLN(global_arg); \
-    global_err = chmod(global_arg, global_arg1_i); \
+    global_cmd++; \
+    global_arg2_i = helper_arg_to_uint(global_arg, 10, 0xffff); \
+    if (global_arg2_i < 0) { \
+        global_err = 1; \
+        global_cmd = COMMAND_INDEX__ERR; \
+    } \
     break;
 
+#define CASE__COMMAND_INDEX__CHOWN__RUN \
+case COMMAND_INDEX__CHOWN__RUN: \
+    LOG(":: chown "); \
+    LOGLN(global_arg); \
+    global_err = chown(global_arg, global_arg1_i, global_arg2_i); \
+    break;
 
-#else /* USE_CMD_CHMOD */
+#else /* USE_CMD_CHOWN */
+#define CASE__COMMAND_INDEX__CHOWN
+#define CASE__COMMAND_INDEX__CHOWN__GROUP
+#define CASE__COMMAND_INDEX__CHOWN__RUN
+#endif /* USE_CMD_CHOWN */
 
-#define CASE__COMMAND_INDEX__CHMOD
-#define CASE__COMMAND_INDEX__CHMOD__RUN
-
-#endif /* USE_CMD_CHMOD */
-
-#endif /* _FS_SHELL__CMD_CHMOD_ */
+#endif /* _FS_SHELL__CMD_CHOWN_ */

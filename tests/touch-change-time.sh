@@ -1,7 +1,7 @@
 #!/bin/bash
 
 # desc: change the time of an existing file
-# requires: +input
+# requires: +touch
 
 echo "?? SKIPPED because changing the time on a file is not currently supported."
 exit 0
