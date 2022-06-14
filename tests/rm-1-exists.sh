@@ -1,6 +1,7 @@
 #!/bin/bash
 
 # desc: rm run with one file that exists and has contents.
+# requires: +rm
 
 echo "a.txt" > a.txt
 echo "b.txt" > b.txt

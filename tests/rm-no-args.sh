@@ -1,7 +1,7 @@
 #!/bin/bash
 
 # desc: rm run with no arguments.
-
+# requires: +rm
 
 "${FS}" rm > out.txt 2>err.txt
 res=$?

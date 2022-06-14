@@ -2,7 +2,7 @@ FROM docker.io/library/alpine:3.10
 
 WORKDIR /opt/code
 
-COPY version.txt .
+COPY Makefile.command-flags  version.txt ./
 COPY src/ src/
 
 RUN \

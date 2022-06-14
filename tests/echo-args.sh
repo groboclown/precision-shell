@@ -1,6 +1,7 @@
 #!/bin/bash
 
 # desc: echo with arguments outputs one argument per line.
+# requires: +echo
 
 "${FS}" echo a b 123 a123 "a b c" > out.txt 2>err.txt
 res=$?

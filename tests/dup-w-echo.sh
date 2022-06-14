@@ -1,7 +1,7 @@
 #!/bin/bash
 
 # desc: dup-w into a file that has contents
-# requires: +input
+# requires: +dup-w +echo
 
 echo "tuna" > a.txt
 "${FS}" dup-w 1 a.txt "&&" echo is yummy  > out.txt 2>err.txt

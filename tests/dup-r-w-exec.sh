@@ -1,7 +1,7 @@
 #!/bin/bash
 
 # desc: pipe output using dup-w and dup-r into a program
-# requires: +input +exec
+# requires: +dup-w +dup-r +exec +echo
 
 echo "?? SKIPPED BECAUSE IT REQUIRES DEBUGGING"
 exit 0

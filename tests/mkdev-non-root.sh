@@ -1,7 +1,7 @@
 #!/bin/bash
 
 # desc: run mknod but with a bad node char.
-# requires: +device
+# requires: +mkdev
 
 if [ "${UID1}" = 0 ] || [ -z "${UID1}" ] ; then
     echo "?? SKIPPED because UID1 is zero or not set"

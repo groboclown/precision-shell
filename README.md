@@ -3,17 +3,19 @@ Minimal, non-interactive file manipulation shell
 
 Sometimes, you just don't need a shell.  You just need minimal file system operations.
 
+`fs-shell` offers a [few commands](#what-it-does) and gives you the flexibility to select which ones to compile, which can make the executable smaller and provide extra security by not enabling commands that don't need to be run.
+
 Last build size:
 
+* Do-nothing build:
+    * glibc: 819,656 bytes
+    * musl: 22,024 bytes
+    * dietlibc: 13,256 bytes
 * Minimal build:
     * glibc: 819,656 bytes
     * musl: 22,024 bytes
     * dietlibc: 13,256 bytes
-* Handle OS signals build:
-    * glibc: 823,752 bytes
-    * musl: 26,120 bytes
-    * dietlibc: 17,352 bytes
-* Full build (OS signals, read script from stdin or file, execute a program):
+* Full build:
     * glibc: 827,848 bytes
     * musl: 26,120 bytes
     * dietlibc: 17,424 bytes

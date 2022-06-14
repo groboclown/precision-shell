@@ -1,6 +1,7 @@
 #!/bin/bash
 
 # desc: chown against a file with existing user id + group id with permissions to change them.
+# requires: +chown
 
 if [ "${UID0}" -ne 0 ] ; then
     echo "!! SKIPPED because not enough permissions to run it."

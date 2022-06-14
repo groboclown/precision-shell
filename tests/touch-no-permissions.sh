@@ -1,7 +1,7 @@
 #!/bin/bash
 
 # desc: touch a file where the command does not have file access permissions
-# requires: +input
+# requires: +touch
 
 if [ "${UID1}" = "${UID2}" ] || [ "${GID1}" = "${GID2}" ] ; then
     echo "?? SKIPPED because UID1 == UID2 (${UID1}) or GID1 == GID2 (${GID1})"

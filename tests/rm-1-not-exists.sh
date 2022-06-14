@@ -1,6 +1,7 @@
 #!/bin/bash
 
 # desc: rm run with one file that doesn't exist
+# requires: +rm
 
 echo "b.txt" > b.txt
 "${FS}" rm a.txt >out.txt 2>err.txt

@@ -1,6 +1,7 @@
 #!/bin/bash
 
 # desc: rmdir against a directory that exists
+# requires: +rmdir
 
 mkdir a
 mkdir b

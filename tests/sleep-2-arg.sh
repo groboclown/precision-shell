@@ -1,6 +1,7 @@
 #!/bin/bash
 
 # desc: sleep with 2 arguments
+# requires: +sleep
 
 # UTC time, seconds since epoc
 before=$( date -u "+%s" )

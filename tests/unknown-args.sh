@@ -1,14 +1,11 @@
 #!/bin/bash
 
-# desc: an unknown command with no arguments.
-
-# This is an acceptable strange situation.  No error code, nothing written.
-# It's an edge case that we test for but deal with it.
+# desc: an unknown command with arguments.
 
 "${FS}" not-a-command a.txt > out.txt 2>err.txt
 res=$?
 
-if [ ${res} -ne 1 ] ; then
+if [ ${res} -ne 2 ] ; then
     echo "Bad exit code: ${res}"
     exit 1
 fi
@@ -20,7 +17,7 @@ if [ -s out.txt ] ; then
     exit 1
 fi
 
-if [ "$( printf "ERROR not-a-command: a.txt\\n" )" != "$( cat err.txt )" ] ; then
+if [ "$( printf "ERROR not-a-command: not-a-command\\nERROR not-a-command: a.txt\\n" )" != "$( cat err.txt )" ] ; then
     echo "Generated stderr not as expected:"
     cat err.txt
     exit 1

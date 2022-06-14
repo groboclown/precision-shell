@@ -1,7 +1,7 @@
 #!/bin/bash
 
 # desc: truncate a file to 0 length
-# requires: +input
+# requires: +trunc
 
 # Create the file, fill it with some data, and set its time to awhile ago.
 echo "foo" > a.txt

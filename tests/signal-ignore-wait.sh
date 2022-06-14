@@ -1,7 +1,7 @@
 #!/bin/bash
 
 # desc: signal to ignore a system signal.
-# requires: +signals
+# requires: +signal
 
 # This tests the intended behavior of a mildly interesting setup.
 

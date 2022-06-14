@@ -1,6 +1,7 @@
 #!/bin/bash
 
 # desc: rm run with some files existing some not; last item exists.
+# requires: +rm
 
 echo "b.txt" > b.txt
 "${FS}" rm a.txt b.txt >out.txt 2>err.txt

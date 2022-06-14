@@ -1,6 +1,7 @@
 #!/bin/bash
 
 # desc: rm run with one file that exists and has no contents.
+# requires: +rm
 
 touch a.txt
 echo "b.txt" > b.txt

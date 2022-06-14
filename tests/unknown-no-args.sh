@@ -2,24 +2,24 @@
 
 # desc: an unknown command with no arguments.
 
-# This is an acceptable strange situation.  No error code, nothing written.
-# It's an edge case that we test for but deal with it.
-
 "${FS}" not-a-command > out.txt 2>err.txt
 res=$?
 
-if [ ${res} -ne 0 ] ; then
+if [ ${res} -ne 1 ] ; then
     echo "Bad exit code: ${res}"
     exit 1
 fi
 
-# -s : file exists and not empty
-if [ -s out.txt ] || [ -s err.txt ] ; then
-    echo "Generated output to stdout or stderr"
-    echo "stdout:"
-    cat out.txt
-    echo "stderr:"
+if [ "$( printf "ERROR not-a-command: not-a-command\\n" )" != "$( cat err.txt )" ] ; then
+    echo "unexpecterd stderr:"
     cat err.txt
+    exit 1
+fi
+
+# -s : file exists and not empty
+if [ -s out.txt ] ; then
+    echo "Generated output to stdout"
+    cat out.txt
     exit 1
 fi
 

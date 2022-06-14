@@ -1,6 +1,7 @@
 #!/bin/bash
 
 # desc: parse arguments explicitly
+# requires: +echo
 
 # This reuses the echo-args test but with required explicit string parsing.
 

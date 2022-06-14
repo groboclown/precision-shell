@@ -36,7 +36,7 @@ int cmd_version_setup(int idx) {
     for (idx = COMMAND_INDEX__NOOP; idx < COMMAND_INDEX__ERR; idx++) {
         // Only output included commands that are not virtual.
         if (command_list_names[idx][0] != 0) {
-            stdoutP(" ");
+            stdoutP(" +");
             stdoutP(command_list_names[idx]);
         }
     }

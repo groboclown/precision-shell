@@ -1,7 +1,7 @@
 #!/bin/bash
 
 # desc: change the time of an existing, empty file
-# requires: +input
+# requires: +trunc
 
 # Use real touch to create the file, and set its time to earlier.
 touch a.txt

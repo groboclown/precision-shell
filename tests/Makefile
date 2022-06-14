@@ -3,23 +3,7 @@ OUTDIR = ../out/tests
 
 # Debug versions are not tested, because they include a bunch
 #   of extra output.
-CMDS = fs-shell \
-	fs-shell-signal \
-	fs-shell-input \
-	fs-shell-signal-input \
-	fs-shell-exec \
-	fs-shell-signal-exec \
-	fs-shell-input-exec \
-	fs-shell-signal-input-exec \
-	fs-shell-device \
-	fs-shell-signal-device \
-	fs-shell-input-device \
-	fs-shell-signal-input-device \
-	fs-shell-exec-device \
-	fs-shell-signal-exec-device \
-	fs-shell-input-exec-device \
-	fs-shell-signal-input-exec-device
-
+CMDS = fs-shell
 
 .PHONY: all clean tests $(CMDS)
 all: clean $(CMDS)

@@ -12,13 +12,15 @@ cd "$( dirname "$0" )"
 
 # Stuff that should always be on.
 # By not including these, we dramatically reduce the combination space.
-base_flags="-Os -s -fomit-frame-pointer"
+base_flags="-Os -s -fomit-frame-pointer -fno-unwind-tables -fno-asynchronous-unwind-tables"
+
+# These always make things bigger
+#  -O2
 
 # All possible flags to try
 all_flags=(
     -g0 \
     -Oz \
-    -O2 \
     -fno-strict-aliasing \
     -fno-align-functions \
     -fno-align-jumps \
@@ -34,8 +36,6 @@ all_flags=(
 	-falign-jumps=1 \
 	-falign-labels=1 \
 	-falign-loops=1 \
-	-fno-unwind-tables \
-	-fno-asynchronous-unwind-tables \
 	-fno-builtin-printf \
 	-fvisibility=hidden \
     -fno-string-plus-int \
@@ -45,11 +45,25 @@ all_flags=(
     -fsanitize=undefined \
 )
 
-flag_count="${#all_flags[@]}"
+# First pass is to find which flags cause a failure.  Don't include these
+#   in our list to try
+valid_flags=()
+tmpout=/tmp/fs-shell-$$
+for val in "${all_flags[@]}" ; do
+    echo "Trying ${val}"
+    ( cd "../../src" && make src MINFLAGS="${val}" OUTDIR="${tmpout}" )
+    if [ $? = 0 ]; then
+        valid_flags+=("${val}")
+    fi
+done
+rm -rf "${tmpout}"
+
+
+flag_count="${#valid_flags[@]}"
 
 # Basically, we want each flag to be a bit, either on or off.
 active_flags=()
-for val in "${all_flags[@]}" ; do
+for val in "${valid_flags[@]}" ; do
     active_flags+=(0)
 done
 
@@ -63,7 +77,7 @@ while [ 1 = 1 ] ; do
     i=0
     while [ $i -lt "${flag_count}" ] ; do
         if [ "${active_flags[$i]}" = 1 ] ; then
-            MINFLAGS="${MINFLAGS} ${all_flags[$i]}"
+            MINFLAGS="${MINFLAGS} ${valid_flags[$i]}"
         fi
         i=$(( i + 1 ))
     done

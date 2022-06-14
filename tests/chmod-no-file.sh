@@ -1,6 +1,7 @@
 #!/bin/bash
 
 # desc: chmod run with incorrect argument count.
+# requires: +chmod
 
 echo "a.txt" > a.txt
 chmod 000 a.txt
