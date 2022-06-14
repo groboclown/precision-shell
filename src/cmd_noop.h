@@ -22,55 +22,51 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
 */
 
-#ifndef _FS_SHELL__CMD_XX_
+#ifndef _FS_SHELL__CMD_NOOP_
 
 #include "uses.h"
 #include "command_def.h"
 #include "command_common.h"
 
 
-#ifdef USE_CMD_XX
+#ifdef USE_CMD_NOOP
 
 
-extern const char *command_name_xx;
-extern const CommandFunc cmd_xx_init;
-extern const CommandSetup cmd_xx_setup;
-extern const CommandFunc cmd_xx_run;
+extern const char *command_name_noop;
 
 
 // Note trailing commas and weird syntax here.
 // These are used by command_list for different setups.
-#define ENUM__CMD_XX        COMMAND_INDEX__XX
-#define NAME__CMD_XX        "xx"
-#define NAMEVAR__CMD_XX     command_name_xx
-#define SETUP__CMD_XX       cmd_xx_setup
-#define RUN__CMD_XX         cmd_xx_run
-#define INIT__CMD_XX        cmd_xx_init
+#define ENUM__CMD_NOOP        COMMAND_INDEX__NOOP
+#define NAME__CMD_NOOP        "noop"
+#define NAMEVAR__CMD_NOOP     command_name_noop
+#define SETUP__CMD_NOOP       command_common_setup_identity
+#define RUN__CMD_NOOP         command_common_run_ok
+#define INIT__CMD_NOOP
 
 
 // Extrapolated defines
-#define ENUM_LIST__CMD_XX   ENUM__CMD_XX,
-#define NAME_T__CMD_XX      NAME__CMD_XX
-#define NAME_TC__CMD_XX     NAME__CMD_XX,
-#define NAME_VC__CMD_XX     NAMEVAR__CMD_XX,
-#define NAME_VS__CMD_XX     names[COMMAND_INDEX__XX] = NAMEVAR__CMD_XX;
-#define SETUP_C__CMD_XX     SETUP__CMD_XX,
-#define SETUP_S__CMD_XX     setups[COMMAND_INDEX__XX] = SETUP__CMD_XX;
-#define RUN_C__CMD_XX       RUN__CMD_XX,
-#define RUN_S__CMD_XX       runs[COMMAND_INDEX__XX] = RUN__CMD_XX,
-#define CALL_INIT__CMD_XX   err += INIT__CMD_XX();
+#define ENUM_LIST__CMD_NOOP   ENUM__CMD_NOOP,
+#define NAME_TC__CMD_NOOP     NAME__CMD_NOOP,
+#define NAME_VC__CMD_NOOP     NAMEVAR__CMD_NOOP,
+#define NAME_VS__CMD_NOOP     names[COMMAND_INDEX__NOOP] = NAMEVAR__CMD_NOOP;
+#define SETUP_C__CMD_NOOP     SETUP__CMD_NOOP,
+#define SETUP_S__CMD_NOOP     setups[COMMAND_INDEX__NOOP] = SETUP__CMD_NOOP;
+#define RUN_C__CMD_NOOP       RUN__CMD_NOOP,
+#define RUN_S__CMD_NOOP       runs[COMMAND_INDEX__NOOP] = RUN__CMD_NOOP,
+#define CALL_INIT__CMD_NOOP
 
 
 
 
 #endif /* USE_CMD_X */
-#define ENUM_LIST__CMD_XX
-#define NAME_TC__CMD_XX
-#define NAME_VC__CMD_XX
-#define NAME_VS__CMD_XX
-#define SETUP_C__CMD_XX
-#define SETUP_S__CMD_XX
-#define RUN_C__CMD_XX
-#define RUN_S__CMD_XX
-#define CALL_INIT__CMD_XX
+#define ENUM_LIST__CMD_NOOP
+#define NAME_TC__CMD_NOOP
+#define NAME_VC__CMD_NOOP
+#define NAME_VS__CMD_NOOP
+#define SETUP_C__CMD_NOOP
+#define SETUP_S__CMD_NOOP
+#define RUN_C__CMD_NOOP
+#define RUN_S__CMD_NOOP
+#define CALL_INIT__CMD_NOOP
 #endif /* _FS_SHELL__CMD_X_ */

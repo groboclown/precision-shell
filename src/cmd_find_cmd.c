@@ -24,21 +24,34 @@ SOFTWARE.
 
 #include "uses.h"
 
-#ifdef USE_CMD_ECHO
+// Find command - always included.
 
 #include "output.h"
 #include "globals.h"
 #include "helpers.h"
+#include "command_common.h"
+#include "command_list.h"
+#include "cmd_find_cmd.h"
 
 
-int cmd_echo_run() {
-    LOG(":: echo ");
-    LOGLN(global_arg);
-    stdoutPLn(global_arg);
-    return 0;
+// cmd_find_cmd_run__func match the current arg against the command list.
+int cmd_find_cmd_run__func() {
+    const char **command_list_names = get_command_list_names();
+    const CommandSetup *command_setup = get_command_setup();
+
+    // No matter what this finds, the command name is the current argument.
+    global_cmd_name = global_arg;
+
+    // Note that the loop includes find_cmd, to keep the finding going,
+    // and does not include err.
+    for (int idx = COMMAND_INDEX__FIND_CMD; idx < COMMAND_INDEX__ERR; idx++) {
+        if (strequal(global_arg, command_list_names[idx])) {
+            global_cmd = command_setup[idx](idx);
+            return 0;
+        }
+    }
+    global_cmd = COMMAND_INDEX__ERR;
+    return 1;
 }
 
-#else
-// disable pedantic warning
-typedef int iso_translation_unit_ECHO;
-#endif /* USE_CMD_ECHO */
+extern const CommandFunc cmd_find_cmd_run = &cmd_find_cmd_run__func;

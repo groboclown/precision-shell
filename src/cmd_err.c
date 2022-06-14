@@ -24,44 +24,24 @@ SOFTWARE.
 
 #include "uses.h"
 
-#ifdef USE_CMD_CHMOD
+#ifdef USE_CMD_ERR
 
-#include <sys/stat.h>
 #include "output.h"
 #include "globals.h"
-#include "command_list.h"
 #include "helpers.h"
+#include "command_common.h"
+#include "cmd_err.h"
 
 
-int cmd_chmod_mod_arg() {
-    // chmod has a special usage that allows for the 4 nybbles to be used.
-
-    LOG(":: Parsing arg as base 8 in val1: ");
-    LOGLN(global_arg);
-
-    // file mode, which is octal in range [0, 07777].
-    global_arg1_i = helper_arg_to_uint(8, 07777);
-    if (global_arg1_i < 0) {
-        LOG("::  - Bad base 8 number, or out of range\n");
-        global_cmd = COMMAND_INDEX__ERR;
-        return 1;
-    }
-
-    // Next argument is command + 1
-    global_cmd++;
-
-    return 0;
+int cmd_err_run__func() {
+    return 1;
 }
 
-
-int cmd_chmod_run() {
-    LOG(":: chmod ");
-    LOGLN(global_arg);
-    return chmod(global_arg, global_arg1_i);
-}
+extern const CommandFunc RUN__CMD_ERR = &cmd_err_run__func;
 
 
-#else /* USE_CMD_CHMOD */
+
+#else
 // disable pedantic warning
-typedef int iso_translation_unit_CHMOD;
-#endif
+typedef int iso_translation_unit__err;
+#endif /* USE_CMD_ERR */

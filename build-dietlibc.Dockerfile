@@ -26,6 +26,7 @@ COPY src/ src/
 COPY tests/ tests/
 
 ENV \
+    BROKEN_DATA_POINTERS=1 \
 #    DEBUG=1 \
     BUILD_MODE=$BUILD_MODE \
     COMMANDS=$COMMANDS \

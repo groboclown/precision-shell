@@ -22,32 +22,18 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
 */
 
-#ifndef _FS_SHELL__CMD_DUP_
-
 #include "uses.h"
 
+#ifdef USE_CMD_NOOP
 
-#ifdef USE_CMD_DUP_A
-// cmd_dup_a_setup sets up the dup command
-int cmd_dup_a_setup();
-#endif /* USE_CMD_DUP_A */
-
-#ifdef USE_CMD_DUP_W
-// cmd_dup_w_setup sets up the dup command
-int cmd_dup_w_setup();
-#endif /* USE_CMD_DUP_W */
-
-#ifdef USE_CMD_DUP_R
-// cmd_dup_r_setup sets up the dup command
-int cmd_dup_r_setup();
-#endif /* USE_CMD_DUP_R */
+#include "cmd_noop.h"
 
 
-#ifdef USES_DUP
+const char NAMEVAR__CMD_NOOP[] = NAME__CMD_NOOP;
 
-// run the dup command
-int cmd_dup_run();
 
-#endif /* USES_DUP */
 
-#endif /* _FS_SHELL__CMD_DUP_ */
+#else
+// disable pedantic warning
+typedef int iso_translation_unit__noop;
+#endif /* USE_CMD_NOOP */

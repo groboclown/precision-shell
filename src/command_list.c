@@ -24,444 +24,138 @@ SOFTWARE.
 
 #include "uses.h"
 #include "command_list.h"
+#include "command_common.h"
 #include "globals.h"
 #include "helpers.h"
 #include "output.h"
 
-// Include each command.  It already has ifdefs around it internally.
-#include "cmd_chmod.h"
-#include "cmd_dup.h"
-#include "cmd_echo.h"
-#include "cmd_fmode.h"
-#include "cmd_version.h"
 
-// ==========================================================================
-// Common helper functions.
+int intern__list_setup();
 
-// cmdl_identity_setup a common setup that uses the invoked command index.
-int cmdl_identity_setup(int idx) {
-    return idx;
+
+// Initialize the commands.  Returns an error.
+int initialize_commands() {
+    int err = intern__list_setup();
+
+    // each command's initializer.
+    CALL_INIT__CMD_FIND_CMD
+    CALL_INIT__CMD_NOOP
+
+    return err;
 }
 
-// cmdl_toint10_arg__runner Useful command magic.
-//   - Shuffles global_arg1_i to global_arg2_i
-//   - parses global_arg as a base 10 integer into global_arg1_i, with error checking.
-//   - increments global_cmd
-int cmdl_toint10_arg__runner() {
-    int val = helper_arg_to_uint(10, 0xffff);
-    if (val < 0) {
+
+
+// DietLibC and other compilers / linkers have trouble with the data section
+//   containing pointers.  Thus, we unfortunately have this strange two-part
+//   duplication of code.
+
+#ifdef BROKEN_DATA_POINTERS
+
+const char **intern__command_list_names = NULL;
+const CommandSetup *intern__command_setup = NULL;
+const CommandFunc *intern__command_functions = NULL;
+
+int intern__list_setup() {
+    if (intern__command_list_names != NULL) {
+        return 0;
+    }
+    const char **names = malloc(sizeof(const char *) * COMMAND_INDEX__FINAL_INDEX);
+    const CommandSetup *setups = malloc(sizeof(const CommandSetup) * COMMAND_INDEX__FINAL_INDEX);
+    const CommandFunc *runs = malloc(sizeof(const CommandFunc) * COMMAND_INDEX__FINAL_INDEX);
+    if (names == NULL || setups == NULL || runs == NULL) {
+        // Half broken state - at least one of these could be non-null.
         return 1;
     }
-    global_arg2_i = global_arg1_i;
-    global_arg1_i = val;
-    global_cmd++;
-    return 0;
+
+    // COMMAND_INDEX__FIND_CMD
+    names[COMMAND_INDEX__FIND_CMD] = command_common_empty_name;
+
+    // Each command.  Order isn't too important except for cache mises.
+    NAME_VS__CMD_FIND_CMD
+    SETUP_S__CMD_FIND_CMD
+      RUN_S__CMD_FIND_CMD
+
+    NAME_VS__CMD_NOOP
+    SETUP_S__CMD_NOOP
+      RUN_S__CMD_NOOP
+
+    // Intentionally not present
+    // COMMAND_INDEX__FINAL_INDEX
+    
+    intern__command_list_names = names;
+    intern__command_setup = setups;
+    intern__command_functions = runs;
 }
 
-// cmdl_store_arg__runner Use command magic.
-//   - sets global_arg_cached to the current argument
-//   - increments global_cmd
-int cmdl_store_arg__runner() {
-    global_arg_cached = global_arg;
-    global_cmd++;
-    return 0;
+const char **get_command_list_names() {
+    intern__list_setup();
+    return intern__command_list_names;
 }
 
-// cmdl_ok a command runner that just returns no-error.
-int cmdl_ok() {
-    return 0;
+// Each command's callback, for execution on the current argument.
+CommandSetup *get_command_setup() {
+    intern__list_setup();
+    return intern__command_setup;
 }
 
-// cmdl_FIXME a command runner that indicates it needs to be replaced.
-int cmdl_FIXME() {
-    stdoutP("TODO implement ");
-    stdoutPLn(global_cmd_name);
-    return 0;
+// Each command's callback, for execution on the current argument.
+CommandFunc *get_command_function() {
+    intern__list_setup();
+    return intern__command_functions;
 }
 
 
-// ==========================================================================
-// ==========================================================================
-// Command Lists
-//   IT IS EXTREMELY IMPORTANT THAT THE ORDER HERE MATCHES THE ENUM ORDER EXACTLY
+
+#else /* BROKEN_DATA_POINTERS */
+
+// Here, we can maintain a list of pointers in the data section.
 
 
-// ==========================================================================
-// Names of each command.
-const char *command_list_names[] = {
-    // COMMAND_INDEX__NOOP
-    "noop",
 
-    // COMMAND_INDEX__VERSION,
-    "version",
+const char *intern__command_list_names[] = {
+    // Each command's name.  In exact order.
 
-#ifdef USES_FMODE
-    // COMMAND_INDEX__FMODE,
-    "fmode",
-#endif
+    NAME_TC__CMD_FIND_CMD
+    NAME_TC__CMD_NOOP
 
-#ifdef USE_CMD_ECHO
-    // COMMAND_INDEX__ECHO,
-    "echo",
-#endif
+    // Intentionally not present
+    // NAME_TC__CMD_ERR
+    // COMMAND_INDEX__FINAL_INDEX
+};
+const CommandSetup intern__command_setup[] = {
+    SETUP_C__CMD_FIND_CMD
+    SETUP_C__CMD_NOOP
 
-#ifdef USE_CMD_RM
-    // COMMAND_INDEX__RM,
-    "rm",
-#endif
+    // Intentionally not present
+    // COMMAND_INDEX__FINAL_INDEX
+};
+const CommandFunc intern__command_functions[] = {
+    RUN_C__CMD_FIND_CMD
+    RUN_C__CMD_NOOP
+    RUN_C__CMD_ERR
 
-#ifdef USE_CMD_RMDIR
-    // COMMAND_INDEX__RMDIR,
-    "rmdir",
-#endif
-
-#ifdef USE_CMD_TOUCH
-    // COMMAND_INDEX__TOUCH,
-    "touch",
-#endif
-
-#ifdef USE_CMD_TRUNC
-    // COMMAND_INDEX__TRUNC,
-    "trunc",
-#endif
-
-#ifdef USE_CMD_DUP_R
-    // COMMAND_INDEX__DUP_R,
-    "dup-r",
-#endif
-
-#ifdef USE_CMD_DUP_W
-    // COMMAND_INDEX__DUP_W,
-    "dup-w",
-#endif
-
-#ifdef USE_CMD_DUP_A
-    // COMMAND_INDEX__DUP_A,
-    "dup-a",
-#endif
-
-#ifdef USES_DUP
-    // COMMAND_INDEX__DUP__FD,
-    "",  // phoney
-    // COMMAND_INDEX__DUP__TGT,
-    "",  // phoney
-#endif
-
-#ifdef USE_CMD_MKNOD
-    // COMMAND_INDEX__MKNOD,
-    "mknod",
-    // COMMAND_INDEX__MKNOD__RUN,
-    "",  // phoney
-#endif
-
-#ifdef USE_CMD_MKDEV
-    // COMMAND_INDEX__MKDEV,
-    "mkdev",
-    // COMMAND_INDEX__MKDEV__MAJOR,
-    "",  // phoney
-    // COMMAND_INDEX__MKDEV__MINOR,
-    "",  // phoney
-    // COMMAND_INDEX__MKDEV__RUN,
-    "",  // phoney
-#endif
-
-#ifdef USE_CMD_MKDIR
-    // COMMAND_INDEX__MKDIR,
-    "mkdir",
-#endif
-
-#ifdef USE_CMD_CHOWN
-    // COMMAND_INDEX__CHOWN,
-    "chown",
-    // COMMAND_INDEX__CHOWN__GROUP,
-    "",  // phoney
-    // COMMAND_INDEX__CHOWN__RUN,
-    "",  // phoney
-#endif
-
-#ifdef USE_CMD_CHMOD
-    // COMMAND_INDEX__CHMOD,
-    "chmod",
-    // COMMAND_INDEX__CHMOD__RUN,
-    "",  // phoney
-#endif
-
-#ifdef USE_CMD_LN_S
-    // COMMAND_INDEX__LN_S,
-    "ln-s",
-    // COMMAND_INDEX__LN_S__RUN,
-    "",  // phoney
-#endif
-
-#ifdef USE_CMD_LN_H
-    // COMMAND_INDEX__LN_H,
-    "ln-h",
-    // COMMAND_INDEX__LN_H__RUN,
-    "",  // phoney
-#endif
-
-#ifdef USE_CMD_MV
-    // COMMAND_INDEX__MV,
-    "mv",
-    // COMMAND_INDEX__MV__RUN,
-    "",  // phoney
-#endif
-
-#ifdef USE_CMD_SLEEP
-    // COMMAND_INDEX__SLEEP,
-    "sleep",
-#endif
-
-#ifdef USE_CMD_SIGNAL
-    // COMMAND_INDEX__SIGNAL,
-    "signal",
-#endif
-
-#ifdef USE_CMD_EXEC
-    // COMMAND_INDEX__EXEC,
-    "exec",
-#endif
-
-    // COMMAND_INDEX__ERR
-    //   End List marker
+    // Intentionally not present
+    // COMMAND_INDEX__FINAL_INDEX
 };
 
-CommandSetup command_setup[] = {
-    // COMMAND_INDEX__NOOP
-    &cmdl_identity_setup,
+int intern__list_setup() {
+    return 0;
+}
 
-    // COMMAND_INDEX__VERSION,
-    &cmd_version_setup,
+const char **get_command_list_names() {
+    return intern__command_list_names;
+}
 
-#ifdef USES_FMODE
-    // COMMAND_INDEX__FMODE,
-    &cmdl_identity_setup,
-#endif
+// Each command's callback, for execution on the current argument.
+CommandSetup *get_command_setup() {
+    return intern__command_setup;
+}
 
-#ifdef USE_CMD_ECHO
-    // COMMAND_INDEX__ECHO,
-    &cmdl_identity_setup,
-#endif
-#ifdef USE_CMD_RM
-    // COMMAND_INDEX__RM,
-    &cmdl_identity_setup,
-#endif
-#ifdef USE_CMD_RMDIR
-    // COMMAND_INDEX__RMDIR,
-    &cmdl_identity_setup,
-#endif
-#ifdef USE_CMD_TOUCH
-    // COMMAND_INDEX__TOUCH,
-    &cmdl_identity_setup,
-#endif
-#ifdef USE_CMD_TRUNC
-    // COMMAND_INDEX__TRUNC,
-    &cmdl_identity_setup,
-#endif
-#ifdef USE_CMD_DUP_R
-    // COMMAND_INDEX__DUP_R,
-    &cmd_dup_r_setup,
-#endif
-#ifdef USE_CMD_DUP_W
-    // COMMAND_INDEX__DUP_W,
-    &cmd_dup_w_setup,
-#endif
-#ifdef USE_CMD_DUP_A
-    // COMMAND_INDEX__DUP_A,
-    &cmd_dup_a_setup,
-#endif
+// Each command's callback, for execution on the current argument.
+CommandFunc *get_command_function() {
+    return intern__command_functions;
+}
 
-#ifdef USES_DUP
-    // COMMAND_INDEX__DUP__FD,
-    NULL,  // phoney
-    // COMMAND_INDEX__DUP__TGT,
-    NULL,  // phoney
-#endif
 
-#ifdef USE_CMD_MKNOD
-    // COMMAND_INDEX__MKNOD,
-    &cmdl_identity_setup,
-    // COMMAND_INDEX__MKNOD__RUN,
-    NULL,  // phoney
-#endif
-#ifdef USE_CMD_MKDEV
-    // COMMAND_INDEX__MKDEV,
-    &cmdl_identity_setup,
-    // COMMAND_INDEX__MKDEV__MAJOR,
-    NULL,  // phoney
-    // COMMAND_INDEX__MKDEV__MINOR,
-    NULL,  // phoney
-    // COMMAND_INDEX__MKDEV__RUN,
-    NULL,  // phoney
-#endif
-#ifdef USE_CMD_MKDIR
-    // COMMAND_INDEX__MKDIR,
-    &cmdl_identity_setup,
-#endif
-#ifdef USE_CMD_CHOWN
-    // COMMAND_INDEX__CHOWN,
-    &cmdl_identity_setup,
-    // COMMAND_INDEX__CHOWN__GROUP,
-    NULL,  // phoney
-    // COMMAND_INDEX__CHOWN__RUN,
-    NULL,  // phoney
-#endif
-#ifdef USE_CMD_CHMOD
-    // COMMAND_INDEX__CHMOD,
-    &cmdl_identity_setup,
-    // COMMAND_INDEX__CHMOD__RUN,
-    NULL,  // phoney
-#endif
-#ifdef USE_CMD_LN_S
-    // COMMAND_INDEX__LN_S,
-    &cmdl_identity_setup,
-    // COMMAND_INDEX__LN_S__RUN,
-    NULL,  // phoney
-#endif
-#ifdef USE_CMD_LN_H
-    // COMMAND_INDEX__LN_H,
-    &cmdl_identity_setup,
-    // COMMAND_INDEX__LN_H__RUN,
-    NULL,  // phoney
-#endif
-#ifdef USE_CMD_MV
-    // COMMAND_INDEX__MV,
-    &cmdl_identity_setup,
-    // COMMAND_INDEX__MV__RUN,
-    NULL,  // phoney
-#endif
-#ifdef USE_CMD_SLEEP
-    // COMMAND_INDEX__SLEEP,
-    &cmdl_identity_setup,
-#endif
-#ifdef USE_CMD_SIGNAL
-    // COMMAND_INDEX__SIGNAL,
-    &cmdl_identity_setup,
-#endif
-#ifdef USE_CMD_EXEC
-    // COMMAND_INDEX__EXEC,
-    &cmdl_identity_setup,
-#endif
-    // COMMAND_INDEX__ERR
-    //   End List marker
-};
-
-CommandFunc command_function[] = {
-    // COMMAND_INDEX__NOOP
-    &cmdl_ok,
-
-    // COMMAND_INDEX__VERSION,
-    NULL,  // version has no runner
-
-#ifdef USES_FMODE
-    // COMMAND_INDEX__FMODE,
-    &cmd_fmode_run,
-#endif
-
-#ifdef USE_CMD_ECHO
-    // COMMAND_INDEX__ECHO,
-    &cmd_echo_run,
-#endif
-#ifdef USE_CMD_RM
-    // COMMAND_INDEX__RM,
-    &cmdl_FIXME,
-#endif
-#ifdef USE_CMD_RMDIR
-    // COMMAND_INDEX__RMDIR,
-    &cmdl_FIXME,
-#endif
-#ifdef USE_CMD_TOUCH
-    // COMMAND_INDEX__TOUCH,
-    &cmdl_FIXME,
-#endif
-#ifdef USE_CMD_TRUNC
-    // COMMAND_INDEX__TRUNC,
-    &cmdl_FIXME,
-#endif
-#ifdef USE_CMD_DUP_R
-    // COMMAND_INDEX__DUP_R,
-    NULL,  // special command that is never run directly
-#endif
-#ifdef USE_CMD_DUP_W
-    // COMMAND_INDEX__DUP_W,
-    NULL,  // special command that is never run directly
-#endif
-#ifdef USE_CMD_DUP_A
-    // COMMAND_INDEX__DUP_A,
-    NULL,  // special command that is never run directly
-#endif
-
-#ifdef USES_DUP
-    // COMMAND_INDEX__DUP__FD,
-    &cmdl_toint10_arg__runner,
-    // COMMAND_INDEX__DUP__TGT,
-    &cmd_dup_run,
-#endif
-
-#ifdef USE_CMD_MKNOD
-    // COMMAND_INDEX__MKNOD,
-    &cmdl_FIXME,
-    // COMMAND_INDEX__MKNOD__RUN,
-    &cmdl_FIXME,
-#endif
-#ifdef USE_CMD_MKDEV
-    // COMMAND_INDEX__MKDEV,
-    &cmdl_FIXME,
-    // COMMAND_INDEX__MKDEV__MAJOR,
-    &cmdl_toint10_arg__runner,
-    // COMMAND_INDEX__MKDEV__MINOR,
-    &cmdl_toint10_arg__runner,
-    // COMMAND_INDEX__MKDEV__RUN,
-    &cmdl_FIXME,
-#endif
-#ifdef USE_CMD_MKDIR
-    // COMMAND_INDEX__MKDIR,
-    &cmdl_FIXME,
-#endif
-#ifdef USE_CMD_CHOWN
-    // COMMAND_INDEX__CHOWN,
-    &cmdl_toint10_arg__runner,
-    // COMMAND_INDEX__CHOWN__GROUP,
-    &cmdl_toint10_arg__runner,
-    // COMMAND_INDEX__CHOWN__RUN,
-    &cmdl_FIXME,
-#endif
-#ifdef USE_CMD_CHMOD
-    // COMMAND_INDEX__CHMOD,
-    &cmd_chmod_mod_arg,
-    // COMMAND_INDEX__CHMOD__RUN,
-    &cmd_chmod_run,
-#endif
-#ifdef USE_CMD_LN_S
-    // COMMAND_INDEX__LN_S,
-    &cmdl_store_arg__runner,
-    // COMMAND_INDEX__LN_S__RUN,
-    &cmdl_FIXME,
-#endif
-#ifdef USE_CMD_LN_H
-    // COMMAND_INDEX__LN_H,
-    &cmdl_store_arg__runner,
-    // COMMAND_INDEX__LN_H__RUN,
-    &cmdl_FIXME,
-#endif
-#ifdef USE_CMD_MV
-    // COMMAND_INDEX__MV,
-    &cmdl_store_arg__runner,
-    // COMMAND_INDEX__MV__RUN,
-    &cmdl_FIXME,
-#endif
-#ifdef USE_CMD_SLEEP
-    // COMMAND_INDEX__SLEEP,
-    &cmdl_FIXME,
-#endif
-#ifdef USE_CMD_SIGNAL
-    // COMMAND_INDEX__SIGNAL,
-    &cmdl_FIXME,
-#endif
-#ifdef USE_CMD_EXEC
-    // COMMAND_INDEX__EXEC,
-    NULL,  // cmd is parsed very specially in its setup.
-#endif
-    // COMMAND_INDEX__ERR
-    //   End List marker
-};
+#endif /* BROKEN_DATA_POINTERS */

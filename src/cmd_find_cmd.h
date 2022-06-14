@@ -22,55 +22,43 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
 */
 
-#ifndef _FS_SHELL__CMD_XX_
+#ifndef _FS_SHELL__CMD_FIND_CMD_
+#define _FS_SHELL__CMD_FIND_CMD_
+
+// A very special command.  Must always be included.
 
 #include "uses.h"
 #include "command_def.h"
 #include "command_common.h"
 
 
-#ifdef USE_CMD_XX
-
-
-extern const char *command_name_xx;
-extern const CommandFunc cmd_xx_init;
-extern const CommandSetup cmd_xx_setup;
-extern const CommandFunc cmd_xx_run;
+extern const CommandFunc cmd_find_cmd_run;
 
 
 // Note trailing commas and weird syntax here.
 // These are used by command_list for different setups.
-#define ENUM__CMD_XX        COMMAND_INDEX__XX
-#define NAME__CMD_XX        "xx"
-#define NAMEVAR__CMD_XX     command_name_xx
-#define SETUP__CMD_XX       cmd_xx_setup
-#define RUN__CMD_XX         cmd_xx_run
-#define INIT__CMD_XX        cmd_xx_init
+#define ENUM__CMD_FIND_CMD        COMMAND_INDEX__FIND_CMD
+#define NAME__CMD_FIND_CMD        EMPTY_STRING
+#define NAMEVAR__CMD_FIND_CMD     command_common_empty_name
+#define SETUP__CMD_FIND_CMD       command_common_setup_identity
+#define RUN__CMD_FIND_CMD         cmd_find_cmd_run
+#define INIT__CMD_FIND_CMD
 
 
 // Extrapolated defines
-#define ENUM_LIST__CMD_XX   ENUM__CMD_XX,
-#define NAME_T__CMD_XX      NAME__CMD_XX
-#define NAME_TC__CMD_XX     NAME__CMD_XX,
-#define NAME_VC__CMD_XX     NAMEVAR__CMD_XX,
-#define NAME_VS__CMD_XX     names[COMMAND_INDEX__XX] = NAMEVAR__CMD_XX;
-#define SETUP_C__CMD_XX     SETUP__CMD_XX,
-#define SETUP_S__CMD_XX     setups[COMMAND_INDEX__XX] = SETUP__CMD_XX;
-#define RUN_C__CMD_XX       RUN__CMD_XX,
-#define RUN_S__CMD_XX       runs[COMMAND_INDEX__XX] = RUN__CMD_XX,
-#define CALL_INIT__CMD_XX   err += INIT__CMD_XX();
+#define ENUM_LIST__CMD_FIND_CMD   ENUM__CMD_FIND_CMD,
+#define NAME_TC__CMD_FIND_CMD     NAME__CMD_FIND_CMD,
+#define NAME_VC__CMD_FIND_CMD     NAMEVAR__CMD_FIND_CMD,
+#define NAME_VS__CMD_FIND_CMD     names[COMMAND_INDEX__FIND_CMD] = NAMEVAR__CMD_FIND_CMD;
+#define SETUP_C__CMD_FIND_CMD     SETUP__CMD_FIND_CMD,
+#define SETUP_S__CMD_FIND_CMD     setups[COMMAND_INDEX__FIND_CMD] = SETUP__CMD_FIND_CMD;
+#define RUN_C__CMD_FIND_CMD       RUN__CMD_FIND_CMD,
+#define RUN_S__CMD_FIND_CMD       runs[COMMAND_INDEX__FIND_CMD] = RUN__CMD_FIND_CMD,
+#define CALL_INIT__CMD_FIND_CMD
 
 
 
+extern const char *command_name_find_cmd;
+extern const CommandFunc cmd_find_cmd_run;
 
-#endif /* USE_CMD_X */
-#define ENUM_LIST__CMD_XX
-#define NAME_TC__CMD_XX
-#define NAME_VC__CMD_XX
-#define NAME_VS__CMD_XX
-#define SETUP_C__CMD_XX
-#define SETUP_S__CMD_XX
-#define RUN_C__CMD_XX
-#define RUN_S__CMD_XX
-#define CALL_INIT__CMD_XX
-#endif /* _FS_SHELL__CMD_X_ */
+#endif /* _FS_SHELL__CMD_FIND_CMD_ */

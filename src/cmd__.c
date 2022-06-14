@@ -24,19 +24,32 @@ SOFTWARE.
 
 #include "uses.h"
 
-#ifdef USE_CMD_X
+#ifdef USE_CMD_XX
 
 #include "output.h"
 #include "globals.h"
 #include "helpers.h"
+#include "command_common.h"
+#include "cmd_xx.h"
 
 
-int cmd_X_run() {
-    // No error.
+const char NAMEVAR__CMD_XX[] = NAME__CMD_XX;
+
+
+int cmd_xx_setup__func(int idx) {
+    return idx;
+}
+
+int cmd_xx_run__func() {
     return 0;
 }
 
+extern const CommandSetup SETUP__CMD_XX = &cmd_xx_setup__func;
+extern const CommandFunc RUN__CMD_XX = &cmd_xx_run__func;
+
+
+
 #else
 // disable pedantic warning
-typedef int iso_translation_unit_X;
-#endif /* USE_CMD_X */
+typedef int iso_translation_unit__xx;
+#endif /* USE_CMD_XX */

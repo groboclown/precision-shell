@@ -23,11 +23,15 @@ SOFTWARE.
 */
 
 #include "globals.h"
+#include "output.h"
 #include "command_common.h"
 
+const char *command_common_empty_name = EMPTY_STRING;
 
 // command_common_setup_identity a common setup that uses the invoked command index.
 int command_common_setup_identity__func(int idx) {
+    LOG(":: setup ");
+    LOGLN(global_arg);
     return idx;
 }
 
@@ -39,6 +43,10 @@ const CommandSetup command_common_setup_identity = &command_common_setup_identit
 //   - parses global_arg as a base 10 integer into global_arg1_i, with error checking.
 //   - increments global_cmd
 int command_common_run_toint10__func() {
+    LOG(":: ");
+    LOG(global_cmd_name);
+    LOG(" arg to base10 int ");
+    LOGLN(global_arg);
     int val = helper_arg_to_uint(10, 0xffff);
     if (val < 0) {
         return 1;
@@ -56,6 +64,10 @@ const CommandFunc command_common_run_toint10 = &command_common_run_toint10__func
 //   - sets global_arg_cached to the current argument
 //   - increments global_cmd
 int command_common_run_store_arg__func() {
+    LOG(":: ");
+    LOG(global_cmd_name);
+    LOG(" storing argument ");
+    LOGLN(global_arg);
     global_arg_cached = global_arg;
     global_cmd++;
     return 0;
@@ -66,6 +78,10 @@ const CommandFunc command_common_run_store_arg = &command_common_run_store_arg__
 
 // command_common_run_ok a command runner that just returns no-error.
 int command_common_run_ok__func() {
+    LOG(":: ");
+    LOG(global_cmd_name);
+    LOG(" skipping ");
+    LOGLN(global_arg);
     return 0;
 }
 
