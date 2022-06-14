@@ -183,7 +183,8 @@ enum CommandIndex {
 //   really easy structure for things to parse.  The alternative is a bit more memory
 //   conservative, but is really funky to create correctly (at least I couldn't do it with
 //   dietlibc).
-extern const char command_list_names[][9];
+// extern const void * const command_list_names_void[];
+const char ** get_command_list_names();
 
 
 #endif /* _FS_SHELL_COMMANDS_ */

@@ -68,6 +68,8 @@ int command_runner() {
     int global_arg2_i = 0;
     int global_arg3_i = 0;
 
+    const char **command_list_names = get_command_list_names();
+
     // General use argument storage value
     const char *global_arg_cached = NULL;
 

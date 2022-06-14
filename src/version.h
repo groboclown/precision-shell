@@ -13,7 +13,7 @@
 #define _VERSION_INPUT ""
 #endif
 
-static const char *VERSION_STR =
+static const char VERSION_STR[] =
     // The "fs-shell" should come from the arg0, but we lose that
     // in the argument processing.
     " " VERSION_NUMBER _VERSION_INPUT _VERSION_DEBUG;

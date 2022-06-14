@@ -38,140 +38,194 @@ SOFTWARE.
 // ==========================================================================
 // Names of each command.
 
-const char command_list_names[][9] = {
-    // COMMAND_INDEX__FIND_CMD
-    "",
+const char intern__empty[] = "";
+const char intern__noop[] = "noop";
+const char intern__version[] = "version";
+#ifdef USES_FMODE
+const char intern__fmode[] = "fmode";
+#endif
+#ifdef USE_CMD_ECHO
+const char intern__echo[] = "echo";
+#endif
+#ifdef USE_CMD_RM
+const char intern__rm[] = "rm";
+#endif
+#ifdef USE_CMD_RMDIR
+const char intern__rmdir[] = "rmdir";
+#endif
+#ifdef USE_CMD_TOUCH
+const char intern__touch[] = "touch";
+#endif
+#ifdef USE_CMD_TRUNC
+const char intern__trunc[] = "trunc";
+#endif
+#ifdef USE_CMD_DUP_R
+const char intern__dup_r[] = "dup-r";
+#endif
+#ifdef USE_CMD_DUP_W
+const char intern__dup_w[] = "dup-w";
+#endif
+#ifdef USE_CMD_DUP_A
+const char intern__dup_a[] = "dup-a";
+#endif
+#ifdef USE_CMD_MKNOD
+const char intern__mknod[] = "mknod";
+#endif
+#ifdef USE_CMD_MKDEV
+const char intern__mkdev[] = "mkdev";
+#endif
+#ifdef USE_CMD_MKDIR
+const char intern__mkdir[] = "mkdir";
+#endif
+#ifdef USE_CMD_CHOWN
+const char intern__chown[] = "chown";
+#endif
+#ifdef USE_CMD_CHMOD
+const char intern__chmod[] = "chmod";
+#endif
+#ifdef USE_CMD_LN_S
+const char intern__ln_s[] = "ln-s";
+#endif
+#ifdef USE_CMD_LN_H
+const char intern__ln_h[] = "ln-h";
+#endif
+#ifdef USE_CMD_MV
+const char intern__mv[] = "mv";
+#endif
+#ifdef USE_CMD_SLEEP
+const char intern__sleep[] = "sleep";
+#endif
+#ifdef USE_CMD_SIGNAL
+const char intern__signal[] = "signal";
+#endif
+#ifdef USE_CMD_EXEC
+const char intern__exec[] = "exec";
+#endif
 
-    // COMMAND_INDEX__NOOP
-    "noop",
+const char *intern_all_names[COMMAND_INDEX__ERR];
 
-    // COMMAND_INDEX__VERSION,
-    "version",
+const char ** get_command_list_names() {
+    intern_all_names[COMMAND_INDEX__FIND_CMD] = intern__empty;
+    intern_all_names[COMMAND_INDEX__NOOP] = intern__noop;
+    intern_all_names[COMMAND_INDEX__VERSION] = intern__version;
 
 #ifdef USES_FMODE
-    // COMMAND_INDEX__FMODE,
-    "fmode",
+    intern_all_names[COMMAND_INDEX__FMODE] = intern__fmode;
 #endif
 
 #ifdef USE_CMD_ECHO
-    // COMMAND_INDEX__ECHO,
-    "echo",
+    intern_all_names[COMMAND_INDEX__ECHO] = intern__echo;
 #endif
 
 #ifdef USE_CMD_RM
-    // COMMAND_INDEX__RM,
-    "rm",
+    intern_all_names[COMMAND_INDEX__RM] = intern__rm;
 #endif
 
 #ifdef USE_CMD_RMDIR
-    // COMMAND_INDEX__RMDIR,
-    "rmdir",
+    intern_all_names[COMMAND_INDEX__RMDIR] = intern__rmdir;
 #endif
 
 #ifdef USE_CMD_TOUCH
-    // COMMAND_INDEX__TOUCH,
-    "touch",
+    intern_all_names[COMMAND_INDEX__TOUCH] = intern__touch;
 #endif
 
 #ifdef USE_CMD_TRUNC
-    // COMMAND_INDEX__TRUNC,
-    "trunc",
+    // ;
+    intern_all_names[COMMAND_INDEX__TRUNC] = intern__trunc;
 #endif
 #if defined(USE_CMD_TOUCH) || defined(USE_CMD_TRUNC)
-    // COMMAND_INDEX__TRUNC_TOUCH__RUN,
-    "",  // phoney
+    // ;
+    intern_all_names[COMMAND_INDEX__TRUNC_TOUCH__RUN] = intern__empty;
 #endif
 
 #ifdef USE_CMD_DUP_R
-    // COMMAND_INDEX__DUP_R,
-    "dup-r",
+    // ;
+    intern_all_names[COMMAND_INDEX__DUP_R] = intern__dup_r;
 #endif
 
 #ifdef USE_CMD_DUP_W
-    // COMMAND_INDEX__DUP_W,
-    "dup-w",
+    // ;
+    intern_all_names[COMMAND_INDEX__DUP_W] = intern__dup_w;
 #endif
 
 #ifdef USE_CMD_DUP_A
-    // COMMAND_INDEX__DUP_A,
-    "dup-a",
+    // ;
+    intern_all_names[COMMAND_INDEX__DUP_A] = intern__dup_a;
 #endif
 
 #ifdef USES_DUP
-    // COMMAND_INDEX__DUP__FD,
-    "",  // phoney
-    // COMMAND_INDEX__DUP__TGT,
-    "",  // phoney
+    // ;
+    intern_all_names[COMMAND_INDEX__DUP__FD] = intern__empty;
+    // ;
+    intern_all_names[COMMAND_INDEX__DUP__TGT] = intern__empty;
 #endif
 
 #ifdef USE_CMD_MKNOD
-    // COMMAND_INDEX__MKNOD,
-    "mknod",
+    // ;
+    intern_all_names[COMMAND_INDEX__MKNOD] = intern__mknod;
 #endif
 #ifdef USE_CMD_MKDEV
-    // COMMAND_INDEX__MKDEV,
-    "mkdev",
-    // COMMAND_INDEX__MKDEV__MINOR,
-    "",
+    // ;
+    intern_all_names[COMMAND_INDEX__MKDEV] = intern__mkdev;
+    // ;
+    intern_all_names[COMMAND_INDEX__MKDEV__MINOR] = intern__empty;
 #endif
 #ifdef USES_MKNOD
-    // COMMAND_INDEX__MKNOD_DEV__TYPE,
-    "",
-    // COMMAND_INDEX__MKNOD_DEV__RUN,
-    "",
+    // ;
+    intern_all_names[COMMAND_INDEX__MKNOD_DEV__TYPE] = intern__empty;
+    // ;
+    intern_all_names[COMMAND_INDEX__MKNOD_DEV__RUN] = intern__empty;
 #endif
 
 #ifdef USE_CMD_MKDIR
-    // COMMAND_INDEX__MKDIR,
-    "mkdir",
+    // ;
+    intern_all_names[COMMAND_INDEX__MKDIR] = intern__mkdir;
 #endif
 
 #ifdef USE_CMD_CHOWN
-    // COMMAND_INDEX__CHOWN,
-    "chown",
-    // COMMAND_INDEX__CHOWN__GROUP,
-    "",  // phoney
-    // COMMAND_INDEX__CHOWN__RUN,
-    "",  // phoney
+    // ;
+    intern_all_names[COMMAND_INDEX__CHOWN] = intern__chown;
+    // ;
+    intern_all_names[COMMAND_INDEX__CHOWN__GROUP] = intern__empty;
+    // ;
+    intern_all_names[COMMAND_INDEX__CHOWN__RUN] = intern__empty;
 #endif
 
 #ifdef USE_CMD_CHMOD
-    // COMMAND_INDEX__CHMOD,
-    "chmod",
-    // COMMAND_INDEX__CHMOD__RUN,
-    "",  // phoney
+    // ;
+    intern_all_names[COMMAND_INDEX__CHMOD] = intern__chmod;
+    // ;
+    intern_all_names[COMMAND_INDEX__CHMOD__RUN] = intern__empty;
 #endif
 
 #ifdef USE_CMD_LN_S
-    // COMMAND_INDEX__LN_S,
-    "ln-s",
+    // ;
+    intern_all_names[COMMAND_INDEX__LN_S] = intern__ln_s;
 #endif
 
 #ifdef USE_CMD_LN_H
-    // COMMAND_INDEX__LN_H,
-    "ln-h",
+    // ;
+    intern_all_names[COMMAND_INDEX__LN_H] = intern__ln_h;
 #endif
 
 #ifdef USE_CMD_MV
-    // COMMAND_INDEX__MV,
-    "mv",
+    // ;
+    intern_all_names[COMMAND_INDEX__MV] = intern__mv;
 #endif
 
 #ifdef USE_CMD_SLEEP
-    // COMMAND_INDEX__SLEEP,
-    "sleep",
+    // ;
+    intern_all_names[COMMAND_INDEX__SLEEP] = intern__sleep;
 #endif
 
 #ifdef USE_CMD_SIGNAL
-    // COMMAND_INDEX__SIGNAL,
-    "signal",
+    // ;
+    intern_all_names[COMMAND_INDEX__SIGNAL] = intern__signal;
 #endif
 
 #ifdef USE_CMD_EXEC
-    // COMMAND_INDEX__EXEC,
-    "exec",
+    // ;
+    intern_all_names[COMMAND_INDEX__EXEC] = intern__exec;
 #endif
-
-    // COMMAND_INDEX__ERR
-    //   End List marker
-};
+    return intern_all_names;
+}
