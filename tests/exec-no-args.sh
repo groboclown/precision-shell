@@ -18,7 +18,7 @@ if [ -s out.txt ] ; then
     exit 1
 fi
 
-if [ "$( printf "ERROR no command\\n" )" != "$( cat err.txt )" ] ; then
+if [ "$( printf "ERROR no command\\nERROR exec: exec\\n" )" != "$( cat err.txt )" ] ; then
     echo "Generated unexpected stderr"
     cat err.txt
     exit 1
