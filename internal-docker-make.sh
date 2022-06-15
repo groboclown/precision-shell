@@ -12,21 +12,24 @@ elif [ "${BUILD_MODE}" = "src" ] ; then
 elif [ "${BUILD_MODE}" = "full-test" ] ; then
     experiments/full-tests.sh
 elif [ "${BUILD_MODE}" = "combos" ] ; then
+    mkdir -p .tmp/combos
     make src tests || echo "Tests failed"
-    cp out/fs-shell out/fs-shell-zero
-    cp out/fs-shell-debug out/fs-shell-zero-debug
+    cp out/fs-shell .tmp/combos/fs-shell-zero
+    cp out/fs-shell-debug .tmp/combos/fs-shell-zero-debug
 
     make INCLUDE_ALL_COMMANDS=1 src tests || echo "Tests failed"
-    cp out/fs-shell out/fs-shell-all
-    cp out/fs-shell-debug out/fs-shell-all-debug
+    cp out/fs-shell .tmp/combos/fs-shell-all
+    cp out/fs-shell-debug .tmp/combos/fs-shell-all-debug
 
     make INCLUDE_MINIMAL_COMMANDS=1 src tests || echo "Tests failed"
-    cp out/fs-shell out/fs-shell-min
-    cp out/fs-shell-debug out/fs-shell-min-debug
+    cp out/fs-shell .tmp/combos/fs-shell-min
+    cp out/fs-shell-debug .tmp/combos/fs-shell-min-debug
 
     make INCLUDE_STANDARD_COMMANDS=1 src tests || echo "Tests failed"
-    cp out/fs-shell out/fs-shell-std
-    cp out/fs-shell-debug out/fs-shell-std-debug
+    cp out/fs-shell .tmp/combos/fs-shell-std
+    cp out/fs-shell-debug .tmp/combos/fs-shell-std-debug
+
+    cp .tmp/combos/* out/.
 
     echo "fs-shell-zero" > out/build-inventory.txt
     echo "fs-shell-zero-debug" >> out/build-inventory.txt
