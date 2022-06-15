@@ -52,13 +52,13 @@ int cmd_chmod_run__file();
 #define ENUM_LIST__CMD_CHMOD   ENUM__CMD_CHMOD, COMMAND_INDEX__CHMOD__FILE,
 #define NAME_TC__CMD_CHMOD     NAME__CMD_CHMOD, EMPTY_STRING,
 #define NAME_VC__CMD_CHMOD     NAMEVAR__CMD_CHMOD, command_common_empty_name,
-#define NAME_VS__CMD_CHMOD     names[COMMAND_INDEX__CHMOD] = NAMEVAR__CMD_CHMOD; \
+#define NAME_VS__CMD_CHMOD     names[ENUM__CMD_CHMOD] = NAMEVAR__CMD_CHMOD; \
                                names[COMMAND_INDEX__CHMOD__FILE] = EMPTY_STRING;
 #define SETUP_C__CMD_CHMOD     &SETUP__CMD_CHMOD, &command_common_setup_identity,
-#define SETUP_S__CMD_CHMOD     setups[COMMAND_INDEX__CHMOD] = &SETUP__CMD_CHMOD; \
+#define SETUP_S__CMD_CHMOD     setups[ENUM__CMD_CHMOD] = &SETUP__CMD_CHMOD; \
                                setups[COMMAND_INDEX__CHMOD__FILE] = &command_common_setup_identity;
 #define RUN_C__CMD_CHMOD       &RUN__CMD_CHMOD, &cmd_chmod_run__file,
-#define RUN_S__CMD_CHMOD       runs[COMMAND_INDEX__CHMOD] = &RUN__CMD_CHMOD; \
+#define RUN_S__CMD_CHMOD       runs[ENUM__CMD_CHMOD] = &RUN__CMD_CHMOD; \
                                runs[COMMAND_INDEX__CHMOD__FILE] = &cmd_chmod_run__file;
 #define CALL_INIT__CMD_CHMOD
 

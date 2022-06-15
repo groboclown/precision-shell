@@ -24,39 +24,40 @@ SOFTWARE.
 
 #include "uses.h"
 
-// Find command - always included.
+#ifdef USE_CMD_FMODE
 
 #include "output.h"
 #include "globals.h"
 #include "helpers.h"
 #include "command_common.h"
-#include "command_list.h"
-#include "cmd_find_cmd.h"
-
-const char command_name_find_cmd[] = NAME__CMD_FIND_CMD;
+#include "cmd_fmode.h"
 
 
-// cmd_find_cmd_run__func match the current arg against the command list.
-int cmd_find_cmd_run() {
-    const char **command_list_names = get_command_list_names();
-    const CommandSetup *command_setup = get_command_setup();
+const char NAMEVAR__CMD_FMODE[] = NAME__CMD_FMODE;
 
-    // No matter what this finds, the command name is the current argument.
-    global_cmd_name = global_arg;
 
-    // Note that the loop includes find_cmd, to keep the finding going,
-    // and does not include err.
-    for (int idx = COMMAND_INDEX__FIND_CMD; idx < COMMAND_INDEX__ERR; idx++) {
-        if (strequal(global_arg, command_list_names[idx])) {
-            global_cmd = command_setup[idx](idx);
-            // Special case for a setup that encounters an error condition.
-            if (global_cmd < 0) {
-                global_cmd = COMMAND_INDEX__ERR;
-                return 1;
-            }
-            return 0;
-        }
-    }
+int cmd_fmode_run() {
+    int val;
+
+    // Nothing must run after this.
     global_cmd = COMMAND_INDEX__ERR;
-    return 1;
+
+    LOG(":: fmode ");
+    LOGLN(global_arg);
+    // File mode is only up to the first 3 nybbles.
+    // Due to error checking, this will not change fmode unless it's okay.
+    val = helper_arg_to_uint(global_arg, 8, 0777);
+    if (val < 0) {
+        return 1;
+    }
+    global_fmode = val;
+
+    return 0;
 }
+
+
+
+#else
+// disable pedantic warning
+typedef int iso_translation_unit__fmode;
+#endif /* USE_CMD_FMODE */

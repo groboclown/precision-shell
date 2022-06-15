@@ -36,6 +36,11 @@ SOFTWARE.
 #include "cmd_chown.h"
 #include "cmd_dup.h"
 #include "cmd_echo.h"
+#include "cmd_exec.h"
+#include "cmd_fmode.h"
+#include "cmd_ln_h.h"
+#include "cmd_ln_s.h"
+#include "cmd_mv.h"
 #include "cmd_err.h"
 
 
@@ -56,6 +61,11 @@ enum CommandIndex {
     ENUM_LIST__CMD_CHOWN
     ENUM_LIST__CMD_DUP
     ENUM_LIST__CMD_ECHO
+    ENUM_LIST__CMD_EXEC
+    ENUM_LIST__CMD_FMODE
+    ENUM_LIST__CMD_LN_H
+    ENUM_LIST__CMD_LN_S
+    ENUM_LIST__CMD_MV
 
     // The error command is always penultimate; it's a signal for the number of entries in the index.
     //   It also prevents odd errors for trailing commas.

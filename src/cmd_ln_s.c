@@ -24,39 +24,29 @@ SOFTWARE.
 
 #include "uses.h"
 
-// Find command - always included.
+#ifdef USE_CMD_LN_S
 
 #include "output.h"
 #include "globals.h"
 #include "helpers.h"
 #include "command_common.h"
-#include "command_list.h"
-#include "cmd_find_cmd.h"
-
-const char command_name_find_cmd[] = NAME__CMD_FIND_CMD;
+#include "cmd_ln_s.h"
 
 
-// cmd_find_cmd_run__func match the current arg against the command list.
-int cmd_find_cmd_run() {
-    const char **command_list_names = get_command_list_names();
-    const CommandSetup *command_setup = get_command_setup();
+const char NAMEVAR__CMD_LN_S[] = NAME__CMD_LN_S;
 
-    // No matter what this finds, the command name is the current argument.
-    global_cmd_name = global_arg;
-
-    // Note that the loop includes find_cmd, to keep the finding going,
-    // and does not include err.
-    for (int idx = COMMAND_INDEX__FIND_CMD; idx < COMMAND_INDEX__ERR; idx++) {
-        if (strequal(global_arg, command_list_names[idx])) {
-            global_cmd = command_setup[idx](idx);
-            // Special case for a setup that encounters an error condition.
-            if (global_cmd < 0) {
-                global_cmd = COMMAND_INDEX__ERR;
-                return 1;
-            }
-            return 0;
-        }
-    }
-    global_cmd = COMMAND_INDEX__ERR;
-    return 1;
+// When this command runs, global_arg_cached contains the source, global_arg contains the target
+int cmd_ln_s_run() {
+    LOG(":: symbolic link ");
+    LOG(global_arg_cached);
+    LOG(" to ");
+    LOGLN(global_arg);
+    return symlink(global_arg_cached, global_arg);
 }
+
+
+
+#else
+// disable pedantic warning
+typedef int iso_translation_unit__ln_s;
+#endif /* USE_CMD_LN_S */

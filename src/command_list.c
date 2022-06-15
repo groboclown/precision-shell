@@ -46,6 +46,11 @@ int initialize_commands() {
     CALL_INIT__CMD_CHOWN
     CALL_INIT__CMD_DUP
     CALL_INIT__CMD_ECHO
+    CALL_INIT__CMD_EXEC
+    CALL_INIT__CMD_FMODE
+    CALL_INIT__CMD_LN_H
+    CALL_INIT__CMD_LN_S
+    CALL_INIT__CMD_MV
     CALL_INIT__CMD_ERR
 
     return err;
@@ -112,6 +117,26 @@ int intern__list_setup() {
     SETUP_S__CMD_ECHO
       RUN_S__CMD_ECHO
 
+    NAME_VS__CMD_EXEC
+    SETUP_S__CMD_EXEC
+      RUN_S__CMD_EXEC
+
+    NAME_VS__CMD_FMODE
+    SETUP_S__CMD_FMODE
+      RUN_S__CMD_FMODE
+
+    NAME_VS__CMD_LN_H
+    SETUP_S__CMD_LN_H
+      RUN_S__CMD_LN_H
+
+    NAME_VS__CMD_LN_S
+    SETUP_S__CMD_LN_S
+      RUN_S__CMD_LN_S
+
+    NAME_VS__CMD_MV
+    SETUP_S__CMD_MV
+      RUN_S__CMD_MV
+
     NAME_VS__CMD_ERR
     SETUP_S__CMD_ERR
       RUN_S__CMD_ERR
@@ -161,6 +186,11 @@ const char *intern__command_list_names[] = {
     NAME_TC__CMD_CHOWN
     NAME_TC__CMD_DUP
     NAME_TC__CMD_ECHO
+    NAME_TC__CMD_EXEC
+    NAME_TC__CMD_FMODE
+    NAME_TC__CMD_LN_H
+    NAME_TC__CMD_LN_S
+    NAME_TC__CMD_MV
     NAME_TC__CMD_ERR
 
     // Intentionally not present
@@ -175,6 +205,11 @@ const CommandSetup intern__command_setup[] = {
     SETUP_C__CMD_CHOWN
     SETUP_C__CMD_DUP
     SETUP_C__CMD_ECHO
+    SETUP_C__CMD_EXEC
+    SETUP_C__CMD_FMODE
+    SETUP_C__CMD_LN_H
+    SETUP_C__CMD_LN_S
+    SETUP_C__CMD_MV
     SETUP_C__CMD_ERR
 
     // Intentionally not present
@@ -189,6 +224,11 @@ const CommandFunc intern__command_functions[] = {
     RUN_C__CMD_CHOWN
     RUN_C__CMD_DUP
     RUN_C__CMD_ECHO
+    RUN_C__CMD_EXEC
+    RUN_C__CMD_FMODE
+    RUN_C__CMD_LN_H
+    RUN_C__CMD_LN_S
+    RUN_C__CMD_MV
     RUN_C__CMD_ERR
 
     // Intentionally not present
