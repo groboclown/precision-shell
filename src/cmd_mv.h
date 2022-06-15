@@ -47,7 +47,7 @@ int cmd_mv_run();
 
 
 // Extrapolated defines
-#define ENUM_LIST__CMD_MV   ENUM__CMD_MV, ENUM__CMD_MV__RUN,
+#define ENUM_LIST__CMD_MV   ENUM__CMD_MV, COMMAND_INDEX__MV__RUN,
 #define NAME_TC__CMD_MV     NAME__CMD_MV, EMPTY_STRING,
 #define NAME_VC__CMD_MV     NAMEVAR__CMD_MV, command_common_empty_name,
 #define NAME_VS__CMD_MV     names[COMMAND_INDEX__MV] = NAMEVAR__CMD_MV; \

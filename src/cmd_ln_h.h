@@ -47,7 +47,7 @@ int cmd_ln_h_run();
 
 
 // Extrapolated defines
-#define ENUM_LIST__CMD_LN_H   ENUM__CMD_LN_H, ENUM__CMD_LN_H__RUN,
+#define ENUM_LIST__CMD_LN_H   ENUM__CMD_LN_H, COMMAND_INDEX__LN_H__RUN,
 #define NAME_TC__CMD_LN_H     NAME__CMD_LN_H, EMPTY_STRING,
 #define NAME_VC__CMD_LN_H     NAMEVAR__CMD_LN_H, command_common_empty_name,
 #define NAME_VS__CMD_LN_H     names[COMMAND_INDEX__LN_H] = NAMEVAR__CMD_LN_H; \
