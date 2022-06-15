@@ -41,6 +41,13 @@ SOFTWARE.
 #include "cmd_ln_h.h"
 #include "cmd_ln_s.h"
 #include "cmd_mv.h"
+#include "cmd_mkdir.h"
+#include "cmd_mknod_mkdev.h"
+#include "cmd_rm.h"
+#include "cmd_rmdir.h"
+#include "cmd_signal.h"
+#include "cmd_sleep.h"
+#include "cmd_touch_trunc.h"
 #include "cmd_err.h"
 
 
@@ -66,6 +73,13 @@ enum CommandIndex {
     ENUM_LIST__CMD_LN_H
     ENUM_LIST__CMD_LN_S
     ENUM_LIST__CMD_MV
+    ENUM_LIST__CMD_MKDIR
+    ENUM_LIST__CMD_MKNOD_MKDEV
+    ENUM_LIST__CMD_RM
+    ENUM_LIST__CMD_RMDIR
+    ENUM_LIST__CMD_SIGNAL
+    ENUM_LIST__CMD_SLEEP
+    ENUM_LIST__CMD_TOUCH_TRUNC
 
     // The error command is always penultimate; it's a signal for the number of entries in the index.
     //   It also prevents odd errors for trailing commas.

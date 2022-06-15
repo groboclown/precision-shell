@@ -24,16 +24,24 @@ SOFTWARE.
 
 #include "uses.h"
 
-#ifdef USE_CMD_FMODE
+#ifdef USES_FMODE
 
 #include "output.h"
 #include "globals.h"
 #include "helpers.h"
+#include "command_list.h"
 #include "command_common.h"
 #include "cmd_fmode.h"
 
 
 const char NAMEVAR__CMD_FMODE[] = NAME__CMD_FMODE;
+
+
+int cmd_fmode_init() {
+    LOG(":: fmode init\n");
+    global_fmode = 0644;
+    return 0;
+}
 
 
 int cmd_fmode_run() {
@@ -46,7 +54,7 @@ int cmd_fmode_run() {
     LOGLN(global_arg);
     // File mode is only up to the first 3 nybbles.
     // Due to error checking, this will not change fmode unless it's okay.
-    val = helper_arg_to_uint(global_arg, 8, 0777);
+    val = helper_arg_to_uint(8, 0777);
     if (val < 0) {
         return 1;
     }
@@ -60,4 +68,4 @@ int cmd_fmode_run() {
 #else
 // disable pedantic warning
 typedef int iso_translation_unit__fmode;
-#endif /* USE_CMD_FMODE */
+#endif /* USES_FMODE */

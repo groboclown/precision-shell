@@ -26,13 +26,14 @@ SOFTWARE.
 
 #include "uses.h"
 
-#ifdef USE_CMD_FMODE
+#ifdef USES_FMODE
 
 #include "command_def.h"
 #include "command_common.h"
 
 
 extern const char command_name_fmode[];
+int cmd_fmode_init();
 int cmd_fmode_run();
 
 
@@ -43,7 +44,7 @@ int cmd_fmode_run();
 #define NAMEVAR__CMD_FMODE     command_name_fmode
 #define SETUP__CMD_FMODE       command_common_setup_identity
 #define RUN__CMD_FMODE         cmd_fmode_run
-#define INIT__CMD_FMODE
+#define INIT__CMD_FMODE        cmd_fmode_init
 
 
 // Extrapolated defines
@@ -55,12 +56,12 @@ int cmd_fmode_run();
 #define SETUP_S__CMD_FMODE     setups[COMMAND_INDEX__FMODE] = &SETUP__CMD_FMODE;
 #define RUN_C__CMD_FMODE       &RUN__CMD_FMODE,
 #define RUN_S__CMD_FMODE       runs[COMMAND_INDEX__FMODE] = &RUN__CMD_FMODE;
-#define CALL_INIT__CMD_FMODE
+#define CALL_INIT__CMD_FMODE   err += INIT__CMD_FMODE();
 
 
 
 
-#else /* USE_CMD_FMODE */
+#else /* USES_FMODE */
 #define ENUM_LIST__CMD_FMODE
 #define NAME_TC__CMD_FMODE
 #define NAME_VC__CMD_FMODE
@@ -70,5 +71,5 @@ int cmd_fmode_run();
 #define RUN_C__CMD_FMODE
 #define RUN_S__CMD_FMODE
 #define CALL_INIT__CMD_FMODE
-#endif /* USE_CMD_FMODE */
+#endif /* USES_FMODE */
 #endif /* _FS_SHELL__CMD_FMODE_ */

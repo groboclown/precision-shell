@@ -24,26 +24,28 @@ SOFTWARE.
 
 #include "uses.h"
 
-#ifdef USE_CMD_XX
+#ifdef USE_CMD_SLEEP
 
 #include "output.h"
 #include "globals.h"
 #include "helpers.h"
 #include "command_common.h"
-#include "cmd_xx.h"
+#include "cmd_sleep.h"
 
 
-const char NAMEVAR__CMD_XX[] = NAME__CMD_XX;
+const char NAMEVAR__CMD_SLEEP[] = NAME__CMD_SLEEP;
 
-int cmd_xx_init() {
-    return 0;
-}
 
-int cmd_xx_setup(int idx) {
-    return idx;
-}
-
-int cmd_xx_run() {
+int cmd_sleep_run() {
+    int val;
+    LOG(":: sleep ");
+    LOGLN(global_arg);
+    val = helper_arg_to_uint(10, 0xffff);
+    if (val < 0) {
+        return 1;
+    } else if (val > 0) {
+        sleep(val);
+    }
     return 0;
 }
 
@@ -51,5 +53,5 @@ int cmd_xx_run() {
 
 #else
 // disable pedantic warning
-typedef int iso_translation_unit__xx;
-#endif /* USE_CMD_XX */
+typedef int iso_translation_unit__sleep;
+#endif /* USE_CMD_SLEEP */

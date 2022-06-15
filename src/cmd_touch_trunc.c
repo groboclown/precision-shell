@@ -24,32 +24,56 @@ SOFTWARE.
 
 #include "uses.h"
 
-#ifdef USE_CMD_XX
+#if defined(USE_CMD_TOUCH) || defined(USE_CMD_TRUNC)
+
+#include <fcntl.h>
 
 #include "output.h"
 #include "globals.h"
 #include "helpers.h"
 #include "command_common.h"
-#include "cmd_xx.h"
+#include "cmd_touch_trunc.h"
 
 
-const char NAMEVAR__CMD_XX[] = NAME__CMD_XX;
-
-int cmd_xx_init() {
+int cmd_touch_trunc_run() {
+    int val;
+    LOG(":: touch/trunc ");
+    LOGLN(global_arg);
+    val = open(
+        global_arg, global_arg1_i, global_fmode
+    );
+    if (val == -1) {
+        return 1;
+    } else {
+        close(val);
+    }
     return 0;
 }
 
-int cmd_xx_setup(int idx) {
+
+#ifdef USE_CMD_TOUCH
+
+const char command_name_touch[] = NAME__CMD_TOUCH;
+int cmd_touch_setup(int idx) {
+    LOG(":: preparing touch\n");
+    global_arg1_i = O_WRONLY | O_CREAT;
     return idx;
 }
 
-int cmd_xx_run() {
-    return 0;
+#endif /* USE_CMD_TOUCH */
+
+#ifdef USE_CMD_TRUNC
+
+const char command_name_trunc[] = NAME__CMD_TRUNC;
+int cmd_trunc_setup(int idx) {
+    LOG(":: preparing trunc\n");
+    global_arg1_i = O_WRONLY | O_CREAT | O_TRUNC;
+    return idx;
 }
 
-
+#endif /* USE_CMD_TRUNC */
 
 #else
 // disable pedantic warning
-typedef int iso_translation_unit__xx;
-#endif /* USE_CMD_XX */
+typedef int iso_translation_unit__touch_trunc;
+#endif /* defined(USE_CMD_TOUCH) || defined(USE_CMD_TRUNC) */

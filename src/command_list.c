@@ -51,6 +51,13 @@ int initialize_commands() {
     CALL_INIT__CMD_LN_H
     CALL_INIT__CMD_LN_S
     CALL_INIT__CMD_MV
+    CALL_INIT__CMD_MKDIR
+    CALL_INIT__CMD_MKNOD_MKDEV
+    CALL_INIT__CMD_RM
+    CALL_INIT__CMD_RMDIR
+    CALL_INIT__CMD_SIGNAL
+    CALL_INIT__CMD_SLEEP
+    CALL_INIT__CMD_TOUCH_TRUNC
     CALL_INIT__CMD_ERR
 
     return err;
@@ -137,6 +144,34 @@ int intern__list_setup() {
     SETUP_S__CMD_MV
       RUN_S__CMD_MV
 
+    NAME_VS__CMD_MKDIR
+    SETUP_S__CMD_MKDIR
+      RUN_S__CMD_MKDIR
+    
+    NAME_VS__CMD_MKNOD_MKDEV
+    SETUP_S__CMD_MKNOD_MKDEV
+      RUN_S__CMD_MKNOD_MKDEV
+
+    NAME_VS__CMD_RM
+    SETUP_S__CMD_RM
+      RUN_S__CMD_RM
+
+    NAME_VS__CMD_RMDIR
+    SETUP_S__CMD_RMDIR
+      RUN_S__CMD_RMDIR
+
+    NAME_VS__CMD_SIGNAL
+    SETUP_S__CMD_SIGNAL
+      RUN_S__CMD_SIGNAL
+
+    NAME_VS__CMD_SLEEP
+    SETUP_S__CMD_SLEEP
+      RUN_S__CMD_SLEEP
+
+    NAME_VS__CMD_TOUCH_TRUNC
+    SETUP_S__CMD_TOUCH_TRUNC
+      RUN_S__CMD_TOUCH_TRUNC
+
     NAME_VS__CMD_ERR
     SETUP_S__CMD_ERR
       RUN_S__CMD_ERR
@@ -191,6 +226,13 @@ const char *intern__command_list_names[] = {
     NAME_TC__CMD_LN_H
     NAME_TC__CMD_LN_S
     NAME_TC__CMD_MV
+    NAME_TC__CMD_MKDIR
+    NAME_TC__CMD_MKNOD_MKDEV
+    NAME_TC__CMD_RM
+    NAME_TC__CMD_RMDIR
+    NAME_TC__CMD_SIGNAL
+    NAME_TC__CMD_SLEEP
+    NAME_TC__CMD_TOUCH_TRUNC
     NAME_TC__CMD_ERR
 
     // Intentionally not present
@@ -210,6 +252,13 @@ const CommandSetup intern__command_setup[] = {
     SETUP_C__CMD_LN_H
     SETUP_C__CMD_LN_S
     SETUP_C__CMD_MV
+    SETUP_C__CMD_MKDIR
+    SETUP_C__CMD_MKNOD_MKDEV
+    SETUP_C__CMD_RM
+    SETUP_C__CMD_RMDIR
+    SETUP_C__CMD_SIGNAL
+    SETUP_C__CMD_SLEEP
+    SETUP_C__CMD_TOUCH_TRUNC
     SETUP_C__CMD_ERR
 
     // Intentionally not present
@@ -229,6 +278,13 @@ const CommandFunc intern__command_functions[] = {
     RUN_C__CMD_LN_H
     RUN_C__CMD_LN_S
     RUN_C__CMD_MV
+    RUN_C__CMD_MKDIR
+    RUN_C__CMD_MKNOD_MKDEV
+    RUN_C__CMD_RM
+    RUN_C__CMD_RMDIR
+    RUN_C__CMD_SIGNAL
+    RUN_C__CMD_SLEEP
+    RUN_C__CMD_TOUCH_TRUNC
     RUN_C__CMD_ERR
 
     // Intentionally not present

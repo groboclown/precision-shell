@@ -24,32 +24,30 @@ SOFTWARE.
 
 #include "uses.h"
 
-#ifdef USE_CMD_XX
+#ifdef USE_CMD_RMDIR
+
+#include <sys/stat.h>
+#include <fcntl.h>
 
 #include "output.h"
 #include "globals.h"
 #include "helpers.h"
 #include "command_common.h"
-#include "cmd_xx.h"
+#include "cmd_rmdir.h"
 
 
-const char NAMEVAR__CMD_XX[] = NAME__CMD_XX;
+const char NAMEVAR__CMD_RMDIR[] = NAME__CMD_RMDIR;
 
-int cmd_xx_init() {
-    return 0;
-}
 
-int cmd_xx_setup(int idx) {
-    return idx;
-}
-
-int cmd_xx_run() {
-    return 0;
+int cmd_rmdir_run() {
+    LOG(":: rmdir ");
+    LOGLN(global_arg);
+    return rmdir(global_arg);
 }
 
 
 
 #else
 // disable pedantic warning
-typedef int iso_translation_unit__xx;
-#endif /* USE_CMD_XX */
+typedef int iso_translation_unit__rmdir;
+#endif /* USE_CMD_RMDIR */

@@ -68,6 +68,9 @@ for test_name in "$@" ; do
                     # Quiet mode, but report failures completely
                     echo ">> ${TEST_NAME}"
                 fi
+                if [ "${QUIET}" != 1 ]; then
+                    cat "${logs}"
+                fi
                 echo "!! FAILED in before"
             else
                 ( cd "${TEST_DIR}" && ${RUNNER} ${test_script} ) > "${logs}" 2>&1
@@ -77,8 +80,8 @@ for test_name in "$@" ; do
                     if [ "${QUIET}" = 1 ]; then
                         # Quiet mode, but report failures completely
                         echo ">> ${TEST_NAME}"
-                        cat "${logs}"
                     fi
+                    cat "${logs}"
                     echo "!! FAILED"
                 fi
             fi
@@ -86,8 +89,11 @@ for test_name in "$@" ; do
             ${RUNNER} "${here}/_after-each.sh" > "${logs}" 2>&1
 
         fi
-        if [ "${QUIET}" != 1 ]; then
+        if [ ${res} = 0 ] && [ "${QUIET}" != 1 ]; then
             cat "${logs}"
+        fi
+        if [ "${QUIET}" != 1 ]; then
+            echo ""
         fi
     fi
 done

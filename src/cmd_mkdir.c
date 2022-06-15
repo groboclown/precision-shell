@@ -24,32 +24,33 @@ SOFTWARE.
 
 #include "uses.h"
 
-#ifdef USE_CMD_XX
+#ifdef USE_CMD_MKDIR
+
+#include <sys/stat.h>
+#include <fcntl.h>
 
 #include "output.h"
 #include "globals.h"
 #include "helpers.h"
 #include "command_common.h"
-#include "cmd_xx.h"
+#include "cmd_mkdir.h"
 
 
-const char NAMEVAR__CMD_XX[] = NAME__CMD_XX;
+const char NAMEVAR__CMD_MKDIR[] = NAME__CMD_MKDIR;
 
-int cmd_xx_init() {
-    return 0;
-}
 
-int cmd_xx_setup(int idx) {
-    return idx;
-}
-
-int cmd_xx_run() {
-    return 0;
+int cmd_mkdir_run() {
+    int val;
+    LOG(":: mkdir ");
+    LOGLN(global_arg);
+    // For now, assume that execution is enabled for all modes.
+    val = global_fmode | S_IXUSR | S_IXGRP | S_IXOTH;
+    return mkdir(global_arg, val);
 }
 
 
 
 #else
 // disable pedantic warning
-typedef int iso_translation_unit__xx;
-#endif /* USE_CMD_XX */
+typedef int iso_translation_unit__mkdir;
+#endif /* USE_CMD_MKDIR */

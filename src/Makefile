@@ -56,7 +56,14 @@ SRC = main.c helpers.c globals.c command_runner.c command_list.c command_common.
 	cmd_fmode.c \
 	cmd_ln_h.c \
 	cmd_ln_s.c \
-	cmd_mv.c
+	cmd_mv.c \
+	cmd_mkdir.c \
+	cmd_mknod_mkdev.c \
+	cmd_rm.c \
+	cmd_rmdir.c \
+	cmd_signal.c \
+	cmd_sleep.c \
+	cmd_touch_trunc.c
 
 
 .PHONY: all
