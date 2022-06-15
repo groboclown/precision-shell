@@ -41,10 +41,6 @@ SOFTWARE.
 #define STARTUP__COMMAND_INDEX__MKNOD_DEV__TYPE
 #define STARTUP__COMMAND_INDEX__MKNOD_DEV__RUN
 
-// this one has a follow-up command that means we don't need the startup
-#define STARTUP__COMMAND_INDEX__MKDEV
-
-
 
 #ifdef USE_CMD_MKNOD
 
