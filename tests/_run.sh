@@ -47,54 +47,50 @@ for test_name in "$@" ; do
         # Note that this requires running the command version before it's tested...
         dorun=1
         if [ ! -z "${requirements}" ] ; then
-            "${FS}" version | grep "${requirements}" >/dev/null 2>&1
-            if [ $? -ne 0 ] ; then
-                if [ "${QUIET}" != 1 ]; then
-                    echo "?? SKIPPED because ${FS} does not support ${requirements}"
+            for req_name in ${requirements} ; do
+                "${FS}" version | grep "${req_name}" >/dev/null 2>&1
+                if [ $? -ne 0 ] ; then
+                    if [ "${QUIET}" != 1 ]; then
+                        echo "?? SKIPPED because ${FS} does not support ${requirements} (missing ${req_name})"
+                    fi
+                    dorun=0
+                    break
                 fi
-                dorun=0
-            fi
+            done
         fi
         if [ "${dorun}" == 1 ] ; then
             logs="${TEST_TMP_DIR}/run.log"
-            if [ "${QUIET}" != 1 ]; then
-                ${RUNNER} "${here}/_before-each.sh" 2>&1 | tee "${logs}"
-                res=$?
-            else
-                ${RUNNER} "${here}/_before-each.sh" > "${logs}" 2>&1
-                res=$?
-            fi
+            ${RUNNER} "${here}/_before-each.sh" > "${logs}" 2>&1
+            res=$?
             if [ ${res} -ne 0 ] ; then
                 FAILED=$(( FAILED + 1 ))
                 if [ "${QUIET}" = 1 ]; then
                     # Quiet mode, but report failures completely
                     echo ">> ${TEST_NAME}"
                 fi
+                if [ "${QUIET}" != 1 ]; then
+                    cat "${logs}"
+                fi
                 echo "!! FAILED in before"
             else
-                if [ "${QUIET}" != 1 ]; then
-                    ( cd "${TEST_DIR}" && ${RUNNER} ${test_script} ) 2>&1 | tee "${logs}"
-                    res=$?
-                else
-                    ( cd "${TEST_DIR}" && ${RUNNER} ${test_script} ) > "${logs}" 2>&1
-                    res=$?
-                fi
+                ( cd "${TEST_DIR}" && ${RUNNER} ${test_script} ) > "${logs}" 2>&1
+                res=$?
                 if [ ${res} -ne 0 ] ; then
                     FAILED=$(( FAILED + 1 ))
                     if [ "${QUIET}" = 1 ]; then
                         # Quiet mode, but report failures completely
                         echo ">> ${TEST_NAME}"
-                        cat "${logs}"
                     fi
+                    cat "${logs}"
                     echo "!! FAILED"
                 fi
             fi
             # Always run the after each, and ignore failures.
-            if [ "${QUIET}" != 1 ]; then
-                ${RUNNER} "${here}/_after-each.sh" 2>&1 | tee "${logs}"
-            else
-                ${RUNNER} "${here}/_after-each.sh" > "${logs}" 2>&1
-            fi
+            ${RUNNER} "${here}/_after-each.sh" > "${logs}" 2>&1
+
+        fi
+        if [ ${res} = 0 ] && [ "${QUIET}" != 1 ]; then
+            cat "${logs}"
         fi
         if [ "${QUIET}" != 1 ]; then
             echo ""
