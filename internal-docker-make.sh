@@ -11,6 +11,33 @@ elif [ "${BUILD_MODE}" = "src" ] ; then
     ls -lA out/fs-shell*
 elif [ "${BUILD_MODE}" = "full-test" ] ; then
     experiments/full-tests.sh
+elif [ "${BUILD_MODE}" = "combos" ] ; then
+    make src tests
+    cp out/fs-shell out/fs-shell-zero
+    cp out/fs-shell-debug out/fs-shell-zero-debug
+
+    make INCLUDE_ALL_COMMANDS=1 src tests
+    cp out/fs-shell out/fs-shell-all
+    cp out/fs-shell-debug out/fs-shell-all-debug
+
+    make INCLUDE_MINIMAL_COMMANDS=1 src tests
+    cp out/fs-shell out/fs-shell-min
+    cp out/fs-shell-debug out/fs-shell-min-debug
+
+    make INCLUDE_STANDARD_COMMANDS=1 src tests
+    cp out/fs-shell out/fs-shell-std
+    cp out/fs-shell-debug out/fs-shell-std-debug
+
+    echo "fs-shell-zero" > out/build-inventory.txt
+    echo "fs-shell-zero-debug" >> out/build-inventory.txt
+    echo "fs-shell-all" >> out/build-inventory.txt
+    echo "fs-shell-all-debug" >> out/build-inventory.txt
+    echo "fs-shell-min" >> out/build-inventory.txt
+    echo "fs-shell-min-debug" >> out/build-inventory.txt
+    echo "fs-shell-std" >> out/build-inventory.txt
+    echo "fs-shell-std-debug" >> out/build-inventory.txt
+
+    ls -lAS out/fs-shell*
 else
     commands=""
     for cmd in ${COMMANDS} ; do

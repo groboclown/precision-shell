@@ -60,13 +60,8 @@ for test_name in "$@" ; do
         fi
         if [ "${dorun}" == 1 ] ; then
             logs="${TEST_TMP_DIR}/run.log"
-            if [ "${QUIET}" != 1 ]; then
-                ${RUNNER} "${here}/_before-each.sh" 2>&1
-                res=$?
-            else
-                ${RUNNER} "${here}/_before-each.sh" > "${logs}" 2>&1
-                res=$?
-            fi
+            ${RUNNER} "${here}/_before-each.sh" > "${logs}" 2>&1
+            res=$?
             if [ ${res} -ne 0 ] ; then
                 FAILED=$(( FAILED + 1 ))
                 if [ "${QUIET}" = 1 ]; then
@@ -75,13 +70,8 @@ for test_name in "$@" ; do
                 fi
                 echo "!! FAILED in before"
             else
-                if [ "${QUIET}" != 1 ]; then
-                    ( cd "${TEST_DIR}" && ${RUNNER} ${test_script} ) 2>&1
-                    res=$?
-                else
-                    ( cd "${TEST_DIR}" && ${RUNNER} ${test_script} ) > "${logs}" 2>&1
-                    res=$?
-                fi
+                ( cd "${TEST_DIR}" && ${RUNNER} ${test_script} ) > "${logs}" 2>&1
+                res=$?
                 if [ ${res} -ne 0 ] ; then
                     FAILED=$(( FAILED + 1 ))
                     if [ "${QUIET}" = 1 ]; then
@@ -93,14 +83,11 @@ for test_name in "$@" ; do
                 fi
             fi
             # Always run the after each, and ignore failures.
-            if [ "${QUIET}" != 1 ]; then
-                ${RUNNER} "${here}/_after-each.sh" 2>&1
-            else
-                ${RUNNER} "${here}/_after-each.sh" > "${logs}" 2>&1
-            fi
+            ${RUNNER} "${here}/_after-each.sh" > "${logs}" 2>&1
+
         fi
         if [ "${QUIET}" != 1 ]; then
-            echo ""
+            cat "${logs}"
         fi
     fi
 done
