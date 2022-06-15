@@ -12,19 +12,19 @@ elif [ "${BUILD_MODE}" = "src" ] ; then
 elif [ "${BUILD_MODE}" = "full-test" ] ; then
     experiments/full-tests.sh
 elif [ "${BUILD_MODE}" = "combos" ] ; then
-    make src tests
+    make src tests || echo "Tests failed"
     cp out/fs-shell out/fs-shell-zero
     cp out/fs-shell-debug out/fs-shell-zero-debug
 
-    make INCLUDE_ALL_COMMANDS=1 src tests
+    make INCLUDE_ALL_COMMANDS=1 src tests || echo "Tests failed"
     cp out/fs-shell out/fs-shell-all
     cp out/fs-shell-debug out/fs-shell-all-debug
 
-    make INCLUDE_MINIMAL_COMMANDS=1 src tests
+    make INCLUDE_MINIMAL_COMMANDS=1 src tests || echo "Tests failed"
     cp out/fs-shell out/fs-shell-min
     cp out/fs-shell-debug out/fs-shell-min-debug
 
-    make INCLUDE_STANDARD_COMMANDS=1 src tests
+    make INCLUDE_STANDARD_COMMANDS=1 src tests || echo "Tests failed"
     cp out/fs-shell out/fs-shell-std
     cp out/fs-shell-debug out/fs-shell-std-debug
 
