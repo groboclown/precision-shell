@@ -57,7 +57,7 @@ int cmd_ln_s_run();
                               setups[COMMAND_INDEX__LN_S__RUN] = &command_common_setup_identity;
 #define RUN_C__CMD_LN_S       &command_common_run_store_arg, &RUN__CMD_LN_S,
 #define RUN_S__CMD_LN_S       runs[COMMAND_INDEX__LN_S] = &command_common_run_store_arg; \
-                              runs[COMMAND_INDEX__LN_S] = &RUN__CMD_LN_S;
+                              runs[COMMAND_INDEX__LN_S__RUN] = &RUN__CMD_LN_S;
 #define CALL_INIT__CMD_LN_S
 
 

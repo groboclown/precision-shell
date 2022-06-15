@@ -57,7 +57,7 @@ int cmd_mv_run();
                               setups[COMMAND_INDEX__MV__RUN] = &command_common_setup_identity;
 #define RUN_C__CMD_MV       &command_common_run_store_arg, &RUN__CMD_MV,
 #define RUN_S__CMD_MV       runs[COMMAND_INDEX__MV] = &command_common_run_store_arg; \
-                              runs[COMMAND_INDEX__MV] = &RUN__CMD_MV;
+                              runs[COMMAND_INDEX__MV__RUN] = &RUN__CMD_MV;
 #define CALL_INIT__CMD_MV
 
 

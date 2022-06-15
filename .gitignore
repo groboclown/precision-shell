@@ -4,6 +4,7 @@ fs-shell-debug
 *.tar
 local-*
 /out/
+/size-versions/*/out/
 
 # Test output
 .tmp/

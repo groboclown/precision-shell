@@ -1,5 +1,9 @@
 FROM docker.io/library/ubuntu:22.04
 
+# This experiment is abandonded, because the
+# "embeddedartistry" library does not include real file
+# manipulation commands, making this unusable.
+
 # This file is broken up to make rebuilds fast
 # by reusing previous layers that take a while to run.
 
