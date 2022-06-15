@@ -15,15 +15,23 @@ MINFLAGS = \
 	-fdata-sections \
 	-fno-guess-branch-probability \
 	-funsigned-char \
-	-falign-functions=1 \
-	-falign-jumps=1 \
-	-falign-labels=1 \
-	-falign-loops=1 \
 	-fno-unwind-tables \
 	-fno-asynchronous-unwind-tables \
 	-fno-builtin-printf \
 	-Os \
-	-fvisibility=hidden
+	-fvisibility=hidden \
+	-g0 \
+	-s \
+	-fno-strict-aliasing \
+	-fno-align-functions \
+	-fno-align-jumps \
+	-fno-align-loops \
+	-fno-align-labels
+#	-Oz \
+#	-falign-functions=1 \
+#	-falign-jumps=1 \
+#	-falign-labels=1 \
+#	-falign-loops=1 \
 
 LFLAGS = -static -static-libgcc
 DFLAGS = -DDEBUG=1 -g
