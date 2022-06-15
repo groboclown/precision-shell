@@ -88,9 +88,9 @@ for test_name in "$@" ; do
             # Always run the after each, and ignore failures.
             ${RUNNER} "${here}/_after-each.sh" > "${logs}" 2>&1
 
-        fi
-        if [ ${res} = 0 ] && [ "${QUIET}" != 1 ]; then
-            cat "${logs}"
+            if [ ${res} = 0 ] && [ "${QUIET}" != 1 ]; then
+                cat "${logs}"
+            fi
         fi
         if [ "${QUIET}" != 1 ]; then
             echo ""
