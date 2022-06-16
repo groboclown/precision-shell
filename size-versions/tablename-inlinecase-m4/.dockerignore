@@ -1,0 +1,6 @@
+*.o
+*.tar
+LICENSE
+README.md
+out/
+local-*
