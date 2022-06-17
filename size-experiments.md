@@ -52,6 +52,14 @@ The implementations that put behavior into `#define` statements make debugging v
 * **table-func** - This has the easiest and most standard C coding style of the three, and is easiest to debug because of the procedural separation of execution.  A particular style was developed for this that allows a per-file set of defines to build up the included functionality, which makes maintenance of the common files easier.  File sizes are strangely in the middle of the two other setups, and is highly dependent upon the underlying c library.
 
 
+## Other Attempts
+
+Because the table-case setup is the most efficient from a size perspective, but is difficult to write code for, different attempts were made to simplify it.
+
+* Replace `#define` functionality macros with inline functions.  This failed because of the recursion of include files, where a function needed to reference another command index, but it wasn't in-scope in the command-list file.  This created a huge headache and was deemed unsolvable without even more hacks.  If it worked, it would have made debugging easier.
+* Use `m4` to generate the source files.  After much hacking, m4, though incredibly powerful, has limitations, such as single tick marks (`'`) and commas (`,`) that when read in comments caused the macro to freak out.  Though this could be solved, the m4 script was extremely complex, broke all kinds of code assist tools, and was difficult to maintain even during development.  Generated code couldn't be traced back to the source easily.
+* Use a custom parser and custom mini-language to assemble the code.  Though really custom, and requires even more tooling (in this case, a Python 3 environment), it's a middle-of-the-road solution.  Debugging is still tricky, compiler errors require a bunch of tracing, and the parser + language are really boutique.  However, it gets us our size and ease of coding new commands.
+
 ## Results
 
 `fs-shell` philosophy primarily focuses on *just enough functionality*.  File size is secondary.

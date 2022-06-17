@@ -10,11 +10,11 @@ WORKDIR /opt/code
 
 RUN \
        apt-get update \
-    && apt-get -y install "build-essential=12.9ubuntu3" \
+    && apt-get -y install "build-essential=12.9ubuntu3" python3 \
     && rm -rf /tmp/* /var/cache/apt/*
 
 COPY experiments/ experiments/
-COPY Makefile Makefile.command-flags version.txt internal-docker-make.sh ./
+COPY Makefile Makefile.command-flags version.txt internal-docker-make.sh generate-command-template.py ./
 COPY src/ src/
 COPY tests/ tests/
 

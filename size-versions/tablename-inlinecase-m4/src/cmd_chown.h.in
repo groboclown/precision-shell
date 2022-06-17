@@ -1,5 +1,4 @@
-/*
-MIT License
+/* MIT License
 
 Copyright (c) 2022 groboclown
 
@@ -19,11 +18,39 @@ FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
 AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
 LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
-SOFTWARE.
-*/
+SOFTWARE. */
+AsOptional(command="chown",
 
+#include <sys/stat.h>
+#include <fcntl.h>
+
+#include "output.h"
 #include "globals.h"
+#include "helpers.h"
 
+WithNamedStep(enum="CHOWN_OWNER", name="chown",
+    OnArg(
+        LOG(":: chown owner id ");
+        LOGLN(global_arg);
+        // parse this argument into arg1.
+        // the next command will run shared_int2, which puts
+        // that argument parsed into arg2, then runs the next
+        // step in arg3, which is the run command.
+        global_cmd = COMMAND_INDEX__SHARED_INT2;
+        global_arg3_i = COMMAND_INDEX__CHOWN_RUN;
+        global_arg1_i = helper_arg_to_uint(global_arg, 10, 0xffff);
+        if (global_arg1_i < 0) {
+            global_err = 1;
+            global_cmd = COMMAND_INDEX__ERR;
+        }
+    )
+)
+WithVirtualStep(enum="CHOWN_RUN",
+    OnArg(
+        LOG(":: chown on ");
+        LOGLN(global_arg);
+        global_err = chown(global_arg, global_arg1_i, global_arg2_i);
+    )
+)
 
-// Global variable storage.
-const char *global_invoked_name;
+)

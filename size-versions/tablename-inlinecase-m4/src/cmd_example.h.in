@@ -1,5 +1,4 @@
-/*
-MIT License
+/* MIT License
 
 Copyright (c) 2022 groboclown
 
@@ -19,11 +18,34 @@ FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
 AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
 LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
-SOFTWARE.
-*/
+SOFTWARE. */
 
+AsOptional(command="xx",
+
+#include "output.h"
 #include "globals.h"
+#include "helpers.h"
 
+WithNamedStep(enum="XX", name="xx",
+    // Runs at tool start
+    OnInit(
+        LOG(":: init xx");
+    )
+    // Runs when the cmd name is found
+    OnCmd(
+        LOG(":: xx start");
+    )
+    // Runs when the cmd encounters an argument
+    OnArg(
+        LOG(":: xx arg ");
+        LOGLN(global_arg);
+    )
+)
+WithVirtualStep(enum="XX_RUN",
+    OnArg(
+        LOG(":: xx on ");
+        LOGLN(global_arg);
+    )
+)
 
-// Global variable storage.
-const char *global_invoked_name;
+)

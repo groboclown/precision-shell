@@ -62,5 +62,24 @@ SOFTWARE.
 
 #endif
 
+// USES_SHARED_STR - shared logic for capturing an argument for later use.
+#if    defined(USE_CMD_LN_S) \
+    || defined(USE_CMD_LN_H) \
+    || defined(USE_CMD_MV)
+
+#define USES_SHARED_STR
+
+#endif
+
+// USES_SHARED_INT - shared logic for capturing an argument for later use.
+#if    defined(USES_DUP) \
+    || defined(USE_CMD_LN_H) \
+    || defined(USE_CMD_MV) \
+    || defined(USE_CMD_MKDEV) \
+    || defined(USE_CMD_CHOWN)
+
+#define USES_SHARED_INT
+
+#endif
 
 #endif /* _FS_SHELL__USES_ */

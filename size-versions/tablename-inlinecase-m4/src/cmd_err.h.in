@@ -1,5 +1,4 @@
-/*
-MIT License
+/* MIT License
 
 Copyright (c) 2022 groboclown
 
@@ -19,11 +18,19 @@ FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
 AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
 LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
-SOFTWARE.
-*/
+SOFTWARE. */
+AsRequired(command="err",
 
+#include "output.h"
 #include "globals.h"
+#include "helpers.h"
 
+WithVirtualStep(enum="ERR",
+    OnArg(
+        LOG(":: err arg ");
+        LOGLN(global_arg);
+        global_err = 1;
+    )
+)
 
-// Global variable storage.
-const char *global_invoked_name;
+)

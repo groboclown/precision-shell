@@ -28,10 +28,11 @@ SOFTWARE.
 #include "args.h"
 #include "globals.h"
 #include "command_runner.h"
-#include "command_list.h"
+#include "gen-cmd/command_list.h"
 #include "helpers.h"
 #include "version.h"
 
+CMD_GLOBAL_VARDEF
 
 // command_runner runs the commands over the parsed arguments.
 //   returns the error code.
@@ -39,9 +40,13 @@ int command_runner() {
     // ======================================================================
     // Command runner internal variables
     int _err_count = 0;
-    int _idx;
 
-    LOCAL_GLOBALS
+    // Current command index to run.
+    int global_cmd;
+    // The current argument being parsed.
+    const char *global_arg;
+    // Marker that there's an error in the current command.
+    int global_err = 0;
 
     // Initialize all the commands that need it.
     CMD_INITIALIZE
@@ -51,6 +56,10 @@ int command_runner() {
     while (1 == 1) {
         global_arg = args_advance_token();
         if (global_arg == NULL) {
+            // TODO could add another case here for the current command.
+            // This would allow us to check for commands that require
+            // an extra argument, and, if not present, geenrate an error.
+
             break;
         }
         // This is a long if/else block until error checking.
@@ -78,35 +87,12 @@ int command_runner() {
             // Default to no error.
             global_err = 0;
 
+            LOG(":: processing ");
+            LOGLN(global_arg);
+
             switch (global_cmd) {
                 // ==========================================================
                 // Find the invoked command.
-                case COMMAND_INDEX__FIND_CMD:
-                    // This should be defined in its own cmd file,
-                    // but, due to ordering of referenced values, it
-                    // would otherwise cause bad loading as command_list
-                    // depends on find_cmd and find_cmd depends on command_list.
-                    global_cmd_name = global_arg;
-
-                    // Assume that this will fail...
-                    global_cmd = COMMAND_INDEX__ERR;
-                    global_err = 1;
-
-                    // Don't check if the command is "error", as that's not
-                    // a real callable command.
-                    for (_idx = COMMAND_INDEX__FIND_CMD; _idx < COMMAND_INDEX__ERR; _idx++) {
-                        if (strequal(global_arg, command_list_names[_idx])) {
-                            LOG(":: starting command processing for ");
-                            LOGLN(global_arg);
-                            global_err = 0;
-                            global_cmd = _idx;
-                            switch (_idx) {
-                                CMD_STARTUP_CASE                                
-                            }
-                            break;
-                        }
-                    }
-                    break;
 
                 CMD_RUN_CASE
             }

@@ -4,7 +4,7 @@
 # requires: +chown
 
 if [ "${UID0}" -ne 0 ] ; then
-    echo "!! SKIPPED because not enough permissions to run it."
+    echo "?? SKIPPED because not enough permissions to run it."
     exit 0
 fi
 if [ "${UID0}" == "${UID1}" ] || [ "${GID0}" == "${GID1}" ] ; then

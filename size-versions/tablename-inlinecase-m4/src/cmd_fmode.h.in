@@ -13,7 +13,7 @@ furnished to do so, subject to the following conditions:
 The above copyright notice and this permission notice shall be included in all
 copies or substantial portions of the Software.
 
-THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EFMODEPRESS OR
 IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
 FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
 AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
@@ -21,9 +21,30 @@ LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
 */
+AsOptional(command="fmode", ifdef="USES_FMODE",
 
-#include "globals.h"
+WithNamedStep(enum="FMODE", name="fmode",
+    OnInit(
+        // Including the fmode command creates a shared variable,
+        // with a default value.
+        int global_fmode = 0644;
+    )
 
+    OnArg(
+        LOG(":: fmode ");
+        LOGLN(global_arg);
+        // File mode is only up to the first 3 nybbles.
+        // Due to error checking, this will not change fmode unless it's okay.
+        tmp_val = helper_arg_to_uint(global_arg, 8, 0777);
+        if (tmp_val < 0) {
+            global_err = 1;
+            break;
+        }
+        global_fmode = tmp_val;
 
-// Global variable storage.
-const char *global_invoked_name;
+        // No other args will be processed.
+        global_cmd = COMMAND_INDEX__ERR;
+    )
+)
+
+)

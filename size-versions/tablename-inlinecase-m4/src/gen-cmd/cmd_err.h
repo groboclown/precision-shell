@@ -1,5 +1,6 @@
-/*
-MIT License
+// GENERATED FROM cmd_err.h.in.  DO NOT EDIT.
+
+/* MIT License
 
 Copyright (c) 2022 groboclown
 
@@ -19,11 +20,34 @@ FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
 AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
 LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
-SOFTWARE.
-*/
+SOFTWARE. */
 
+#ifndef _FS_SHELL__CMD_ERR_
+#define _FS_SHELL__CMD_ERR_
+
+// Required command err
+
+
+#include "output.h"
 #include "globals.h"
+#include "helpers.h"
 
 
-// Global variable storage.
-const char *global_invoked_name;
+
+#define ENUM_LIST__ERR
+#define VIRTUAL_ENUM_LIST__ERR \
+            /* from cmd_err.h.in:28 */ \
+            COMMAND_INDEX__ERR,
+#define GLOBAL_VARDEF__ERR
+#define INITIALIZE__ERR
+#define STARTUP_CASE__ERR
+#define RUN_CASE__ERR \
+    case COMMAND_INDEX__ERR: \
+        /* from cmd_err.h.in:28 */ \
+            /* from cmd_err.h.in:29 */ \
+        LOG(":: err arg "); \
+        LOGLN(global_arg); \
+        global_err = 1; \
+        break;
+
+#endif /* _FS_SHELL__CMD_ERR_ */

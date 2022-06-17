@@ -21,9 +21,13 @@ LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
 */
+AsOptional(command="noop",
 
-#include "globals.h"
+    WithNamedStep(enum="noop", name="noop",
+        OnArg(
+            LOG(":: ignore");
+            LOGLN(global_arg);
+        )
+    )
 
-
-// Global variable storage.
-const char *global_invoked_name;
+)

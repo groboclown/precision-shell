@@ -2,11 +2,12 @@ include ../version.txt
 include ../Makefile.command-flags
 
 
-.SUFFIXES: .h.in .h
+.SUFFIXES: .h.m4 .h
 
-CMD_TEMPLATE_SCRIPT = python3 ../generate-command-template.py
-MKCMD = $(CMD_TEMPLATE_SCRIPT)
-MKCMDLIST = $(CMD_TEMPLATE_SCRIPT) --cmd-list .in
+M4 = m4
+M4FLAGS =
+HEADER_SCRIPT = cmd-generator.m4
+LIST_SCRIPT = cmd-list-generator.m4
 
 # Include the version number from the version.txt
 CFLAGS += -DVERSION_NUMBER=\"$(VERSION)-$(LIBNAME)\"
@@ -46,11 +47,11 @@ MINFLAGS = \
 LFLAGS = -static -static-libgcc
 DFLAGS = -DDEBUG=1 -g
 
-COMMAND_HEADERS_DIR = ./gen-cmd
+COMMAND_HEADERS = $(OUTDIR)/.m4-commands
 
 # Normally, we want unused variable warnings, however, with very limited command flags,
 #   we will see this appear.
-CFLAGS += -Wall -pedantic -Wno-unused-variable -I$(COMMAND_HEADERS_DIR) -I.
+CFLAGS += -Wall -pedantic -Wno-unused-variable -I$(COMMAND_HEADERS) -I.
 OUTDIR = ../out
 SRC = main.c helpers.c globals.c command_runner.c args-argv.c args-input.c
 
@@ -61,22 +62,6 @@ COMMANDS = \
 	cmd_chmod.h \
 	cmd_chown.h \
 	cmd_dup.h \
-	cmd_echo.h \
-	cmd_exec.h \
-	cmd_fmode.h \
-	cmd_ln_h.h \
-	cmd_ln_s.h \
-	cmd_mkdir.h \
-	cmd_mknod_mkdev.h \
-	cmd_mv.h \
-	cmd_noop.h \
-	cmd_rm.h \
-	cmd_rmdir.h \
-	cmd_shared_virtual.h \
-	cmd_signal.h \
-	cmd_sleep.h \
-	cmd_touch_trunc.h \
-	cmd_version.h \
 	cmd_err.h
 
 
@@ -95,27 +80,27 @@ debug: \
 # Note that the arguments to the rm match the all parameters.
 .PHONY: clean
 clean:
-	rm $(OUTDIR)/fs-shell* $(COMMAND_HEADERS_DIR) 2>/dev/null || echo ""
+	rm $(OUTDIR)/fs-shell* $(COMMAND_HEADERS) 2>/dev/null || echo ""
 
 
 .PHONY: cmd_headers
-cmd_headers: $(COMMANDS) $(COMMAND_HEADERS_DIR)/command_list.h
+cmd_headers: $(COMMANDS)
 
-%.h: %.h.in
-	mkdir -p $(COMMAND_HEADERS_DIR)
-	$(MKCMD) $< $(COMMAND_HEADERS_DIR)/$*.h
-
-
-$(COMMAND_HEADERS_DIR)/command_list.h: $(COMMANDS)
-	mkdir -p $(COMMAND_HEADERS_DIR)
-	$(MKCMDLIST) $(COMMANDS) $*.h
+%.h: %.h.m4
+	mkdir -p $(COMMAND_HEADERS)
+	$(M4) $(M4FLAGS) $(HEADER_SCRIPT) $< > $(COMMAND_HEADERS)/$*.h
 
 
-$(OUTDIR)/fs-shell: $(SRC) $(COMMAND_HEADERS_DIR)/command_list.h
+$(COMMAND_HEADERS)/command_list.h: cmd-list-generator.m4 $(COMMANDS)
+	mkdir -p $(COMMAND_HEADERS)
+	$(M4) $(M4FLAGS) "-DFILE_NAMES=$(COMMANDS)" cmd-list-generator.m4 >$*.h
+
+
+$(OUTDIR)/fs-shell: $(SRC) $(COMMAND_HEADERS)/command_list.h
 	mkdir -p $(OUTDIR)
 	$(CC) $(CFLAGS) $(LFLAGS) $(MINFLAGS) $(COMMAND_FLAGS) $? $(LDFLAGS) -o $@
 
 
-$(OUTDIR)/fs-shell-debug: $(SRC) $(COMMAND_HEADERS_DIR)/command_list.h
+$(OUTDIR)/fs-shell-debug: $(SRC) $(COMMAND_HEADERS)/command_list.h
 	mkdir -p $(OUTDIR)
 	$(CC) $(CFLAGS) $(LFLAGS) $(DFLAGS) $(COMMAND_FLAGS) $? $(LDFLAGS) -o $@

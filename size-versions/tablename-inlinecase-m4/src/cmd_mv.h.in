@@ -21,9 +21,26 @@ LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
 */
+AsOptional(command="mv",
 
-#include "globals.h"
+WithNamedStep(enum="MV", name="mv",
+    OnCmd(
+        // Call the shared store to capture the next argument.
+        global_cmd = COMMAND_INDEX__SHARED_STR;
+        global_arg3_i = COMMAND_INDEX__MV;
+    )
 
+    OnArg(
+        // Called after the first argument was captured, and now
+        // on the second argument.
+        LOG(":: move ");
+        LOG(global_arg_cached);
+        LOG(" to ");
+        LOGLN(global_arg);
+        global_err = rename(global_arg_cached, global_arg);
+        // No more arguments allowed.
+        global_cmd = COMMAND_INDEX__ERR;
+    )
+)
 
-// Global variable storage.
-const char *global_invoked_name;
+)

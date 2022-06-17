@@ -21,9 +21,23 @@ LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
 */
+AsOptional(command="mkdir",
 
-#include "globals.h"
+
+#include <fcntl.h>
+#include <unistd.h>
 
 
-// Global variable storage.
-const char *global_invoked_name;
+WithNamedStep(enum="MKDIR", name="mkdir",
+
+    OnArg(
+        LOG(":: mkdir ");
+        LOGLN(global_arg);
+        // For now, assume that execution is enabled for all modes.
+        global_arg1_i = global_fmode | S_IXUSR | S_IXGRP | S_IXOTH;
+        global_err = mkdir(global_arg, global_arg1_i);
+    )
+
+)
+
+)

@@ -1,0 +1,83 @@
+/* MIT License
+
+Copyright (c) 2022 groboclown
+
+Permission is hereby granted, free of charge, to any person obtaining a copy
+of this software and associated documentation files (the "Software"), to deal
+in the Software without restriction, including without limitation the rights
+to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+copies of the Software, and to permit persons to whom the Software is
+furnished to do so, subject to the following conditions:
+
+The above copyright notice and this permission notice shall be included in all
+copies or substantial portions of the Software.
+
+THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+SOFTWARE. */
+AsRequired(command="find_cmd",
+
+
+#include <stdlib.h>
+#include "output.h"
+#include "globals.h"
+#include "helpers.h"
+
+OnInit(
+    // Global variables common to all commands.
+
+    // List of command names to check.
+    const char *command_list_names[COMMAND_INDEX__LAST_NAMED_CMD];
+
+    // Common global values for cross-command storage.
+    const char *global_arg_cached = NULL;
+    int global_arg1_i = 0;
+    int global_arg2_i = 0;
+    int global_arg3_i = 0;
+
+    // This one does not span across commands; any step can use it as it needs.
+    int tmp_val;
+
+    // The current command name being run.
+    const char *global_cmd_name = NULL;
+
+    // Initialize globals.
+    global_cmd = COMMAND_INDEX__FIND_CMD;
+)
+
+WithNamedStep(enum="FIND_CMD", name="<first>",
+    OnArg(
+        LOG(":: find_cmd start\n");
+        global_cmd_name = global_arg;
+
+        /* Assume that this will fail... */
+        global_cmd = COMMAND_INDEX__ERR;
+        global_err = 1;
+
+        /* Do not check if the command is "error", as that is not */
+        /* a real callable command. */
+        // printf(":: scanning from %d to %d\n", COMMAND_INDEX__FIND_CMD, COMMAND_INDEX__LAST_NAMED_CMD);
+        for (tmp_val = COMMAND_INDEX__FIND_CMD; tmp_val < COMMAND_INDEX__LAST_NAMED_CMD; tmp_val++) {
+            // printf(" - checking %d - %s\n", tmp_val, command_list_names[tmp_val]);
+            if (strequal(global_arg, command_list_names[tmp_val])) {
+                LOG(":: starting command processing for ");
+                LOGLN(global_arg);
+                global_err = 0;
+                global_cmd = tmp_val;
+                switch (tmp_val) {
+                    CMD_STARTUP_CASE                                
+                }
+                break;
+            }
+            // printf(" -  no match on %d\n", tmp_val);
+        }
+        // printf(":: final global_cmd %d\n", global_cmd);
+        break;
+    )
+)
+
+)

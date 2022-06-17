@@ -1,0 +1,119 @@
+/*
+MIT License
+
+Copyright (c) 2022 groboclown
+
+Permission is hereby granted, free of charge, to any person obtaining a copy
+of this software and associated documentation files (the "Software"), to deal
+in the Software without restriction, including without limitation the rights
+to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+copies of the Software, and to permit persons to whom the Software is
+furnished to do so, subject to the following conditions:
+
+The above copyright notice and this permission notice shall be included in all
+copies or substantial portions of the Software.
+
+THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+SOFTWARE.
+*/
+AsOptionalUnion(file="mknod-mkdev",
+
+AsOptional(command="mknod",
+
+    WithNamedStep(enum="mknod_start", name="mknod",
+        OnCmd(
+            LOG(":: mknod setup\n");
+            global_cmd = COMMAND_INDEX__MKNOD_DEV__TYPE;
+            global_arg1_i = 0;
+        )
+    )
+
+)
+
+
+AsOptional(command="mkdev",
+
+#include <sys/sysmacros.h>
+
+    WithNamedStep(enum="mkdev_start", name="mkdev",
+        OnCmd(
+            LOG(":: mkdev setup\n");
+            // Call the shared store to capture the next argument.
+            // Which is the major device number
+            global_cmd = COMMAND_INDEX__SHARED_INT2;
+            global_arg3_i = COMMAND_INDEX__MKDEV__DEVICE;
+        )
+    )
+
+    WithVirtualStep(enum="MKDEV__DEVICE",
+        OnArg(
+            // Just read in the major version into arg2.
+            // This arg is the minor version.
+            LOG(":: mkdev minor device ");
+            LOGLN(global_arg);
+            global_cmd = COMMAND_INDEX__MKNOD_DEV__TYPE;
+            global_arg3_i = helper_arg_to_uint(global_arg, 10, 0xffff);
+            if (global_arg3_i == -1) {
+                global_err = 1;
+                global_cmd = COMMAND_INDEX__ERR;
+            } else {
+                global_arg1_i = makedev(global_arg2_i, global_arg3_i);
+                if (global_arg1_i == -1) {
+                    global_err = 1;
+                    global_cmd = COMMAND_INDEX__ERR;
+                }
+            }
+        )
+    )
+)
+
+
+WithAuxFor(commands=[mknod, mkdev],
+
+    WithVirtualStep(enum="MKNOD_DEV__TYPE",
+        OnArg(
+            LOG(":: create node with device type ");
+            LOGLN(global_arg);
+            global_cmd = COMMAND_INDEX__MKNOD_DEV__RUN;
+
+            // just look at the first character
+            global_arg3_i = global_arg[0];
+            global_arg2_i = global_fmode;
+            if (global_arg3_i == 'c' || global_arg3_i == 'u') {
+                    global_arg2_i |= S_IFCHR;
+            } else if (global_arg3_i == 'b') {
+                global_arg2_i |= S_IFBLK;
+            } else if (global_arg3_i == 's') {
+                global_arg2_i |= S_IFSOCK;
+            } else if (global_arg3_i == 'p') {
+                global_arg2_i |= S_IFIFO;
+            } else {
+                global_err = 1;
+                global_cmd = COMMAND_INDEX__ERR;
+            }
+        )
+    )
+
+    WithVirtualStep(enum="MKNOD_DEV__RUN",
+        OnArg(
+            LOG(":: mknod/dev ");
+            LOGLN(global_arg);
+            // target file, mode, device
+            global_err = mknod(global_arg, global_arg2_i, global_arg1_i);
+
+            // Could include
+            // global_cmd = COMMAND_INDEX__ERR;
+            // to make this create only one file, but let it
+            // create as many as the user wants.  It actually makes the code smaller
+            // while giving more behavior.
+        )
+    )
+
+)
+
+)

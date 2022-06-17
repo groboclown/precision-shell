@@ -22,8 +22,17 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
 */
 
+AsOptional(command="echo",
+
+#include "output.h"
 #include "globals.h"
+#include "helpers.h"
 
+WithNamedStep(enum="ECHO", name="echo",
+    OnArg(
+        LOG(":: echo\n");
+        stdoutPLn(global_arg);
+    )
+)
 
-// Global variable storage.
-const char *global_invoked_name;
+)

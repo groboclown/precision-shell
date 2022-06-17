@@ -10,7 +10,7 @@ WORKDIR /opt/code
 
 RUN \
        apk --no-cache update \
-    && apk add build-base=0.5-r1 curl tar xz "bash=~5" \
+    && apk add build-base=0.5-r1 curl tar xz python3 "bash=~5" \
     && mkdir -p /opt/dietlibc \
     && curl -o /tmp/dietlibc.tar.xz https://www.fefe.de/dietlibc/dietlibc-0.34.tar.xz \
     && xz -d /tmp/dietlibc.tar.xz \
@@ -21,7 +21,7 @@ RUN \
 ENV CC="diet cc"
 
 COPY experiments/ experiments/
-COPY Makefile Makefile.command-flags version.txt internal-docker-make.sh ./
+COPY Makefile Makefile.command-flags version.txt internal-docker-make.sh generate-command-template.py ./
 COPY src/ src/
 COPY tests/ tests/
 

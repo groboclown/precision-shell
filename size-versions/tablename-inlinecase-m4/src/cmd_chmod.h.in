@@ -1,5 +1,4 @@
-/*
-MIT License
+/* MIT License
 
 Copyright (c) 2022 groboclown
 
@@ -19,11 +18,35 @@ FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
 AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
 LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
-SOFTWARE.
-*/
+SOFTWARE. */
+AsOptional(command="chmod",
 
+#include <sys/stat.h>
+#include <fcntl.h>
+
+#include "output.h"
 #include "globals.h"
+#include "helpers.h"
 
+WithNamedStep(enum="CHMOD_MODE", name="chmod",
+    OnArg(
+        LOG(":: using mode ");
+        LOGLN(global_arg);
+        global_cmd = COMMAND_INDEX__CHMOD_RUN;
+        global_arg1_i = helper_arg_to_uint(global_arg, 8, 07777);
+        if (global_arg1_i < 0) {
+            LOG("::  - Bad base 8 number, or out of range\n");
+            global_cmd = COMMAND_INDEX__ERR;
+            global_err = 1;
+        }
+    )
+)
+WithVirtualStep(enum="CHMOD_RUN",
+    OnArg(
+        LOG(":: chmod on ");
+        LOGLN(global_arg);
+        global_err = chmod(global_arg, global_arg1_i);
+    )
+)
 
-// Global variable storage.
-const char *global_invoked_name;
+)
