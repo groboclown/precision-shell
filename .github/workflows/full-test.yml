@@ -1,6 +1,6 @@
 name: Full Test
-on:
-  # This build takes a VERY long time to run.  Only run on-demand.
+
+# This build takes a VERY long time to run.  Only run on-demand.
 
 jobs:
 
