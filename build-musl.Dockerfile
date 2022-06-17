@@ -10,11 +10,11 @@ WORKDIR /opt/code
 
 RUN \
        apk --no-cache update \
-    && apk add build-base=0.5-r1 "bash=~5" python3 \
+    && apk add build-base=0.5-r1 "bash=~5" "python3=~3.7" \
     && rm -rf /tmp/* /var/cache/apk/*
 
 COPY build-tools/ build-tools/
-COPY Makefile Makefile.command-flags version.txt internal-docker-make.sh generate-command-template.py ./
+COPY Makefile Makefile.command-flags version.txt ./
 COPY src/ src/
 COPY tests/ tests/
 

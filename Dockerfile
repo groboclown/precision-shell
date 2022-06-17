@@ -1,16 +1,21 @@
 FROM docker.io/library/alpine:3.10
 
+ARG FLAGS="INCLUDE_ALL_COMMANDS=1"
+
 WORKDIR /opt/code
 
-COPY Makefile.command-flags  version.txt ./
+COPY Makefile.command-flags version.txt ./
+COPY build-tools/generate-command-template.py build-tools/
 COPY src/ src/
+
+ENV FLAGS=$FLAGS
 
 RUN \
        apk --no-cache update \
-    && apk add "build-base=~0" \
+    && apk add "build-base=~0" "python3=~3.7" \
     && rm -rf /tmp/* /var/cache/apk/* \
     && echo 'LIBNAME=musl' >> version.txt \
-    && cd src && make
+    && cd src && make ${FLAGS}
 
 
 # ---------------------------------
@@ -25,7 +30,7 @@ LABEL name="local/fs-shell" \
 # This also chooses the features to include.  In this case, it's the
 #   all-feature version.
 COPY --from=0 \
-    /opt/code/out/fs-shell-fat \
+    /opt/code/out/fs-shell \
     /bin/sh
 
 ENTRYPOINT ["/bin/sh"]
