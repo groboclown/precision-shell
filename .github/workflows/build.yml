@@ -28,7 +28,7 @@ jobs:
       
       - name: build-test
         run: |
-          podman build -f build-glibc.Dockerfile -t glibc:offline .
+          podman build -f build-glibc.Dockerfile -t glibc:offline --build-arg COMMANDS=ALL .
       # Podman on Ubuntu is a buggy version that causes this to look up the
       # image online, rather than look in the local repo.
       # https://github.com/containers/podman/issues/11181
@@ -56,7 +56,7 @@ jobs:
       
       - name: build-test
         run: |
-          podman build -f build-dietlibc.Dockerfile -t dietlibc:offline .
+          podman build -f build-dietlibc.Dockerfile -t dietlibc:offline --build-arg COMMANDS=ALL .
       
   musl:
     name: Build & Test with musl
@@ -78,4 +78,4 @@ jobs:
       
       - name: build-test
         run: |
-          podman build -f build-musl.Dockerfile -t musl:offline .
+          podman build -f build-musl.Dockerfile -t musl:offline --build-arg COMMANDS=ALL .

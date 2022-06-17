@@ -4,7 +4,7 @@ set -e
 # File invoked through Dockerfile to run the build.
 echo "Running in [${BUILD_MODE}]"
 
-cd "$( dirname "$0"/.. )"
+cd "$( dirname "$0" )/.."
 
 if [ "${BUILD_MODE}" = "size-check" ] ; then
     experiments/size-check/compile-size-test.sh
@@ -45,22 +45,26 @@ elif [ "${BUILD_MODE}" = "combos" ] ; then
     ls -lAS out/fs-shell*
 else
     commands=""
-    for cmd in ${COMMANDS} ; do
-        if [ ${cmd} = "input" ] ; then
-            cmd_arg="-DUSE_STREAMING_INPUT=1"
-        else
-            cmd_arg="$( echo ${cmd^^} | tr - _ )"
-            cmd_arg="-DUSE_CMD_${cmd_arg}=1"
+    if [ "${COMMANDS}" = "ALL" ] ; then
+        cmdarg="INCLUDE_ALL_COMMANDS=1"
+    else
+        for cmd in ${COMMANDS} ; do
+            if [ ${cmd} = "input" ] ; then
+                cmd_arg="-DUSE_STREAMING_INPUT=1"
+            else
+                cmd_arg="$( echo ${cmd^^} | tr - _ )"
+                cmd_arg="-DUSE_CMD_${cmd_arg}=1"
+            fi
+            if [ -z "${commands}" ] ; then
+                commands="${cmd_arg}"
+            else
+                commands="${commands} ${cmd_arg}"
+            fi
+        done
+        cmdarg=""
+        if [ ! -z "${commands}" ] ; then
+            cmdarg="COMMAND_FLAGS=${commands}"
         fi
-        if [ -z "${commands}" ] ; then
-            commands="${cmd_arg}"
-        else
-            commands="${commands} ${cmd_arg}"
-        fi
-    done
-    cmdarg=""
-    if [ ! -z "${commands}" ] ; then
-        cmdarg="COMMAND_FLAGS=${commands}"
     fi
     echo "make \"${cmdarg}\" all"
     make "${cmdarg}" all
