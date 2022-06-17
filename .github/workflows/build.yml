@@ -35,6 +35,10 @@ jobs:
       # podman images
       # ./extract-executables.sh localhost/glibc:offline -o out/glibc
       # ls -lA out/glibc
+     
+      - name: file-size
+        run: |
+          podman build -f build-glibc.Dockerfile -t glibc:offline --build-arg BUILD_MODE=cmd-size .
 
   dietlibc:
     name: Build & Test with dietlibc
@@ -57,7 +61,11 @@ jobs:
       - name: build-test
         run: |
           podman build -f build-dietlibc.Dockerfile -t dietlibc:offline --build-arg COMMANDS=ALL .
-      
+            
+      - name: file-size
+        run: |
+          podman build -f build-dietlibc.Dockerfile -t dietlibc:offline --build-arg BUILD_MODE=cmd-size .
+
   musl:
     name: Build & Test with musl
     runs-on: ubuntu-latest
@@ -79,6 +87,11 @@ jobs:
       - name: build-test
         run: |
           podman build -f build-musl.Dockerfile -t musl:offline --build-arg COMMANDS=ALL .
+      
+      - name: file-size
+        run: |
+          podman build -f build-musl.Dockerfile -t musl:offline --build-arg BUILD_MODE=cmd-size .
+
 
   sample:
     name: Run the sample builds.

@@ -4,7 +4,7 @@ Minimal, non-interactive file manipulation shell
 
 Sometimes, you just don't need a shell.  You just need minimal file system operations.
 
-`fs-shell` offers a [few commands](#what-it-does) and gives you the flexibility to select which ones to compile, which can make the executable smaller and provide extra security by not enabling commands that don't need to be run.
+`fs-shell` offers a [few commands](#what-it-does), and gives you the flexibility to select which ones to compile, which can make the executable smaller and provide extra security by not enabling commands that don't need to be run.
 
 Last build size:
 

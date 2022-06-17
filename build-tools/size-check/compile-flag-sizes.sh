@@ -1,6 +1,7 @@
 #!/bin/bash
 
-# Test compilation to get the smallest size possible.
+# Test compilation across different compile flags to get the smallest size possible.
+
 if [ ! -z "$1" ] ; then
     MAX_JOB_COUNT=$1
 elif [ -z "${MAX_JOB_COUNT}" ] ; then

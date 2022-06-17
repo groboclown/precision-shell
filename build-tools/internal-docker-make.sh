@@ -6,8 +6,10 @@ echo "Running in [${BUILD_MODE}]"
 
 cd "$( dirname "$0" )/.."
 
-if [ "${BUILD_MODE}" = "size-check" ] ; then
-    build-tools/size-check/compile-size-test.sh
+if [ "${BUILD_MODE}" = "compile-flag-sizes" ] ; then
+    build-tools/size-check/compile-flag-sizes.sh
+elif [ "${BUILD_MODE}" = "cmd-size" ] ; then
+    build-tools/cmd-sizes.sh
 elif [ "${BUILD_MODE}" = "src" ] ; then
     ( cd src && make src )
     ls -lA out/fs-shell*
