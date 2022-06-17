@@ -101,4 +101,4 @@ jobs:
       - name: build-test
         run: |
           podman build -t local/fs-shell-sample --build-arg FLAGS=INCLUDE_ALL_COMMANDS=1 .
-          docker run --rm -it local/fs-shell-sample version
+          podman run --rm -t local/fs-shell-sample version

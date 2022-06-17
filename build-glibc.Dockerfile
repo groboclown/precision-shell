@@ -10,7 +10,8 @@ WORKDIR /opt/code
 
 RUN \
        apt-get update \
-    && apt-get -y install "build-essential=12.9ubuntu3" "python3.10" \
+    && apt-get -y install "build-essential=12.9ubuntu3" "python3.10-minimal" \
+    && ln -s /usr/bin/python3.10 /usr/bin/python3 \
     && rm -rf /tmp/* /var/cache/apt/*
 
 COPY build-tools/ build-tools/
