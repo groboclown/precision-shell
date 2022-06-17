@@ -457,6 +457,7 @@ class AuxCommandFilePart(FilePart):
         parts: List[FilePart] = [
             RawText.mk(self, f'#if {self._mk_def()}'),
             RawText.mk(self, ''),
+            *self.raw,
             steps,
             RawText.mk(self, ''),
             RawText.mk(self, f'#else /* {self._mk_def()} */'),
