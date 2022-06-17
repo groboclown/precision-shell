@@ -1,6 +1,9 @@
 name: Full Test
 
 # This build takes a VERY long time to run.  Only run on-demand.
+on:
+  push:
+    branches: [main]
 
 jobs:
 
