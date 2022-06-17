@@ -7,12 +7,12 @@ echo "Running in [${BUILD_MODE}]"
 cd "$( dirname "$0" )/.."
 
 if [ "${BUILD_MODE}" = "size-check" ] ; then
-    experiments/size-check/compile-size-test.sh
+    build-tools/size-check/compile-size-test.sh
 elif [ "${BUILD_MODE}" = "src" ] ; then
     ( cd src && make src )
     ls -lA out/fs-shell*
 elif [ "${BUILD_MODE}" = "full-test" ] ; then
-    experiments/full-tests.sh
+    build-tools/full-tests.sh
 elif [ "${BUILD_MODE}" = "combos" ] ; then
     mkdir -p .tmp/combos
     make src tests || echo "Tests failed"
