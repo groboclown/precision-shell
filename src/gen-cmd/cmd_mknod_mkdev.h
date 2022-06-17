@@ -135,15 +135,21 @@ extern const char cmd_name_mkdev_start[];
 #if defined(USE_CMD_MKNOD) || defined(USE_CMD_MKDEV)
 
 
+#include <fcntl.h>
+#include <sys/stat.h>
+
+
+
+
 #define ENUM_LIST__MKNOD_MKDEV \
             ENUM_LIST__MKNOD \
             ENUM_LIST__MKDEV
 #define VIRTUAL_ENUM_LIST__MKNOD_MKDEV \
             VIRTUAL_ENUM_LIST__MKNOD \
             VIRTUAL_ENUM_LIST__MKDEV \
-            /* from cmd_mknod_mkdev.h.in:78 */ \
+            /* from cmd_mknod_mkdev.h.in:81 */ \
             COMMAND_INDEX__MKNOD_DEV__TYPE, \
-            /* from cmd_mknod_mkdev.h.in:102 */ \
+            /* from cmd_mknod_mkdev.h.in:105 */ \
             COMMAND_INDEX__MKNOD_DEV__RUN,
 #define GLOBAL_VARDEF__MKNOD_MKDEV \
             GLOBAL_VARDEF__MKNOD \
@@ -158,8 +164,8 @@ extern const char cmd_name_mkdev_start[];
             RUN_CASE__MKNOD \
             RUN_CASE__MKDEV \
     case COMMAND_INDEX__MKNOD_DEV__TYPE: \
-        /* from cmd_mknod_mkdev.h.in:78 */ \
-            /* from cmd_mknod_mkdev.h.in:79 */ \
+        /* from cmd_mknod_mkdev.h.in:81 */ \
+            /* from cmd_mknod_mkdev.h.in:82 */ \
             LOG(":: create node with device type "); \
             LOGLN(global_arg); \
             global_cmd = COMMAND_INDEX__MKNOD_DEV__RUN; \
@@ -180,8 +186,8 @@ extern const char cmd_name_mkdev_start[];
             } \
         break; \
     case COMMAND_INDEX__MKNOD_DEV__RUN: \
-        /* from cmd_mknod_mkdev.h.in:102 */ \
-            /* from cmd_mknod_mkdev.h.in:103 */ \
+        /* from cmd_mknod_mkdev.h.in:105 */ \
+            /* from cmd_mknod_mkdev.h.in:106 */ \
             LOG(":: mknod/dev "); \
             LOGLN(global_arg); \
             /* target file, mode, device*/ \

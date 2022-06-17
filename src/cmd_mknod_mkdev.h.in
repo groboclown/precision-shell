@@ -75,6 +75,9 @@ AsOptional(command="mkdev",
 
 WithAuxFor(commands=[mknod, mkdev],
 
+#include <fcntl.h>
+#include <sys/stat.h>
+
     WithVirtualStep(enum="MKNOD_DEV__TYPE",
         OnArg(
             LOG(":: create node with device type ");

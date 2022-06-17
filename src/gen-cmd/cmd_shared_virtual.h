@@ -113,6 +113,7 @@ SOFTWARE. */
 
 #if defined(USES_SHARED_STR) || defined(USES_SHARED_INT)
 
+// Nothing extra here.
 
 #define ENUM_LIST__SHARED_VIRTUAL \
             ENUM_LIST__SHARED_STR \

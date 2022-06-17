@@ -32,24 +32,26 @@ SOFTWARE.
 #ifdef USE_CMD_RMDIR
 
 
+#include <stdio.h>
 
-/* from cmd_rmdir.h.in:26 */
+
+/* from cmd_rmdir.h.in:28 */
 extern const char cmd_name_rmdir[];
 #define ENUM_LIST__RMDIR \
-            /* from cmd_rmdir.h.in:26 */ \
+            /* from cmd_rmdir.h.in:28 */ \
             COMMAND_INDEX__RMDIR,
 #define VIRTUAL_ENUM_LIST__RMDIR
 #define GLOBAL_VARDEF__RMDIR \
-            /* from cmd_rmdir.h.in:26 */ \
+            /* from cmd_rmdir.h.in:28 */ \
             const char cmd_name_rmdir[] = "rmdir";
 #define INITIALIZE__RMDIR \
-            /* from cmd_rmdir.h.in:26 */ \
+            /* from cmd_rmdir.h.in:28 */ \
             command_list_names[COMMAND_INDEX__RMDIR] = cmd_name_rmdir;
 #define STARTUP_CASE__RMDIR
 #define RUN_CASE__RMDIR \
     case COMMAND_INDEX__RMDIR: \
-        /* from cmd_rmdir.h.in:26 */ \
-            /* from cmd_rmdir.h.in:27 */ \
+        /* from cmd_rmdir.h.in:28 */ \
+            /* from cmd_rmdir.h.in:29 */ \
             LOG(":: rmdir "); \
             LOGLN(global_arg); \
             global_err = rmdir(global_arg); \

@@ -103,13 +103,17 @@ extern const char cmd_name_trunc[];
 #if defined(USE_CMD_TOUCH) || defined(USE_CMD_TRUNC)
 
 
+#include <fcntl.h>
+
+
+
 #define ENUM_LIST__TOUCH_TRUNC \
             ENUM_LIST__TOUCH \
             ENUM_LIST__TRUNC
 #define VIRTUAL_ENUM_LIST__TOUCH_TRUNC \
             VIRTUAL_ENUM_LIST__TOUCH \
             VIRTUAL_ENUM_LIST__TRUNC \
-            /* from cmd_touch_trunc.h.in:47 */ \
+            /* from cmd_touch_trunc.h.in:51 */ \
             COMMAND_INDEX__TRUNC_TOUCH__RUN,
 #define GLOBAL_VARDEF__TOUCH_TRUNC \
             GLOBAL_VARDEF__TOUCH \
@@ -124,8 +128,8 @@ extern const char cmd_name_trunc[];
             RUN_CASE__TOUCH \
             RUN_CASE__TRUNC \
     case COMMAND_INDEX__TRUNC_TOUCH__RUN: \
-        /* from cmd_touch_trunc.h.in:47 */ \
-            /* from cmd_touch_trunc.h.in:48 */ \
+        /* from cmd_touch_trunc.h.in:51 */ \
+            /* from cmd_touch_trunc.h.in:52 */ \
             LOG(":: touch/trunc "); \
             LOGLN(global_arg); \
             global_arg2_i = open( \

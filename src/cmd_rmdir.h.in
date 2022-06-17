@@ -23,6 +23,8 @@ SOFTWARE.
 */
 AsOptional(command="rmdir",
 
+#include <stdio.h>
+
     WithNamedStep(enum="rmdir", name="rmdir",
         OnArg(
             LOG(":: rmdir ");

@@ -44,6 +44,10 @@ AsOptional(command="trunc",
 )
 
 WithAuxFor(commands=[touch, trunc],
+
+#include <fcntl.h>
+
+
     WithVirtualStep(enum="TRUNC_TOUCH__RUN",
         OnArg(
             LOG(":: touch/trunc ");

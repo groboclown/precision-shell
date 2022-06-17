@@ -152,6 +152,21 @@ extern const char cmd_name_dup_r__setup[];
 #if defined(USE_CMD_DUP_A) || defined(USE_CMD_DUP_W) || defined(USE_CMD_DUP_R)
 
 
+#include <sys/stat.h>
+#include <fcntl.h>
+
+#include "output.h"
+#include "globals.h"
+#include "helpers.h"
+
+    // Use the shared "COMMAND_INDEX__SHARED_INT"
+    // to store the fd in global_arg2_i
+    // In order to use this:
+    //   - global_cmd = COMMAND_INDEX__SHARED_INT;
+    //   - global_arg3_i = COMMAND_INDEX__DUP__TGT;
+
+
+
 #define ENUM_LIST__DUP \
             ENUM_LIST__DUP_A \
             ENUM_LIST__DUP_W \
