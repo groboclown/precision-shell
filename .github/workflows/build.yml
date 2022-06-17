@@ -79,3 +79,26 @@ jobs:
       - name: build-test
         run: |
           podman build -f build-musl.Dockerfile -t musl:offline --build-arg COMMANDS=ALL .
+
+  sample:
+    name: Run the sample builds.
+    runs-on: ubuntu-latest
+    outputs:
+      version: ${{ steps.properties.outputs.version }}
+      changelog: ${{ steps.properties.outputs.changelog }}
+    steps:
+
+      # Check out current repository
+      - name: Fetch Sources
+        uses: actions/checkout@v3
+      
+      # Install tools
+      - name: Install Required tools
+        run: |
+          sudo apt-get update
+          sudo apt-get install podman
+      
+      - name: build-test
+        run: |
+          podman build -t local/fs-shell-sample --build-arg FLAGS=INCLUDE_ALL_COMMANDS=1 .
+          docker run --rm -it local/fs-shell-sample version
