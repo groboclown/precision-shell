@@ -28,7 +28,7 @@ while [ $i -lt $set_count ] ; do
     cmds="${command_sets[$i]}"
     outdir=/tmp/fs-shell-$$
     mkdir -p "${outdir}"
-    ( cd "$( dirname "$0" )/../../src" && make src "${cmds}" OUTDIR="${outdir}" >/dev/null 2>&1 )
+    ( cd "$( dirname "$0" )/../src" && make src "${cmds}" OUTDIR="${outdir}" >/dev/null 2>&1 )
     if [ $? != 0 ] || [ ! -f "${outdir}/fs-shell" ] ; then
         echo "Build failed for command set ${cmds}" >&2
     else

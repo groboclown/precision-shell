@@ -1,8 +1,5 @@
 FROM docker.io/library/alpine:3.10
 
-ARG BUILD_MODE=build
-ARG COMMANDS="chmod ln-s"
-
 # This file is broken up to make rebuilds fast
 # by reusing previous layers that take a while to run.
 
@@ -17,6 +14,9 @@ COPY build-tools/ build-tools/
 COPY Makefile Makefile.command-flags version.txt ./
 COPY src/ src/
 COPY tests/ tests/
+
+ARG BUILD_MODE=build
+ARG COMMANDS="chmod ln-s"
 
 ENV \
 #    DEBUG=1 \
