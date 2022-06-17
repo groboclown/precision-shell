@@ -1,29 +1,39 @@
 # fs-shell
 
-Minimal, non-interactive file manipulation shell
+Minimal file manipulation shell for Linux.
 
 Sometimes, you just don't need a shell.  You just need minimal file system operations.
 
 `fs-shell` offers a [few commands](#what-it-does), and gives you the flexibility to select which ones to compile, which can make the executable smaller and provide extra security by not enabling commands that don't need to be run.
 
+The tool has two goals - provide just enough commands for what you need to do, and make it small.
+
 Last build size:
 
 * Do-nothing build:
-    * glibc: 819,656 bytes
-    * musl: 22,024 bytes
-    * dietlibc: 13,256 bytes
+  * glibc (Ubuntu): 819,656 bytes
+  * glibc (Arch): 778,280 bytes
+  * musl (Alpine): 21,944 bytes
+  * dietlibc (Alpine): 13,256 bytes
 * Minimal build:
-    * glibc: 819,656 bytes
-    * musl: 22,024 bytes
-    * dietlibc: 13,256 bytes
+  * glibc: 819,656 bytes
+  * glibc (Arch): 778,280 bytes
+  * musl: 21,944 bytes
+  * dietlibc: 13,256 bytes
+* Standard buld:
+  * glibc (Ubuntu): 831,944 bytes
+  * glibc (Arch): 782,376 bytes
+  * musl (Alpine): 26,048 bytes
+  * dietlibc (Alpine): 17,424 bytes
 * Full build:
-    * glibc: 901,048 bytes
-    * musl: 151,168 bytes
-    * dietlibc: 24,192 bytes
-
-*At some point, a decision should be made whether to keep these separate or just join them into a single executable.*
+  * glibc (Ubuntu): 831,944 bytes
+  * glibc (Arch): 782,376 bytes
+  * musl: 26,048 bytes
+  * dietlibc: 17,424 bytes
 
 *dietlibc [requires](https://www.fefe.de/dietlibc/FAQ.txt) that you either not distribute the compiled executable, or release the executable under GPL v2.*
+
+These file sizes are *statically compiled*, so they don't have any external dependencies other than the Linux OS.
 
 
 ## What It Does
@@ -45,7 +55,7 @@ The shell supports these commands:
 * [sleep](#sleep) - wait for a number of seconds.
 * [mknod](#mknod) - create a FIFO or UNIX socket node.
 * [mkdev](#mkdev) - create a device OS node.
-* [touch](#touch) - Update the access and modification times of each file to the current time, or, if a file does not exist, it is created empty.
+* [touch](#touch) - <strike>Update the access and modification times of each file to the current time, or,</strike> if a file does not exist, it is created empty.
 * [trunc](#trunc) - Sets the file length to 0, and if the file does not exist, creates it.
 * [dup-r, dup-w, dup-a](#dup) - duplicates a file to a file descriptor for the remaining commands in this execution.
 * [signal .. wait](#signal-wait) - wait for an OS signal before continuing.
@@ -54,8 +64,10 @@ The shell supports these commands:
 It also supports:
 * [Chaining commands](#command-chaining) together with `&&` and `;`.
 * [Standard script argument flag](#standard-script-flag) - if passed with the arguments `-c "commands"`, then the shell will parse the commands argument into individual commands.
-* [Script files](#script-files) - as an argument if used with `-f script-file-name`.  *Only available in input-enabled builds.*
-* [Commands from stdin](#passing-commands-from-stdin) - With the `-` argument, commands are parsed from stdin.  *Only available in input-enabled builds.*
+
+If the streaming input flag is enabled, then the tool also supports:
+* [Script files](#script-files) - as an argument if used with `-f script-file-name`.
+* [Commands from stdin](#passing-commands-from-stdin) - With the `-` argument, commands are parsed from stdin.  **Without the streaming input flag, the shell will not read from stdin.**
 
 This allows you to use it in Docker or Podman as a default shell, which is useful if you need file modifications to an image that has no shell.
 
@@ -100,6 +112,36 @@ The tool was built with Docker images that use minimal OS resources.  If somethi
 Additionally, you can build the tool with exactly the commands you need to run.  This limits the attack surface, making your install just that much safer.
 
 See [sample.Dockerfile](sample.Dockerfile) for an example of using it with Docker and a `FROM scratch`, to show that no OS setup is necessary to run the shell.
+
+
+## How Do I Get It?
+
+Because of the goals for the shell, no compiled version is distributed.  You're expected to build it from source yourself.
+
+You can build it directly and directly set the included commands:
+
+```bash
+make "COMMAND_FLAGS=-DUSE_CMD_CHMOD -DUSE_STREAMING_INPUT"
+```
+
+For each command, you use the flag `USE_CMD_(flag name)` (with a few odd ones).  The flag name is in all capital letters with an underscore (`_`) in place of a hyphen (`-`).  A complete list of flags is in the [`Makefile.command-flags`](Makefile.command-flags) file.
+
+The `-DUSE_STREAMING_INPUT=1` turns on the special streaming input mode, which allows for reading scripts from stdin or a file.
+
+You can use some built-in command flag groups:
+
+* `make INCLUDE_ALL_COMMANDS=1` - build with all supported commands.
+* `make INCLUDE_STANDARD_COMMANDS=1` - include some simple file operations, streaming input, sleep, and signal handling.
+* `make INCLUDE_MINIMAL_COMMANDS=1` - include symbolic links, mkdir, echo, chown, and chmod.
+
+The commands that cannot be directly controlled for inclusion are:
+
+* `version` - this is always included.
+* `fmode` - this is automatically included for `mkdir`, `touch`, `trunc`, and the `dup` commands.
+
+To run the build, you'll need basic C compiler, linker, and make.  If you have Python 3 installed, you can generate the command source files (they are bundled if you don't have it).
+
+The most common setup is to build it inside a Docker container for use in another container.  See [`Dockerfile`](Dockerfile) for how this is done.
 
 
 ## What Does It Mean?
@@ -230,15 +272,11 @@ The execution of this command requires running with root level privileges, or th
 
 ### touch
 
-*Only available in input-enabled builds.*
-
 Usage: `touch [file1 [file2 ...]]`
 
 For each argument, if it does not exist, it is created.  If the argument exists and is not a file, then the command fails.  **Warning:** Unlike the standard `touch` command, this will not update the modified time of the file.
 
 ### trunc
-
-*Only available in input-enabled builds.*
 
 Usage: `trunc [file1 [file2 ...]]`
 
@@ -246,10 +284,10 @@ For each argument, sets the file length to 0 if the file exists, otherwise creat
 
 ### dup-r, dup-w, dup-a
 
-*Only available in input-enabled builds.*
-
 Usage: `dup-w (fd) (file)`
+
 Usage: `dup-r (fd) (file)`
+
 Usage: `dup-a (fd) (file)`
 
 Opens the given file in either write + truncate mode (`dup-w`), write + append mode (`dup-a`), or read mode (`dup-r`), then duplicates that file descriptor to the "fd" argument.  This duplication remains in effect for the remainder of the execution, or until another `dup` command runs for the same file descriptor.
@@ -312,8 +350,6 @@ fs-shell -c "dup-w 1 contents.txt \
 
 ### signal-wait
 
-*Only available in signal-enabled builds.*
-
 Usage: `signal [signal1 [signal2]] [wait]`
 
 Waits for any of the OS signal number arguments before continuing.  If no signal is given (just `signal wait`), then it waits for a standard OS interruption, which will kill the whole process.
@@ -321,16 +357,14 @@ Waits for any of the OS signal number arguments before continuing.  If no signal
 Of note, once a signal is added to the list, it is registered for standard OS ignoring.  Only by adding the statement `wait` will the processing wait for the signal to be raised.  This can be used for interesting applications, such as:
 
 ```bash
-./fs-shell signal 2 \; signal 15 wait
+fs-shell -c "signal 2 ; signal 15 wait"
 ```
 
 This will cause the shell to ignore SIGINT (2, usually sent by a ctrl-c input), and wait for SIGTERM (15).
 
-*Note that `dietlibc` does not support this scenario, and will exit with an error if the to-be-ignored signals are received.*
+*Note that `dietlibc` does not support ignoring signals not waited on, and will exit with an error if the to-be-ignored signals are received.*
 
 ### exec
-
-*Only available in exec-enabled builds.*
 
 Usage: `exec (cmd) [arg1 [arg2 ...]]`
 
@@ -340,7 +374,7 @@ Commands must be given in the full path; it doesn't look at any environment vari
 
 ### Chaining Commands
 
-Like most shells, you can chain commands together with `&&` and `;`.  `&&` stops the execution if the previous command failed and allows anothe command after it; and `;` resets the error count to 0 and allows another command to follow it.
+Like most shells, you can chain commands together with `&&` and `;`.  `&&` stops the execution if the previous command failed and allows another command after it; and `;` resets the error count to 0 and allows another command to follow it.
 
 ```bash
 $ ls
