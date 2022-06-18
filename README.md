@@ -429,14 +429,9 @@ In this mode, the newline character acts like joining the two lines with a [`;`]
 If you use the input-enabled build, then you can pass the argument `-` to have the tool read commands from stdin.
 
 
-## Building
-
-You can build the shell either by installing the autoconf tools locally and running `make`, or you can build it through a container technology by using the example `build-*.Dockerfile` files.
-
-The make generates a collection of different forms of the shell, depending on your needs.  They have different file sizes.
-
-
 ## Developing
+
+A guide to the special format for command code is in the [source tree](src/README.md).
 
 To compile the shell, you will need a C compiler that includes a version of the standard C libraries.
 
@@ -446,12 +441,18 @@ To test, run:
 chmod +x tests/*.sh && docker build -f build-(libname).Dockerfile .
 ```
 
-To build through Docker and capture the built executable:
+You can build directly, but some of the tests require root privileges, which are safer to run from within a container.
+
+To build through Docker and capture the built executables:
 
 ```bash
+mkdir -p out
 for libname in glibc musl ; do
-    docker build -t local/fs-shell-${libname} -f build-${libname}.Dockerfile . || exit 1
-    ./extract-executables.sh local/fs-shell-${libname} -o out -s .${libname} -d || exit 1
+    docker build -t local/fs-shell-${libname} -f build-${libname}.Dockerfile .
+    container=$( docker create local/fs-shell-${libname} )
+    docker cp "${container}:/opt/code/out/fs-shell" out/fs-shell.${libname}
+    docker cp "${container}:/opt/code/out/fs-shell-debug" out/fs-shell-debug.${libname}
+    docker rm "${container}"
 done
 ```
 

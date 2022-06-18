@@ -1,4 +1,18 @@
 
+## v2.0.1
+
+* Fixed an issue with many commands reporting ok status when required arguments are not given.  This increases the file size slightly for the minimal commands, though.  This introduces a new element to the command coding.
+* Added a `.dockerignore` file to tighten up the docker file sizes.
+* Updated documentation to better match the current version.
+* Late update to the changes file to include v2.0.0.
+
+
+## v2.0.0
+
+* Added `fmode` to set a common value to set the file mode used by mkdir, touch, trunc, the dup commands, and some others.  This introduced a backwards-incompatible difference with mkdir, thus making the version jump.
+* Changed how the commands are written, based upon a thorough examination on how different coding styles impact the final file size (see [size-experiments.md](size-experiments.md)).
+
+
 ## v1.2.0
 
 * Added new commands:
