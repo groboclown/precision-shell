@@ -56,6 +56,7 @@ extern const char cmd_name_rm[];
             LOGLN(global_arg); \
             global_err = unlink(global_arg); \
         break;
+#define REQUIRES_ADDL_ARG__RM
 
 #else /* USE_CMD_RM */
 
@@ -65,6 +66,7 @@ extern const char cmd_name_rm[];
 #define INITIALIZE__RM
 #define STARTUP_CASE__RM
 #define RUN_CASE__RM
+#define REQUIRES_ADDL_ARG__RM
 #endif /* USE_CMD_RM */
 
 #endif /* _FS_SHELL__CMD_RM_ */

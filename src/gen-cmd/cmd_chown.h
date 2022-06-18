@@ -44,7 +44,7 @@ extern const char cmd_name_chown_owner[];
             /* from cmd_chown.h.in:31 */ \
             COMMAND_INDEX__CHOWN_OWNER,
 #define VIRTUAL_ENUM_LIST__CHOWN \
-            /* from cmd_chown.h.in:48 */ \
+            /* from cmd_chown.h.in:50 */ \
             COMMAND_INDEX__CHOWN_RUN,
 #define GLOBAL_VARDEF__CHOWN \
             /* from cmd_chown.h.in:31 */ \
@@ -56,7 +56,7 @@ extern const char cmd_name_chown_owner[];
 #define RUN_CASE__CHOWN \
     case COMMAND_INDEX__CHOWN_OWNER: \
         /* from cmd_chown.h.in:31 */ \
-            /* from cmd_chown.h.in:32 */ \
+            /* from cmd_chown.h.in:34 */ \
         LOG(":: chown owner id "); \
         LOGLN(global_arg); \
         /* parse this argument into arg1.*/ \
@@ -72,12 +72,14 @@ extern const char cmd_name_chown_owner[];
         } \
         break; \
     case COMMAND_INDEX__CHOWN_RUN: \
-        /* from cmd_chown.h.in:48 */ \
-            /* from cmd_chown.h.in:49 */ \
+        /* from cmd_chown.h.in:50 */ \
+            /* from cmd_chown.h.in:51 */ \
         LOG(":: chown on "); \
         LOGLN(global_arg); \
         global_err = chown(global_arg, global_arg1_i, global_arg2_i); \
         break;
+#define REQUIRES_ADDL_ARG__CHOWN \
+            case COMMAND_INDEX__CHOWN_OWNER:
 
 #else /* USE_CMD_CHOWN */
 
@@ -87,6 +89,7 @@ extern const char cmd_name_chown_owner[];
 #define INITIALIZE__CHOWN
 #define STARTUP_CASE__CHOWN
 #define RUN_CASE__CHOWN
+#define REQUIRES_ADDL_ARG__CHOWN
 #endif /* USE_CMD_CHOWN */
 
 #endif /* _FS_SHELL__CMD_CHOWN_ */

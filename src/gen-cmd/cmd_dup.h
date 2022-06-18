@@ -55,6 +55,7 @@ extern const char cmd_name_dup_a__setup[];
             global_arg3_i = COMMAND_INDEX__DUP__TGT; \
         break;
 #define RUN_CASE__DUP_A
+#define REQUIRES_ADDL_ARG__DUP_A
 
 #else /* USE_CMD_DUP_A */
 
@@ -64,6 +65,7 @@ extern const char cmd_name_dup_a__setup[];
 #define INITIALIZE__DUP_A
 #define STARTUP_CASE__DUP_A
 #define RUN_CASE__DUP_A
+#define REQUIRES_ADDL_ARG__DUP_A
 #endif /* USE_CMD_DUP_A */
 
 
@@ -96,6 +98,7 @@ extern const char cmd_name_dup_w__setup[];
             global_arg3_i = COMMAND_INDEX__DUP__TGT; \
         break;
 #define RUN_CASE__DUP_W
+#define REQUIRES_ADDL_ARG__DUP_W
 
 #else /* USE_CMD_DUP_W */
 
@@ -105,6 +108,7 @@ extern const char cmd_name_dup_w__setup[];
 #define INITIALIZE__DUP_W
 #define STARTUP_CASE__DUP_W
 #define RUN_CASE__DUP_W
+#define REQUIRES_ADDL_ARG__DUP_W
 #endif /* USE_CMD_DUP_W */
 
 
@@ -137,6 +141,7 @@ extern const char cmd_name_dup_r__setup[];
             global_arg3_i = COMMAND_INDEX__DUP__TGT; \
         break;
 #define RUN_CASE__DUP_R
+#define REQUIRES_ADDL_ARG__DUP_R
 
 #else /* USE_CMD_DUP_R */
 
@@ -146,6 +151,7 @@ extern const char cmd_name_dup_r__setup[];
 #define INITIALIZE__DUP_R
 #define STARTUP_CASE__DUP_R
 #define RUN_CASE__DUP_R
+#define REQUIRES_ADDL_ARG__DUP_R
 #endif /* USE_CMD_DUP_R */
 
 
@@ -220,6 +226,10 @@ extern const char cmd_name_dup_r__setup[];
                 } \
             } \
         break;
+#define REQUIRES_ADDL_ARG__DUP \
+            REQUIRES_ADDL_ARG__DUP_A \
+            REQUIRES_ADDL_ARG__DUP_W \
+            REQUIRES_ADDL_ARG__DUP_R
 
 #else /* defined(USE_CMD_DUP_A) || defined(USE_CMD_DUP_W) || defined(USE_CMD_DUP_R) */
 
@@ -229,6 +239,7 @@ extern const char cmd_name_dup_r__setup[];
 #define INITIALIZE__DUP
 #define STARTUP_CASE__DUP
 #define RUN_CASE__DUP
+#define REQUIRES_ADDL_ARG__DUP
 #endif /* defined(USE_CMD_DUP_A) || defined(USE_CMD_DUP_W) || defined(USE_CMD_DUP_R) */
 
 #endif /* _FS_SHELL__CMD_DUP_ */

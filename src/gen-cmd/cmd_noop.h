@@ -53,6 +53,7 @@ extern const char cmd_name_noop[];
             LOG(":: ignore"); \
             LOGLN(global_arg); \
         break;
+#define REQUIRES_ADDL_ARG__NOOP
 
 #else /* USE_CMD_NOOP */
 
@@ -62,6 +63,7 @@ extern const char cmd_name_noop[];
 #define INITIALIZE__NOOP
 #define STARTUP_CASE__NOOP
 #define RUN_CASE__NOOP
+#define REQUIRES_ADDL_ARG__NOOP
 #endif /* USE_CMD_NOOP */
 
 #endif /* _FS_SHELL__CMD_NOOP_ */

@@ -51,6 +51,8 @@ AsOptional(command="mkdev",
     )
 
     WithVirtualStep(enum="MKDEV__DEVICE",
+        RequiresAnotherArg()
+
         OnArg(
             // Just read in the major version into arg2.
             // This arg is the minor version.
@@ -79,6 +81,8 @@ WithAuxFor(commands=[mknod, mkdev],
 #include <sys/stat.h>
 
     WithVirtualStep(enum="MKNOD_DEV__TYPE",
+        RequiresAnotherArg()
+
         OnArg(
             LOG(":: create node with device type ");
             LOGLN(global_arg);

@@ -55,6 +55,7 @@ extern const char cmd_name_mknod_start[];
             global_arg1_i = 0; \
         break;
 #define RUN_CASE__MKNOD
+#define REQUIRES_ADDL_ARG__MKNOD
 
 #else /* USE_CMD_MKNOD */
 
@@ -64,6 +65,7 @@ extern const char cmd_name_mknod_start[];
 #define INITIALIZE__MKNOD
 #define STARTUP_CASE__MKNOD
 #define RUN_CASE__MKNOD
+#define REQUIRES_ADDL_ARG__MKNOD
 #endif /* USE_CMD_MKNOD */
 
 
@@ -102,7 +104,7 @@ extern const char cmd_name_mkdev_start[];
 #define RUN_CASE__MKDEV \
     case COMMAND_INDEX__MKDEV__DEVICE: \
         /* from cmd_mknod_mkdev.h.in:53 */ \
-            /* from cmd_mknod_mkdev.h.in:54 */ \
+            /* from cmd_mknod_mkdev.h.in:56 */ \
             /* Just read in the major version into arg2.*/ \
             /* This arg is the minor version.*/ \
             LOG(":: mkdev minor device "); \
@@ -120,6 +122,8 @@ extern const char cmd_name_mkdev_start[];
                 } \
             } \
         break;
+#define REQUIRES_ADDL_ARG__MKDEV \
+            case COMMAND_INDEX__MKDEV__DEVICE:
 
 #else /* USE_CMD_MKDEV */
 
@@ -129,6 +133,7 @@ extern const char cmd_name_mkdev_start[];
 #define INITIALIZE__MKDEV
 #define STARTUP_CASE__MKDEV
 #define RUN_CASE__MKDEV
+#define REQUIRES_ADDL_ARG__MKDEV
 #endif /* USE_CMD_MKDEV */
 
 
@@ -147,9 +152,9 @@ extern const char cmd_name_mkdev_start[];
 #define VIRTUAL_ENUM_LIST__MKNOD_MKDEV \
             VIRTUAL_ENUM_LIST__MKNOD \
             VIRTUAL_ENUM_LIST__MKDEV \
-            /* from cmd_mknod_mkdev.h.in:81 */ \
+            /* from cmd_mknod_mkdev.h.in:83 */ \
             COMMAND_INDEX__MKNOD_DEV__TYPE, \
-            /* from cmd_mknod_mkdev.h.in:105 */ \
+            /* from cmd_mknod_mkdev.h.in:109 */ \
             COMMAND_INDEX__MKNOD_DEV__RUN,
 #define GLOBAL_VARDEF__MKNOD_MKDEV \
             GLOBAL_VARDEF__MKNOD \
@@ -164,8 +169,8 @@ extern const char cmd_name_mkdev_start[];
             RUN_CASE__MKNOD \
             RUN_CASE__MKDEV \
     case COMMAND_INDEX__MKNOD_DEV__TYPE: \
-        /* from cmd_mknod_mkdev.h.in:81 */ \
-            /* from cmd_mknod_mkdev.h.in:82 */ \
+        /* from cmd_mknod_mkdev.h.in:83 */ \
+            /* from cmd_mknod_mkdev.h.in:86 */ \
             LOG(":: create node with device type "); \
             LOGLN(global_arg); \
             global_cmd = COMMAND_INDEX__MKNOD_DEV__RUN; \
@@ -186,8 +191,8 @@ extern const char cmd_name_mkdev_start[];
             } \
         break; \
     case COMMAND_INDEX__MKNOD_DEV__RUN: \
-        /* from cmd_mknod_mkdev.h.in:105 */ \
-            /* from cmd_mknod_mkdev.h.in:106 */ \
+        /* from cmd_mknod_mkdev.h.in:109 */ \
+            /* from cmd_mknod_mkdev.h.in:110 */ \
             LOG(":: mknod/dev "); \
             LOGLN(global_arg); \
             /* target file, mode, device*/ \
@@ -198,6 +203,10 @@ extern const char cmd_name_mkdev_start[];
             /* create as many as the user wants.  It actually makes the code smaller*/ \
             /* while giving more behavior.*/ \
         break;
+#define REQUIRES_ADDL_ARG__MKNOD_MKDEV \
+            REQUIRES_ADDL_ARG__MKNOD \
+            REQUIRES_ADDL_ARG__MKDEV \
+            case COMMAND_INDEX__MKNOD_DEV__TYPE:
 
 #else /* defined(USE_CMD_MKNOD) || defined(USE_CMD_MKDEV) */
 
@@ -207,6 +216,7 @@ extern const char cmd_name_mkdev_start[];
 #define INITIALIZE__MKNOD_MKDEV
 #define STARTUP_CASE__MKNOD_MKDEV
 #define RUN_CASE__MKNOD_MKDEV
+#define REQUIRES_ADDL_ARG__MKNOD_MKDEV
 #endif /* defined(USE_CMD_MKNOD) || defined(USE_CMD_MKDEV) */
 
 

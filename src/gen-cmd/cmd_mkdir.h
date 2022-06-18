@@ -61,6 +61,7 @@ extern const char cmd_name_mkdir[];
         global_arg1_i = global_fmode | S_IXUSR | S_IXGRP | S_IXOTH; \
         global_err = mkdir(global_arg, global_arg1_i); \
         break;
+#define REQUIRES_ADDL_ARG__MKDIR
 
 #else /* USE_CMD_MKDIR */
 
@@ -70,6 +71,7 @@ extern const char cmd_name_mkdir[];
 #define INITIALIZE__MKDIR
 #define STARTUP_CASE__MKDIR
 #define RUN_CASE__MKDIR
+#define REQUIRES_ADDL_ARG__MKDIR
 #endif /* USE_CMD_MKDIR */
 
 #endif /* _FS_SHELL__CMD_MKDIR_ */

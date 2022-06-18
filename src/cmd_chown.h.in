@@ -29,6 +29,8 @@ AsOptional(command="chown",
 #include "helpers.h"
 
 WithNamedStep(enum="CHOWN_OWNER", name="chown",
+    RequiresAnotherArg()
+
     OnArg(
         LOG(":: chown owner id ");
         LOGLN(global_arg);

@@ -93,5 +93,6 @@ extern const char cmd_name_find_cmd[];
         /* printf(":: final global_cmd %d\n", global_cmd);*/ \
         break; \
         break;
+#define REQUIRES_ADDL_ARG__FIND_CMD
 
 #endif /* _FS_SHELL__CMD_FIND_CMD_ */

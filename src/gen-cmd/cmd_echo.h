@@ -58,6 +58,7 @@ extern const char cmd_name_echo[];
         LOG(":: echo\n"); \
         stdoutPLn(global_arg); \
         break;
+#define REQUIRES_ADDL_ARG__ECHO
 
 #else /* USE_CMD_ECHO */
 
@@ -67,6 +68,7 @@ extern const char cmd_name_echo[];
 #define INITIALIZE__ECHO
 #define STARTUP_CASE__ECHO
 #define RUN_CASE__ECHO
+#define REQUIRES_ADDL_ARG__ECHO
 #endif /* USE_CMD_ECHO */
 
 #endif /* _FS_SHELL__CMD_ECHO_ */

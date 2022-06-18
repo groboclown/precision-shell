@@ -190,6 +190,7 @@ class CmdStep(FilePart):
         self.inits: List[MacroSection] = []
         self.args: List[MacroSection] = []
         self.cmds: List[MacroSection] = []
+        self.requires_another_arg = False
         self.raw: List[RawText] = []
     
     def add_child(self, child: FilePart) -> None:
@@ -204,6 +205,8 @@ class CmdStep(FilePart):
                 self.args.append(child)
             elif child.name == 'OnCmd':
                 self.cmds.append(child)
+            elif child.name == 'RequiresAnotherArg':
+                self.requires_another_arg = True
             else:
                 raise ValueError(f"{child.cxt} :: cannot add `{child.name}` inside a command step ({self.cxt})")
         else:
@@ -308,7 +311,13 @@ class StepCollection(FilePart):
                 ret += f' \\\n{mcr.generate()}'
             if step.args:
                 ret += f' \\\n        break;'
-        ret += '\n'
+        ret += f'\n#define REQUIRES_ADDL_ARG__{self.command_name}'
+        for ref in self.references:
+            ret += f' \\\n            REQUIRES_ADDL_ARG__{ref}'
+        for step in self.steps:
+            if step.requires_another_arg:
+                ret += f' \\\n            case COMMAND_INDEX__{step.enum_name}:'
+        ret += "\n"
         return ret
 
 
@@ -599,8 +608,14 @@ class ParseEntry:
             self, cxt: ParseContext,
             name: str, args: Dict[str, str],
     ) -> None:
-        # right now, there are no single line entries.
-        self.container.add_raw_text(cxt)
+        cct = cxt.copy()
+        cct.context.update(self.container.cxt.context)
+        cct.context.update(args)
+        if name == 'RequiresAnotherArg':
+            child = MacroSection(cct, name)
+            self.container.add_child(child)
+        else:
+            self.container.add_raw_text(cxt)
 
 
 # Arguments can be in the form:
@@ -620,7 +635,7 @@ class ParseEntry:
 _INNER_NAMED_ARG = r'\w+\s*=\s*(?:(?:"[^"]*")|(?:\[\s*(?:[\w|-]+(?:\s*,\s*[\w|-]+)*)?\s*\]))'
 
 OPEN_EXPR_LINE_RE = re.compile(r'^\s*(\w+)\s*\(((?:\s*' + _INNER_NAMED_ARG + r'\s*,)*)\s*$')
-COMPLETE_EXPR_LINE_RE = re.compile(r'^\s*(\w+)\s*\(((?:\s*' + _INNER_NAMED_ARG + '\s*(?:,\s*' + _INNER_NAMED_ARG + '))?)\)\s*$')
+COMPLETE_EXPR_LINE_RE = re.compile(r'^\s*(\w+)\s*\(((?:\s*' + _INNER_NAMED_ARG + r'(?:\s*,\s*' + _INNER_NAMED_ARG + r')*)?\s*)\)\s*$')
 CLOSE_EXPR_LINE_RE = re.compile(r'^\s*\)\s*$')
 ARG_EXPR_RE = re.compile(f'({_INNER_NAMED_ARG})')
 ARG_STR_PAIR_RE = re.compile(r'^\s*(\w+)\s*=\s*"([^"]*)"\s*$')
@@ -758,6 +773,10 @@ SOFTWARE.
     out_text += "\n#define CMD_RUN_CASE"
     for name in enum_names:
         out_text += f" \\\n            RUN_CASE__{name}"
+    
+    out_text += "\n#define CMD_REQUIRES_ADDL_ARG"
+    for name in enum_names:
+        out_text += f" \\\n            REQUIRES_ADDL_ARG__{name}"
 
     out_text += """
 

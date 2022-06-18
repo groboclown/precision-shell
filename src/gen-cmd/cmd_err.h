@@ -49,5 +49,6 @@ SOFTWARE. */
         LOGLN(global_arg); \
         global_err = 1; \
         break;
+#define REQUIRES_ADDL_ARG__ERR
 
 #endif /* _FS_SHELL__CMD_ERR_ */

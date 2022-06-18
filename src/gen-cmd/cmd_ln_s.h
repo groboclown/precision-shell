@@ -64,9 +64,10 @@ extern const char cmd_name_ln_s[];
         LOG(" to "); \
         LOGLN(global_arg); \
         global_err = symlink(global_arg_cached, global_arg); \
-        /* No more arguments allowed.*/ \
-        global_cmd = COMMAND_INDEX__ERR; \
+        /* Chould stop here, but this allows a long list of linking of the*/ \
+        /*   same source to other places.*/ \
         break;
+#define REQUIRES_ADDL_ARG__LN_S
 
 #else /* USE_CMD_LN_S */
 
@@ -76,6 +77,7 @@ extern const char cmd_name_ln_s[];
 #define INITIALIZE__LN_S
 #define STARTUP_CASE__LN_S
 #define RUN_CASE__LN_S
+#define REQUIRES_ADDL_ARG__LN_S
 #endif /* USE_CMD_LN_S */
 
 #endif /* _FS_SHELL__CMD_LN_S_ */

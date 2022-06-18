@@ -107,6 +107,7 @@ void signal_empty_handler(int signal) { \
             sigaddset(&global_signal_set, global_arg1_i); \
             signal(global_arg1_i, &signal_empty_handler); \
         break;
+#define REQUIRES_ADDL_ARG__SIGNAL
 
 #else /* USE_CMD_SIGNAL */
 
@@ -116,6 +117,7 @@ void signal_empty_handler(int signal) { \
 #define INITIALIZE__SIGNAL
 #define STARTUP_CASE__SIGNAL
 #define RUN_CASE__SIGNAL
+#define REQUIRES_ADDL_ARG__SIGNAL
 #endif /* USE_CMD_SIGNAL */
 
 #endif /* _FS_SHELL__CMD_SIGNAL_ */

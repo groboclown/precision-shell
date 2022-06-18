@@ -34,6 +34,21 @@ SOFTWARE.
 
 CMD_GLOBAL_VARDEF
 
+int _on_cmd_end(const char *name, int cmd_idx) {
+    switch (cmd_idx) {
+        // The last index, which shouldn't ever be used,
+        //   is included here to make the case not fail in
+        //   the event that the compilation has no items.
+        CMD_REQUIRES_ADDL_ARG
+        case COMMAND_INDEX__LAST_VIRTUAL_CMD:
+            stdoutP("ERROR ");
+            stdoutP(name);
+            stdoutP(": requires another argument.\n");
+            return 1;
+    }
+    return 0;
+}
+
 // command_runner runs the commands over the parsed arguments.
 //   returns the error code.
 int command_runner() {
@@ -56,10 +71,7 @@ int command_runner() {
     while (1 == 1) {
         global_arg = args_advance_token();
         if (global_arg == NULL) {
-            // TODO could add another case here for the current command.
-            // This would allow us to check for commands that require
-            // an extra argument, and, if not present, geenrate an error.
-
+            _err_count += _on_cmd_end(global_cmd_name, global_cmd);
             break;
         }
         // This is a long if/else block until error checking.
@@ -69,6 +81,7 @@ int command_runner() {
         //   This allows recognizing "; ;" as okay.
 
         if (strequal("&&", global_arg)) {
+            _err_count += _on_cmd_end(global_cmd_name, global_cmd);
             if (_err_count > 0) {
                 // && with errors stops the shell.
                 stderrP("FAIL &&\n");
@@ -79,6 +92,7 @@ int command_runner() {
         } else
 
         if (strequal(";", global_arg)) {
+            _err_count += _on_cmd_end(global_cmd_name, global_cmd);
             // ";" ignores any errors, resetting the error count.
             LOG(":: ;\n");
             _err_count = 0;

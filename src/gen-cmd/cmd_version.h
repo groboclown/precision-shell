@@ -66,5 +66,6 @@ extern const char cmd_name_version[];
             global_cmd = COMMAND_INDEX__ERR; \
         break;
 #define RUN_CASE__VERSION
+#define REQUIRES_ADDL_ARG__VERSION
 
 #endif /* _FS_SHELL__CMD_VERSION_ */

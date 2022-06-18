@@ -38,8 +38,9 @@ WithNamedStep(enum="LN_S", name="ln-s",
         LOG(" to ");
         LOGLN(global_arg);
         global_err = symlink(global_arg_cached, global_arg);
-        // No more arguments allowed.
-        global_cmd = COMMAND_INDEX__ERR;
+        
+        // Chould stop here, but this allows a long list of linking of the
+        //   same source to other places.
     )
 )
 

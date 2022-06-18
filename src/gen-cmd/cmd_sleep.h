@@ -59,6 +59,7 @@ extern const char cmd_name_sleep[];
                 sleep(global_arg1_i); \
             } \
         break;
+#define REQUIRES_ADDL_ARG__SLEEP
 
 #else /* USE_CMD_SLEEP */
 
@@ -68,6 +69,7 @@ extern const char cmd_name_sleep[];
 #define INITIALIZE__SLEEP
 #define STARTUP_CASE__SLEEP
 #define RUN_CASE__SLEEP
+#define REQUIRES_ADDL_ARG__SLEEP
 #endif /* USE_CMD_SLEEP */
 
 #endif /* _FS_SHELL__CMD_SLEEP_ */

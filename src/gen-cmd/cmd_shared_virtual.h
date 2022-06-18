@@ -52,12 +52,14 @@ SOFTWARE. */
 #define RUN_CASE__SHARED_STR \
     case COMMAND_INDEX__SHARED_STR: \
         /* from cmd_shared_virtual.h.in:35 */ \
-            /* from cmd_shared_virtual.h.in:36 */ \
+            /* from cmd_shared_virtual.h.in:37 */ \
             LOG(":: storing "); \
             LOGLN(global_arg); \
             global_arg_cached = global_arg; \
             global_cmd = global_arg3_i; \
         break;
+#define REQUIRES_ADDL_ARG__SHARED_STR \
+            case COMMAND_INDEX__SHARED_STR:
 
 #else /* USES_SHARED_STR */
 
@@ -67,6 +69,7 @@ SOFTWARE. */
 #define INITIALIZE__SHARED_STR
 #define STARTUP_CASE__SHARED_STR
 #define RUN_CASE__SHARED_STR
+#define REQUIRES_ADDL_ARG__SHARED_STR
 #endif /* USES_SHARED_STR */
 
 
@@ -79,15 +82,15 @@ SOFTWARE. */
 
 #define ENUM_LIST__SHARED_INT
 #define VIRTUAL_ENUM_LIST__SHARED_INT \
-            /* from cmd_shared_virtual.h.in:49 */ \
+            /* from cmd_shared_virtual.h.in:50 */ \
             COMMAND_INDEX__SHARED_INT2,
 #define GLOBAL_VARDEF__SHARED_INT
 #define INITIALIZE__SHARED_INT
 #define STARTUP_CASE__SHARED_INT
 #define RUN_CASE__SHARED_INT \
     case COMMAND_INDEX__SHARED_INT2: \
-        /* from cmd_shared_virtual.h.in:49 */ \
-            /* from cmd_shared_virtual.h.in:50 */ \
+        /* from cmd_shared_virtual.h.in:50 */ \
+            /* from cmd_shared_virtual.h.in:52 */ \
             LOG(":: storing int "); \
             LOGLN(global_arg); \
             tmp_val = helper_arg_to_uint(global_arg, 10, 0xffff); \
@@ -99,6 +102,8 @@ SOFTWARE. */
             global_arg2_i = tmp_val; \
             global_cmd = global_arg3_i; \
         break;
+#define REQUIRES_ADDL_ARG__SHARED_INT \
+            case COMMAND_INDEX__SHARED_INT2:
 
 #else /* USES_SHARED_INT */
 
@@ -108,6 +113,7 @@ SOFTWARE. */
 #define INITIALIZE__SHARED_INT
 #define STARTUP_CASE__SHARED_INT
 #define RUN_CASE__SHARED_INT
+#define REQUIRES_ADDL_ARG__SHARED_INT
 #endif /* USES_SHARED_INT */
 
 
@@ -133,6 +139,9 @@ SOFTWARE. */
 #define RUN_CASE__SHARED_VIRTUAL \
             RUN_CASE__SHARED_STR \
             RUN_CASE__SHARED_INT
+#define REQUIRES_ADDL_ARG__SHARED_VIRTUAL \
+            REQUIRES_ADDL_ARG__SHARED_STR \
+            REQUIRES_ADDL_ARG__SHARED_INT
 
 #else /* defined(USES_SHARED_STR) || defined(USES_SHARED_INT) */
 
@@ -142,6 +151,7 @@ SOFTWARE. */
 #define INITIALIZE__SHARED_VIRTUAL
 #define STARTUP_CASE__SHARED_VIRTUAL
 #define RUN_CASE__SHARED_VIRTUAL
+#define REQUIRES_ADDL_ARG__SHARED_VIRTUAL
 #endif /* defined(USES_SHARED_STR) || defined(USES_SHARED_INT) */
 
 

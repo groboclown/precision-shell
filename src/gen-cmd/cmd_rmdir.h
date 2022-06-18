@@ -56,6 +56,7 @@ extern const char cmd_name_rmdir[];
             LOGLN(global_arg); \
             global_err = rmdir(global_arg); \
         break;
+#define REQUIRES_ADDL_ARG__RMDIR
 
 #else /* USE_CMD_RMDIR */
 
@@ -65,6 +66,7 @@ extern const char cmd_name_rmdir[];
 #define INITIALIZE__RMDIR
 #define STARTUP_CASE__RMDIR
 #define RUN_CASE__RMDIR
+#define REQUIRES_ADDL_ARG__RMDIR
 #endif /* USE_CMD_RMDIR */
 
 #endif /* _FS_SHELL__CMD_RMDIR_ */

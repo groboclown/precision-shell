@@ -146,6 +146,7 @@ extern const char cmd_name_exec[];
         /* The trailing break could be eliminated here, because it won't ever be called.*/ \
         break;
 #define RUN_CASE__EXEC
+#define REQUIRES_ADDL_ARG__EXEC
 
 #else /* USE_CMD_EXEC */
 
@@ -155,6 +156,7 @@ extern const char cmd_name_exec[];
 #define INITIALIZE__EXEC
 #define STARTUP_CASE__EXEC
 #define RUN_CASE__EXEC
+#define REQUIRES_ADDL_ARG__EXEC
 #endif /* USE_CMD_EXEC */
 
 #endif /* _FS_SHELL__CMD_EXEC_ */

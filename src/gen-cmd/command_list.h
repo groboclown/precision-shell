@@ -138,6 +138,28 @@ SOFTWARE.
             RUN_CASE__TOUCH_TRUNC \
             RUN_CASE__VERSION \
             RUN_CASE__ERR
+#define CMD_REQUIRES_ADDL_ARG \
+            REQUIRES_ADDL_ARG__FIND_CMD \
+            REQUIRES_ADDL_ARG__CHMOD \
+            REQUIRES_ADDL_ARG__CHOWN \
+            REQUIRES_ADDL_ARG__DUP \
+            REQUIRES_ADDL_ARG__ECHO \
+            REQUIRES_ADDL_ARG__EXEC \
+            REQUIRES_ADDL_ARG__FMODE \
+            REQUIRES_ADDL_ARG__LN_H \
+            REQUIRES_ADDL_ARG__LN_S \
+            REQUIRES_ADDL_ARG__MKDIR \
+            REQUIRES_ADDL_ARG__MKNOD_MKDEV \
+            REQUIRES_ADDL_ARG__MV \
+            REQUIRES_ADDL_ARG__NOOP \
+            REQUIRES_ADDL_ARG__RM \
+            REQUIRES_ADDL_ARG__RMDIR \
+            REQUIRES_ADDL_ARG__SHARED_VIRTUAL \
+            REQUIRES_ADDL_ARG__SIGNAL \
+            REQUIRES_ADDL_ARG__SLEEP \
+            REQUIRES_ADDL_ARG__TOUCH_TRUNC \
+            REQUIRES_ADDL_ARG__VERSION \
+            REQUIRES_ADDL_ARG__ERR
 
 // All the commands, by index.
 enum CommandIndex {

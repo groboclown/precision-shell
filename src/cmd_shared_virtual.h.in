@@ -33,6 +33,7 @@ AsOptionalUnion(file="shared-virtual",
 WithOptional(command="shared_str", ifdef="USES_SHARED_STR",
 
     WithVirtualStep(enum="SHARED_STR",
+        RequiresAnotherArg()
         OnArg(
             LOG(":: storing ");
             LOGLN(global_arg);
@@ -47,6 +48,7 @@ WithOptional(command="shared_str", ifdef="USES_SHARED_STR",
 WithOptional(command="shared_int", ifdef="USES_SHARED_INT",
 
     WithVirtualStep(enum="SHARED_INT2",
+        RequiresAnotherArg()
         OnArg(
             LOG(":: storing int ");
             LOGLN(global_arg);

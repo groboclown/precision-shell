@@ -53,6 +53,7 @@ extern const char cmd_name_touch[];
             global_cmd = COMMAND_INDEX__TRUNC_TOUCH__RUN; \
         break;
 #define RUN_CASE__TOUCH
+#define REQUIRES_ADDL_ARG__TOUCH
 
 #else /* USE_CMD_TOUCH */
 
@@ -62,6 +63,7 @@ extern const char cmd_name_touch[];
 #define INITIALIZE__TOUCH
 #define STARTUP_CASE__TOUCH
 #define RUN_CASE__TOUCH
+#define REQUIRES_ADDL_ARG__TOUCH
 #endif /* USE_CMD_TOUCH */
 
 // Optional command trunc
@@ -89,6 +91,7 @@ extern const char cmd_name_trunc[];
             global_cmd = COMMAND_INDEX__TRUNC_TOUCH__RUN; \
         break;
 #define RUN_CASE__TRUNC
+#define REQUIRES_ADDL_ARG__TRUNC
 
 #else /* USE_CMD_TRUNC */
 
@@ -98,6 +101,7 @@ extern const char cmd_name_trunc[];
 #define INITIALIZE__TRUNC
 #define STARTUP_CASE__TRUNC
 #define RUN_CASE__TRUNC
+#define REQUIRES_ADDL_ARG__TRUNC
 #endif /* USE_CMD_TRUNC */
 
 #if defined(USE_CMD_TOUCH) || defined(USE_CMD_TRUNC)
@@ -141,6 +145,9 @@ extern const char cmd_name_trunc[];
                 global_err = close(global_arg2_i); \
             } \
         break;
+#define REQUIRES_ADDL_ARG__TOUCH_TRUNC \
+            REQUIRES_ADDL_ARG__TOUCH \
+            REQUIRES_ADDL_ARG__TRUNC
 
 #else /* defined(USE_CMD_TOUCH) || defined(USE_CMD_TRUNC) */
 
@@ -150,6 +157,7 @@ extern const char cmd_name_trunc[];
 #define INITIALIZE__TOUCH_TRUNC
 #define STARTUP_CASE__TOUCH_TRUNC
 #define RUN_CASE__TOUCH_TRUNC
+#define REQUIRES_ADDL_ARG__TOUCH_TRUNC
 #endif /* defined(USE_CMD_TOUCH) || defined(USE_CMD_TRUNC) */
 
 

@@ -67,6 +67,7 @@ extern const char cmd_name_fmode[];
         /* No other args will be processed.*/ \
         global_cmd = COMMAND_INDEX__ERR; \
         break;
+#define REQUIRES_ADDL_ARG__FMODE
 
 #else /* USES_FMODE */
 
@@ -76,6 +77,7 @@ extern const char cmd_name_fmode[];
 #define INITIALIZE__FMODE
 #define STARTUP_CASE__FMODE
 #define RUN_CASE__FMODE
+#define REQUIRES_ADDL_ARG__FMODE
 #endif /* USES_FMODE */
 
 #endif /* _FS_SHELL__CMD_FMODE_ */

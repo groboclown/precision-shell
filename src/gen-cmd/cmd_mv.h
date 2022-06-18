@@ -67,6 +67,7 @@ extern const char cmd_name_mv[];
         /* No more arguments allowed.*/ \
         global_cmd = COMMAND_INDEX__ERR; \
         break;
+#define REQUIRES_ADDL_ARG__MV
 
 #else /* USE_CMD_MV */
 
@@ -76,6 +77,7 @@ extern const char cmd_name_mv[];
 #define INITIALIZE__MV
 #define STARTUP_CASE__MV
 #define RUN_CASE__MV
+#define REQUIRES_ADDL_ARG__MV
 #endif /* USE_CMD_MV */
 
 #endif /* _FS_SHELL__CMD_MV_ */

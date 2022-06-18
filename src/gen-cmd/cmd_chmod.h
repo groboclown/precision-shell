@@ -74,6 +74,7 @@ extern const char cmd_name_chmod_mode[];
         LOGLN(global_arg); \
         global_err = chmod(global_arg, global_arg1_i); \
         break;
+#define REQUIRES_ADDL_ARG__CHMOD
 
 #else /* USE_CMD_CHMOD */
 
@@ -83,6 +84,7 @@ extern const char cmd_name_chmod_mode[];
 #define INITIALIZE__CHMOD
 #define STARTUP_CASE__CHMOD
 #define RUN_CASE__CHMOD
+#define REQUIRES_ADDL_ARG__CHMOD
 #endif /* USE_CMD_CHMOD */
 
 #endif /* _FS_SHELL__CMD_CHMOD_ */
