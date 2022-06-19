@@ -18,8 +18,8 @@ Last build size:
 * Minimal build:
   * glibc: 819,656 bytes
   * glibc (Arch): 778,280 bytes
-  * musl: 21,944 bytes
-  * dietlibc: 13,256 bytes
+  * musl (Alpine): 21,944 bytes
+  * dietlibc (Alpine): 13,256 bytes
 * Standard buld:
   * glibc (Ubuntu): 831,944 bytes
   * glibc (Arch): 782,376 bytes
@@ -28,8 +28,8 @@ Last build size:
 * Full build:
   * glibc (Ubuntu): 831,944 bytes
   * glibc (Arch): 782,376 bytes
-  * musl: 26,048 bytes
-  * dietlibc: 17,424 bytes
+  * musl (Alpine): 26,048 bytes
+  * dietlibc (Alpine): 17,424 bytes
 
 *dietlibc [requires](https://www.fefe.de/dietlibc/FAQ.txt) that you either not distribute the compiled executable, or release the executable under GPL v2.*
 
@@ -458,6 +458,15 @@ done
 
 The build generates combinations of the flags for different executables with various enabled actions.  The `version` command lists which flags the executable has enabled.
 
+To enable different commands in the compiled executable from the Docker build, run the build command like so:
+
+```bash
+docker build \
+  -t local/fs-shell-${libname} -f build-${libname}.Dockerfile \
+  --build-arg COMMANDS="rm rmdir chmod chown"
+  .
+```
+
 Additionally, for your own purposes, you can build it against the "dietlibc" library.  However, this has special considerations in that it's GPL v2, and [you can't distribute the binary under this program's MIT license](http://www.fefe.de/dietlibc/FAQ.txt).
 
 ```bash
@@ -472,13 +481,26 @@ To bump the version number, change the [version.txt](version.txt) file.  Version
 
 To contribute to the project, submit a PR or open a bug.  All code submitted must be licensed under the MIT license.
 
+Contributing new commands requires (this list assumes that the change is for a single command contained in one file, but it can be multiple commands in a single file, or multiple files, each with their own command):
 
-## Some Future Items
+1. Read through the [source readme file](src/README.md).  This describes how to add commands, though it's lacking on the details that go into a full change.
+2. Add cmd_mount.h.in in the src tree and include it in source control changes.
+3. Add the cmd_mount.h file to the src/Makefile header list and include the Makefile in source control changes.
+4. Generate the .h file by running make and add that to source control.
+5. Include the new USE_CMD_* in the flag list in the Makefile.command-flags file, both in the list of flags, and in the INCLUDE_ALL_COMMANDS list.
+6. Add new test scripts in the `tests` directory.  The [test readme file](tests/README.md) offers a brief overview of what goes into a test script.
+7. Add documentation in the root [README.md](README.md) file, both in the initial command listing, and the detailed description.
 
-Future versions will have some backwards-incompatible changes:
 
-* `sleep` will be put under the "signal" category of commands.
-* `mkdir` will no longer take a mode argument and instead use a default one; users who want a non-standard mode will need to run `chmod` afterwards to set the mode.
+## Releasing
+
+Releases should:
+
+1. Bump the version number in [version.txt](version.txt).
+2. Bump the version number in [Dockerfile](Dockerfile).
+3. Ensure the builds pass.  These run as part of the GitHub actions.
+4. The root [README.md](README.md) file is updated with the latest binary file sizes.  The automated builds include the file sizes.
+5. Author a new release in GitHub, with the title & tag set to the new version number.  No binary files are included here, but it auto-generates the source tarball.
 
 
 ## License

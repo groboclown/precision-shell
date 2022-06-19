@@ -29,12 +29,14 @@ SOFTWARE.
 #include "globals.h"
 #include "command_runner.h"
 #include "gen-cmd/command_list.h"
-#include "helpers.h"
-#include "version.h"
+#include "force-inline.h"
 
 CMD_GLOBAL_VARDEF
 
-int _on_cmd_end(const char *name, int cmd_idx) {
+
+// Temporarily disable until desired.
+#ifdef REQUIRE_FULL_CMD
+/*forceinline*/ int _on_cmd_end(const char *name, int cmd_idx) {
     switch (cmd_idx) {
         // The last index, which shouldn't ever be used,
         //   is included here to make the case not fail in
@@ -48,6 +50,7 @@ int _on_cmd_end(const char *name, int cmd_idx) {
     }
     return 0;
 }
+#endif
 
 // command_runner runs the commands over the parsed arguments.
 //   returns the error code.
@@ -71,7 +74,9 @@ int command_runner() {
     while (1 == 1) {
         global_arg = args_advance_token();
         if (global_arg == NULL) {
+#ifdef REQUIRE_FULL_CMD
             _err_count += _on_cmd_end(global_cmd_name, global_cmd);
+#endif
             break;
         }
         // This is a long if/else block until error checking.
@@ -81,7 +86,9 @@ int command_runner() {
         //   This allows recognizing "; ;" as okay.
 
         if (strequal("&&", global_arg)) {
+#ifdef REQUIRE_FULL_CMD
             _err_count += _on_cmd_end(global_cmd_name, global_cmd);
+#endif
             if (_err_count > 0) {
                 // && with errors stops the shell.
                 stderrP("FAIL &&\n");
@@ -92,7 +99,9 @@ int command_runner() {
         } else
 
         if (strequal(";", global_arg)) {
+#ifdef REQUIRE_FULL_CMD
             _err_count += _on_cmd_end(global_cmd_name, global_cmd);
+#endif
             // ";" ignores any errors, resetting the error count.
             LOG(":: ;\n");
             _err_count = 0;

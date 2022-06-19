@@ -1,14 +1,15 @@
 name: Full Test
 
-# This build takes a VERY long time to run.  Only run on-demand.
+# This build takes a VERY long time to run.  Only run on-demand, which
+#   means an explicit push into the "combinatorics-test" branch.
 on:
   push:
-    branches: [main]
+    branches: [combinatorics-test]
 
 jobs:
 
   glibc:
-    name: Full Build & Test with glibc
+    name: Full Command Combinatorics Build & Test with glibc
     runs-on: ubuntu-latest
     outputs:
       version: ${{ steps.properties.outputs.version }}
@@ -27,7 +28,7 @@ jobs:
       
       - name: build-test
         run: |
-          podman build -f build-glibc.Dockerfile -t glibc:offline --build-arg BUILD_MODE=full-test .
+          podman build -f build-glibc.Dockerfile -t glibc:offline --build-arg BUILD_MODE=combinatorics-test .
       # Podman on Ubuntu is a buggy version that causes this to look up the
       # image online, rather than look in the local repo.
       # https://github.com/containers/podman/issues/11181
@@ -36,7 +37,7 @@ jobs:
       # ls -lA out/glibc
 
   dietlibc:
-    name: Full Build & Test with dietlibc
+    name: Full Command Combinatorics Build & Test with dietlibc
     runs-on: ubuntu-latest
     outputs:
       version: ${{ steps.properties.outputs.version }}
@@ -55,10 +56,10 @@ jobs:
       
       - name: build-test
         run: |
-          podman build -f build-dietlibc.Dockerfile -t dietlibc:offline --build-arg BUILD_MODE=full-test .
+          podman build -f build-dietlibc.Dockerfile -t dietlibc:offline --build-arg BUILD_MODE=combinatorics-test .
       
   musl:
-    name: Full Build & Test with musl
+    name: Full Command Combinatorics Build & Test with musl
     runs-on: ubuntu-latest
     outputs:
       version: ${{ steps.properties.outputs.version }}
@@ -77,4 +78,4 @@ jobs:
       
       - name: build-test
         run: |
-          podman build -f build-musl.Dockerfile -t musl:offline --build-arg BUILD_MODE=full-test .
+          podman build -f build-musl.Dockerfile -t musl:offline --build-arg BUILD_MODE=combinatorics-test .

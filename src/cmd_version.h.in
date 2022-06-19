@@ -26,6 +26,7 @@ AsRequired(command="version",
 #include "output.h"
 #include "globals.h"
 #include "helpers.h"
+#include "version.h"
 
     WithNamedStep(enum="VERSION", name="version",
         OnCmd(

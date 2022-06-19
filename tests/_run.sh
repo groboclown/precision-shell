@@ -48,7 +48,10 @@ for test_name in "$@" ; do
         dorun=1
         if [ ! -z "${requirements}" ] ; then
             for req_name in ${requirements} ; do
-                "${FS}" version | grep "${req_name}" >/dev/null 2>&1
+                # Note explicit space after the name;
+                #   this helps prevent commands like "rm" from running "rmdir"
+                #   commands, and will work because version is always last.
+                "${FS}" version | grep "${req_name} " >/dev/null 2>&1
                 if [ $? -ne 0 ] ; then
                     if [ "${QUIET}" != 1 ]; then
                         echo "?? SKIPPED because ${FS} does not support ${requirements} (missing ${req_name})"

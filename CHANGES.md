@@ -1,7 +1,12 @@
 
 ## v2.0.1
 
-* Fixed an issue with many commands reporting ok status when required arguments are not given.  This increases the file size slightly for the minimal commands, though.  This introduces a new element to the command coding.
+* Fixed an issue with many commands reporting ok status when required arguments are not given.  This increases the file size slightly for the minimal commands, though.  This introduces a new element to the command coding.  This is disabled, but can be enabled by adding the define `REQUIRE_FULL_CMD`; turning this on will cause some tests to fail, as it alters the behavior.
+* Altered the make to not require Python to build (issue #4).  If Python is not installed and the headers are not generated, then the build will still fail.
+* Added a new test build that checks that each individual command flag can build and passes tests.  This also ensures that, with the flag enabled, the `version` command reports the command enabled (issue #3).
+* Changed the automated builds to instead run the build once for each command.  The old combinatorics test still exists, but it's been renamed and will only build on pushes to the `combinatorics-test` branch.  This will likely fail because the test takes over 6 hours.
+* Fixed a bug in the tests that would cause "rm" only command builds to also run rmdir commands.
+* General code infrastructure quality improvements.
 * Added a `.dockerignore` file to tighten up the docker file sizes.
 * Updated documentation to better match the current version.
 * Late update to the changes file to include v2.0.0.
@@ -10,7 +15,7 @@
 ## v2.0.0
 
 * Added `fmode` to set a common value to set the file mode used by mkdir, touch, trunc, the dup commands, and some others.  This introduced a backwards-incompatible difference with mkdir, thus making the version jump.
-* Changed how the commands are written, based upon a thorough examination on how different coding styles impact the final file size (see [size-experiments.md](size-experiments.md)).
+* Changed how the commands are written, based upon a thorough examination on how different coding styles impact the final file size (see [size-experiments.md](size-experiments.md)).  This was a major change that included a lot of experimentation, so the version bump here is too many change files to mention.
 
 
 ## v1.2.0

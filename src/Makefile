@@ -4,7 +4,9 @@ include ../Makefile.command-flags
 
 .SUFFIXES: .h.in .h
 
-CMD_TEMPLATE_SCRIPT = python3 ../build-tools/generate-command-template.py
+CMD_TEMPLATE_RUNNER = python3
+CMD_TEMPLATE_CHECK = $(CMD_TEMPLATE_RUNNER) --version
+CMD_TEMPLATE_SCRIPT = $(CMD_TEMPLATE_RUNNER) ../build-tools/generate-command-template.py
 MKCMD = $(CMD_TEMPLATE_SCRIPT)
 MKCMDLIST = $(CMD_TEMPLATE_SCRIPT) --cmd-list .in
 
@@ -55,6 +57,10 @@ OUTDIR = ../out
 SRC = main.c helpers.c globals.c command_runner.c args-argv.c args-input.c
 
 # cmd_find_cmd.h must always be first.
+# cmd_version.h must always be second-to-last.
+#   This is for test purposes.  By having the required command
+#   "version" be at the end of the "version" command list, it
+#   makes checking for command existence easier.
 # cmd_err.h must always be last.
 COMMANDS = \
 	cmd_find_cmd.h \
@@ -97,18 +103,33 @@ debug: \
 clean:
 	rm $(OUTDIR)/fs-shell* $(COMMAND_HEADERS_DIR) 2>/dev/null || echo ""
 
+.PHONY: all-clean
+all-clean: clean
+	rm gen-cmd/*
+
 
 .PHONY: cmd_headers
 cmd_headers: $(COMMANDS) $(COMMAND_HEADERS_DIR)/command_list.h
 
+
+# Note: If Python is not installed and the header does not exist, then
+#   this will fail.  Otherwise, only build the headers if Python is
+#   installed.
+
 %.h: %.h.in
 	mkdir -p $(COMMAND_HEADERS_DIR)
-	$(MKCMD) $< $(COMMAND_HEADERS_DIR)/$*.h
+	$(CMD_TEMPLATE_CHECK) > /dev/null 2>&1 ; \
+		test $$? != 0 -a -f $(COMMAND_HEADERS_DIR)/$*.h \
+		&& echo "Skipping generation" \
+		|| $(MKCMD) $< $(COMMAND_HEADERS_DIR)/$*.h
 
 
 $(COMMAND_HEADERS_DIR)/command_list.h: $(COMMANDS)
 	mkdir -p $(COMMAND_HEADERS_DIR)
-	$(MKCMDLIST) $(COMMANDS) $*.h
+	$(CMD_TEMPLATE_CHECK) > /dev/null 2>&1 ; \
+		test $$? != 0 -a -f $(COMMAND_HEADERS_DIR)/command_list.h \
+		&& echo "Skipping generation" \
+		|| $(MKCMDLIST) $(COMMANDS) $*.h
 
 
 $(OUTDIR)/fs-shell: $(SRC) $(COMMAND_HEADERS_DIR)/command_list.h

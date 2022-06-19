@@ -33,24 +33,25 @@ SOFTWARE.
 #include "output.h"
 #include "globals.h"
 #include "helpers.h"
+#include "version.h"
 
 
-/* from cmd_version.h.in:30 */
+/* from cmd_version.h.in:31 */
 extern const char cmd_name_version[];
 #define ENUM_LIST__VERSION \
-            /* from cmd_version.h.in:30 */ \
+            /* from cmd_version.h.in:31 */ \
             COMMAND_INDEX__VERSION,
 #define VIRTUAL_ENUM_LIST__VERSION
 #define GLOBAL_VARDEF__VERSION \
-            /* from cmd_version.h.in:30 */ \
+            /* from cmd_version.h.in:31 */ \
             const char cmd_name_version[] = "version";
 #define INITIALIZE__VERSION \
-            /* from cmd_version.h.in:30 */ \
+            /* from cmd_version.h.in:31 */ \
             command_list_names[COMMAND_INDEX__VERSION] = cmd_name_version;
 #define STARTUP_CASE__VERSION \
     case COMMAND_INDEX__VERSION: \
-        /* from cmd_version.h.in:30 */ \
-            /* from cmd_version.h.in:31 */ \
+        /* from cmd_version.h.in:31 */ \
+            /* from cmd_version.h.in:32 */ \
             /* stdoutP(global_invoked_name);*/ \
             stdoutP("fs-shell"); \
             stdoutP(VERSION_STR); \
