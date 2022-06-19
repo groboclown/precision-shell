@@ -5,6 +5,7 @@
 * Altered the make to not require Python to build (issue #4).  If Python is not installed and the headers are not generated, then the build will still fail.
 * Added a new test build that checks that each individual command flag can build and passes tests.  This also ensures that, with the flag enabled, the `version` command reports the command enabled (issue #3).
 * Changed the automated builds to instead run the build once for each command.  The old combinatorics test still exists, but it's been renamed and will only build on pushes to the `combinatorics-test` branch.  This will likely fail because the test takes over 6 hours.
+* Added a build to run glibc on Arch Linux, which produces smaller static binaries than on Ubuntu.
 * Fixed a bug in the tests that would cause "rm" only command builds to also run rmdir commands.
 * General code infrastructure quality improvements.
 * Added a `.dockerignore` file to tighten up the docker file sizes.
