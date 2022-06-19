@@ -1,5 +1,7 @@
 # fs-shell
 
+[![Build](https://github.com/groboclown/fs-shell/actions/workflows/build.yml/badge.svg)](https://github.com/groboclown/fs-shell/actions/workflows/build.yml)
+
 Minimal file manipulation shell for Linux.
 
 Sometimes, you just don't need a shell.  You just need minimal file system operations.
