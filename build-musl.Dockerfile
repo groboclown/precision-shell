@@ -28,4 +28,4 @@ ENV \
     GID2=2
 
 RUN    echo 'LIBNAME=musl' >> version.txt \
-    && ./build-tools/internal-docker-make.sh \
+    && ./build-tools/internal-docker-make.sh
