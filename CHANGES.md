@@ -1,4 +1,11 @@
 
+## v2.0.2
+
+* Fixed an issue with allocating memory.  The type sizes were not 100% accurate, but this only led to allocating more memory than what was actually needed.
+* Fixed an issue with tests not running the version command tests.
+* Updated the `sample.Dockerfile` to show how to fully build the command + copy it into a scratch org from a multi-part Dockerfile.
+
+
 ## v2.0.1
 
 * Fixed an issue with many commands reporting ok status when required arguments are not given.  This increases the file size slightly for the minimal commands, though.  This introduces a new element to the command coding.  This is disabled, but can be enabled by adding the define `REQUIRE_FULL_CMD`; turning this on will cause some tests to fail, as it alters the behavior.

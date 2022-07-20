@@ -1,18 +1,33 @@
+# Builds the fs-shell tool in one container, then adds that built version into the
+# derived container.  This uses the musl library.
+FROM docker.io/library/alpine:3.10 AS builder
+WORKDIR /opt/code
+
+ARG BUILD_MODE=build
+ARG COMMANDS="chmod ln-s"
+
+ENV \
+#    DEBUG=1 \
+    BUILD_MODE=build \
+    COMMANDS=$COMMANDS \
+    UID1=1 \
+    UID2=2 \
+    GID1=1 \
+    GID2=2
+
+RUN \
+       apk --no-cache update \
+    && apk add build-base=0.5-r1 "bash=~5" "python3=~3.7" git \
+    && rm -rf /tmp/* /var/cache/apk/* \
+    && git clone https://github.com/groboclown/fs-shell.git /opt/code/fs-shell \
+    && cd /opt/code/fs-shell \
+    && echo 'LIBNAME=musl' >> version.txt \
+    && ./build-tools/internal-docker-make.sh
+
+
+# The real image, using what was just built.
 FROM scratch
 LABEL name="local/fs-shell-example"
 
-# fs-shell must be built before this image.
-# The build.Dockerfile will create it, but you need to extract it
-# yourself.  Alternatively, you can use the Dockerfile formula to
-# build the fs-shell within the same Dockerfile that it's used.
-COPY out/fs-shell /bin/sh
-
-# Example setting up files and performing some file manipulations
-# on them.
-COPY extract-executables.sh CHANGES.md /tmp/
-
-RUN echo Test3
-RUN chmod 755 /tmp/extract-executables.sh \
-    && rm /tmp/CHANGES.md \
-    && mkdir 777 /opt/special \
-    && echo "All done."
+# Copy the image built above and set it as the shell.
+COPY --from=builder /opt/code/fs-shell/out/fs-shell /bin/sh

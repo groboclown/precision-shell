@@ -35,4 +35,4 @@ ENV \
     GID2=2
 
 RUN    echo 'LIBNAME=dietlibc' >> version.txt \
-    && ./build-tools/internal-docker-make.sh \
+    && ./build-tools/internal-docker-make.sh
