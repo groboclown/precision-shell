@@ -1,9 +1,10 @@
 
 ## v2.0.2
 
-* Fixed an issue with allocating memory.  The type sizes were not 100% accurate, but this only led to allocating more memory than what was actually needed.
-* Fixed an issue with tests not running the version command tests.
-* Updated the `sample.Dockerfile` to show how to fully build the command + copy it into a scratch org from a multi-part Dockerfile.
+* [0875b25](0875b259cf26427f003a570c96ff3620c3a30104)
+    * Fixed an issue with allocating memory.  The type sizes were not 100% accurate, but this only led to allocating more memory than what was actually needed.
+    * Fixed an issue with tests not running the version command tests.
+    * Updated the `sample.Dockerfile` to show how to fully build the command + copy it into a scratch org from a multi-part Dockerfile.
 
 
 ## v2.0.1
