@@ -28,6 +28,8 @@ export UID0=$( id -u )
 export GID0=$( id -g )
 export FS="$( get_abs_filename "${FS_SHELL}" )"
 
+fs_supports="$( "${FS}" version )"
+
 FAILED=0
 for test_name in "$@" ; do
     test_script="$( get_abs_filename "${test_name}" )"
@@ -51,8 +53,8 @@ for test_name in "$@" ; do
                 # Note explicit space after the name;
                 #   this helps prevent commands like "rm" from running "rmdir"
                 #   commands, and will work because version is always last.
-                "${FS}" version | grep "${req_name} " >/dev/null 2>&1
-                if [ $? -ne 0 ] ; then
+                echo "${fs_supports}" | grep "${req_name} " >/dev/null 2>&1
+                if [ $? -ne 0 ] && [ "${req_name}" != "+version" ] ; then
                     if [ "${QUIET}" != 1 ]; then
                         echo "?? SKIPPED because ${FS} does not support ${requirements} (missing ${req_name})"
                     fi

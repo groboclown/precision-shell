@@ -371,7 +371,7 @@ int args_setup_tokenizer(const int srcArgc, char *srcArgv[]) {
         }
         _parsedArgSize = DEFAULT_PARSED_ARG_SIZE;
 
-        _inputBuffer = malloc(sizeof(char *) * DEFAULT_INPUT_BUFFER_SIZE);
+        _inputBuffer = malloc(sizeof(char) * DEFAULT_INPUT_BUFFER_SIZE);
         _inputBufferAllocated = 1;
         if (_inputBuffer == NULL) {
             stderrP("ERROR malloc failed\n");
@@ -408,7 +408,7 @@ int args_setup_tokenizer(const int srcArgc, char *srcArgv[]) {
         // With an input of "a b c", the arg count is 3 (len / 2 + 1)
         // These are maximum argument counts.
         _parsedArgSize = (_inputBufferSize / 2) + 1;
-        _parsedArgs = malloc(sizeof(char **) * _parsedArgSize);
+        _parsedArgs = malloc(sizeof(char *) * _parsedArgSize);
         _parsedArgAllocated = 1;
         
         _inputFD = INPUT_FD_FREED;
