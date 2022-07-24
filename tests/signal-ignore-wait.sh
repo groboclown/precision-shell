@@ -11,7 +11,7 @@
 #   is called.
 "${FS}" version | grep dietlibc > /dev/null 2>&1
 if [ $? = 0 ] ; then
-    echo "!!! SKIPPED becuase dietlibc does not support scenario"
+    echo "!!! SKIPPED because dietlibc does not support scenario"
     exit 0
 fi
 

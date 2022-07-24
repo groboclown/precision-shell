@@ -414,7 +414,7 @@ The tool also supports invoking it with the arguments `-c "commands"` to simulat
 The parsing is kept simple, and follows these rules:
 
 * A space character (` `), tab, and linefeed (`\r`) separates arguments.
-* The parser will handle newlines (`\n`) differently depending on whether you use an input-enabled build or not.  With an input-enabled build, newlines are treated like inserting a `;` between commands, whereas a non-input-enabled build treats newlines like a space.
+* Unix-style newlines (`\n`) are treated like inserting a `;` between commands.
 * Pairs of quote characters (`"` and `'`) can encapsulate text, allowing space characters and other quote characters to be part of an argument, rather than separating arguments.
 * Characters can be escaped by adding a backslash (`\`) character.  `\n` turns into a newline, `\r` into a linefeed, `\t` into a tab, and anything else is the character itself.  This is how quote characters can be added, as well as an alternate to adding a space to an argument.
 
@@ -422,8 +422,6 @@ The parsing is kept simple, and follows these rules:
 ### Script Files
 
 If you use the input-enabled build, then you can pass the arguments `-f script-file-name` to run that file as a set of commands.
-
-In this mode, the newline character acts like joining the two lines with a [`;`](#chaining-commands).
 
 
 ### Passing Commands from stdin
