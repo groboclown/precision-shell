@@ -52,9 +52,11 @@ COMMAND_HEADERS_DIR = ./gen-cmd
 
 # Normally, we want unused variable warnings, however, with very limited command flags,
 #   we will see this appear.
-CFLAGS += -Wall -pedantic -Wno-unused-variable -I$(COMMAND_HEADERS_DIR) -I.
+# switch is disabled because there are command enums that are markers rather than
+#   real values to switch on.
+CFLAGS += -Wall -pedantic -Wno-unused-variable -Wswitch -I$(COMMAND_HEADERS_DIR) -I.
 OUTDIR = ../out
-SRC = main.c helpers.c globals.c command_runner.c args-argv.c args-input.c
+SRC = main.c helpers.c globals.c command_runner.c args.c
 
 # cmd_find_cmd.h must always be first.
 # cmd_version.h must always be second-to-last.

@@ -60,7 +60,7 @@ int command_runner() {
     int _err_count = 0;
 
     // Current command index to run.
-    int global_cmd;
+    enum CommandIndex global_cmd;
     // The current argument being parsed.
     const char *global_arg;
     // Marker that there's an error in the current command.

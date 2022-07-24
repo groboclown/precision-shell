@@ -1,3 +1,7 @@
+## v3.0.0
+
+* Merged argument parsing implementations together into one file.
+
 
 ## v2.0.2
 
