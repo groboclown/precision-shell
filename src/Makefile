@@ -54,7 +54,7 @@ COMMAND_HEADERS_DIR = ./gen-cmd
 #   we will see this appear.
 # switch is disabled because there are command enums that are markers rather than
 #   real values to switch on.
-CFLAGS += -Wall -pedantic -Wno-unused-variable -Wswitch -I$(COMMAND_HEADERS_DIR) -I.
+CFLAGS += -Wall -pedantic -Wno-unused-variable -Wno-switch -I$(COMMAND_HEADERS_DIR) -I.
 OUTDIR = ../out
 SRC = main.c helpers.c globals.c command_runner.c args.c
 

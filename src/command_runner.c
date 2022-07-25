@@ -61,8 +61,16 @@ int command_runner() {
 
     // Current command index to run.
     enum CommandIndex global_cmd;
+
     // The current argument being parsed.
+    const Argument *global_arg_state;
     const char *global_arg;
+
+    // The current command name being run.
+    //   Because a command can have more arguments than the
+    //   preserve count, this should be a copy of the input argument.
+    char global_cmd_name[PARSED_ARG_SIZE] = "";
+
     // Marker that there's an error in the current command.
     int global_err = 0;
 
@@ -72,13 +80,17 @@ int command_runner() {
     // ======================================================================
     // Argument Parsing Loop
     while (1 == 1) {
-        global_arg = args_advance_token();
-        if (global_arg == NULL) {
+        global_arg_state = args_advance_token();
+        if (global_arg_state->state == ARG_STATE_ERR) {
+            _err_count++;
+        }
+        if (global_arg_state->state >= ARG_STATE_END) {
 #ifdef REQUIRE_FULL_CMD
             _err_count += _on_cmd_end(global_cmd_name, global_cmd);
 #endif
             break;
         }
+        global_arg = global_arg_state->arg;
         // This is a long if/else block until error checking.
 
         // ==================================================================

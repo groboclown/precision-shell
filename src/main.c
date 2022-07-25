@@ -43,7 +43,7 @@ int main(const int argc, char *argv[]) {
 
     // Initialize the argument parser.
     int ret = args_setup_tokenizer(argc, argv);
-    if (!ret) {
+    if (ret == 0) {
         // Run all the commands
         ret = command_runner();
     }

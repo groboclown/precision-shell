@@ -1,11 +1,11 @@
 #!/bin/bash
 
-# desc: arguments as-is must not be escaped.
+# desc: parse arguments explicitly
 # requires: +echo
 
 # This reuses the echo-args test but with required explicit string parsing.
 
-"${FS}" echo "a \\n b c" > out.txt 2>err.txt
+"${FS}" -c "echo a b 123 a123 \"a b c\"" > out.txt 2>err.txt
 res=$?
 
 if [ ${res} -ne 0 ] ; then
@@ -19,8 +19,7 @@ if [ -s err.txt ] ; then
     cat err.txt
     exit 1
 fi
-# bash will turn \\ into \, but then printf will do additional unescaping.
-if [ "$( printf "a \\\\n b c" )" != "$( cat out.txt )" ] ; then
+if [ "$( printf "a\\nb\\n123\\na123\\na b c\\n" )" != "$( cat out.txt )" ] ; then
     echo "Generated stdout not as expected:"
     cat out.txt
     exit 1

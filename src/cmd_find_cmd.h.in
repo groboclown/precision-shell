@@ -23,6 +23,7 @@ AsRequired(command="find_cmd",
 
 
 #include <stdlib.h>
+#include <string.h>
 #include "output.h"
 #include "globals.h"
 #include "helpers.h"
@@ -42,24 +43,24 @@ OnInit(
     // This one does not span across commands; any step can use it as it needs.
     int tmp_val;
 
-    // The current command name being run.
-    const char *global_cmd_name = NULL;
-
     // Initialize globals.
     global_cmd = COMMAND_INDEX__FIND_CMD;
 )
 
 WithNamedStep(enum="FIND_CMD", name="<first>",
     OnArg(
-        LOG(":: find_cmd start\n");
-        global_cmd_name = global_arg;
+        // The command name can exceed the preserved argument
+        //   count, so make a copy of it.
+        strcpy(global_cmd_name, global_arg);
+        LOG(":: find_cmd start\n:: - using command name ");
+        LOGLN(global_cmd_name);
 
-        /* Assume that this will fail... */
+        // Assume that this will fail...
         global_cmd = COMMAND_INDEX__ERR;
         global_err = 1;
 
-        /* Do not check if the command is "error", as that is not */
-        /* a real callable command. */
+        // Do not check if the command is "error", as that is not
+        //   a real callable command.
         // printf(":: scanning from %d to %d\n", COMMAND_INDEX__FIND_CMD, COMMAND_INDEX__LAST_NAMED_CMD);
         for (tmp_val = COMMAND_INDEX__FIND_CMD; tmp_val < COMMAND_INDEX__LAST_NAMED_CMD; tmp_val++) {
             // printf(" - checking %d - %s\n", tmp_val, command_list_names[tmp_val]);

@@ -1,6 +1,11 @@
 ## v3.0.0
 
-* Merged argument parsing implementations together into one file.
+* [ba250c4](ba250c452722f32677621eba5157b8c1173d0f34)
+    * Merged argument parsing implementations together into one file.  This was a backwards incompatible change around how argument parsing without streaming was done, and so required the major version bump to 3.
+* (change tbd)
+    * Marked REQUIRE_FULL_CMD as a top-level makefile flag.
+    * Added argument parser error checking (#10).  With this, the argument parsing routine was rewritten which made the compled version smaller.  This significantly changes how non `-c` argument parsing is handled now, and it may not be supported for v3.0.
+    * Fixed a bug with the `exec` command when the exec call out fails.  Before, the error was ignored.  Added a test to cover this (`exec-not-a-command.sh`).
 
 
 ## v2.0.2

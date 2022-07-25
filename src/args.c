@@ -35,61 +35,123 @@ SOFTWARE.
 #include "args.h"
 
 
-// FD marker for non-free-able buffer.
-#ifdef USE_STREAMING_INPUT
-#define INPUT_FD_ARGV -2
-#define INPUT_FD_FREED -1
-#endif
+// When a newline character is encountered, the
+// parsed arg points to this string instead of where
+// the newline happens.  In Bash, the '-e' flag will
+// turn this into '&&'.
+// Changing this behavior is part of issue #14.
+static const char *_ReplaceNewline = ";";
 
 
-// Configurable argument and buffer sizes.
-//   By making these configurable, it means the tool is better
+// Configurable buffer size.
+//   By making this configurable, it means the tool is better
 //   able to be sized into memory constrained environments.
-#ifndef PARSED_ARG_SIZE
-#define PARSED_ARG_SIZE    1000
-#endif
 #ifndef INPUT_BUFFER_SIZE
 #define INPUT_BUFFER_SIZE  4096
 #endif
 
 // Parse states
 enum ParseState {
-    PARSE_SEARCH,
+    // Searching for an argument start
+    PARSE_SEARCH = 0,
+
+    // Inside a plain text argument
     PARSE_PLAIN,
+
+    // Inside a double-quote part of an argument
     PARSE_DOUBLE,
+
+    // Inside a single-quote part of an argument
     PARSE_SINGLE,
-    PARSE_END
+
+    // Just found an escape character
+    //   Set up such that x - PARSE_ESCAPE_PLAIN + PARSE_PLAIN gives the original state,
+    //   and x + PARSE_ESCAPE_PLAIN - PARSE_PLAIN gives the escaped state
+    PARSE_ESCAPE_PLAIN,
+    PARSE_ESCAPE_DOUBLE,
+    PARSE_ESCAPE_SINGLE
 };
 
+enum ParseSrc {
+    // Things with closable actions are first.
+    PARSE_SRC_ALLOCATED_STRING = 0,
 
-// When a newline character is encountered, the
-// parsed arg points to this string instead of where
-// the newline happens.  In Bash, the '-e' flag will
-// turn this into '&&'.
-static const char *_ReplaceNewline = ";";
+#ifdef USE_STREAMING_INPUT
+    PARSE_SRC_CLOSABLE_FD,
+#endif
+
+    // These have no close actions.
+#ifdef USE_STREAMING_INPUT
+    PARSE_SRC_EXTERN_FD,
+#endif
+    PARSE_SRC_NONE,
+    PARSE_SRC_ARGV,
+    PARSE_SRC_STATIC_STRING
+};
 
 // Buffers:
 //    size = allocated size (cannot exceed this length).
 //    len = number of usable values.
 
-static const char **_parsed_arg_list = NULL;
-static int _parsed_arg_pos = 0;
-static int _parsed_arg_len = 0;
-static int _parsed_arg_size = 0;
-static int _parsed_arg_allocated = 0;
+
+typedef struct {
+    // Not allocated memory
+    char **argv;
+    int argc;
+    int argv_index;
+    int str_pos;
+} _ParseSrcArgv;
+
+
+typedef struct {
+    // source is allocated
+    char *source_chars;
+    int str_pos;
+} _ParseSrcString;
+
 
 #ifdef USE_STREAMING_INPUT
-static int _input_fd = INPUT_FD_FREED;
-#endif
-static char *_input_chars = NULL;
-static int _input_len = 0;
-static int _input_size = 0;
-static int _input_allocated = 0;
+typedef struct {
+    // buffer is an allocated memory string.
+    char *buffer;
+    int str_pos;
+    int length;
 
-static int _input_last_arg_start_pos = 0;
-static int _input_source_pos = 0;
-static int _input_target_pos = 0;
-static enum ParseState _parse_state = PARSE_SEARCH;
+    // if source_type is PARSE_SRC_CLOSABLE_FD, then this needs to be closed.
+    int fd;
+} _ParseSrcFd;
+#endif
+
+
+// When the sub-command parsing happens, this can take
+// a parent reference structure, too.
+
+
+typedef union {
+    // struct none {};  "none" has no data.
+    _ParseSrcArgv argv;
+    _ParseSrcString string;
+#ifdef USE_STREAMING_INPUT
+    _ParseSrcFd fd;
+#endif
+} _ParseSrc;
+
+
+typedef struct {
+    // output is an allocated memory string.
+    char *preserve_args[PARSED_ARG_SAVE_COUNT];
+    int preserve_index;
+    int put_back;
+    enum ParseSrc source_type;
+    _ParseSrc source;
+} _ParseData;
+
+
+#define PUT_BACK_NOPE -1
+#define PUT_BACK_EOF 0
+
+static _ParseData _parse_data;
+static Argument _arg_value;
 
 
 void args_tokenize_buffer(int);
@@ -98,284 +160,265 @@ void args_tokenize_buffer(int);
 // Close function
 
 int args_close_tokenizer() {
+    int i;
     int ret = 0;
-    if (_input_chars != NULL && _input_allocated) {
-        free(_input_chars);
-        _input_chars = NULL;
-        _input_len = _input_size = 0;
+    for (i = 0; i < PARSED_ARG_SAVE_COUNT; i++) {
+        if (_parse_data.preserve_args[i] != NULL) {
+            free(_parse_data.preserve_args[i]);
+        }
     }
-    if (_parsed_arg_list != NULL && _parsed_arg_allocated) {
-        free(_parsed_arg_list);
-        _parsed_arg_list = NULL;
-        _parsed_arg_size = _parsed_arg_len = 0;
+
+    // Parse source types that need freeing.
+    if (_parse_data.source_type == PARSE_SRC_ALLOCATED_STRING) {
+        free(_parse_data.source.string.source_chars);
+#ifdef USE_STREAMING_INPUT
+    } else if (_parse_data.source_type == PARSE_SRC_CLOSABLE_FD) {
+        ret = close(_parse_data.source.fd.fd);
+#endif
     }
 #ifdef USE_STREAMING_INPUT
-    if (_input_fd != INPUT_FD_ARGV && _input_fd != INPUT_FD_FREED) {
-        ret = close(_input_fd);
-        _input_fd = INPUT_FD_FREED;
+    if (
+            (
+                _parse_data.source_type == PARSE_SRC_CLOSABLE_FD
+                || _parse_data.source_type == PARSE_SRC_EXTERN_FD
+            ) && _parse_data.source.fd.buffer != NULL
+    ) {
+        free(_parse_data.source.fd.buffer);
+        _parse_data.source.fd.buffer = NULL;
     }
 #endif
+
+    // Mark the data as freed
+    _parse_data.source_type = PARSE_SRC_NONE;
     return ret;
 }
+
 
 // ----------------------------------------------
 // Tokenize functions
 
-/** Everything is already parsed. */
-const char *args_advance_pre_parsed() {
-    if (_parsed_arg_pos < _parsed_arg_len) {
-        return _parsed_arg_list[_parsed_arg_pos++];
-    }
-    return NULL;
-}
 
-const char *args_advance_token() {
-    int i, j;
-    int closed = 0;
+// Parse a single token from the input and return it.
+const Argument *args_advance_token() {
+    // Due to the way the parser is written, this always
+    // just reads a single token.  So parsing state can be
+    // contained just here.
+    char to_parse = 0;
+    enum ParseState state = PARSE_SEARCH;
+    _arg_value.state = ARG_STATE_NORMAL;
 
-    // Read from the FD -> the buffer -> the parser args.
-    const char *ret = args_advance_pre_parsed();
-    if (ret == NULL
+    // Loop through the preserved argument list.
+    _parse_data.preserve_index = (_parse_data.preserve_index + 1) % PARSED_ARG_SAVE_COUNT;
+
+    // Write to this position.
+    char *write_pos = _parse_data.preserve_args[_parse_data.preserve_index];
+    _arg_value.arg = write_pos;
+
+    // End at this position
+    char *write_pos_end = &(write_pos[PARSED_ARG_SIZE]);
+
+    while (1 == 1) {
+        if (write_pos >= write_pos_end) {
+            stderrP("Argument length too long");
+            _arg_value.state = ARG_STATE_ERR;
+            return &_arg_value;
+        }
+
+        // --------------------------------------
+        // Read the next character.
+        if (_parse_data.put_back == PUT_BACK_EOF) {
+            // Something had finished up an argument, meaning that the next
+            //   call needs to report the EOF.
+            // Tell the requestor that this is the end.
+            _arg_value.state = ARG_STATE_END;
+            // This NULL line may be omitted.
+            _arg_value.arg = NULL;
+            return &_arg_value;
+        } else if (_parse_data.put_back != PUT_BACK_NOPE) {
+            to_parse = (char) _parse_data.put_back;
+            _parse_data.put_back = PUT_BACK_NOPE;
+        } else {
+            switch (_parse_data.source_type) {
+                // case PARSE_SRC_NONE: initialized with put_back EOF which is handled above.
+                case PARSE_SRC_ALLOCATED_STRING:
+                case PARSE_SRC_STATIC_STRING:
+                    to_parse = _parse_data.source.string.source_chars[_parse_data.source.string.str_pos++];
+                    break;
+                case PARSE_SRC_ARGV:
+                    // argv must start in a parsable way.
+                    to_parse = _parse_data.source.argv.argv[_parse_data.source.argv.argv_index][_parse_data.source.argv.str_pos++];
+                    if (to_parse == 0) {
+                        if (++_parse_data.source.argv.argv_index < _parse_data.source.argv.argc) {
+                            _parse_data.source.argv.str_pos = 0;
+                            to_parse = ' ';
+                        }
+                        // else we're at the end of the argv, so keep to_parse == 0.
+                    }
+                    break;
+
 #ifdef USE_STREAMING_INPUT
-        && _input_fd != INPUT_FD_FREED
+                case PARSE_SRC_CLOSABLE_FD:
+                case PARSE_SRC_EXTERN_FD:
+                    // Starts without anything written.
+                    if (_parse_data.source.fd.str_pos >= _parse_data.source.fd.length) {
+                        _parse_data.source.fd.str_pos = 0;
+
+                        // Write over the whole buffer
+                        _parse_data.source.fd.length = read(
+                                _parse_data.source.fd.fd,
+                                _parse_data.source.fd.buffer,
+                                INPUT_BUFFER_SIZE);
+                    }
+                    if (_parse_data.source.fd.length <= 0) {
+                        // end of parsing.
+                        // This may need an argument termination.
+                        to_parse = 0;
+                    } else {
+                        to_parse = _parse_data.source.fd.buffer[_parse_data.source.fd.str_pos++];
+                    }
+                    break;
 #endif
-    ) {
-
-#ifdef USE_STREAMING_INPUT
-        // Read the buffer, tokenize the buffer, then advance parser args.
-        
-        // The input buffer can contain the left-over cruft from the last
-        //   read, so we need to keep that.
-        //   This shuffles over the buffer, so that last arg start is now 0,
-        //   the source is now based on 0, and reading continues after the length.
-        // Also, after this operation, the parsedArg stuff could be pointing at
-        //   invalid locations, so those are reset.
-        _parsed_arg_pos = _parsed_arg_len = 0;
-        for (j = 0, i = _input_last_arg_start_pos; i < _input_len; i++, j++) {
-            _input_chars[j] = _input_chars[i];
+            }
         }
-        // j <- where the reading of new data can continue.
-        j = _input_len - _input_last_arg_start_pos;
-        if (j >= _input_size) {
-            // The last argument is bigger than the buffer size.
-            //   That's a problem, it means we don't have enough memory allocated
-            //   to handle the user request.
-            // TODO add some error messages?
-            return NULL;
+
+        if (to_parse == 0) {
+            // end of input string marker.
+            //   This might be before the full input buffer is read,
+            //   but we'll still recognize it as a termination of the
+            //   input.
+            if (state == PARSE_SEARCH) {
+                // Still searching for an argument, so return that this is
+                // an EOF.
+                _parse_data.put_back = PUT_BACK_EOF;
+                continue;
+            }
+
+            // Some kind of argument is being parsed, so wrap it up &
+            // tell the parser the next time around that it's EOF.
+            // Should report an error if in ESCAPE mode.
+
+            // Note that there's no need to increment the target here.
+            *write_pos = 0;
+            LOG(":: Parsed argument '");
+            LOG(_arg_value.arg);
+            LOG("'\n");
+            // When we come back, return an EOF.
+            _parse_data.put_back = PUT_BACK_EOF;
+            return &_arg_value;
         }
-        _input_source_pos -= _input_last_arg_start_pos;
-        _input_target_pos -= _input_last_arg_start_pos;
-        _input_last_arg_start_pos = 0;
-        i = read(_input_fd, &(_input_chars[j]), _input_size - j);
-        if (i <= 0) {
-            i = close(_input_fd);
-            // TODO how to handle errors?
-            _input_fd = INPUT_FD_FREED;
-            i = 0;
-            closed = 1;
+        if (state >= PARSE_ESCAPE_PLAIN) {
+            switch (to_parse) {
+                case 'n':
+                    *(write_pos++) = '\n';
+                    break;
+                case 'r':
+                    *(write_pos++) = '\r';
+                    break;
+                case 't':
+                    *(write_pos++) = '\t';
+                    break;
+                default:
+                    *(write_pos++) = to_parse;
+                    break;
+            }
+            state = state - PARSE_ESCAPE_PLAIN + PARSE_PLAIN;
+            continue;
         }
-        _input_len = j + i;
-#endif /* USE_STREAMING_INPUT */
-
-        args_tokenize_buffer(closed);
-        ret = args_advance_pre_parsed();
-    }
-    return ret;
-}
 
 
-/**
- * @brief tokenize the entire input buffer
- * 
- * This modifies the input buffer based on the parsed values, and for each
- * token discovered, it is added to the parsed arg list.  The modifications
- * made to the input buffer are guaranteed to never grow the size of it.
- * 
- * Because the input buffer can include a partial token at the end, the
- * _input_last_arg_start_pos variable manages where it last left off
- * scanning for tokens.
- * 
- * _parsed_arg_pos and _parsed_arg_len are expected to be 0 when this starts, but it
- * will still work even if they aren't.
- */
-void args_tokenize_buffer(int isComplete) {
-    while (
-            _parsed_arg_len < _parsed_arg_size
-            && _input_source_pos < _input_len
-            && _parse_state != PARSE_END
-    ) {
-        switch (_input_chars[_input_source_pos]) {
-            case 0:
-                // null - end of input string
-                //   This might be before the full input buffer is read,
-                //   but we'll still recognize it as a termination of the
-                //   input.
-                //   Note that there's no need to increment the target here.
-                _input_chars[_input_target_pos] = 0;
-                // Terminate the loop
-                _parse_state = PARSE_END;
-                break;
+        switch (to_parse) {
+            // case 0: already checked above.
             case '\n':
-                if (_parse_state == PARSE_PLAIN || _parse_state == PARSE_SEARCH) {
-                    // Newline - this is like a ';' or '&&' depending on the
-                    //   setup.  In order to avoid expanding the one character
-                    //   into 2 or 3 characters, we point the parsedArg at a
-                    //   separate, static string.
-                    _parsed_arg_list[_parsed_arg_len++] = _ReplaceNewline;
-
-                    // In case this is part of a plain search, force this to
-                    //   be the end of the value.
-                    _input_chars[_input_target_pos++] = 0;
-
-                    // The last arg start shouldn't advance yet, because the
-                    // state is search.  However, for safety, set it here.
-                    _input_last_arg_start_pos = _input_target_pos;
-                    _parse_state = PARSE_SEARCH;
-
-                    LOG(":: Parsed newline, which created argument '");
-                    LOG(_parsed_arg_list[_parsed_arg_len-2]);
-                    LOG("' and added '");
-                    LOG(_parsed_arg_list[_parsed_arg_len-1]);
+                // Newline.
+                if (state == PARSE_SEARCH) {
+                    // Outside text.  This is like a ';' or '&&' depending on the setup.
+                    // Use that value instead of writing it to the argument value.
+                    _arg_value.arg = _ReplaceNewline;
+                    LOG(":: Parsed newline as '");
+                    LOG(_arg_value.arg);
                     LOG("'\n");
+                    return &_arg_value;
+                }
+                if (state == PARSE_PLAIN) {
+                    // Already parsing an argument.  Mark this as the end of the argument,
+                    // and put it back so it can be correctly interpreted when parsing
+                    // the next argument.
+                    _parse_data.put_back = '\n';
+
+                    // Note that there's no need to increment the target here.
+                    *write_pos = 0;
+                    LOG(":: Parsed argument '");
+                    LOG(_arg_value.arg);
+                    LOG("' before the newline\n");
+                    return &_arg_value;
                 } else {
-                    // In a string, so keep it in the buffer.
-                    _input_chars[_input_target_pos++] = '\n';
+                    // In quoted text, so keep it in the buffer.
+                    *(write_pos++) = '\n';
                 }
                 break;
             case '\'':
-                if (_parse_state == PARSE_SEARCH) {
-                    // enter a string.
-                    // Point the argument start to the next character,
-                    //   which will be where targetPos is actively pointing.
-                    //   The target position does not move.
-                    _parsed_arg_list[_parsed_arg_len++] = &(_input_chars[_input_target_pos]);
-                    _input_last_arg_start_pos = _input_target_pos;
-                    _parse_state = PARSE_SINGLE;
-                } else if (_parse_state == PARSE_SINGLE) {
-                    // Exit a string.
-                    // This will always be considered as though there is
-                    //   more text in this argument, so ignore the
-                    //   character by stepping over it.
-                    _parse_state = PARSE_PLAIN;
-                } else if (_parse_state == PARSE_PLAIN) {
-                    // Encountered a quote in the middle of text.
-                    // Step over it, but put us in string mode.
-                    _parse_state = PARSE_SINGLE;
+                if (state == PARSE_SINGLE) {
+                    // Inside a single quoted string already, so this ends it.
+                    // Do not keep this character, and set state to looking at
+                    // plain text.
+                    state = PARSE_PLAIN;
+                } else if (state == PARSE_DOUBLE) {
+                    // Keep this character.
+                    *(write_pos++) = '\'';
                 } else {
-                    // Inside a parsing state where we want to keep this character.
-                    _input_chars[_input_target_pos++] = '\'';
+                    // Either searching for the start of an argument, or already in
+                    // an argument.  Either case, enter a quoted context.
+                    _arg_value.state = ARG_STATE_ESCAPED;
+                    state = PARSE_SINGLE;
                 }
                 break;
             case '"':
-                if (_parse_state == PARSE_SEARCH) {
-                    // enter a string.
-                    // Point the argument start to the next character,
-                    //   which will be where targetPos is actively pointing.
-                    _parsed_arg_list[_parsed_arg_len++] = &(_input_chars[_input_target_pos]);
-                    _input_last_arg_start_pos = _input_target_pos;
-                    _parse_state = PARSE_DOUBLE;
-                } else if (_parse_state == PARSE_DOUBLE) {
-                    // Exit a string.
-                    // This will always be considered as though there is
-                    //   more text in this argument, so ignore the
-                    //   character by stepping over it.
-                    _parse_state = PARSE_PLAIN;
-                } else if (_parse_state == PARSE_PLAIN) {
-                    // Encountered a quote in the middle of text.
-                    // Step over it, but put us in string mode.
-                    _parse_state = PARSE_DOUBLE;
+                if (state == PARSE_DOUBLE) {
+                    // Inside a double quoted string already, so this ends it.
+                    // Do not keep this character, and set state to looking at
+                    // plain text.
+                    state = PARSE_PLAIN;
+                } else if (state == PARSE_SINGLE) {
+                    // Keep this character.
+                    *(write_pos++) = '"';
                 } else {
-                    // Inside a parsing state where we want to keep this character.
-                    _input_chars[_input_target_pos++] = '"';
+                    // Either searching for the start of an argument, or already in
+                    // an argument.  Either case, enter a quoted context.
+                    _arg_value.state = ARG_STATE_ESCAPED;
+                    state = PARSE_DOUBLE;
                 }
                 break;
             case ' ':
             case '\r':
             case '\t':
-                if (_parse_state == PARSE_PLAIN) {
-                    // inside an argument.  This ends it.
-                    _input_chars[_input_target_pos++] = 0;
-                    // Move the arg parsing to the character after the space.
-                    _input_last_arg_start_pos = _input_target_pos;
-                    _parse_state = PARSE_SEARCH;
+                if (state == PARSE_PLAIN) {
+                    // Inside an argument.  This ends it.
+                    // No need to increment the write position.
+                    *write_pos = 0;
                     LOG(":: Parsed argument '");
-                    LOG(_parsed_arg_list[_parsed_arg_len-1]);
+                    LOG(_arg_value.arg);
                     LOG("'\n");
-                } else if (_parse_state != PARSE_SEARCH) {
+                    return &_arg_value;
+                } else if (state != PARSE_SEARCH) {
                     // Inside a quoted part.  Make it part of the argument.
-                    _input_chars[_input_target_pos++] = _input_chars[_input_source_pos];
+                    *(write_pos++) = to_parse;
                 }
+                // else still searching for the argument to start.
                 break;
             case '\\':
-                // standard string escaping.
-                if (_parse_state == PARSE_SEARCH) {
-                    // looking for an argument start, and we found it.
-                    _parsed_arg_list[_parsed_arg_len++] = &(_input_chars[_input_target_pos]);
-                    _input_last_arg_start_pos = _input_target_pos;
-                    _parse_state = PARSE_PLAIN;
-                }
-                if (_input_source_pos < _input_len) {
-                    // Ensure we don't look past the read length.
-                    _input_source_pos++;
-                    switch (_input_chars[_input_source_pos]) {
-                        case 0:
-                            // Whoops - ran over.  Formally, a problem
-                            //   with the input, but we'll silently ignore it.
-                            _input_source_pos--;
-                            break;
-                        case 'n':
-                            _input_chars[_input_target_pos++] = '\n';
-                            break;
-                        case 'r':
-                            _input_chars[_input_target_pos++] = '\r';
-                            break;
-                        case 't':
-                            _input_chars[_input_target_pos++] = '\t';
-                            break;
-                        default:
-                            _input_chars[_input_target_pos++] = _input_chars[_input_source_pos];
-                            break;
-                    }
-                    LOG(":: Escaped ");
-                    LOG1(&(_input_chars[_input_source_pos]));
-                    LOG("\n");
-                }
+                // Standard string escaping.
+                // Turn on the escape mode for the next time around.
+                state = state + PARSE_ESCAPE_PLAIN - PARSE_PLAIN;
                 break;
             default:
-                if (_parse_state == PARSE_SEARCH) {
+                if (state == PARSE_SEARCH) {
                     // looking for an argument start, and we found it.
-                    _parsed_arg_list[_parsed_arg_len++] = &(_input_chars[_input_target_pos]);
-                    _input_last_arg_start_pos = _input_target_pos;
-                    _parse_state = PARSE_PLAIN;
+                    state = PARSE_PLAIN;
                 }
                 // Always keep the character.
-                _input_chars[_input_target_pos++] = _input_chars[_input_source_pos];
+                *(write_pos++) = to_parse;
                 break;
         }
-        _input_source_pos++;
-    }
-
-    // Adjust some of the parsing values to accomodate that the last thing
-    // read may be an incomplete argument.
-    if (isComplete) {
-        _input_chars[_input_target_pos] = 0;
-        _input_last_arg_start_pos = _input_len;
-        if (_parse_state != PARSE_SEARCH) {
-            _parsed_arg_len++;
-        }
-#ifdef DEBUG
-        if (_parsed_arg_len > 0) {
-            LOG(":: Parsed last argument '");
-            LOG(_parsed_arg_list[_parsed_arg_len-1]);
-            LOG("'\n");
-        } else {
-            LOG(":: No last argument to parse\n");
-        }
-#endif
-    } else if (_parse_state == PARSE_SEARCH) {
-        _input_last_arg_start_pos = _input_len;
-    } else if (_parsed_arg_len > 0) {
-        _parsed_arg_len--;
     }
 }
 
@@ -384,79 +427,70 @@ void args_tokenize_buffer(int isComplete) {
 // ----------------------------------------------
 // Creator
 
-int args_setup_tokenizer(const int srcArgc, char *srcArgv[]) {
-    if (srcArgc < 2) {
+int args_setup_tokenizer(const int src_argc, char *src_argv[]) {
+    int i;
+    for (i = 0; i < PARSED_ARG_SAVE_COUNT; i++) {
+        _parse_data.preserve_args[i] = malloc(sizeof(char) * PARSED_ARG_SIZE);
+        if (_parse_data.preserve_args[i] == NULL) {
+            stderrP(helper_str__malloc_failed);
+            return 1;
+        }
+    }
+    _parse_data.preserve_index = 0;
+    _parse_data.put_back = PUT_BACK_NOPE;
+
+    if (src_argc < 2) {
         // no argument worth noting.
-        _parsed_arg_pos = 0;
-        _parsed_arg_len = 0;
+        _parse_data.source_type = PARSE_SRC_NONE;
+        // also, tell the argument parser to end immediately.
+        _parse_data.put_back = PUT_BACK_EOF;
 #ifdef USE_STREAMING_INPUT
-    } else if (
-        (srcArgc == 2 && strcmp("-", srcArgv[1]) == 0)
-        || (srcArgc == 3 && strcmp("-f", srcArgv[1]) == 0)
-    ) {
-        // Read & parse from an FD.
-
-        // Setup the common data.
-        _parsed_arg_list = malloc(sizeof(char *) * PARSED_ARG_SIZE);
-        _parsed_arg_allocated = 1;
-        if (_parsed_arg_list == NULL) {
-            stderrP("ERROR malloc failed\n");
+    } else if (src_argc == 2 && strcmp("-", src_argv[1]) == 0) {
+        // Read from stdin
+        _parse_data.source_type = PARSE_SRC_EXTERN_FD;
+        _parse_data.source.fd.fd = STDIN_FILENO;
+    } else if (src_argc == 3 && strcmp("-f", src_argv[1]) == 0) {
+        // Read from a file.
+        LOG(":: Running script ");
+        LOGLN(src_argv[2]);
+        _parse_data.source_type = PARSE_SRC_CLOSABLE_FD;
+        _parse_data.source.fd.fd = open(src_argv[2], O_RDONLY);
+        if (_parse_data.source.fd.fd == -1) {
+            stderrP("ERROR opening file ");
+            stderrPLn(src_argv[2]);
+            _parse_data.source_type = PARSE_SRC_NONE;
             return 1;
-        }
-        _parsed_arg_size = PARSED_ARG_SIZE;
-
-        _input_chars = malloc(sizeof(char) * INPUT_BUFFER_SIZE);
-        _input_allocated = 1;
-        if (_input_chars == NULL) {
-            stderrP("ERROR malloc failed\n");
-            return 1;
-        }
-        _input_size = INPUT_BUFFER_SIZE;
-
-        // Per-argument specialization.
-        if (srcArgc == 2 && strcmp("-", srcArgv[1]) == 0) {
-            // Use stdin as commands.
-            _input_fd = STDIN_FILENO;
-        } else if (srcArgc == 3 && strcmp("-f", srcArgv[1]) == 0) {
-            LOG(":: Running script ");
-            LOGLN(srcArgv[2]);
-            _input_fd = open(srcArgv[2], O_RDONLY);
-            if (_input_fd == -1) {
-                stderrP("ERROR opening file ");
-                stderrPLn(srcArgv[2]);
-                return 1;
-            }
-        } else {
-            // ERROR STATE - invalid program state
-            return 15;
         }
 #endif /* USE_STREAMING_INPUT */
-    } else if (srcArgc == 3 && strcmp("-c", srcArgv[1]) == 0) {
-        // Use the srcArgv[2] as a full script.
-        _input_chars = (char *) srcArgv[2];
-        _input_size
-            = _input_len
-            = _input_last_arg_start_pos
-            = strlen(_input_chars);
-
-        // With an input of "a b", the arg count is 2 (len / 2 + 1)
-        // With an input of "a b c", the arg count is 3 (len / 2 + 1)
-        // These are maximum argument counts.
-        _parsed_arg_size = (_input_size / 2) + 1;
-        _parsed_arg_list = malloc(sizeof(char *) * _parsed_arg_size);
-        _parsed_arg_allocated = 1;
-        
-#ifdef USE_STREAMING_INPUT
-        _input_fd = INPUT_FD_FREED;
-#endif
-
-        // Just tokenize one time.
-        args_tokenize_buffer(1);
+    } else if (src_argc == 3 && strcmp("-c", src_argv[1]) == 0) {
+        // Use the src_argv[2] as a full script.
+        _parse_data.source_type = PARSE_SRC_STATIC_STRING;
+        _parse_data.source.string.source_chars = (char *) src_argv[2];
+        _parse_data.source.string.str_pos = 0;
     } else {
-        // process the args as-is.
-        _parsed_arg_pos = 1;
-        _parsed_arg_len = srcArgc;
-        _parsed_arg_list = (const char **) srcArgv;
+        // Process the args as though there's a single space between
+        // each argument.
+        // argv must start in a parsable way.  We know it's parsable, because src_arg >= 2.
+        _parse_data.source_type = PARSE_SRC_ARGV;
+        _parse_data.source.argv.argv = src_argv;
+        _parse_data.source.argv.argc = src_argc;
+
+        // argv index 1; skip over command name.
+        _parse_data.source.argv.argv_index = 1;
+
+        _parse_data.source.argv.str_pos = 0;
     }
+#ifdef USE_STREAMING_INPUT
+    if (_parse_data.source_type == PARSE_SRC_EXTERN_FD || _parse_data.source_type == PARSE_SRC_CLOSABLE_FD) {
+        _parse_data.source.fd.buffer = malloc(sizeof(char) * INPUT_BUFFER_SIZE);
+        if (_parse_data.source.fd.buffer == NULL) {
+            stderrP(helper_str__malloc_failed);
+            return 1;
+        }
+        _parse_data.source.fd.str_pos = 0;
+        _parse_data.source.fd.length = 0;
+    }
+#endif /* USE_STREAMING_INPUT */
+
     return 0;
 }
