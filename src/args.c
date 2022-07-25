@@ -64,12 +64,29 @@ enum ParseState {
     // Inside a single-quote part of an argument
     PARSE_SINGLE,
 
+#ifdef USE_ENVIROMENT_INPUT
+    // Found the '$'
+    PARSE_ENV_MAYBE_PLAIN,
+    PARSE_ENV_MAYBE_DOUBLE,
+    PARSE_ENV_MAYBE_SINGLE,
+
+    // Found the '{'
+    PARSE_ENV_NAME_PLAIN,
+    PARSE_ENV_NAME_DOUBLE,
+    PARSE_ENV_NAME_SINGLE,
+#endif
+
     // Just found an escape character
     //   Set up such that x - PARSE_ESCAPE_PLAIN + PARSE_PLAIN gives the original state,
     //   and x + PARSE_ESCAPE_PLAIN - PARSE_PLAIN gives the escaped state
     PARSE_ESCAPE_PLAIN,
     PARSE_ESCAPE_DOUBLE,
-    PARSE_ESCAPE_SINGLE
+    PARSE_ESCAPE_SINGLE,
+
+#ifdef USE_ENVIROMENT_INPUT
+    PARSE_ESCAPE_ENV_MAYBE,
+    PARSE_ESCAPE_ENV_NAME,
+#endif
 };
 
 enum ParseSrc {
@@ -142,6 +159,12 @@ typedef struct {
     char *preserve_args[PARSED_ARG_SAVE_COUNT];
     int preserve_index;
     int put_back;
+#ifdef USE_ENVIROMENT_INPUT
+    char **envp_keys;
+    char **envp_values;
+    char *env_buffer;
+    int env_buffer_pos;
+#endif
     enum ParseSrc source_type;
     _ParseSrc source;
 } _ParseData;
@@ -154,7 +177,7 @@ static _ParseData _parse_data;
 static Argument _arg_value;
 
 
-void args_tokenize_buffer(int);
+static const char MSG_ARG_LEN_TOO_LONG[] = "ERROR Argument length too long\n";
 
 // ---------------------------------------------
 // Close function
@@ -167,6 +190,17 @@ int args_close_tokenizer() {
             free(_parse_data.preserve_args[i]);
         }
     }
+#ifdef USE_ENVIROMENT_INPUT
+    if (_parse_data.envp_keys != NULL) {
+        free(_parse_data.envp_keys);
+    }
+    if (_parse_data.envp_values != NULL) {
+        free(_parse_data.envp_values);
+    }
+    if (_parse_data.env_buffer != NULL) {
+        free(_parse_data.env_buffer);
+    }
+#endif
 
     // Parse source types that need freeing.
     if (_parse_data.source_type == PARSE_SRC_ALLOCATED_STRING) {
@@ -217,9 +251,18 @@ const Argument *args_advance_token() {
     // End at this position
     char *write_pos_end = &(write_pos[PARSED_ARG_SIZE]);
 
+#ifdef USE_ENVIROMENT_INPUT
+    int i, j;
+#endif
+
     while (1 == 1) {
+        // The very first write of this loop using:
+        //    *(write_pos++)
+        // is guaranteed because of this check.
+        // Any additional write will require checks first.
+
         if (write_pos >= write_pos_end) {
-            stderrP("Argument length too long");
+            stderrP(MSG_ARG_LEN_TOO_LONG);
             _arg_value.state = ARG_STATE_ERR;
             return &_arg_value;
         }
@@ -231,8 +274,6 @@ const Argument *args_advance_token() {
             //   call needs to report the EOF.
             // Tell the requestor that this is the end.
             _arg_value.state = ARG_STATE_END;
-            // This NULL line may be omitted.
-            _arg_value.arg = NULL;
             return &_arg_value;
         } else if (_parse_data.put_back != PUT_BACK_NOPE) {
             to_parse = (char) _parse_data.put_back;
@@ -281,8 +322,10 @@ const Argument *args_advance_token() {
             }
         }
 
+        // --------------------------------------
+        // Handle end-of-stream
         if (to_parse == 0) {
-            // end of input string marker.
+            // end of input string marker.  Does not fall out of if.
             //   This might be before the full input buffer is read,
             //   but we'll still recognize it as a termination of the
             //   input.
@@ -292,6 +335,10 @@ const Argument *args_advance_token() {
                 _parse_data.put_back = PUT_BACK_EOF;
                 continue;
             }
+
+            // Note - end-of-stream in the middle of escape sequences or
+            //   environment variables are considered "unsupported states"
+            //   and are not handled in any nice way.
 
             // Some kind of argument is being parsed, so wrap it up &
             // tell the parser the next time around that it's EOF.
@@ -306,6 +353,9 @@ const Argument *args_advance_token() {
             _parse_data.put_back = PUT_BACK_EOF;
             return &_arg_value;
         }
+
+        // --------------------------------------
+        // Handle escaping
         if (state >= PARSE_ESCAPE_PLAIN) {
             switch (to_parse) {
                 case 'n':
@@ -324,6 +374,83 @@ const Argument *args_advance_token() {
             state = state - PARSE_ESCAPE_PLAIN + PARSE_PLAIN;
             continue;
         }
+
+#ifdef USE_ENVIROMENT_INPUT
+        // --------------------------------------
+        // Handle env replacement
+        if (state >= PARSE_ENV_NAME_PLAIN && state <= PARSE_ENV_NAME_SINGLE) {
+            if (to_parse == '}') {
+                // End of the variable.
+                _parse_data.env_buffer[_parse_data.env_buffer_pos] = 0;
+
+                // Marker for found/not found.
+                j = -1;
+
+                // See if the buffer contains an environment variable.
+                for (int i = 0; i < MAX_ENVIRONMENT_VARIABLE_COUNT; i++) {
+                    if (
+                            _parse_data.envp_keys[i] != NULL
+                            && strequal(_parse_data.env_buffer, _parse_data.envp_keys[i])
+                    ) {
+                        j = 0;
+                        while (write_pos < write_pos_end && _parse_data.envp_values[i][j] != 0) {
+                            *(write_pos++) = _parse_data.envp_values[i][j++];
+                        }
+                        LOG(":: replaced ${");
+                        LOG(_parse_data.env_buffer);
+                        LOG("} with '");
+                        LOG(_parse_data.envp_values[i]);
+                        LOG("'\n");
+                        break;
+                    }
+                }
+                if (j < 0) {
+                    // Not found.  Add in '${' + buffer + '}'
+                    if (write_pos + 2 <= write_pos_end) {
+                        *(write_pos++) = '$';
+                        *(write_pos++) = '{';
+                    }
+                    // strcpy would introduce needing to adjust write_pos
+                    //   by an extra call to strlen, adjust for the final
+                    //   zero added by strcpy, and also take into account
+                    //   the write buffer size.  That's oodles of extra
+                    //   code when a simple copy is easy.
+                    i = 0;
+                    while (write_pos < write_pos_end && _parse_data.env_buffer[i] != 0) {
+                        *(write_pos++) = _parse_data.env_buffer[i++];
+                    }
+                    if (write_pos < write_pos_end) {
+                        *(write_pos++) = '}';
+                    }
+                }
+
+                // exit out of environment variable scanning.
+                state = state - PARSE_ENV_NAME_PLAIN + PARSE_PLAIN;
+                continue;
+            } else if (_parse_data.env_buffer_pos >= PARSED_ARG_SIZE) {
+                stderrP(MSG_ARG_LEN_TOO_LONG);
+                _arg_value.state = ARG_STATE_ERR;
+                return &_arg_value;
+            }
+            // Else put it in the buffer.
+            _parse_data.env_buffer[_parse_data.env_buffer_pos++] = to_parse;
+            continue;
+        }
+        if (state >= PARSE_ENV_MAYBE_PLAIN) {
+            // Not in env_name state, but in "found $" state.
+            if (to_parse == '{') {
+                // was on a '$', now found the '{' marker.
+                state = state + PARSE_ENV_NAME_PLAIN - PARSE_ENV_MAYBE_PLAIN;
+                _parse_data.env_buffer_pos = 0;
+            } else {
+                // Didn't find the '{', so add the '$' back + this character.
+                state = state - PARSE_ENV_MAYBE_PLAIN + PARSE_PLAIN;
+                *(write_pos++) = '$';
+                _parse_data.put_back = to_parse;
+            }
+            continue;
+        }
+#endif
 
 
         switch (to_parse) {
@@ -410,6 +537,29 @@ const Argument *args_advance_token() {
                 // Turn on the escape mode for the next time around.
                 state = state + PARSE_ESCAPE_PLAIN - PARSE_PLAIN;
                 break;
+#ifdef USE_ENVIROMENT_INPUT
+            case '$':
+                    if (state >= PARSE_ENV_MAYBE_PLAIN) {
+                        // Found a $$ marker.
+                        *(write_pos++) = '$';
+                        // This second one could potentially run past the count.
+                        if (write_pos >= write_pos_end) {
+                            stderrP(MSG_ARG_LEN_TOO_LONG);
+                            _arg_value.state = ARG_STATE_ERR;
+                            return &_arg_value;
+                        }
+                        *(write_pos++) = '$';
+                    }
+                    // Regardless of quote, search, or plain mode, use this
+                    // as a marker for env replacement.
+                    if (state == PARSE_SEARCH) {
+                        // Found a character, so this is the start of an argument.
+                        state = PARSE_ENV_MAYBE_PLAIN;
+                    } else {
+                        state = state + PARSE_ENV_MAYBE_PLAIN - PARSE_PLAIN;
+                    }
+                break;
+#endif
             default:
                 if (state == PARSE_SEARCH) {
                     // looking for an argument start, and we found it.
@@ -427,8 +577,8 @@ const Argument *args_advance_token() {
 // ----------------------------------------------
 // Creator
 
-int args_setup_tokenizer(const int src_argc, char *src_argv[]) {
-    int i;
+int args_setup_tokenizer(const int src_argc, char *src_argv[], char *src_envp[]) {
+    int i, j;
     for (i = 0; i < PARSED_ARG_SAVE_COUNT; i++) {
         _parse_data.preserve_args[i] = malloc(sizeof(char) * PARSED_ARG_SIZE);
         if (_parse_data.preserve_args[i] == NULL) {
@@ -438,6 +588,38 @@ int args_setup_tokenizer(const int src_argc, char *src_argv[]) {
     }
     _parse_data.preserve_index = 0;
     _parse_data.put_back = PUT_BACK_NOPE;
+#ifdef USE_ENVIROMENT_INPUT
+    // This will need to be allocated with extra space to allow for
+    // a "set env" command.
+    // + 1 for the final NULL
+    _parse_data.envp_keys = malloc(sizeof(char *) * (MAX_ENVIRONMENT_VARIABLE_COUNT + 1));
+    _parse_data.envp_values = malloc(sizeof(char *) * (MAX_ENVIRONMENT_VARIABLE_COUNT + 1));
+
+    _parse_data.env_buffer = malloc(sizeof(char) * PARSED_ARG_SIZE);
+    if (_parse_data.env_buffer == NULL) {
+        stderrP(helper_str__malloc_failed);
+        return 1;
+    }
+    // We are given a list of strings in the form:
+    //   ENV_NAME=thevalue\0
+    // In order to allow strcmp to work, replace the '=' with a zero.
+    // This doesn't change the src_envp structure, though.
+    // But we need something more efficient for handling.
+    for (i = 0; src_envp[i] != NULL && i < MAX_ENVIRONMENT_VARIABLE_COUNT; i++) {
+        _parse_data.envp_keys[i] = src_envp[i];
+        for (j = 0; src_envp[i][j] != 0 && src_envp[i][j] != '='; j++);
+        if (src_envp[i][j] == '=') {
+            src_envp[i][j] = 0;
+            _parse_data.envp_values[i] = &(src_envp[i][j+1]);
+        } else {
+            _parse_data.envp_values[i] = NULL;
+        }
+    }
+    for (; i < MAX_ENVIRONMENT_VARIABLE_COUNT + 1; i++) {
+        _parse_data.envp_keys[i] = NULL;
+        _parse_data.envp_values[i] = NULL;
+    }
+#endif
 
     if (src_argc < 2) {
         // no argument worth noting.

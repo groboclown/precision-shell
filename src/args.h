@@ -60,6 +60,9 @@ enum ArgumentDesc {
 #ifndef PARSED_ARG_SAVE_COUNT
 #define PARSED_ARG_SAVE_COUNT    4
 #endif
+#ifndef MAX_ENVIRONMENT_VARIABLE_COUNT
+#define MAX_ENVIRONMENT_VARIABLE_COUNT 127
+#endif
 
 
 /**
@@ -82,7 +85,7 @@ typedef struct {
  * 
  * @return 0 if okay, != 0 if problem.
  */
-int args_setup_tokenizer(const int srcArgc, char *srcArgv[]);
+int args_setup_tokenizer(const int src_argc, char *src_argv[], char * src_envp[]);
 
 /**
  * @brief advance to the next token.

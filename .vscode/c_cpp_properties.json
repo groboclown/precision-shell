@@ -11,7 +11,8 @@
             "intelliSenseMode": "linux-clang-x64",
             "cStandard": "c11",
             "defines": [
-                "USE_STREAMING_INPUT=1"
+                "USE_STREAMING_INPUT=1",
+                "USE_ENVIROMENT_INPUT=1"
             ]
         }
     ],

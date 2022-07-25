@@ -116,6 +116,12 @@ WithNamedStep(enum="EXEC", name="exec",
             LOG("]\n");
             global_arg_state = args_advance_token();
         }
+        if (global_arg_state->state == ARG_STATE_ERR) {
+            // Argument parsing already reported the error.
+            // Use "return" because the command is not expected to
+            // keep the tool running.
+            return 1;
+        }
         // set the final argument to NULL to terminate the list of pointers.
         exec_argv[global_arg1_i++] = NULL;
         if (global_arg1_i <= 1) {
