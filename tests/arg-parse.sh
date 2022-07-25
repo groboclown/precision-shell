@@ -1,11 +1,9 @@
 #!/bin/bash
 
-# desc: parse arguments explicitly
+# desc: inline arguments are parsed as though they are separated by a single space.
 # requires: +echo
 
-# This reuses the echo-args test but with required explicit string parsing.
-
-"${FS}" -c "echo a b 123 a123 \"a b c\"" > out.txt 2>err.txt
+"${FS}" echo \"a   \\n    b    c\" "&&" echo a   b   c > out.txt 2>err.txt
 res=$?
 
 if [ ${res} -ne 0 ] ; then
@@ -19,7 +17,9 @@ if [ -s err.txt ] ; then
     cat err.txt
     exit 1
 fi
-if [ "$( printf "a\\nb\\n123\\na123\\na b c\\n" )" != "$( cat out.txt )" ] ; then
+
+# Note that the \\n b has the space after the newline, which is expected.
+if [ "$( printf "a \\n b c\\na\\nb\\nc\\n" )" != "$( cat out.txt )" ] ; then
     echo "Generated stdout not as expected:"
     cat out.txt
     exit 1

@@ -25,15 +25,15 @@ SOFTWARE.
 #ifndef _FS_SHELL__HELPERS_
 #define _FS_SHELL__HELPERS_
 
-// This core dumps on dietlibc.
+// Simplified semantics on strcmp.
 #define strequal(a, b) (strcmp((a), (b)) == 0)
-// simplified semantics on strcmp.
-// int strequal(const char *a, const char *b);
 
-// convert global_arg to an integer value.
+// Convert global_arg to an integer value.
 int helper_arg_to_uint(const char *arg, int base, int maxValue);
 
 #define EMPTY_STRING ""
 extern const char empty_string[];
+
+extern const char helper_str__malloc_failed[];
 
 #endif /* _FS_SHELL__HELPERS_ */

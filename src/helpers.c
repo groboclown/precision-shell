@@ -28,6 +28,7 @@ SOFTWARE.
 #include "helpers.h"
 
 const char empty_string[] = EMPTY_STRING;
+const char helper_str__malloc_failed[] = "ERROR malloc failed\n";
 
 
 // helper_arg_to_uint Converts the arg to an integer value

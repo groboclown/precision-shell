@@ -1,6 +1,6 @@
 #!/bin/bash
 
-# desc: argument parsing with commands from stdin
+# desc: argument parsing with commands from a file on the arguments, which does not exist
 # requires: +input
 
 "${FS}" -f not-a-file.txt > out.txt 2>err.txt

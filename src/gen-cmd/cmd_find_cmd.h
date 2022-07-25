@@ -30,23 +30,24 @@ SOFTWARE. */
 
 
 #include <stdlib.h>
+#include <string.h>
 #include "output.h"
 #include "globals.h"
 #include "helpers.h"
 
 
 
-/* from cmd_find_cmd.h.in:52 */
+/* from cmd_find_cmd.h.in:50 */
 extern const char cmd_name_find_cmd[];
 #define ENUM_LIST__FIND_CMD \
-            /* from cmd_find_cmd.h.in:52 */ \
+            /* from cmd_find_cmd.h.in:50 */ \
             COMMAND_INDEX__FIND_CMD = 0,
 #define VIRTUAL_ENUM_LIST__FIND_CMD
 #define GLOBAL_VARDEF__FIND_CMD \
-            /* from cmd_find_cmd.h.in:52 */ \
+            /* from cmd_find_cmd.h.in:50 */ \
             const char cmd_name_find_cmd[] = "";
 #define INITIALIZE__FIND_CMD \
-            /* from cmd_find_cmd.h.in:30 */ \
+            /* from cmd_find_cmd.h.in:31 */ \
     /* Global variables common to all commands.*/ \
     /* List of command names to check.*/ \
     const char *command_list_names[COMMAND_INDEX__LAST_NAMED_CMD]; \
@@ -57,24 +58,25 @@ extern const char cmd_name_find_cmd[];
     int global_arg3_i = 0; \
     /* This one does not span across commands; any step can use it as it needs.*/ \
     int tmp_val; \
-    /* The current command name being run.*/ \
-    const char *global_cmd_name = NULL; \
     /* Initialize globals.*/ \
     global_cmd = COMMAND_INDEX__FIND_CMD; \
-            /* from cmd_find_cmd.h.in:52 */ \
+            /* from cmd_find_cmd.h.in:50 */ \
             command_list_names[COMMAND_INDEX__FIND_CMD] = cmd_name_find_cmd;
 #define STARTUP_CASE__FIND_CMD
 #define RUN_CASE__FIND_CMD \
     case COMMAND_INDEX__FIND_CMD: \
-        /* from cmd_find_cmd.h.in:52 */ \
-            /* from cmd_find_cmd.h.in:53 */ \
-        LOG(":: find_cmd start\n"); \
-        global_cmd_name = global_arg; \
-        /* Assume that this will fail... */ \
+        /* from cmd_find_cmd.h.in:50 */ \
+            /* from cmd_find_cmd.h.in:51 */ \
+        /* The command name can exceed the preserved argument*/ \
+        /*   count, so make a copy of it.*/ \
+        strcpy(global_cmd_name, global_arg); \
+        LOG(":: find_cmd start\n:: - using command name "); \
+        LOGLN(global_cmd_name); \
+        /* Assume that this will fail...*/ \
         global_cmd = COMMAND_INDEX__ERR; \
         global_err = 1; \
-        /* Do not check if the command is "error", as that is not */ \
-        /* a real callable command. */ \
+        /* Do not check if the command is "error", as that is not*/ \
+        /*   a real callable command.*/ \
         /* printf(":: scanning from %d to %d\n", COMMAND_INDEX__FIND_CMD, COMMAND_INDEX__LAST_NAMED_CMD);*/ \
         for (tmp_val = COMMAND_INDEX__FIND_CMD; tmp_val < COMMAND_INDEX__LAST_NAMED_CMD; tmp_val++) { \
             /* printf(" - checking %d - %s\n", tmp_val, command_list_names[tmp_val]);*/ \
