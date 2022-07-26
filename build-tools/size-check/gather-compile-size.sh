@@ -16,13 +16,13 @@ fi
 # Test compilation to get the smallest size possible.
 
 
-outdir=/tmp/fs-shell-$$
+outdir=/tmp/presh-$$
 mkdir -p "${outdir}"
 ( cd "$( dirname "$0" )/../../src" && make src MINFLAGS="${minflags}" "${COMMAND_FLAGS}" OUTDIR="${outdir}" >/dev/null 2>&1 )
-if [ $? != 0 ] || [ ! -f "${outdir}/fs-shell" ] ; then
+if [ $? != 0 ] || [ ! -f "${outdir}/presh" ] ; then
     echo "${minflags}" >> "${badfile}"
 else
-    filesize=$( wc -c <"${outdir}/fs-shell" )
+    filesize=$( wc -c <"${outdir}/presh" )
     rm -r "${outdir}"
     echo "${filesize}|${minflags}|${COMMAND_FLAGS}" >> "${sizefile}"
     echo "${filesize} < ${minflags}"

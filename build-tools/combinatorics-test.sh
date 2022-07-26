@@ -50,7 +50,7 @@ while [ ${running} = 1 ] ; do
     echo "XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX"
     echo "${cmdarg}"
 
-    mkout=/tmp/fs-shell-$$.txt
+    mkout=/tmp/presh-$$.txt
     ( cd ../src && make "${cmdarg}" >"${mkout}" 2>&1 )
     if [ $? != 0 ] ; then
         # compile failure is just bad

@@ -94,16 +94,16 @@ all: clean src debug
 
 .PHONY: src
 src: \
-	$(OUTDIR)/fs-shell
+	$(OUTDIR)/presh
 
 .PHONY: debug
 debug: \
-	$(OUTDIR)/fs-shell-debug
+	$(OUTDIR)/presh-debug
 
 # Note that the arguments to the rm match the all parameters.
 .PHONY: clean
 clean:
-	rm $(OUTDIR)/fs-shell* $(COMMAND_HEADERS_DIR) 2>/dev/null || echo ""
+	rm $(OUTDIR)/presh* $(COMMAND_HEADERS_DIR) 2>/dev/null || echo ""
 
 .PHONY: all-clean
 all-clean: clean
@@ -134,11 +134,11 @@ $(COMMAND_HEADERS_DIR)/command_list.h: $(COMMANDS)
 		|| $(MKCMDLIST) $(COMMANDS) $*.h
 
 
-$(OUTDIR)/fs-shell: $(SRC) $(COMMAND_HEADERS_DIR)/command_list.h
+$(OUTDIR)/presh: $(SRC) $(COMMAND_HEADERS_DIR)/command_list.h
 	mkdir -p $(OUTDIR)
 	$(CC) $(CFLAGS) $(LFLAGS) $(MINFLAGS) $(COMMAND_FLAGS) $? $(LDFLAGS) -o $@
 
 
-$(OUTDIR)/fs-shell-debug: $(SRC) $(COMMAND_HEADERS_DIR)/command_list.h
+$(OUTDIR)/presh-debug: $(SRC) $(COMMAND_HEADERS_DIR)/command_list.h
 	mkdir -p $(OUTDIR)
 	$(CC) $(CFLAGS) $(LFLAGS) $(DFLAGS) $(COMMAND_FLAGS) $? $(LDFLAGS) -o $@

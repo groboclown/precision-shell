@@ -29,7 +29,7 @@ command_list=(${command_list_raw})
 
 echo "Complete command variation list: ${command_list[@]} + ${streaming_arg}"
 
-bindir=/tmp/fs-shell-bin-$$
+bindir=/tmp/presh-bin-$$
 mkdir -p "${bindir}"
 failures=/tmp/failures-$$.txt
 touch "${failures}"
@@ -39,12 +39,12 @@ for cmd in "${command_list[@]}" ; do
     cmd_name=$( echo "${cmd_name}" | tr '[:upper:]' '[:lower:]' | tr _ - )
     flag_index=0
     while [ ${flag_index} -lt ${extra_flag_count} ] ; do
-        exe_name="fs-shell-${cmd_name}${extra_name_combos[${flag_index}]}"
+        exe_name="presh-${cmd_name}${extra_name_combos[${flag_index}]}"
         cmdarg="COMMAND_FLAGS=${cmd} ${extra_flag_combos[${flag_index}]}"
         echo "${cmdarg}"
         flag_index=$(( flag_index + 1 ))
 
-        mkout=/tmp/fs-shell-$$.txt
+        mkout=/tmp/presh-$$.txt
         ( cd ../src && make "${cmdarg}" >"${mkout}" 2>&1 )
         if [ $? != 0 ] ; then
             # compile failure is just bad
@@ -54,17 +54,17 @@ for cmd in "${command_list[@]}" ; do
             rm "${mkout}"
             exit 1
         fi
-        cp ../out/fs-shell "${bindir}/${exe_name}"
+        cp ../out/presh "${bindir}/${exe_name}"
         rm "${mkout}"
         touch "${mkout}"
 
         # could also check if +input is in version...
 
-        ../out/fs-shell version | grep " +${cmd_name}" >/dev/null 2>&1
+        ../out/presh version | grep " +${cmd_name}" >/dev/null 2>&1
         if [ $? != 0 ]; then
             echo "===================================================" >> "${failures}"
             echo "${cmdarg}" >> "${failures}"
-            ../out/fs-shell version >> "${failures}"
+            ../out/presh version >> "${failures}"
             echo "No command flag '${cmd_name}' in version listed." >> "${failures}"
         else
             echo "===================================================" > "${mkout}"

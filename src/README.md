@@ -90,7 +90,7 @@ AsRequired(command="version",
 
     WithNamedStep(enum="VERSION", name="version",
         OnCmd(
-            stdoutP("fs-shell\n");
+            stdoutP("presh\n");
             // ... ommitted for size
             // should be no arguments, so immediately switch to error mode.
             global_cmd = COMMAND_INDEX__ERR;

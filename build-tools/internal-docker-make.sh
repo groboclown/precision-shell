@@ -15,7 +15,7 @@ case "${BUILD_MODE}" in
         ;;
     src)
         ( cd src && make src )
-        ls -lA out/fs-shell*
+        ls -lA out/presh*
         ;;
     combinatorics-test)
         build-tools/combinatorics-test.sh
@@ -26,33 +26,33 @@ case "${BUILD_MODE}" in
     combos)
         mkdir -p .tmp/combos
         make src tests || echo "Tests failed"
-        cp out/fs-shell .tmp/combos/fs-shell-zero
-        cp out/fs-shell-debug .tmp/combos/fs-shell-zero-debug
+        cp out/presh .tmp/combos/presh-zero
+        cp out/presh-debug .tmp/combos/presh-zero-debug
 
         make INCLUDE_ALL_COMMANDS=1 src tests || echo "Tests failed"
-        cp out/fs-shell .tmp/combos/fs-shell-all
-        cp out/fs-shell-debug .tmp/combos/fs-shell-all-debug
+        cp out/presh .tmp/combos/presh-all
+        cp out/presh-debug .tmp/combos/presh-all-debug
 
         make INCLUDE_MINIMAL_COMMANDS=1 src tests || echo "Tests failed"
-        cp out/fs-shell .tmp/combos/fs-shell-min
-        cp out/fs-shell-debug .tmp/combos/fs-shell-min-debug
+        cp out/presh .tmp/combos/presh-min
+        cp out/presh-debug .tmp/combos/presh-min-debug
 
         make INCLUDE_STANDARD_COMMANDS=1 src tests || echo "Tests failed"
-        cp out/fs-shell .tmp/combos/fs-shell-std
-        cp out/fs-shell-debug .tmp/combos/fs-shell-std-debug
+        cp out/presh .tmp/combos/presh-std
+        cp out/presh-debug .tmp/combos/presh-std-debug
 
         cp .tmp/combos/* out/.
 
-        echo "fs-shell-zero" > out/build-inventory.txt
-        echo "fs-shell-zero-debug" >> out/build-inventory.txt
-        echo "fs-shell-all" >> out/build-inventory.txt
-        echo "fs-shell-all-debug" >> out/build-inventory.txt
-        echo "fs-shell-min" >> out/build-inventory.txt
-        echo "fs-shell-min-debug" >> out/build-inventory.txt
-        echo "fs-shell-std" >> out/build-inventory.txt
-        echo "fs-shell-std-debug" >> out/build-inventory.txt
+        echo "presh-zero" > out/build-inventory.txt
+        echo "presh-zero-debug" >> out/build-inventory.txt
+        echo "presh-all" >> out/build-inventory.txt
+        echo "presh-all-debug" >> out/build-inventory.txt
+        echo "presh-min" >> out/build-inventory.txt
+        echo "presh-min-debug" >> out/build-inventory.txt
+        echo "presh-std" >> out/build-inventory.txt
+        echo "presh-std-debug" >> out/build-inventory.txt
 
-        ls -lAS out/fs-shell*
+        ls -lAS out/presh*
         ;;
     *)
         commands=""
@@ -79,6 +79,6 @@ case "${BUILD_MODE}" in
         fi
         echo "make \"${cmdarg}\" all"
         make "${cmdarg}" all
-        ls -lAS out/fs-shell*
+        ls -lAS out/presh*
         ;;
 esac

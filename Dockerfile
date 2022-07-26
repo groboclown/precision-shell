@@ -26,8 +26,8 @@ RUN \
 # ---------------------------------
 # The real image.
 FROM scratch
-LABEL name="local/fs-shell" \
-      version="2.0.1"
+LABEL name="local/precision-shell" \
+      version="3.0.0"
 
 # Set the executable under the file "/bin/sh", so that
 #   docker will use it as the default shell when it encounters
@@ -35,7 +35,7 @@ LABEL name="local/fs-shell" \
 # This also chooses the features to include.  In this case, it's the
 #   all-feature version.
 COPY --from=0 \
-    /opt/code/out/fs-shell \
+    /opt/code/out/precision-shell \
     /bin/sh
 
 ENTRYPOINT ["/bin/sh"]

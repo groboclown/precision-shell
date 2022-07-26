@@ -2,7 +2,7 @@
 
 # Make sure the tests are setup right.
 test -d "${TEST_TMP_DIR}" || exit 99
-test -x "${FS_SHELL}" || exit 99
+test -x "${PRESH}" || exit 99
 
 RUNNER=/bin/bash
 if [ "${DEBUG}" = "1" ] ; then
@@ -26,9 +26,9 @@ here="$( dirname "${myself}" )"
 
 export UID0=$( id -u )
 export GID0=$( id -g )
-export FS="$( get_abs_filename "${FS_SHELL}" )"
+export FS="$( get_abs_filename "${PRESH}" )"
 
-fs_supports="$( "${FS}" version )"
+presh_supports="$( "${FS}" version )"
 
 FAILED=0
 for test_name in "$@" ; do
@@ -62,7 +62,7 @@ for test_name in "$@" ; do
                 # Note explicit space after the name;
                 #   this helps prevent commands like "rm" from running "rmdir"
                 #   commands, and will work because version is always last.
-                echo "${fs_supports}" | grep "${req_name} " >/dev/null 2>&1
+                echo "${presh_supports}" | grep "${req_name} " >/dev/null 2>&1
                 if [ $? ${grep_res_match} 0 ] && [ "${req_name}" != "+version" ] ; then
                     # "+version" is always last, so doesn't have the trailing space,
                     # but it must always exist, so don't skip.
@@ -113,5 +113,5 @@ for test_name in "$@" ; do
         fi
     fi
 done
-echo "${FS_SHELL} - ${FAILED} failure(s)"
+echo "${PRESH} - ${FAILED} failure(s)"
 exit ${FAILED}

@@ -31,7 +31,7 @@ AsRequired(command="version",
     WithNamedStep(enum="VERSION", name="version",
         OnCmd(
             // stdoutP(global_invoked_name);
-            stdoutP("fs-shell");
+            stdoutP("presh");
             stdoutP(VERSION_STR);
             for (tmp_val = 0; tmp_val < COMMAND_INDEX__LAST_NAMED_CMD; tmp_val++) {
                 // Only output included commands that are not virtual.
