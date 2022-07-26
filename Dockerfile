@@ -35,7 +35,7 @@ LABEL name="local/precision-shell" \
 # This also chooses the features to include.  In this case, it's the
 #   all-feature version.
 COPY --from=0 \
-    /opt/code/out/precision-shell \
+    /opt/code/out/presh \
     /bin/sh
 
 ENTRYPOINT ["/bin/sh"]
