@@ -37,13 +37,13 @@ SOFTWARE.
 #include "command_runner.h"
 
 
-int main(const int argc, char *argv[]) {
+int main(const int argc, char *argv[], char * envp[]) {
     // Set the invoked name now, before the parser loses it.
     global_invoked_name = argv[0];
 
     // Initialize the argument parser.
-    int ret = args_setup_tokenizer(argc, argv);
-    if (!ret) {
+    int ret = args_setup_tokenizer(argc, argv, envp);
+    if (ret == 0) {
         // Run all the commands
         ret = command_runner();
     }

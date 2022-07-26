@@ -1,6 +1,6 @@
 #!/bin/bash
 
-# desc: exec with no arguments
+# desc: exec with a real executable.
 # requires: +exec
 
 touch_exec="$( which touch )"

@@ -1,0 +1,20 @@
+{
+    "configurations": [
+        {
+            "name": "Linux",
+            "includePath": [
+                "${workspaceFolder}/src",
+                "${workspaceFolder}/src/gen-cmd"
+            ],
+            "compilerPath": "/usr/bin/gcc",
+            "cppStandard": "c++14",
+            "intelliSenseMode": "linux-clang-x64",
+            "cStandard": "c11",
+            "defines": [
+                "USE_STREAMING_INPUT=1",
+                "USE_ENVIROMENT_INPUT=1"
+            ]
+        }
+    ],
+    "version": 4
+}

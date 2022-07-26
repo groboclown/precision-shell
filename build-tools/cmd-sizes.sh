@@ -27,13 +27,13 @@ while [ $i -lt ${set_count} ] ; do
     name="${command_set_names[$i]}"
     cmds="${command_sets[$i]}"
     # echo "$i : ${name} - ${cmds}"
-    outdir=/tmp/fs-shell-$$
+    outdir=/tmp/presh-$$
     mkdir -p "${outdir}"
     ( cd "../src" && make src "${cmds}" OUTDIR="${outdir}" >/dev/null 2>&1 )
-    if [ $? != 0 ] || [ ! -f "${outdir}/fs-shell" ] ; then
+    if [ $? != 0 ] || [ ! -f "${outdir}/presh" ] ; then
         echo "Build failed for: make src ${cmds} OUTDIR=${outdir}" >&2
     else
-        filesize=$( wc -c <"${outdir}/fs-shell" )
+        filesize=$( wc -c <"${outdir}/presh" )
         echo "${filesize}|${name}" >> "${sizefile}"
         # echo "${filesize} < ${name}"
     fi

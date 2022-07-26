@@ -1,9 +1,9 @@
 #!/bin/bash
 
-# desc: ln-s with no arguments
-# requires: +ln-s
+# desc: dup-w with no arguments, without required args
+# requires: +dup-w -reqargs
 
-"${FS}" ln-s >out.txt 2>err.txt
+"${FS}" dup-w > out.txt 2>err.txt
 res=$?
 
 if [ ${res} -ne 0 ] ; then
@@ -11,7 +11,6 @@ if [ ${res} -ne 0 ] ; then
     exit 1
 fi
 
-# -s : file exists and not empty
 if [ -s out.txt ] || [ -s err.txt ] ; then
     echo "Generated output to stdout or stderr"
     echo "stdout:"

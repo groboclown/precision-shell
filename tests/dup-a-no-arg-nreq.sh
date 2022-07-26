@@ -1,9 +1,9 @@
 #!/bin/bash
 
-# desc: dup-r with no arguments
-# requires: +dup-r
+# desc: dup-a with no arguments, without required args
+# requires: +dup-a -reqargs
 
-"${FS}" dup-r > out.txt 2>err.txt
+"${FS}" dup-a > out.txt 2>err.txt
 res=$?
 
 if [ ${res} -ne 0 ] ; then

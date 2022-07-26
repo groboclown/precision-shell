@@ -6,7 +6,7 @@ For this tool, three different implementations were created:
 * **table-case**: command names are stored in a table, which are looped over to perform comparison for the assigned command integer.  This integer is then used for a case statement when first discovered (only a few commands are in this case), and also for each argument to the command.
 * **table**: all command names and execution functions are stored in tables.  Commands are implemented in separate functions.
 
-Each of these commands can be found in the `v2` branch of the code.
+Each of these commands can be found in the `v2` branch of the code.  Note that this branch still uses the old branding, where the tool is called `fs-shell`.
 
 The implementations were compiled against the glibc, musl, and dietlibc libraries using four different command sets, as defined in the `Makefile.command-flags` file ("zero" being a version built with only the `version` command, which cannot be turned off).
 
@@ -62,7 +62,7 @@ Because the table-case setup is the most efficient from a size perspective, but 
 
 ## Results
 
-`fs-shell` philosophy primarily focuses on *just enough functionality*.  File size is secondary.
+`presh` philosophy primarily focuses on *just enough functionality*.  File size is secondary.
 
 Note that the table-func version increases linearly as the number of functions is added, whereas the case statements one increase in blocks, most likely because the case lookup table is aligned in blocks.
 

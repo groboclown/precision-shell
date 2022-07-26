@@ -1,3 +1,18 @@
+## v3.0.0
+
+* [ba250c4](ba250c452722f32677621eba5157b8c1173d0f34)
+    * Merged argument parsing implementations together into one file.  This was a backwards incompatible change around how argument parsing without streaming was done, and so required the major version bump to 3.
+* [ab726d9](ab726d9c58ecc09dbe234cc28484422c69a69bc6)
+    * Added argument parser error checking (#10).  With this, the argument parsing routine was rewritten which made the compiled version smaller.  This significantly changes how non `-c` argument parsing is handled now, and it may not be supported for v3.0.
+    * Fixed a bug with the `exec` command when the exec call out fails.  Before, the error was ignored.  Added a test to cover this (`exec-not-a-command.sh`).
+* [162b1f1](162b1f1ec35ce8d8fcf19e8dbe274ad01b7d8bc8)
+    * Adjusted tests to allow "-" on each flag to run only if the flag is not enabled.
+    * Marked `REQUIRE_FULL_CMD` as a top-level Makefile flag.  Added tests for this flag, and added it to the version flags report and combination builds.
+    * Added `ENVIRO_INPUT` as top-level Makefile flag.  Added it to the version flags report and combination builds.
+    * Added environment variable parsing when the `ENVIRO_INPUT` flag is set (#11).
+* (tbd)
+    * Rebranded `fs-shell` as `precision-shell` (presh).
+
 
 ## v2.0.2
 

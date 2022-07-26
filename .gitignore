@@ -1,6 +1,6 @@
 # Compiled Output
-fs-shell
-fs-shell-debug
+presh
+presh-debug
 *.tar
 local-*
 /out/

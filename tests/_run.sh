@@ -2,7 +2,7 @@
 
 # Make sure the tests are setup right.
 test -d "${TEST_TMP_DIR}" || exit 99
-test -x "${FS_SHELL}" || exit 99
+test -x "${PRESH}" || exit 99
 
 RUNNER=/bin/bash
 if [ "${DEBUG}" = "1" ] ; then
@@ -26,9 +26,9 @@ here="$( dirname "${myself}" )"
 
 export UID0=$( id -u )
 export GID0=$( id -g )
-export FS="$( get_abs_filename "${FS_SHELL}" )"
+export FS="$( get_abs_filename "${PRESH}" )"
 
-fs_supports="$( "${FS}" version )"
+presh_supports="$( "${FS}" version )"
 
 FAILED=0
 for test_name in "$@" ; do
@@ -50,13 +50,24 @@ for test_name in "$@" ; do
         dorun=1
         if [ ! -z "${requirements}" ] ; then
             for req_name in ${requirements} ; do
+                grep_res_match=-ne
+                missing_message="missing"
+                if [ "${req_name:0:1}" = "-" ] ; then
+                    # leading - means that it must not be set.
+                    grep_res_match=-eq
+                    req_name="+${req_name:1}"
+                    missing_message="includes"
+                fi
+
                 # Note explicit space after the name;
                 #   this helps prevent commands like "rm" from running "rmdir"
                 #   commands, and will work because version is always last.
-                echo "${fs_supports}" | grep "${req_name} " >/dev/null 2>&1
-                if [ $? -ne 0 ] && [ "${req_name}" != "+version" ] ; then
+                echo "${presh_supports}" | grep "${req_name} " >/dev/null 2>&1
+                if [ $? ${grep_res_match} 0 ] && [ "${req_name}" != "+version" ] ; then
+                    # "+version" is always last, so doesn't have the trailing space,
+                    # but it must always exist, so don't skip.
                     if [ "${QUIET}" != 1 ]; then
-                        echo "?? SKIPPED because ${FS} does not support ${requirements} (missing ${req_name})"
+                        echo "?? SKIPPED because ${FS} does not support ${requirements} (${missing_message} ${req_name})"
                     fi
                     dorun=0
                     break
@@ -102,5 +113,5 @@ for test_name in "$@" ; do
         fi
     fi
 done
-echo "${FS_SHELL} - ${FAILED} failure(s)"
+echo "${PRESH} - ${FAILED} failure(s)"
 exit ${FAILED}

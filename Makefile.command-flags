@@ -1,4 +1,4 @@
-# Definition for which commands to include in fs-shell
+# Definition for which commands to include in presh
 COMMAND_FLAGS =
 
 # This is a complete list of command names and the flags that trigger them.
@@ -27,6 +27,9 @@ CMD_TRUNC = -DUSE_CMD_TRUNC
 
 # These flags indicate additional features that aren't commands.
 STREAMING_INPUT = -DUSE_STREAMING_INPUT
+REQUIRE_FULL_CMD = -DREQUIRE_FULL_CMD
+ENVIRO_INPUT = -DUSE_ENVIROMENT_INPUT
+
 
 # END LIST
 
@@ -53,7 +56,9 @@ ifdef INCLUDE_ALL_COMMANDS
 		$(CMD_SLEEP) \
 		$(CMD_TOUCH) \
 		$(CMD_TRUNC) \
-		$(STREAMING_INPUT)
+		$(STREAMING_INPUT) \
+		$(REQUIRE_FULL_CMD) \
+		$(ENVIRO_INPUT)
 endif
 
 ifdef INCLUDE_MINIMAL_COMMANDS

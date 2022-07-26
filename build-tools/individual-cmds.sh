@@ -4,12 +4,32 @@
 cd "$( dirname "$0" )"
 
 command_list_raw="$( egrep "^CMD_" ../Makefile.command-flags | cut -f 3 -d ' ' )"
+
+# Extra Flag Combos - see "gen-extra-flag-combos.sh"
 streaming_arg="$( egrep "^STREAMING_INPUT = " ../Makefile.command-flags | cut -f 3 -d ' ' )"
+reqargs_arg="$( egrep "^REQUIRE_FULL_CMD = " ../Makefile.command-flags | cut -f 3 -d ' ' )"
+enviro_arg="$( egrep "^ENVIRO_INPUT = " ../Makefile.command-flags | cut -f 3 -d ' ' )"
+
+# Slimmed down flag combinations, for ones that matter.
+extra_flag_combos=( \
+    "" \
+    "${streaming_arg}" \
+    "${enviro_arg}" \
+    "${streaming_arg} ${reqargs_arg} ${enviro_arg}" \
+)
+extra_name_combos=( \
+    "" \
+    "-input" \
+    "-enviro" \
+    "-input-reqargs-enviro"
+)
+extra_flag_count="${#extra_flag_combos[@]}"
+
 command_list=(${command_list_raw})
 
 echo "Complete command variation list: ${command_list[@]} + ${streaming_arg}"
 
-bindir=/tmp/fs-shell-bin-$$
+bindir=/tmp/presh-bin-$$
 mkdir -p "${bindir}"
 failures=/tmp/failures-$$.txt
 touch "${failures}"
@@ -17,16 +37,14 @@ fail_count=0
 for cmd in "${command_list[@]}" ; do
     cmd_name="${cmd:10}"
     cmd_name=$( echo "${cmd_name}" | tr '[:upper:]' '[:lower:]' | tr _ - )
-    for use_stream in 0 1 ; do
-        exe_name="fs-shell-${cmd_name}"
-        cmdarg="COMMAND_FLAGS=${cmd}"
-        if [ "${use_stream}" = 1 ] ; then
-            cmdarg="${cmdarg} ${streaming_arg}"
-            exe_name="${exe_name}-input"
-        fi
+    flag_index=0
+    while [ ${flag_index} -lt ${extra_flag_count} ] ; do
+        exe_name="presh-${cmd_name}${extra_name_combos[${flag_index}]}"
+        cmdarg="COMMAND_FLAGS=${cmd} ${extra_flag_combos[${flag_index}]}"
         echo "${cmdarg}"
+        flag_index=$(( flag_index + 1 ))
 
-        mkout=/tmp/fs-shell-$$.txt
+        mkout=/tmp/presh-$$.txt
         ( cd ../src && make "${cmdarg}" >"${mkout}" 2>&1 )
         if [ $? != 0 ] ; then
             # compile failure is just bad
@@ -36,17 +54,17 @@ for cmd in "${command_list[@]}" ; do
             rm "${mkout}"
             exit 1
         fi
-        cp ../out/fs-shell "${bindir}/${exe_name}"
+        cp ../out/presh "${bindir}/${exe_name}"
         rm "${mkout}"
         touch "${mkout}"
 
         # could also check if +input is in version...
 
-        ../out/fs-shell version | grep " +${cmd_name}" >/dev/null 2>&1
+        ../out/presh version | grep " +${cmd_name}" >/dev/null 2>&1
         if [ $? != 0 ]; then
             echo "===================================================" >> "${failures}"
             echo "${cmdarg}" >> "${failures}"
-            ../out/fs-shell version >> "${failures}"
+            ../out/presh version >> "${failures}"
             echo "No command flag '${cmd_name}' in version listed." >> "${failures}"
         else
             echo "===================================================" > "${mkout}"
