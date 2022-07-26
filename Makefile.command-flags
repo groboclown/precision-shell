@@ -1,4 +1,4 @@
-# Definition for which commands to include in fs-shell
+# Definition for which commands to include in presh
 COMMAND_FLAGS =
 
 # This is a complete list of command names and the flags that trigger them.

@@ -1,6 +1,6 @@
 # Planning Board
 
-Here's what's planned for the future of the tool.  Because of the backwards compatibility issues, this will be a major version bump.  With that, the tool will be renamed to "Precision Shell", because the Hadoop system has a "file system shell" that makes searching for `fs-shell` hard.
+Here's what's planned for the future of the tool.  Because of the backwards compatibility issues, this will be a major version bump.
 
 
 ## Change Argument Quoting
@@ -20,3 +20,15 @@ The special command `(` will cause the shell to enter a sub-command, allowing fo
 ## Command Line Arguments
 
 Historically, arguments were used as-is, assuming the calling program already parsed them.  Starting with v3, the parsing algorithm significantly changed to support the much more common use case of "-c" argument parsing.  This raises the question if the old command line parsing should be maintained?  No other major shell supports this execution mode.
+
+
+## Fix signal-ignore-wait
+
+Issue #18
+
+On musl, this test fails often with 
+
+```
+kill: can't kill pid 3110: No such process
+Did not stay alive on wait (2).
+```

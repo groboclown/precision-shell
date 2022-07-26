@@ -1,7 +1,7 @@
 #!/usr/bin/python3
 
 # Instead of using m4, which is everywhere but horribly tricky to use,
-# we have our own template language.
+# we have our own template language.  This means no tooling support!  Yay!
 
 from typing import List, Sequence, Dict, Optional
 import os

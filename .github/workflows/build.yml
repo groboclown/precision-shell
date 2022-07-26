@@ -161,5 +161,5 @@ jobs:
       
       - name: build-test
         run: |
-          podman build -t local/fs-shell-sample --build-arg FLAGS=INCLUDE_ALL_COMMANDS=1 .
-          podman run --rm -t local/fs-shell-sample version
+          podman build -t local/precision-shell-sample --build-arg FLAGS=INCLUDE_ALL_COMMANDS=1 .
+          podman run --rm -t local/precision-shell-sample version

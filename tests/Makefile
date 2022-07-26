@@ -4,7 +4,7 @@ LFLAGS = -static -static-libgcc
 
 # Debug versions are not tested, because they include a bunch
 #   of extra output.
-CMDS = fs-shell
+CMDS = presh
 
 .PHONY: all clean tests $(CMDS)
 all: clean tests
@@ -22,4 +22,4 @@ tests: $(CMDS)
 $(CMDS): $(OUTDIR)/arg_runner
 	@mkdir -p $(OUTDIR)/$@
 	@cp $(OUTDIR)/arg_runner $(OUTDIR)/$@/arg_runner
-	@TEST_TMP_DIR=$(OUTDIR)/$@ FS_SHELL=$(BINDIR)/$@ $(CURDIR)/_all.sh
+	@TEST_TMP_DIR=$(OUTDIR)/$@ PRESH=$(BINDIR)/$@ $(CURDIR)/_all.sh

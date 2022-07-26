@@ -49,7 +49,7 @@ all_flags=(
 # First pass is to find which flags cause a failure.  Don't include these
 #   in our list to try
 valid_flags=()
-tmpout=/tmp/fs-shell-$$
+tmpout=/tmp/presh-$$
 for val in "${all_flags[@]}" ; do
     echo "Trying ${val}"
     ( cd "../../src" && make src MINFLAGS="${val}" OUTDIR="${tmpout}" )

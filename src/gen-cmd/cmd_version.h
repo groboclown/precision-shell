@@ -53,7 +53,7 @@ extern const char cmd_name_version[];
         /* from cmd_version.h.in:31 */ \
             /* from cmd_version.h.in:32 */ \
             /* stdoutP(global_invoked_name);*/ \
-            stdoutP("fs-shell"); \
+            stdoutP("presh"); \
             stdoutP(VERSION_STR); \
             for (tmp_val = 0; tmp_val < COMMAND_INDEX__LAST_NAMED_CMD; tmp_val++) { \
                 /* Only output included commands that are not virtual.*/ \
