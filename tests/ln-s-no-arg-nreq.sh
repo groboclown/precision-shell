@@ -1,9 +1,9 @@
 #!/bin/bash
 
-# desc: ln-h with no arguments
-# requires: +ln-h
+# desc: ln-s with no arguments and they aren't required
+# requires: +ln-s -reqargs
 
-"${FS}" ln-h >out.txt 2>err.txt
+"${FS}" ln-s >out.txt 2>err.txt
 res=$?
 
 if [ ${res} -ne 0 ] ; then

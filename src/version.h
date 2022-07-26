@@ -13,9 +13,19 @@
 #define _VERSION_INPUT ""
 #endif
 
+#ifdef USE_ENVIROMENT_INPUT
+#define _VERSION_ENVIRON " +enviro"
+#else
+#define _VERSION_ENVIRON ""
+#endif
+
+#ifdef REQUIRE_FULL_CMD
+#define _VERSION_REQARGS " +reqargs"
+#else
+#define _VERSION_REQARGS ""
+#endif
+
 static const char VERSION_STR[] =
-    // The "fs-shell" should come from the arg0, but we lose that
-    // in the argument processing.
-    " " VERSION_NUMBER _VERSION_INPUT _VERSION_DEBUG;
+    " " VERSION_NUMBER _VERSION_INPUT _VERSION_ENVIRON _VERSION_REQARGS _VERSION_DEBUG;
 
 #endif /* _FS_SHELL_VERSION_ */

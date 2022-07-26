@@ -43,9 +43,9 @@ CMD_GLOBAL_VARDEF
         //   the event that the compilation has no items.
         CMD_REQUIRES_ADDL_ARG
         case COMMAND_INDEX__LAST_VIRTUAL_CMD:
-            stdoutP("ERROR ");
-            stdoutP(name);
-            stdoutP(": requires another argument.\n");
+            stderrP("ERROR ");
+            stderrP(name);
+            stderrP(": requires another argument\n");
             return 1;
     }
     return 0;

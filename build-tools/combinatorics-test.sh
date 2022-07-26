@@ -5,8 +5,10 @@
 cd "$( dirname "$0" )"
 
 command_list_raw="$( egrep "^CMD_" ../Makefile.command-flags | cut -f 3 -d ' ' )"
-streaming_arg="$( egrep "^STREAMING_INPUT = " ../Makefile.command-flags | cut -f 3 -d ' ' )"
-command_list=(${command_list_raw} ${streaming_arg})
+streaming_arg="$( egrep "^STREAMING_INPUT = " "${flag_file}" | cut -f 3 -d ' ' )"
+reqargs_arg="$( egrep "^REQUIRE_FULL_CMD = " "${flag_file}" | cut -f 3 -d ' ' )"
+enviro_arg="$( egrep "^ENVIRO_INPUT = " "${flag_file}" | cut -f 3 -d ' ' )"
+command_list=(${command_list_raw} ${streaming_arg} ${reqargs_arg} ${enviro_arg})
 
 echo "Complete command variation list: ${command_list[@]}"
 

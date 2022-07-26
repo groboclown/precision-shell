@@ -3,13 +3,6 @@
 Here's what's planned for the future of the tool.  Because of the backwards compatibility issues, this will be a major version bump.  With that, the tool will be renamed to "Precision Shell", because the Hadoop system has a "file system shell" that makes searching for `fs-shell` hard.
 
 
-## Environment Variable Parsing
-
-Issue #11
-
-The environment variables will be interpreted within the parsing of the commands, assuming the env handling flag is turned on.  Environment variables must be in the form `${VALUE}`; the standard shell supported syntax of `$VALUE` will not be supported.
-
-
 ## Change Argument Quoting
 
 Issue #12
