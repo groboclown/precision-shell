@@ -1,3 +1,10 @@
+## v4.0.0
+
+* (tbd)
+    * Switched argument and input parsing to a unified front.  This will allow for commands such as `envsubst` to be more easily implemented.
+    * Switched quoting to now be re-entrant.  The quote characters are now starting with '[' and ending with ']'.  This is a non-standard formatting, but allows interesting things like better support of the `exec` command.
+
+
 ## v3.0.0
 
 * [ba250c4](ba250c452722f32677621eba5157b8c1173d0f34)

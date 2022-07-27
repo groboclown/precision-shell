@@ -33,8 +33,8 @@ SOFTWARE.
 
 
 
-// Strange form of the command.  All other arguments must be pulled in and run as-is.
-// This takes over the command parsing loop
+// Exec takes a single argument and parses it into arguments using the
+// input_loader.
 
 // Slurp up all remaining arguments up to command max.
 // global_arg: current argument
@@ -59,13 +59,13 @@ SOFTWARE.
 #ifdef DEBUG
 #define EXEC_DEBUG_REPORT \
     LOG(":: Running command ["); \
-    LOG(exec_argv[0]); \
+    LOG(shared_split_argv[0]); \
     LOG("] with arguments ["); \
-    for (global_arg3_i = 0; exec_argv[global_arg3_i] != NULL; global_arg3_i++) { \
-        if (global_arg3_i > 0) { \
+    for (global_arg2_i = 0; shared_split_argv[global_arg2_i] != NULL; global_arg2_i++) { \
+        if (global_arg2_i > 0) { \
             LOG("] ["); \
         } \
-        LOG(exec_argv[global_arg3_i]); \
+        LOG(shared_split_argv[global_arg2_i]); \
     } \
     LOG("]\n");
 #else
@@ -85,68 +85,15 @@ extern const char cmd_name_exec[];
             const char cmd_name_exec[] = "exec";
 #define INITIALIZE__EXEC \
             /* from cmd_exec.h.in:67 */ \
-            command_list_names[COMMAND_INDEX__EXEC] = cmd_name_exec; \
-            /* from cmd_exec.h.in:68 */ \
-        /* This command needs some of its own variables.*/ \
-        char **exec_argv; \
-        char *exec_arg3;
-#define STARTUP_CASE__EXEC \
+            command_list_names[COMMAND_INDEX__EXEC] = cmd_name_exec;
+#define STARTUP_CASE__EXEC
+#define RUN_CASE__EXEC \
     case COMMAND_INDEX__EXEC: \
         /* from cmd_exec.h.in:67 */ \
-            /* from cmd_exec.h.in:74 */ \
-        /* add a trailing + 1 for the final 0, if necessary*/ \
-        exec_argv = malloc((sizeof(const char *) * MAX_EXEC_ARGS) + 1); \
-        if (exec_argv == NULL) { \
-            stderrP("ERROR malloc failed\n"); \
-            return 1; \
-        } \
-        /* add a trailing + 1 for the final 0, if necessary*/ \
-        exec_arg3 = malloc((sizeof(const char) * MAX_EXEC_ARG_LEN) + 1); \
-        if (exec_arg3 == NULL) { \
-            stderrP("ERROR malloc failed\n"); \
-            return 1; \
-        } \
-        global_arg1_i = 0; \
-        global_arg2_i = 0; \
-        global_arg_state = args_advance_token(); \
-        LOG(":: generating arguments\n"); \
-        while (global_arg_state->state < ARG_STATE_END) { \
-            if (global_arg1_i >= MAX_EXEC_ARGS) { \
-                stderrP("ERROR exec too many arguments\n"); \
-                /* Use "return" because the command is not expected to*/ \
-                /* keep the tool running.*/ \
-                return 1; \
-            } \
-            if (global_arg2_i >= MAX_EXEC_ARG_LEN) { \
-                stderrP("ERROR exec argument total length exceeded\n"); \
-                /* Use "return" because the command is not expected to*/ \
-                /* keep the tool running.*/ \
-                return 1; \
-            } \
-            global_arg = global_arg_state->arg; \
-            /* set current argv index to point to start of argument, and advance argv index.*/ \
-            exec_argv[global_arg1_i++] = &(exec_arg3[global_arg2_i]); \
-            /* copy the current argument into the long array*/ \
-            global_arg3_i = 0; \
-            while (global_arg[global_arg3_i] != 0 && global_arg2_i < MAX_EXEC_ARG_LEN) { \
-                exec_arg3[global_arg2_i++] = global_arg[global_arg3_i++]; \
-            } \
-            /* terminate the copied argument.*/ \
-            exec_arg3[global_arg2_i++] = 0; \
-            LOG(":: arg: ["); \
-            LOG(exec_argv[global_arg1_i-1]); \
-            LOG("]\n"); \
-            global_arg_state = args_advance_token(); \
-        } \
-        if (global_arg_state->state == ARG_STATE_ERR) { \
-            /* Argument parsing already reported the error.*/ \
-            /* Use "return" because the command is not expected to*/ \
-            /* keep the tool running.*/ \
-            return 1; \
-        } \
-        /* set the final argument to NULL to terminate the list of pointers.*/ \
-        exec_argv[global_arg1_i++] = NULL; \
-        if (global_arg1_i <= 1) { \
+            /* from cmd_exec.h.in:69 */ \
+        /* Split the arguments.*/ \
+        SHARED_SPLIT__PARSE_ARG \
+        if (global_arg3_i <= 1) { \
             /* No command to run*/ \
             stderrP("ERROR no command\n"); \
             /* Use "return" because the command is not expected to*/ \
@@ -155,15 +102,14 @@ extern const char cmd_name_exec[];
         } \
         EXEC_DEBUG_REPORT \
         /* This launches a new executable and terminates this one immediately.*/ \
-        execvp(exec_argv[0], (char * const*) exec_argv); \
+        execvp(shared_split_argv[0], (char * const*) shared_split_argv); \
         /* If the code is still running at this point, then there was an error.*/ \
         stderrP("ERROR exec failed to launch command "); \
-        stderrPLn(exec_argv[0]); \
+        stderrPLn(shared_split_argv[0]); \
         /* Use "return" because the command is not expected to*/ \
         /* keep the tool running.*/ \
         return 1; \
         break;
-#define RUN_CASE__EXEC
 #define REQUIRES_ADDL_ARG__EXEC
 
 #else /* USE_CMD_EXEC */

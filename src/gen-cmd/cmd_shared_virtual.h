@@ -20,7 +20,8 @@ FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
 AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
 LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
-SOFTWARE. */
+SOFTWARE.
+*/
 
 #ifndef _FS_SHELL__CMD_SHARED_VIRTUAL_
 #define _FS_SHELL__CMD_SHARED_VIRTUAL_
@@ -44,15 +45,15 @@ SOFTWARE. */
 
 #define ENUM_LIST__SHARED_STR
 #define VIRTUAL_ENUM_LIST__SHARED_STR \
-            /* from cmd_shared_virtual.h.in:35 */ \
+            /* from cmd_shared_virtual.h.in:36 */ \
             COMMAND_INDEX__SHARED_STR,
 #define GLOBAL_VARDEF__SHARED_STR
 #define INITIALIZE__SHARED_STR
 #define STARTUP_CASE__SHARED_STR
 #define RUN_CASE__SHARED_STR \
     case COMMAND_INDEX__SHARED_STR: \
-        /* from cmd_shared_virtual.h.in:35 */ \
-            /* from cmd_shared_virtual.h.in:37 */ \
+        /* from cmd_shared_virtual.h.in:36 */ \
+            /* from cmd_shared_virtual.h.in:38 */ \
             LOG(":: storing "); \
             LOGLN(global_arg); \
             global_arg_cached = global_arg; \
@@ -82,15 +83,15 @@ SOFTWARE. */
 
 #define ENUM_LIST__SHARED_INT
 #define VIRTUAL_ENUM_LIST__SHARED_INT \
-            /* from cmd_shared_virtual.h.in:50 */ \
+            /* from cmd_shared_virtual.h.in:51 */ \
             COMMAND_INDEX__SHARED_INT2,
 #define GLOBAL_VARDEF__SHARED_INT
 #define INITIALIZE__SHARED_INT
 #define STARTUP_CASE__SHARED_INT
 #define RUN_CASE__SHARED_INT \
     case COMMAND_INDEX__SHARED_INT2: \
-        /* from cmd_shared_virtual.h.in:50 */ \
-            /* from cmd_shared_virtual.h.in:52 */ \
+        /* from cmd_shared_virtual.h.in:51 */ \
+            /* from cmd_shared_virtual.h.in:53 */ \
             LOG(":: storing int "); \
             LOGLN(global_arg); \
             tmp_val = helper_arg_to_uint(global_arg, 10, 0xffff); \

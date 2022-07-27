@@ -82,4 +82,29 @@ SOFTWARE.
 
 #endif
 
+
+// USES_FD_READ - any command or capability that allows for reading from a file descriptor.
+#if   defined(USE_STREAMING_INPUT)
+
+#define USES_FD_READ
+
+#endif
+
+
+// USES_ENVIRONMENT - any command or capability that performs management of environment variables.
+#if   defined(USE_ENVIROMENT_INPUT)
+
+#define USES_ENVIRONMENT
+
+#endif
+
+
+// USES_SHARED_SPLIT_ARG - shared data for splitting one arg into multiple args.
+#if   defined(USE_CMD_EXEC)
+
+#define USES_SHARED_SPLIT_ARG
+
+#endif
+
+
 #endif /* _FS_SHELL__USES_ */

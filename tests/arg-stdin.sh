@@ -3,7 +3,7 @@
 # desc: argument parsing with commands from stdin
 # requires: +input +echo
 
-printf "echo a b 123 a123\\necho \"a b c\" def" | "${FS}" - > out.txt 2>err.txt
+printf "echo a b 123 a123\\necho [a b c] def" | "${FS}" - > out.txt 2>err.txt
 res=$?
 
 if [ ${res} -ne 0 ] ; then

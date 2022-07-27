@@ -1,25 +1,22 @@
 #!/bin/bash
 
-# desc: exec with no arguments
+# desc: exec with no arguments; will not fail.
 # requires: +exec
 
 "${FS}" exec >out.txt 2>err.txt
 res=$?
 
-if [ ${res} -ne 1 ] ; then
+if [ ${res} -ne 0 ] ; then
     echo "Bad exit code: ${res}"
     exit 1
 fi
 
 # -s : file exists and not empty
-if [ -s out.txt ] ; then
-    echo "Generated output to stdout"
+if [ -s out.txt ] || [ -s err.txt ] ; then
+    echo "Generated output to stdout or stderr"
+    echo "stdout:"
     cat out.txt
-    exit 1
-fi
-
-if [ "$( printf "ERROR no command\\n" )" != "$( cat err.txt )" ] ; then
-    echo "Generated unexpected stderr"
+    echo "stderr"
     cat err.txt
     exit 1
 fi

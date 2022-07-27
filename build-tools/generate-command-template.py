@@ -349,7 +349,7 @@ class CommandFileType(FilePart):
         elif isinstance(child, MacroSection) and child.name == 'OnInit':
             self.children.append(child)
         else:
-            raise ValueError(f'{child.cxt} :: cannot add inside a command definition ({self.cxt})')
+            raise ValueError(f'{child.cxt} :: cannot add {child.name} inside a command definition ({self.cxt})')
 
     def complete(self) -> FilePart:
         """Turn this into a real file type."""

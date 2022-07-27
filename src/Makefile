@@ -56,7 +56,7 @@ COMMAND_HEADERS_DIR = ./gen-cmd
 #   real values to switch on.
 CFLAGS += -Wall -pedantic -Wno-unused-variable -Wno-switch -I$(COMMAND_HEADERS_DIR) -I.
 OUTDIR = ../out
-SRC = main.c helpers.c globals.c command_runner.c args.c
+SRC = main.c helpers.c globals.c command_runner.c args.c load_input.c
 
 # cmd_find_cmd.h must always be first.
 # cmd_version.h must always be second-to-last.
@@ -80,6 +80,7 @@ COMMANDS = \
 	cmd_noop.h \
 	cmd_rm.h \
 	cmd_rmdir.h \
+	cmd_shared_sub_args.h \
 	cmd_shared_virtual.h \
 	cmd_signal.h \
 	cmd_sleep.h \

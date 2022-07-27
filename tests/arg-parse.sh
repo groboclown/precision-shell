@@ -3,7 +3,7 @@
 # desc: inline arguments are parsed as though they are separated by a single space.
 # requires: +echo
 
-"${FS}" echo \"a   \\n    b    c\" "&&" echo a   b   c > out.txt 2>err.txt
+"${FS}" echo [a   \\n    b    c] "&&" echo a   b   c > out.txt 2>err.txt
 res=$?
 
 if [ ${res} -ne 0 ] ; then

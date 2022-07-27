@@ -4,7 +4,7 @@
 # requires: +exec
 
 touch not-executable
-"${FS}" exec not-executable a.txt >out.txt 2>err.txt
+"${FS}" exec [not-executable a.txt] >out.txt 2>err.txt
 res=$?
 
 if [ ${res} -ne 1 ] ; then
