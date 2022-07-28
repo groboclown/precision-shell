@@ -25,7 +25,7 @@ if [ -s out.txt ] ; then
     exit 1
 fi
 
-if [ "$( printf "ERROR exec failed to launch command not-executable\\n" )" != "$( cat err.txt )" ] ; then
+if [ "$( printf "ERROR exec: not-executable a.txt" )" != "$( cat err.txt )" ] ; then
     echo "Generated unexpected stderr"
     cat err.txt
     exit 1

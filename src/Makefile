@@ -82,6 +82,7 @@ COMMANDS = \
 	cmd_rmdir.h \
 	cmd_shared_sub_args.h \
 	cmd_shared_virtual.h \
+	cmd_spawn.h \
 	cmd_signal.h \
 	cmd_sleep.h \
 	cmd_touch_trunc.h \

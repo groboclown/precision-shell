@@ -92,7 +92,8 @@ SOFTWARE.
 
 
 // USES_ENVIRONMENT - any command or capability that performs management of environment variables.
-#if   defined(USE_ENVIROMENT_INPUT)
+#if    defined(USE_ENVIROMENT_INPUT) \
+    || defined(USE_CMD_SPAWN)
 
 #define USES_ENVIRONMENT
 
@@ -100,7 +101,8 @@ SOFTWARE.
 
 
 // USES_SHARED_SPLIT_ARG - shared data for splitting one arg into multiple args.
-#if   defined(USE_CMD_EXEC)
+#if    defined(USE_CMD_EXEC) \
+    || defined(USE_CMD_SPAWN)
 
 #define USES_SHARED_SPLIT_ARG
 

@@ -1,6 +1,6 @@
 ## v4.0.0
 
-* (tbd)
+* [d72dc56](d72dc569173a90cedab6bcb4fae9b534c2798e6c)
     * Switched argument and input parsing to a unified front.  This will allow for commands such as `envsubst` to be more easily implemented.
     * Switched quoting to now be re-entrant.  The quote characters are now starting with '[' and ending with ']'.  This is a non-standard formatting, but allows interesting things like better support of the `exec` command.
 
@@ -17,7 +17,7 @@
     * Marked `REQUIRE_FULL_CMD` as a top-level Makefile flag.  Added tests for this flag, and added it to the version flags report and combination builds.
     * Added `ENVIRO_INPUT` as top-level Makefile flag.  Added it to the version flags report and combination builds.
     * Added environment variable parsing when the `ENVIRO_INPUT` flag is set (#11).
-* (tbd)
+* [ea4f744](ea4f74499c235c07ead248230c161d94e252078a)
     * Rebranded `fs-shell` as `precision-shell` (presh).
 
 

@@ -44,6 +44,7 @@ SOFTWARE.
 #include "cmd_rmdir.h"
 #include "cmd_shared_sub_args.h"
 #include "cmd_shared_virtual.h"
+#include "cmd_spawn.h"
 #include "cmd_signal.h"
 #include "cmd_sleep.h"
 #include "cmd_touch_trunc.h"
@@ -69,6 +70,7 @@ SOFTWARE.
             GLOBAL_VARDEF__RMDIR \
             GLOBAL_VARDEF__SHARED_SUB_ARGS \
             GLOBAL_VARDEF__SHARED_VIRTUAL \
+            GLOBAL_VARDEF__SPAWN \
             GLOBAL_VARDEF__SIGNAL \
             GLOBAL_VARDEF__SLEEP \
             GLOBAL_VARDEF__TOUCH_TRUNC \
@@ -92,6 +94,7 @@ SOFTWARE.
             INITIALIZE__RMDIR \
             INITIALIZE__SHARED_SUB_ARGS \
             INITIALIZE__SHARED_VIRTUAL \
+            INITIALIZE__SPAWN \
             INITIALIZE__SIGNAL \
             INITIALIZE__SLEEP \
             INITIALIZE__TOUCH_TRUNC \
@@ -115,6 +118,7 @@ SOFTWARE.
             STARTUP_CASE__RMDIR \
             STARTUP_CASE__SHARED_SUB_ARGS \
             STARTUP_CASE__SHARED_VIRTUAL \
+            STARTUP_CASE__SPAWN \
             STARTUP_CASE__SIGNAL \
             STARTUP_CASE__SLEEP \
             STARTUP_CASE__TOUCH_TRUNC \
@@ -138,6 +142,7 @@ SOFTWARE.
             RUN_CASE__RMDIR \
             RUN_CASE__SHARED_SUB_ARGS \
             RUN_CASE__SHARED_VIRTUAL \
+            RUN_CASE__SPAWN \
             RUN_CASE__SIGNAL \
             RUN_CASE__SLEEP \
             RUN_CASE__TOUCH_TRUNC \
@@ -161,6 +166,7 @@ SOFTWARE.
             REQUIRES_ADDL_ARG__RMDIR \
             REQUIRES_ADDL_ARG__SHARED_SUB_ARGS \
             REQUIRES_ADDL_ARG__SHARED_VIRTUAL \
+            REQUIRES_ADDL_ARG__SPAWN \
             REQUIRES_ADDL_ARG__SIGNAL \
             REQUIRES_ADDL_ARG__SLEEP \
             REQUIRES_ADDL_ARG__TOUCH_TRUNC \
@@ -188,6 +194,7 @@ enum CommandIndex {
             ENUM_LIST__RMDIR
             ENUM_LIST__SHARED_SUB_ARGS
             ENUM_LIST__SHARED_VIRTUAL
+            ENUM_LIST__SPAWN
             ENUM_LIST__SIGNAL
             ENUM_LIST__SLEEP
             ENUM_LIST__TOUCH_TRUNC
@@ -214,6 +221,7 @@ enum CommandIndex {
             VIRTUAL_ENUM_LIST__RMDIR
             VIRTUAL_ENUM_LIST__SHARED_SUB_ARGS
             VIRTUAL_ENUM_LIST__SHARED_VIRTUAL
+            VIRTUAL_ENUM_LIST__SPAWN
             VIRTUAL_ENUM_LIST__SIGNAL
             VIRTUAL_ENUM_LIST__SLEEP
             VIRTUAL_ENUM_LIST__TOUCH_TRUNC

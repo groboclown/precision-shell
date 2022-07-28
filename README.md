@@ -1,12 +1,12 @@
 # Precision Shell (presh)
 
-[![Build](https://github.com/groboclown/pre-shell/actions/workflows/build.yml/badge.svg)](https://github.com/groboclown/pre-shell/actions/workflows/build.yml)
+[![Build](https://github.com/groboclown/precision-shell/actions/workflows/build.yml/badge.svg)](https://github.com/groboclown/precision-shell/actions/workflows/build.yml)
 
 ## Custom Built Shell With Only What You Need
 
 Sometimes, you don't need or want a full fledged shell.  You just have a few things that you need to do, and allowing more is a security issue.
 
-`presh` offers a [few commands and shell syntax](#what-it-does), and gives you the flexibility to select which ones to compile, which can make the executable smaller and provide extra security by not enabling commands that don't need to be run.
+`presh` offers a [few commands and shell syntax](#what-it-does), and gives you the flexibility to select which ones to compile, which can make the executable smaller and provide extra security by not enabling commands that don't need to be run.  It's not POSIX conformant, and doesn't try to be.
 
 The tool has two goals - provide just enough commands for what you need to do, and make it small.
 
@@ -18,7 +18,7 @@ Last build size:
   * musl (Alpine): 21,944 bytes
   * dietlibc (Alpine): 13,256 bytes
 * Minimal build:
-  * glibc: 819,656 bytes
+  * glibc: 823,752 bytes
   * glibc (Arch): 778,280 bytes
   * musl (Alpine): 21,944 bytes
   * dietlibc (Alpine): 17,352 bytes
@@ -65,6 +65,7 @@ The shell supports these commands:
 * [exec](#exec) - switch execution to a new process.
 
 It also supports:
+* [Embedded Quoting](#command-parsing) by using the `[` and `]` symbols to allow easy deep quotes, like `exec [/usr/bin/echo [from native echo]]`
 * [Chaining commands](#command-chaining) together with `&&` and `;` (cannot be disabled).
 * [Standard script argument flag](#standard-script-flag) - if passed with the arguments `-c "commands"`, then the shell will parse the commands argument into individual commands (cannot be disabled).
 * [Script files](#script-files) - as an argument if used with `-f script-file-name`.
@@ -96,7 +97,7 @@ RUN echo Startup \
 * Change file timestamps.
 * Change current directory.
 * Provide splat pattern replacements.
-* Alter environment variables.
+* Alter environment variables (will change soon, though).
 * Flow control (if logic and loops) outside of early exit due to prior errors.
 * Background jobs or job control.
 * Anything with the network.
@@ -116,15 +117,13 @@ See [sample.Dockerfile](sample.Dockerfile) for an example of using it with Docke
 
 Because of the goals for the shell, no compiled version is distributed.  You're expected to build it from source yourself.
 
-You can build it directly and directly set the included commands:
+You can build it directly and set the included commands:
 
 ```bash
 make "COMMAND_FLAGS=-DUSE_CMD_CHMOD -DUSE_STREAMING_INPUT"
 ```
 
-For each command, you use the flag `USE_CMD_(flag name)` (with a few odd ones).  The flag name is in all capital letters with an underscore (`_`) in place of a hyphen (`-`).  A complete list of flags is in the [`Makefile.command-flags`](Makefile.command-flags) file.
-
-The `-DUSE_STREAMING_INPUT=1` turns on the special streaming input mode, which allows for reading scripts from stdin or a file.
+Flags are split into command flags and usage flags.  Each [command](#help) in this document also includes the flag to enable it in the compiled executable.  A complete list of flags is in the [`Makefile.command-flags`](Makefile.command-flags) file.
 
 You can use some built-in command flag groups:
 
@@ -437,15 +436,29 @@ This will cause the shell to ignore SIGINT (2, usually sent by a ctrl-c input), 
 
 **Compile flag**: `-DUSE_CMD_TRUNC`
 
-**Usage**: `exec (cmd) [arg1 [arg2 ...]]`
+**Usage**: `exec all-arguments`
 
-Reads the remaining arguments (even `;` and `&&`, thus it ignores command chaining), and replaces the current process with the new one.  If the command argument is not given, then this fails.
+Parses the first argument using the [presh quoting rules](#command-parsing) and transfers execution to the command.  The first value extracted is the full path to the executable to run, and the rest of the values are passed as arguments.  If the executable exists and is executable, then presh will not run any more commands.
 
 Commands must be given in the full path; it doesn't look at any environment variable like `PATH`, even with the [environment variable parsing](#environment-variables) enabled.
+
+If the command file does not exist or is not executable, then the next argument will be tried to run.  If none of them can be run, then the `exec` command generates an error.  Note that if the called command can run but generates an error, presh doesn't have control at that point and will not run anything else.
+
+Because of how `exec` works, trailing the command with [`&&`](#chaining-commands) will never cause the following command to run.  This is because the only way `exec` will allow `presh` to run the next command is if it encountered an error attempting to launch the new process.
+
+**Example:**
+
+Report the date and time to a file, where the date time tool may be located in several locations, not known ahead of time.  This uses [`dup-w`](#dup-r-dup-w-dup-a) to cause the stdout from the executed command to be sent to the `/etc/time.txt` file, and if no date program is found, the message "unknown date" is written instead.
+
+```bash
+presh -c "dup-w 1 /etc/time.txt && exec [/bin/date] [/usr/bin/date] [/sbin/date] ; echo [unknown date]"
+```
 
 ### Chaining Commands
 
 Like most shells, you can chain commands together with `&&` and `;`.  `&&` stops the execution if the previous command failed and allows another command after it; and `;` resets the error count to 0 and allows another command to follow it.  If a new line is encountered, that acts like a `;`.
+
+A [future feature](https://github.com/groboclown/precision-shell/issues/14) may allow changing the newline behavior via a compile flag.
 
 ```bash
 $ ls
@@ -462,21 +475,6 @@ $ ./presh -c "echo abc \
 echo def"
 abc
 def
-```
-
-The `exec` command, however, ignores the chain, and passes all arguments to the requested command:
-
-```bash
-$ ./presh -c "echo abc ; echo def"
-abc
-def
-# Use the "which" command to find where the echo command is located
-# on the path.  Some systems have this under /usr/sbin/echo.
-$ ./presh -c "$( which echo ) abc ; echo def"
-ERROR /usr/sbin/echo: abc
-def
-$ ./presh -c "exec $( which echo ) abc ; echo def"
-abc ; echo def
 ```
 
 ### Environment Variables
@@ -526,6 +524,8 @@ If you use the input-enabled build, then you can use these additional forms of t
 Some commands, like [`ln-s`](#ln-s), require an exact number of arguments.  Unless this flag is set, using the command with just one argument will not cause a failure.  With this flag, `presh` will generate an error.
 
 ### Passing Commands from stdin
+
+**Compile flag**: `-DUSE_STREAMING_INPUT`
 
 If you use the input-enabled build, then you can pass the argument `-` to have the tool read commands from stdin.
 
