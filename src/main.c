@@ -37,18 +37,28 @@ SOFTWARE.
 #include "command_runner.h"
 
 
-int main(const int argc, char *argv[], char * envp[]) {
+int main(const int argc, char *argv[]) {
     // Set the invoked name now, before the parser loses it.
     global_invoked_name = argv[0];
 
     // Initialize the argument parser.
-    int ret = args_setup_tokenizer(argc, argv, envp);
-    if (ret == 0) {
+    struct ArgState *arg_state = args_setup_tokenizer(
+        argc, argv,
+#ifdef USE_ENVIROMENT_INPUT
+        1
+#else
+        0
+#endif
+        );
+    int ret = 0;
+    if (arg_state == NULL) {
+        ret = 1;
+    } else {
         // Run all the commands
-        ret = command_runner();
+        ret = command_runner(arg_state);
+        // Close the tokenizer, capturing any additional errors along the way.
+        ret += args_close_tokenizer(arg_state);
     }
-    // Close the tokenizer, capturing any additional errors along the way.
-    ret += args_close_tokenizer();
 
     // Exit code.
     return ret;

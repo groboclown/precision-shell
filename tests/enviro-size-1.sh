@@ -14,7 +14,7 @@ expected="${long_arg}"
 # Make it longer
 long_arg="${long_arg}terminated"
 export long_arg
-"${FS}" -c "echo '${long_arg}'" > out.txt 2>err.txt
+"${FS}" -c "echo [${long_arg}]" > out.txt 2>err.txt
 res=$?
 
 if [ ${res} -ne 1 ] ; then

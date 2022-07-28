@@ -3,7 +3,7 @@
 # desc: argument parsing with commands from stdin
 # requires: +input +echo
 
-printf "echo a b 123 a123\\necho \"a b c\" def" > test-script.txt
+printf "echo a b 123 a123\\necho [a b c] def" > test-script.txt
 "${FS}" -f test-script.txt > out.txt 2>err.txt
 res=$?
 
@@ -19,7 +19,7 @@ if [ -s err.txt ] ; then
     exit 1
 fi
 
-if [ "$( printf "echo a b 123 a123\\necho \"a b c\" def" )" != "$( cat test-script.txt )" ] ; then
+if [ "$( printf "echo a b 123 a123\\necho [a b c] def" )" != "$( cat test-script.txt )" ] ; then
     echo "input script was changed."
     cat test-script.txt
     exit 1

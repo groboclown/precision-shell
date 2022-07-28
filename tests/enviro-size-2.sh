@@ -17,7 +17,7 @@ while [ "${#long_arg}" -le $(( PARSED_ARG_SIZE - 5 )) ] ; do
 done
 long_arg="${long_arg}\${VAL}"
 export long_arg
-"${FS}" -c "echo '${long_arg}'" > out.txt 2>err.txt
+"${FS}" -c "echo [${long_arg}]" > out.txt 2>err.txt
 res=$?
 
 if [ ${res} -ne 1 ] ; then

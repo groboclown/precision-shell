@@ -5,7 +5,7 @@
 
 export A_Test_Value=MyValue
 # The $VAR format is not supported; only the ${VAR} is supported.
-"${FS}" -c "echo 'x \$A_Test_Value y\${A_Test_Value}z'" > out.txt 2>err.txt
+"${FS}" -c "echo [x \$A_Test_Value y\${A_Test_Value}z]" > out.txt 2>err.txt
 res=$?
 
 if [ ${res} -ne 0 ] ; then

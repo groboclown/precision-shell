@@ -60,9 +60,6 @@ enum ArgumentDesc {
 #ifndef PARSED_ARG_SAVE_COUNT
 #define PARSED_ARG_SAVE_COUNT    4
 #endif
-#ifndef MAX_ENVIRONMENT_VARIABLE_COUNT
-#define MAX_ENVIRONMENT_VARIABLE_COUNT 127
-#endif
 
 
 /**
@@ -79,28 +76,40 @@ typedef struct {
 
 
 /**
+ * @brief Opaque state data for the argument tokenizer.
+ * 
+ */
+struct ArgState;
+
+
+/**
  * @brief Parse the shell execution request into tokens.
  * 
  * After calling this and all advanceToken calls, "closeTokenizer()" must be called.
  * 
- * @return 0 if okay, != 0 if problem.
+ * @param uses_environment 0 if not using environment, otherwise uses environment variables
+ *      (if the flag is enabled)
+ * @return NULL if there's a problem or the opaque state data.  This memory is
+ *      managed by the arg parser.
  */
-int args_setup_tokenizer(const int src_argc, char *src_argv[], char * src_envp[]);
+struct ArgState *args_setup_tokenizer(const int src_argc, char *src_argv[], int uses_environment);
 
 /**
  * @brief advance to the next token.
  * 
  * "tokenize" must be called first.
  * 
- * @return const char* 
+ * @param state the internal state data
+ * @return const Argument* a read-only structure; the memory is owned by the tokenizer.
  */
-const Argument *args_advance_token();
+const Argument *args_advance_token(struct ArgState *state);
 
 /**
  * @brief Clean out the tokenizer after using it.
  * 
+ * @param state the internal state data; it will be invalid after this call.
  * @return int 0 if okay, non-zero if error.
  */
-int args_close_tokenizer();
+int args_close_tokenizer(struct ArgState *state);
 
 #endif

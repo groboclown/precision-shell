@@ -6,7 +6,7 @@
 export A_Test_Value=MyValue
 unset A_Test_Value
 export A_Test_Value
-"${FS}" -c "echo 'x \${A_Test_Value} y'" > out.txt 2>err.txt
+"${FS}" -c "echo [x \${A_Test_Value} y]" > out.txt 2>err.txt
 res=$?
 
 if [ ${res} -ne 0 ] ; then

@@ -3,7 +3,7 @@
 # desc: echo with arguments outputs one argument per line.
 # requires: +echo
 
-"${FS}" echo a b 123 a123 \"a b c\" > out.txt 2>err.txt
+"${FS}" echo a b 123 a123 [a b c] [[1 2 3]] > out.txt 2>err.txt
 res=$?
 
 if [ ${res} -ne 0 ] ; then
@@ -17,7 +17,7 @@ if [ -s err.txt ] ; then
     cat err.txt
     exit 1
 fi
-if [ "$( printf "a\\nb\\n123\\na123\\na b c\\n" )" != "$( cat out.txt )" ] ; then
+if [ "$( printf "a\\nb\\n123\\na123\\na b c\\n[1 2 3]\\n" )" != "$( cat out.txt )" ] ; then
     echo "Generated stdout not as expected:"
     cat out.txt
     exit 1

@@ -42,6 +42,7 @@ SOFTWARE.
 #include "cmd_noop.h"
 #include "cmd_rm.h"
 #include "cmd_rmdir.h"
+#include "cmd_shared_sub_args.h"
 #include "cmd_shared_virtual.h"
 #include "cmd_signal.h"
 #include "cmd_sleep.h"
@@ -66,6 +67,7 @@ SOFTWARE.
             GLOBAL_VARDEF__NOOP \
             GLOBAL_VARDEF__RM \
             GLOBAL_VARDEF__RMDIR \
+            GLOBAL_VARDEF__SHARED_SUB_ARGS \
             GLOBAL_VARDEF__SHARED_VIRTUAL \
             GLOBAL_VARDEF__SIGNAL \
             GLOBAL_VARDEF__SLEEP \
@@ -88,6 +90,7 @@ SOFTWARE.
             INITIALIZE__NOOP \
             INITIALIZE__RM \
             INITIALIZE__RMDIR \
+            INITIALIZE__SHARED_SUB_ARGS \
             INITIALIZE__SHARED_VIRTUAL \
             INITIALIZE__SIGNAL \
             INITIALIZE__SLEEP \
@@ -110,6 +113,7 @@ SOFTWARE.
             STARTUP_CASE__NOOP \
             STARTUP_CASE__RM \
             STARTUP_CASE__RMDIR \
+            STARTUP_CASE__SHARED_SUB_ARGS \
             STARTUP_CASE__SHARED_VIRTUAL \
             STARTUP_CASE__SIGNAL \
             STARTUP_CASE__SLEEP \
@@ -132,6 +136,7 @@ SOFTWARE.
             RUN_CASE__NOOP \
             RUN_CASE__RM \
             RUN_CASE__RMDIR \
+            RUN_CASE__SHARED_SUB_ARGS \
             RUN_CASE__SHARED_VIRTUAL \
             RUN_CASE__SIGNAL \
             RUN_CASE__SLEEP \
@@ -154,6 +159,7 @@ SOFTWARE.
             REQUIRES_ADDL_ARG__NOOP \
             REQUIRES_ADDL_ARG__RM \
             REQUIRES_ADDL_ARG__RMDIR \
+            REQUIRES_ADDL_ARG__SHARED_SUB_ARGS \
             REQUIRES_ADDL_ARG__SHARED_VIRTUAL \
             REQUIRES_ADDL_ARG__SIGNAL \
             REQUIRES_ADDL_ARG__SLEEP \
@@ -180,6 +186,7 @@ enum CommandIndex {
             ENUM_LIST__NOOP
             ENUM_LIST__RM
             ENUM_LIST__RMDIR
+            ENUM_LIST__SHARED_SUB_ARGS
             ENUM_LIST__SHARED_VIRTUAL
             ENUM_LIST__SIGNAL
             ENUM_LIST__SLEEP
@@ -205,6 +212,7 @@ enum CommandIndex {
             VIRTUAL_ENUM_LIST__NOOP
             VIRTUAL_ENUM_LIST__RM
             VIRTUAL_ENUM_LIST__RMDIR
+            VIRTUAL_ENUM_LIST__SHARED_SUB_ARGS
             VIRTUAL_ENUM_LIST__SHARED_VIRTUAL
             VIRTUAL_ENUM_LIST__SIGNAL
             VIRTUAL_ENUM_LIST__SLEEP
