@@ -35,7 +35,7 @@ fi
 # Should have output 2 lines:
 # SPAWNED_PID_1 SPAWNED_PID_2
 # COMPLETED_PID_1 COMPLETED_PID_2
-if [ 2 != "$( cat out.txt | wc --lines )" ] || [ 4 != "$( cat out.txt | wc --words )" ] ; then
+if [ 2 != "$( cat out.txt | wc -l )" ] || [ 4 != "$( cat out.txt | wc -w )" ] ; then
     echo "Generated unexpected stdout"
     cat out.txt
     exit 1

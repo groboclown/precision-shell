@@ -45,7 +45,7 @@ The shell supports these commands:
 * [version](#version) - prints the current version (cannot be disabled).
 * [noop](#noop) - do nothing.  The comment command.
 * [echo](#echo) - send text to `stdout`.
-* [?](#conditional-command) - run a command conditionally based on the error result of another.
+* [?:](#conditional-command) - run a command conditionally based on the error result of another.
 * [subcmd](#subcmd) - run an argument as a complete precision shell command.
 * [exit](#exit) - exits the command (or sub-command) with an exit code.
 * [cd](#cd) - change current working directory.
