@@ -4,6 +4,8 @@
 # requires: +exec
 
 touch not-executable
+# explicitly make it not executable
+chmod -x not-executable
 "${FS}" exec [not-executable a.txt] >out.txt 2>err.txt
 res=$?
 

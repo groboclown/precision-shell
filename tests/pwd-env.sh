@@ -1,9 +1,10 @@
 #!/bin/bash
 
-# desc: exec with only the command name to run.
-# requires: +exec
+# desc: pwd storing the value in an env
+# requires: +pwd +echo +enviro
 
-"${FS}" exec [["$( which echo )"]] >out.txt 2>err.txt
+here="$( pwd )"
+"${FS}" -c "pwd [env.value] && echo \${env.value}" > out.txt 2>err.txt
 res=$?
 
 if [ ${res} -ne 0 ] ; then
@@ -11,8 +12,8 @@ if [ ${res} -ne 0 ] ; then
     exit 1
 fi
 
-if [ "$( printf "\\n" )" != "$( cat out.txt )" ] ; then
-    echo "Generated stdout not as expected:"
+if [ "$( printf "${here}\n" )" != "$( cat out.txt )" ] ; then
+    echo "Generated invalid stdout"
     cat out.txt
     exit 1
 fi

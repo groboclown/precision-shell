@@ -1,9 +1,12 @@
 #!/bin/bash
 
-# desc: exec with only the command name to run.
-# requires: +exec
+# desc: noop as a comment
+# requires: +# +echo
 
-"${FS}" exec [["$( which echo )"]] >out.txt 2>err.txt
+"${FS}" -c "\
+    echo 1 ;
+    # [This is a comment] ;
+    echo 2" > out.txt 2>err.txt
 res=$?
 
 if [ ${res} -ne 0 ] ; then
@@ -11,8 +14,8 @@ if [ ${res} -ne 0 ] ; then
     exit 1
 fi
 
-if [ "$( printf "\\n" )" != "$( cat out.txt )" ] ; then
-    echo "Generated stdout not as expected:"
+if [ "$( printf "1\\n2\\n" )" != "$( cat out.txt )" ] ; then
+    echo "Generated invalid stdout"
     cat out.txt
     exit 1
 fi

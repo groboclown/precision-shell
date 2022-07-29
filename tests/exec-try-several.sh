@@ -8,7 +8,7 @@ touch not-a-command.txt
 chmod -x not-a-command.txt
 
 touch_exec="$( which touch )"
-"${FS}" -c "exec [not-a-command.txt] [${touch_exec} a.txt]" >out.txt 2>err.txt
+"${FS}" -c "exec [not-a-command.txt] [[${touch_exec}] a.txt]" >out.txt 2>err.txt
 res=$?
 
 if [ ${res} -ne 0 ] ; then

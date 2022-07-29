@@ -27,6 +27,13 @@ SOFTWARE.
 // The first includes.
 
 
+// --------------------------------------------------------------------------
+// Special commands that imply other commands must be included.
+
+
+// --------------------------------------------------------------------------
+// Derived uses
+
 // USES_SIGNALS - signal processing and special global variables are used.
 #ifdef USE_CMD_SIGNAL
 
@@ -76,6 +83,7 @@ SOFTWARE.
     || defined(USE_CMD_LN_H) \
     || defined(USE_CMD_MV) \
     || defined(USE_CMD_MKDEV) \
+    || defined(USE_CMD_EXPORT) \
     || defined(USE_CMD_CHOWN)
 
 #define USES_SHARED_INT
@@ -93,7 +101,9 @@ SOFTWARE.
 
 // USES_ENVIRONMENT - any command or capability that performs management of environment variables.
 #if    defined(USE_ENVIROMENT_INPUT) \
-    || defined(USE_CMD_SPAWN)
+    || defined(USE_CMD_SPAWN) \
+    || defined(USE_CMD_PWD) \
+    || defined(USE_CMD_WAIT_PID)
 
 #define USES_ENVIRONMENT
 
@@ -102,9 +112,22 @@ SOFTWARE.
 
 // USES_SHARED_SPLIT_ARG - shared data for splitting one arg into multiple args.
 #if    defined(USE_CMD_EXEC) \
-    || defined(USE_CMD_SPAWN)
+    || defined(USE_CMD_EXPORT) \
+    || defined(USE_CMD_SPAWN) \
+    || defined(USE_CMD_WAIT_PID) \
+    || defined(USE_CMD_SUBCMD) \
+    || defined(USE_CMD_CONDITIONAL)
 
 #define USES_SHARED_SPLIT_ARG
+
+#endif
+
+
+// USES_SHARED_ITOA - shared integer to ascii code.
+#if    defined(USE_CMD_SPAWN) \
+    || defined(USE_CMD_WAIT_PID)
+
+#define USES_SHARED_ITOA
 
 #endif
 

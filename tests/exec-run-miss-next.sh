@@ -4,7 +4,7 @@
 # requires: +exec
 
 touch_exec="$( which touch )"
-"${FS}" -c "exec [${touch_exec} a.txt] ; echo foo" >out.txt 2>err.txt
+"${FS}" -c "exec [[${touch_exec}] a.txt] ; echo foo" >out.txt 2>err.txt
 res=$?
 
 if [ ${res} -ne 0 ] ; then
