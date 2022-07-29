@@ -17,7 +17,7 @@
     * Marked `REQUIRE_FULL_CMD` as a top-level Makefile flag.  Added tests for this flag, and added it to the version flags report and combination builds.
     * Added `ENVIRO_INPUT` as top-level Makefile flag.  Added it to the version flags report and combination builds.
     * Added environment variable parsing when the `ENVIRO_INPUT` flag is set (#11).
-* (tbd)
+* [9bc5cac](9bc5caca191c5d06a55e7426a849e119ba637be2)
     * Rebranded `fs-shell` as `precision-shell` (presh).
 
 
