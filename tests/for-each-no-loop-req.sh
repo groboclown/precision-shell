@@ -6,20 +6,22 @@
 "${FS}" -c "for-each abc def" >out.txt 2>err.txt
 res=$?
 
-# For an unknown reason, for-each loop with reqargs
-#   does not trigger an error when the loop is skipped.
-if [ ${res} -ne 0 ] ; then
+if [ ${res} -ne 1 ] ; then
     echo "Bad exit code: ${res}"
     exit 1
 fi
 
 # -s : file exists and not empty
-if [ -s out.txt ] || [ -s err.txt ] ; then
-    echo "Generated output to stdout or stderr"
-    echo "stdout:"
-    cat out.txt
-    echo "stderr:"
+if [ "$( printf "ERROR for-each: requires another argument\\n" )" !=  "$( cat err.txt )" ] ; then
+    echo "Generated unexpected output to stderr"
     cat err.txt
+    exit 1
+fi
+
+# -s : file exists and not empty
+if [ -s out.txt ] ; then
+    echo "Generated output to stdout"
+    cat out.txt
     exit 1
 fi
 

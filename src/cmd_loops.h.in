@@ -77,8 +77,13 @@ AsOptional(command="for-each",
     )
 
     WithVirtualStep(enum="FOR_EACH_IN",
-
+        // Because we change the next command at the end,
+        //      requiring another arg only applies for this
+        //      one virtual step.
+        RequiresAnotherArg()
         OnArg(
+            global_cmd = COMMAND_INDEX__ERR;
+
             // Env name to store the list value in is for_each_var_name
             // List of values is in global_arg_cached
             // Argument to loop over is in global_arg
@@ -129,7 +134,13 @@ AsOptional(command="for-each",
 
 WithAuxFor(commands=[while-no-error, while-error, for-each],
     WithVirtualStep(enum="WHILE_LOOP",
+        // Because we change the next command at the end,
+        //      requiring another arg only applies for this
+        //      one virtual step.
+        RequiresAnotherArg()
         OnArg(
+            global_cmd = COMMAND_INDEX__ERR;
+
             // global_arg1_i == 0 for no-error
             // Argument to test is global_arg_cached
             // Argument to loop over is in global_arg
@@ -165,7 +176,6 @@ WithAuxFor(commands=[while-no-error, while-error, for-each],
                 global_err =
                     command_runner(shared_split_arg_state) + args_close_tokenizer(shared_split_arg_state);
             }
-            global_cmd = COMMAND_INDEX__ERR;
         )
     )
 )

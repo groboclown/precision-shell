@@ -126,6 +126,12 @@ extern const char cmd_name_while_error[];
 
 
 
+
+        // Because we change the next command at the end,
+
+        //      requiring another arg only applies for this
+
+        //      one virtual step.
 /* from cmd_loops.h.in:68 */
 extern const char cmd_name_for_each[];
 #define ENUM_LIST__FOR_EACH \
@@ -157,7 +163,8 @@ extern const char cmd_name_for_each[];
         break; \
     case COMMAND_INDEX__FOR_EACH_IN: \
         /* from cmd_loops.h.in:79 */ \
-            /* from cmd_loops.h.in:81 */ \
+            /* from cmd_loops.h.in:84 */ \
+            global_cmd = COMMAND_INDEX__ERR; \
             /* Env name to store the list value in is for_each_var_name*/ \
             /* List of values is in global_arg_cached*/ \
             /* Argument to loop over is in global_arg*/ \
@@ -199,7 +206,8 @@ extern const char cmd_name_for_each[];
             global_err += args_close_tokenizer(for_each_split_arg_state); \
         break;
 #define REQUIRES_ADDL_ARG__FOR_EACH \
-            case COMMAND_INDEX__FOR_EACH:
+            case COMMAND_INDEX__FOR_EACH: \
+            case COMMAND_INDEX__FOR_EACH_IN:
 
 #else /* USE_CMD_FOR_EACH */
 
@@ -217,6 +225,12 @@ extern const char cmd_name_for_each[];
 #if defined(USE_CMD_WHILE_NO_ERROR) || defined(USE_CMD_WHILE_ERROR) || defined(USE_CMD_FOR_EACH)
 
 
+        // Because we change the next command at the end,
+
+        //      requiring another arg only applies for this
+
+        //      one virtual step.
+
 #define ENUM_LIST__LOOPS \
             ENUM_LIST__WHILE_NO_ERROR \
             ENUM_LIST__WHILE_ERROR \
@@ -225,7 +239,7 @@ extern const char cmd_name_for_each[];
             VIRTUAL_ENUM_LIST__WHILE_NO_ERROR \
             VIRTUAL_ENUM_LIST__WHILE_ERROR \
             VIRTUAL_ENUM_LIST__FOR_EACH \
-            /* from cmd_loops.h.in:131 */ \
+            /* from cmd_loops.h.in:136 */ \
             COMMAND_INDEX__WHILE_LOOP,
 #define GLOBAL_VARDEF__LOOPS \
             GLOBAL_VARDEF__WHILE_NO_ERROR \
@@ -244,8 +258,9 @@ extern const char cmd_name_for_each[];
             RUN_CASE__WHILE_ERROR \
             RUN_CASE__FOR_EACH \
     case COMMAND_INDEX__WHILE_LOOP: \
-        /* from cmd_loops.h.in:131 */ \
-            /* from cmd_loops.h.in:132 */ \
+        /* from cmd_loops.h.in:136 */ \
+            /* from cmd_loops.h.in:141 */ \
+            global_cmd = COMMAND_INDEX__ERR; \
             /* global_arg1_i == 0 for no-error*/ \
             /* Argument to test is global_arg_cached*/ \
             /* Argument to loop over is in global_arg*/ \
@@ -265,10 +280,10 @@ extern const char cmd_name_for_each[];
                     (global_arg1_i == 0 && tmp_val != 0) \
                     || (global_arg1_i != 0 && tmp_val == 0) \
                 ) { \
-                    LOG(":: Test succeeded\n"); \
+                    LOG(":: Test passed criteria.  Stopping loop.\n"); \
                     break; \
                 } \
-                LOG(":: Test failed.  Running body\n"); \
+                LOG(":: Running body\n"); \
                 shared_split_input_argv[2] = global_arg; \
                 shared_split_arg_state = args_setup_tokenizer( \
                     3, (char **) shared_split_input_argv, \
@@ -278,12 +293,12 @@ extern const char cmd_name_for_each[];
                 global_err = \
                     command_runner(shared_split_arg_state) + args_close_tokenizer(shared_split_arg_state); \
             } \
-            global_cmd = COMMAND_INDEX__ERR; \
         break;
 #define REQUIRES_ADDL_ARG__LOOPS \
             REQUIRES_ADDL_ARG__WHILE_NO_ERROR \
             REQUIRES_ADDL_ARG__WHILE_ERROR \
-            REQUIRES_ADDL_ARG__FOR_EACH
+            REQUIRES_ADDL_ARG__FOR_EACH \
+            case COMMAND_INDEX__WHILE_LOOP:
 
 #else /* defined(USE_CMD_WHILE_NO_ERROR) || defined(USE_CMD_WHILE_ERROR) || defined(USE_CMD_FOR_EACH) */
 
