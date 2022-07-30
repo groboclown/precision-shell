@@ -130,6 +130,8 @@ SOFTWARE.
     || defined(USE_CMD_WAIT_PID) \
     || defined(USE_CMD_SUBCMD) \
     || defined(USE_CMD_IF_ELSE) \
+    || defined(USE_CMD_WHILE_NO_ERROR) \
+    || defined(USE_CMD_WHILE_ERROR) \
     || defined(USE_CMD_FOR_EACH)
 
 #define USES_SHARED_SPLIT_ARG

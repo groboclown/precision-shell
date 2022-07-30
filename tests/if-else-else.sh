@@ -3,9 +3,31 @@
 # desc: if-else command running the else block
 # requires: +trunc +echo +if-else
 
+
+# Because root can avoid file mode, make sure this is
+# run as non-root.
+
 echo -n "a.txt" > a.txt
 chmod 000 a.txt
-"${FS}" -c "if-else [trunc a.txt] [echo yes] [echo no]" >out.txt 2>err.txt
+if [ "$( id -u )" = "0" ] || [ "$( id -u )" = "root" ] ; then
+    if [ "${UID1}" = 0 ] || [ -z "${UID1}" ] ; then
+        echo "?? SKIPPED because UID1 is zero or not set"
+        exit 0
+    fi
+    user1="$( getent passwd "${UID1}" | cut -f 1 -d ':' )"
+    if [ -z "${user1}" ] ; then
+        echo "?? SKIPPED because UID1 (${UID1}) is missing"
+        exit 0
+    fi
+    RUN="su -s ${FS} ${user1}"
+    # allow user1 to modify the file
+    chown "${user1}" a.txt
+else
+    RUN="${FS}"
+fi
+
+
+${RUN} -c "if-else [trunc a.txt] [echo yes] [echo no]" >out.txt 2>err.txt
 res=$?
 
 if [ ${res} -ne 0 ] ; then
@@ -17,6 +39,7 @@ chmod 666 a.txt
 # -s : file exists and not empty
 if [ "$( printf "a.txt" )" != "$( cat a.txt )" ] ; then
     echo "Incorrectly removed or changed source file"
+    cat a.txt
     exit 1
 fi
 

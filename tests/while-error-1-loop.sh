@@ -3,9 +3,31 @@
 # desc: exporting environment variables is passed to child processes
 # requires: +while-error +dup-w +chmod
 
-touch a.txt
+
+# Because root can avoid file mode, make sure this is
+# run as non-root.
+
+echo -n "a.txt" > a.txt
 chmod 000 a.txt
-"${FS}" -c "while-error [dup-w 1 a.txt] [chmod 666 a.txt ; echo [modified a]]" >out.txt 2>err.txt
+if [ "$( id -u )" = "0" ] || [ "$( id -u )" = "root" ] ; then
+    if [ "${UID1}" = 0 ] || [ -z "${UID1}" ] ; then
+        echo "?? SKIPPED because UID1 is zero or not set"
+        exit 0
+    fi
+    user1="$( getent passwd "${UID1}" | cut -f 1 -d ':' )"
+    if [ -z "${user1}" ] ; then
+        echo "?? SKIPPED because UID1 (${UID1}) is missing"
+        exit 0
+    fi
+    RUN="su -s ${FS} ${user1}"
+    # allow user1 to modify the file
+    chown "${user1}" a.txt
+else
+    RUN="${FS}"
+fi
+
+
+${RUN} -c "while-error [dup-w 1 a.txt] [chmod 666 a.txt ; echo [modified a]]" >out.txt 2>err.txt
 res=$?
 
 if [ ${res} -ne 0 ] ; then
