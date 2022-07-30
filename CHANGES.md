@@ -15,6 +15,7 @@
     * Added `pwd` command.
     * Added `cat` and `env-cat` commands.
     * Added `write-fd` command.
+    * Added `while-error`, `while-no-error`, and `for-each` looping commands.
     * Modified the noop command to also be called `#` to support comment like structures, and `#!` to allow for running presh scripts natively.
     * Modified the `dup-w` command to back up the standard file descriptors so they can be restored.
     * Fixed a bug in the `dup-*` commands where they did not correctly close file descriptors for opened files if the assigned-to file descriptor gets re-dup'd.

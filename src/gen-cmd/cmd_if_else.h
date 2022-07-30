@@ -68,9 +68,9 @@ extern const char cmd_name_if_else[];
             /* from cmd_if_else.h.in:35 */ \
             COMMAND_INDEX__IF_ELSE,
 #define VIRTUAL_ENUM_LIST__IF_ELSE \
-            /* from cmd_if_else.h.in:59 */ \
+            /* from cmd_if_else.h.in:60 */ \
             COMMAND_INDEX__IF_ELSE__RUN, \
-            /* from cmd_if_else.h.in:78 */ \
+            /* from cmd_if_else.h.in:80 */ \
             COMMAND_INDEX__IF_ELSE__SKIP,
 #define GLOBAL_VARDEF__IF_ELSE \
             /* from cmd_if_else.h.in:35 */ \
@@ -89,7 +89,8 @@ extern const char cmd_name_if_else[];
             /* Any way to force this to not parse env?*/ \
             1); \
         /* Note: error code is not going to be in the global_err*/ \
-        tmp_val = command_runner(shared_split_arg_state); \
+        tmp_val = \
+            command_runner(shared_split_arg_state) + args_close_tokenizer(shared_split_arg_state); \
         global_arg3_i = COMMAND_INDEX__ERR; \
         if (tmp_val == 0) { \
             global_cmd = COMMAND_INDEX__IF_ELSE__RUN; \
@@ -100,21 +101,22 @@ extern const char cmd_name_if_else[];
         } \
         break; \
     case COMMAND_INDEX__IF_ELSE__RUN: \
-        /* from cmd_if_else.h.in:59 */ \
-            /* from cmd_if_else.h.in:64 */ \
+        /* from cmd_if_else.h.in:60 */ \
+            /* from cmd_if_else.h.in:65 */ \
         LOG(":: running argument in a sub-command\n"); \
         shared_split_input_argv[2] = global_arg; \
         shared_split_arg_state = args_setup_tokenizer( \
             3, (char **) shared_split_input_argv, \
             /* Any way to force this to not parse env?*/ \
             1); \
-        global_err = command_runner(shared_split_arg_state); \
+        global_err = \
+            command_runner(shared_split_arg_state) + args_close_tokenizer(shared_split_arg_state); \
         global_cmd = global_arg2_i; \
         global_arg2_i = global_arg3_i; \
         break; \
     case COMMAND_INDEX__IF_ELSE__SKIP: \
-        /* from cmd_if_else.h.in:78 */ \
-            /* from cmd_if_else.h.in:82 */ \
+        /* from cmd_if_else.h.in:80 */ \
+            /* from cmd_if_else.h.in:84 */ \
         global_cmd = global_arg2_i; \
         global_arg2_i = global_arg3_i; \
         LOG(":: skipping argument\n"); \

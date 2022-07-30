@@ -63,7 +63,8 @@ extern const char cmd_name_subcmd[];
             3, (char **) shared_split_input_argv, \
             /* Any way to force this to not parse env?*/ \
             1); \
-        global_err = command_runner(shared_split_arg_state); \
+        global_err = \
+            command_runner(shared_split_arg_state) + args_close_tokenizer(shared_split_arg_state); \
         break;
 #define REQUIRES_ADDL_ARG__SUBCMD
 

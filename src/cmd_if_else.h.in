@@ -44,7 +44,8 @@ WithNamedStep(enum="IF_ELSE", name="if-else",
             // Any way to force this to not parse env?
             1);
         // Note: error code is not going to be in the global_err
-        tmp_val = command_runner(shared_split_arg_state);
+        tmp_val =
+            command_runner(shared_split_arg_state) + args_close_tokenizer(shared_split_arg_state);
         global_arg3_i = COMMAND_INDEX__ERR;
         if (tmp_val == 0) {
             global_cmd = COMMAND_INDEX__IF_ELSE__RUN;
@@ -68,7 +69,8 @@ WithVirtualStep(enum="IF_ELSE__RUN",
             3, (char **) shared_split_input_argv,
             // Any way to force this to not parse env?
             1);
-        global_err = command_runner(shared_split_arg_state);
+        global_err =
+            command_runner(shared_split_arg_state) + args_close_tokenizer(shared_split_arg_state);
         global_cmd = global_arg2_i;
         global_arg2_i = global_arg3_i;
     )

@@ -78,6 +78,7 @@ COMMANDS = \
 	cmd_fmode.h \
 	cmd_ln_h.h \
 	cmd_ln_s.h \
+	cmd_loops.h \
 	cmd_if_else.h \
 	cmd_kill_pid.h \
 	cmd_mkdir.h \

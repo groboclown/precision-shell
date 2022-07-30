@@ -40,6 +40,7 @@ SOFTWARE.
 #include "cmd_fmode.h"
 #include "cmd_ln_h.h"
 #include "cmd_ln_s.h"
+#include "cmd_loops.h"
 #include "cmd_if_else.h"
 #include "cmd_kill_pid.h"
 #include "cmd_mkdir.h"
@@ -76,6 +77,7 @@ SOFTWARE.
             GLOBAL_VARDEF__FMODE \
             GLOBAL_VARDEF__LN_H \
             GLOBAL_VARDEF__LN_S \
+            GLOBAL_VARDEF__LOOPS \
             GLOBAL_VARDEF__IF_ELSE \
             GLOBAL_VARDEF__KILL_PID \
             GLOBAL_VARDEF__MKDIR \
@@ -110,6 +112,7 @@ SOFTWARE.
             INITIALIZE__FMODE \
             INITIALIZE__LN_H \
             INITIALIZE__LN_S \
+            INITIALIZE__LOOPS \
             INITIALIZE__IF_ELSE \
             INITIALIZE__KILL_PID \
             INITIALIZE__MKDIR \
@@ -144,6 +147,7 @@ SOFTWARE.
             STARTUP_CASE__FMODE \
             STARTUP_CASE__LN_H \
             STARTUP_CASE__LN_S \
+            STARTUP_CASE__LOOPS \
             STARTUP_CASE__IF_ELSE \
             STARTUP_CASE__KILL_PID \
             STARTUP_CASE__MKDIR \
@@ -178,6 +182,7 @@ SOFTWARE.
             RUN_CASE__FMODE \
             RUN_CASE__LN_H \
             RUN_CASE__LN_S \
+            RUN_CASE__LOOPS \
             RUN_CASE__IF_ELSE \
             RUN_CASE__KILL_PID \
             RUN_CASE__MKDIR \
@@ -212,6 +217,7 @@ SOFTWARE.
             REQUIRES_ADDL_ARG__FMODE \
             REQUIRES_ADDL_ARG__LN_H \
             REQUIRES_ADDL_ARG__LN_S \
+            REQUIRES_ADDL_ARG__LOOPS \
             REQUIRES_ADDL_ARG__IF_ELSE \
             REQUIRES_ADDL_ARG__KILL_PID \
             REQUIRES_ADDL_ARG__MKDIR \
@@ -250,6 +256,7 @@ enum CommandIndex {
             ENUM_LIST__FMODE
             ENUM_LIST__LN_H
             ENUM_LIST__LN_S
+            ENUM_LIST__LOOPS
             ENUM_LIST__IF_ELSE
             ENUM_LIST__KILL_PID
             ENUM_LIST__MKDIR
@@ -287,6 +294,7 @@ enum CommandIndex {
             VIRTUAL_ENUM_LIST__FMODE
             VIRTUAL_ENUM_LIST__LN_H
             VIRTUAL_ENUM_LIST__LN_S
+            VIRTUAL_ENUM_LIST__LOOPS
             VIRTUAL_ENUM_LIST__IF_ELSE
             VIRTUAL_ENUM_LIST__KILL_PID
             VIRTUAL_ENUM_LIST__MKDIR

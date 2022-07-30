@@ -13,9 +13,9 @@ if [ ${res} -ne 0 ] ; then
     exit 1
 fi
 
-chmod +rw a.txt
+chmod 666 a.txt
 # -s : file exists and not empty
-if [ ! -s a.txt ] ; then
+if [ "$( printf "a.txt" )" != "$( cat a.txt )" ] ; then
     echo "Incorrectly removed or changed source file"
     exit 1
 fi
