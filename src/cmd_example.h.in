@@ -39,9 +39,14 @@ WithNamedStep(enum="XX", name="xx",
     OnArg(
         LOG(":: xx arg ");
         LOGLN(global_arg);
+
+        // the next argument will be parsed with the XX__RUN virtual step.
+        global_cmd = COMMAND_INDEX__XX__RUN;
     )
 )
-WithVirtualStep(enum="XX_RUN",
+WithVirtualStep(enum="XX__RUN",
+    // As a virtual step, it doesn't have OnCmd support, as it only
+    // runs when parsing arguments.
     OnArg(
         LOG(":: xx on ");
         LOGLN(global_arg);

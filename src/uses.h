@@ -27,6 +27,13 @@ SOFTWARE.
 // The first includes.
 
 
+// --------------------------------------------------------------------------
+// Special commands that imply other commands must be included.
+
+
+// --------------------------------------------------------------------------
+// Derived uses
+
 // USES_SIGNALS - signal processing and special global variables are used.
 #ifdef USE_CMD_SIGNAL
 
@@ -65,7 +72,11 @@ SOFTWARE.
 // USES_SHARED_STR - shared logic for capturing an argument for later use.
 #if    defined(USE_CMD_LN_S) \
     || defined(USE_CMD_LN_H) \
-    || defined(USE_CMD_MV)
+    || defined(USE_CMD_MV) \
+    || defined(USE_CMD_EXPORT) \
+    || defined(USE_CMD_WHILE_NO_ERROR) \
+    || defined(USE_CMD_WHILE_ERROR) \
+    || defined(USE_CMD_FOR_EACH)
 
 #define USES_SHARED_STR
 
@@ -76,10 +87,65 @@ SOFTWARE.
     || defined(USE_CMD_LN_H) \
     || defined(USE_CMD_MV) \
     || defined(USE_CMD_MKDEV) \
-    || defined(USE_CMD_CHOWN)
+    || defined(USE_CMD_EXPORT) \
+    || defined(USE_CMD_CHOWN) \
+    || defined(USE_CMD_WRITE_FD) \
+    || defined(USE_CMD_CAT_FD) \
+    || defined(USE_CMD_ENV_CAT_FD)
 
 #define USES_SHARED_INT
 
 #endif
+
+
+// USES_FD_READ - any command or capability that allows for reading from a file descriptor.
+#if    defined(USE_STREAMING_INPUT) \
+    || defined(USE_CMD_CAT_FD) \
+    || defined(USE_CMD_ENV_CAT_FD)
+
+#define USES_FD_READ
+
+#endif
+
+
+// USES_ENVIRONMENT - any command or capability that performs management of environment variables.
+#if    defined(USE_ENVIROMENT_INPUT) \
+    || defined(USE_CMD_ENV_CAT_FD)
+
+#define USES_ENVIRONMENT
+
+// Even though these use setenv, it itself doesn't require
+//   the environment parser.
+//    || defined(USE_CMD_EXPORT)
+//    || defined(USE_CMD_SPAWN)
+//    || defined(USE_CMD_PWD)
+//    || defined(USE_CMD_WAIT_PID)
+
+#endif
+
+
+// USES_SHARED_SPLIT_ARG - shared data for splitting one arg into multiple args.
+#if    defined(USE_CMD_EXEC) \
+    || defined(USE_CMD_SPAWN) \
+    || defined(USE_CMD_WAIT_PID) \
+    || defined(USE_CMD_SUBCMD) \
+    || defined(USE_CMD_IF_ELSE) \
+    || defined(USE_CMD_WHILE_NO_ERROR) \
+    || defined(USE_CMD_WHILE_ERROR) \
+    || defined(USE_CMD_FOR_EACH)
+
+#define USES_SHARED_SPLIT_ARG
+
+#endif
+
+
+// USES_SHARED_ITOA - shared integer to ascii code.
+#if    defined(USE_CMD_SPAWN) \
+    || defined(USE_CMD_WAIT_PID)
+
+#define USES_SHARED_ITOA
+
+#endif
+
 
 #endif /* _FS_SHELL__USES_ */

@@ -3,9 +3,9 @@
 # desc: Environment variable replacement with multiple values.
 # requires: +echo +enviro
 
-export A_Test_Value=MyValue
-export A_Space_Value=" value space "
-"${FS}" -c "echo 'x \${A_Test_Value} y \${A_Space_Value} z'" > out.txt 2>err.txt
+A_Test_Value=MyValue \
+A_Space_Value=" value space " \
+    "${FS}" -c "echo [x \${A_Test_Value} y \${A_Space_Value} z]" > out.txt 2>err.txt
 res=$?
 
 if [ ${res} -ne 0 ] ; then

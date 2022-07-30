@@ -54,7 +54,7 @@ CMD_GLOBAL_VARDEF
 
 // command_runner runs the commands over the parsed arguments.
 //   returns the error code.
-int command_runner() {
+int command_runner(struct ArgState *arg_state) {
     // ======================================================================
     // Command runner internal variables
     int _err_count = 0;
@@ -80,7 +80,7 @@ int command_runner() {
     // ======================================================================
     // Argument Parsing Loop
     while (1 == 1) {
-        global_arg_state = args_advance_token();
+        global_arg_state = args_advance_token(arg_state);
         if (global_arg_state->state == ARG_STATE_ERR) {
             _err_count++;
         }

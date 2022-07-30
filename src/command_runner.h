@@ -24,6 +24,6 @@ SOFTWARE.
 
 #ifndef _FS_SHELL__COMMAND_RUNNER_
 
-int command_runner();
+int command_runner(struct ArgState *arg_state);
 
 #endif /* _FS_SHELL__COMMAND_RUNNER_ */

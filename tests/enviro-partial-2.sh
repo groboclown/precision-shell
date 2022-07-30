@@ -5,7 +5,7 @@
 
 export A_Test_Value=MyValue
 # No trailing '}'
-"${FS}" -c "echo 'x \${A_Test_Value'" > out.txt 2>err.txt
+"${FS}" -c "echo [x \${A_Test_Value]" > out.txt 2>err.txt
 res=$?
 
 if [ ${res} -ne 0 ] ; then

@@ -4,8 +4,11 @@
 # requires: +echo
 
 # This reuses the echo-args test but with required explicit string parsing.
+# Ensure the right quoting format is supported.
+# Also note extra whitespace
 
-"${FS}" -c "echo a b 123 a123 \"a b c\"" > out.txt 2>err.txt
+# this $'' performs escaping of special characters.
+"${FS}" -c $'echo a   b\t123  \t \r  a123 [a b c] \"a\" \'b\'' > out.txt 2>err.txt
 res=$?
 
 if [ ${res} -ne 0 ] ; then
@@ -19,7 +22,7 @@ if [ -s err.txt ] ; then
     cat err.txt
     exit 1
 fi
-if [ "$( printf "a\\nb\\n123\\na123\\na b c\\n" )" != "$( cat out.txt )" ] ; then
+if [ "$( printf "a\\nb\\n123\\na123\\na b c\\n\"a\"\\n'b'\\n" )" != "$( cat out.txt )" ] ; then
     echo "Generated stdout not as expected:"
     cat out.txt
     exit 1

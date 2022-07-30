@@ -28,11 +28,11 @@ AsOptional(command="chmod",
 #include "globals.h"
 #include "helpers.h"
 
-WithNamedStep(enum="CHMOD_MODE", name="chmod",
+WithNamedStep(enum="CHMOD__MODE", name="chmod",
     OnArg(
         LOG(":: using mode ");
         LOGLN(global_arg);
-        global_cmd = COMMAND_INDEX__CHMOD_RUN;
+        global_cmd = COMMAND_INDEX__CHMOD__RUN;
         global_arg1_i = helper_arg_to_uint(global_arg, 8, 07777);
         if (global_arg1_i < 0) {
             LOG("::  - Bad base 8 number, or out of range\n");
@@ -41,7 +41,7 @@ WithNamedStep(enum="CHMOD_MODE", name="chmod",
         }
     )
 )
-WithVirtualStep(enum="CHMOD_RUN",
+WithVirtualStep(enum="CHMOD__RUN",
     OnArg(
         LOG(":: chmod on ");
         LOGLN(global_arg);

@@ -23,7 +23,24 @@ SOFTWARE.
 */
 AsOptional(command="noop",
 
-    WithNamedStep(enum="noop", name="noop",
+    WithNamedStep(enum="NOOP__NAMED", name="noop",
+        OnArg(
+            LOG(":: ignore");
+            LOGLN(global_arg);
+        )
+    )
+
+    // Allow for # style comments... sort of.  Beware the ; and &&.
+    // # [blah] would work okay here.
+    WithNamedStep(enum="NOOP__COMMENT", name="#",
+        OnArg(
+            LOG(":: ignore");
+            LOGLN(global_arg);
+        )
+    )
+
+    // allow for shebang headers.
+    WithNamedStep(enum="NOOP__SHEBANG", name="#!",
         OnArg(
             LOG(":: ignore");
             LOGLN(global_arg);

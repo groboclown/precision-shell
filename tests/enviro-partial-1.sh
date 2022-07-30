@@ -5,7 +5,7 @@
 
 export A_Test_Value=MyValue
 # Partial match name with no trailing '}'
-"${FS}" -c "echo 'x \${A_Test'" > out.txt 2>err.txt
+"${FS}" -c "echo [x \${A_Test]" > out.txt 2>err.txt
 res=$?
 
 if [ ${res} -ne 0 ] ; then
