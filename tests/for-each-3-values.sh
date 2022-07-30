@@ -1,7 +1,7 @@
 #!/bin/bash
 
 # desc: exporting environment variables is passed to child processes
-# requires: +for-each +enviro
+# requires: +for-each +enviro +echo
 
 "${FS}" -c "for-each abc [1 2 3] [echo \$\${abc}]" >out.txt 2>err.txt
 res=$?
