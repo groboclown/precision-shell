@@ -72,7 +72,8 @@ SOFTWARE.
 // USES_SHARED_STR - shared logic for capturing an argument for later use.
 #if    defined(USE_CMD_LN_S) \
     || defined(USE_CMD_LN_H) \
-    || defined(USE_CMD_MV)
+    || defined(USE_CMD_MV) \
+    || defined(USE_CMD_EXPORT)
 
 #define USES_SHARED_STR
 
@@ -84,7 +85,10 @@ SOFTWARE.
     || defined(USE_CMD_MV) \
     || defined(USE_CMD_MKDEV) \
     || defined(USE_CMD_EXPORT) \
-    || defined(USE_CMD_CHOWN)
+    || defined(USE_CMD_CHOWN) \
+    || defined(USE_CMD_WRITE_FD) \
+    || defined(USE_CMD_CAT_FD) \
+    || defined(USE_CMD_ENV_CAT_FD)
 
 #define USES_SHARED_INT
 
@@ -92,7 +96,9 @@ SOFTWARE.
 
 
 // USES_FD_READ - any command or capability that allows for reading from a file descriptor.
-#if   defined(USE_STREAMING_INPUT)
+#if    defined(USE_STREAMING_INPUT) \
+    || defined(USE_CMD_CAT_FD) \
+    || defined(USE_CMD_ENV_CAT_FD)
 
 #define USES_FD_READ
 
@@ -103,7 +109,8 @@ SOFTWARE.
 #if    defined(USE_ENVIROMENT_INPUT) \
     || defined(USE_CMD_SPAWN) \
     || defined(USE_CMD_PWD) \
-    || defined(USE_CMD_WAIT_PID)
+    || defined(USE_CMD_WAIT_PID) \
+    || defined(USE_CMD_ENV_CAT_FD)
 
 #define USES_ENVIRONMENT
 
@@ -116,7 +123,7 @@ SOFTWARE.
     || defined(USE_CMD_SPAWN) \
     || defined(USE_CMD_WAIT_PID) \
     || defined(USE_CMD_SUBCMD) \
-    || defined(USE_CMD_CONDITIONAL)
+    || defined(USE_CMD_IF_ELSE)
 
 #define USES_SHARED_SPLIT_ARG
 

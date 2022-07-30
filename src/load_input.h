@@ -106,11 +106,16 @@ typedef union {
  * 
  */
 typedef struct {
-#ifdef USES_ENVIRONMENT
     // if non-zero, then the environment variables will be used.
     // if 0, then the environment variables will not be used.
+    // This should be wrapped in USE_ENVIRONMENT, but due to
+    // how the command declaration uses #define, the #ifdef
+    // in the command's can't reference this conditionally.
+    // So, we have an extra bit of wasted space in the
+    // non-environment situation.  That said, this is only used
+    // if USE_ENVIRONMENT is defined.
     int uses_environment;
-#endif
+
     enum DataSrcType   input_type;
     // input must match the input_type
     DataSrc            input;
@@ -172,6 +177,10 @@ struct LoadInputState;
 /**
  * @brief Begin the process for loading the input defined in the context.
  * 
+ * If the context contains managed data, that data will be freed if this
+ * returns NULL, just as if close had been called.  The ownership is passed
+ * to this module.
+ * 
  * @param context data context used to load the data.
  * @return LoadInputState* data used by load_input functions, or NULL on error.
  */
@@ -180,6 +189,8 @@ struct LoadInputState *load_input_initialize(LoadInputContext *context);
 /**
  * @brief Closes the input.  The data passed in must be considered invalid
  * after this call.  The load_input will free its memory.
+ * 
+ * The buffer memory passed in the context will be freed.
  * 
  * @param state loader internal state data; must not be NULL
  * @return int 0 if the load completed without issue, and anything else for an error.

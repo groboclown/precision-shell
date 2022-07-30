@@ -22,13 +22,13 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
 */
 
-AsOptional(command="chdir",
+AsOptional(command="cd",
 
 #include <unistd.h>
 #include "globals.h"
 #include "helpers.h"
 
-WithNamedStep(enum="CHDIR", name="cd",
+WithNamedStep(enum="CD", name="cd",
     OnArg(
         LOG(":: cd ");
         LOGLN(global_arg);

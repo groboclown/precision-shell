@@ -66,8 +66,8 @@ SRC = main.c helpers.c globals.c command_runner.c args.c load_input.c
 # cmd_err.h must always be last.
 COMMANDS = \
 	cmd_find_cmd.h \
-	cmd_conditional.h \
-	cmd_chdir.h \
+	cmd_cat.h \
+	cmd_cd.h \
 	cmd_chmod.h \
 	cmd_chown.h \
 	cmd_dup.h \
@@ -78,6 +78,7 @@ COMMANDS = \
 	cmd_fmode.h \
 	cmd_ln_h.h \
 	cmd_ln_s.h \
+	cmd_if_else.h \
 	cmd_kill_pid.h \
 	cmd_mkdir.h \
 	cmd_mknod_mkdev.h \
@@ -94,6 +95,7 @@ COMMANDS = \
 	cmd_subcmd.h \
 	cmd_touch_trunc.h \
 	cmd_wait_pid.h \
+	cmd_write_fd.h \
 	cmd_version.h \
 	cmd_err.h
 

@@ -99,6 +99,7 @@ struct ArgState *args_setup_tokenizer(const int src_argc, char *src_argv[], int 
         return NULL;
     }
 
+    // this read buffer memory has its ownership passed to the load_input.
     ret->read_buffer = malloc(sizeof(char) * PARSED_ARG_SIZE);
     if (ret->read_buffer == NULL) {
         stderrP(helper_str__malloc_failed);
@@ -114,8 +115,12 @@ struct ArgState *args_setup_tokenizer(const int src_argc, char *src_argv[], int 
     for (i = 0; i < PARSED_ARG_SAVE_COUNT; i++) {
         ret->preserve_args[i] = malloc(sizeof(char) * PARSED_ARG_SIZE);
         if (ret->preserve_args[i] == NULL) {
-            // Don't cleanup already allocated memory.
             stderrP(helper_str__malloc_failed);
+            while (--i >= 0) {
+                free(ret->preserve_args[i]);
+            }
+            free(ret->read_buffer);
+            free(ret);
             return NULL;
         }
     }
@@ -146,8 +151,9 @@ struct ArgState *args_setup_tokenizer(const int src_argc, char *src_argv[], int 
         if (input_context.input.fd.fd == -1) {
             stderrP("ERROR opening file ");
             stderrPLn(src_argv[2]);
-            input_context.input_type = DATA_SRC_NONE;
-            return NULL;
+            // load_input not called yet, so need to explicitly free the read buffer.
+            free(ret->read_buffer);
+            goto OnError;
         }
 #endif /* USE_STREAMING_INPUT */
 
@@ -168,10 +174,19 @@ struct ArgState *args_setup_tokenizer(const int src_argc, char *src_argv[], int 
     ret->input_state = load_input_initialize(&input_context);
     if (ret->input_state == NULL) {
         // Error already reported.
-        return NULL;
+        goto OnError;
     }
     
     return ret;
+
+OnError:
+    // Does not close fd or free the read buffer, because the
+    // load_input may have already done that.
+    for (i = 0; i < PARSED_ARG_SAVE_COUNT; i++) {
+        free(ret->preserve_args[i]);
+    }
+    free(ret);
+    return NULL;
 }
 
 // ---------------------------------------------

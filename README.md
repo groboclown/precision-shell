@@ -45,7 +45,7 @@ The shell supports these commands:
 * [version](#version) - prints the current version (cannot be disabled).
 * [noop](#noop) - do nothing.  The comment command.
 * [echo](#echo) - send text to `stdout`.
-* [?:](#conditional-command) - run a command conditionally based on the error result of another.
+* [if-else](#if-else-command) - run a command conditionally based on the error result of another.
 * [subcmd](#subcmd) - run an argument as a complete precision shell command.
 * [exit](#exit) - exits the command (or sub-command) with an exit code.
 * [cd](#cd) - change current working directory.
@@ -60,6 +60,9 @@ The shell supports these commands:
 * [chown](#chown) - change user and group owner for files.
 * [ln-s](#ln-s) - create a symbolic link.
 * [ln-h](#ln-h) - create a hard link.
+* [cat-fd](#cat-fd) - write the contents of a file to a file descriptor.
+* [env-cat-fd](#env-cat-fd) - write the contents of a file to a file descriptor, performing environment variable parsing on the source file.
+* [write-fd](#write-fd) - write the arguments to a file descriptor, either stdout or stdin, or those opened through the `dup-*` commands.
 * [sleep](#sleep) - wait for a number of seconds.
 * [mknod](#mknod) - create a FIFO or UNIX socket node.
 * [mkdev](#mkdev) - create a device OS node.
@@ -100,7 +103,6 @@ RUN echo Startup \
 ## What It Doesn't Do
 
 * List files or file details.
-* Copy files.
 * Report detailed error messages.
 * Change file timestamps.
 * Provide splat pattern replacements.
@@ -169,7 +171,9 @@ Prints the version information to stdout.  Any additional arguments generates an
 
 **Usage**: `#! /shebang/format/presh -f`
 
-Does nothing and ignores all arguments after it.  When used as a comment, it's best to enclose the comment inside quotes to protect against `&&` and `;`, which the shell will interpret as an end-of-command.
+Does nothing and ignores all arguments after it.
+
+**WARNING**  This does not work like you'd expect a normal comment to work.  This is a command, which means that ';' and '&&' will terminate it, so it's best to quote the arguments.  Also, it will be interpreted as a command for commands that take sub-commands as arguments.
 
 The noop can also be used to mask a file start shebang (`#!`) marker.  To work with presh, the precise format will need a space after the shebang mark, and include the `-f` argument to have the script be interpreted as a file.  This mode requires the [stream input flag](#script-files).
 
@@ -183,6 +187,39 @@ A script file.
 echo [This is a script file.]
 ```
 
+**Example 2:**
+
+Careful with characters; the no-op is a command.
+
+```bash
+$ presh -c " \
+  echo [Text 1] ; \
+  # echo [Text 2] ; echo [Text 3] ; \
+  # [echo [Text 4] ; echo [Text 5]] ; \
+  echo [Text 6]"
+Text 1
+Text 3
+Text 6
+```
+
+**Example 3:**
+
+Careful with location; the no-op is a command.
+
+```bash
+$ presh -c "\
+  touch a-file.txt && \
+  chmod 000 a-file.txt &&
+  if-else [touch a-file.txt] \
+    # [echo Worked] \
+    [echo [chmod does not work]] \
+    [echo [chmod works]]
+chmod does not work
+ERROR if-else: echo [chmod works]
+```
+
+In this situation, the `# [echo Worked]` line is interpreted as a no-op operation, so the failure line is `[echo [chmod does not work]]` and, because there's no termination for the `if-else` command, it generates an error for the extra parameter `[echo [chmod works]]`.
+
 ### echo
 
 **Compile flag**: `-DUSE_CMD_ECHO`
@@ -191,11 +228,11 @@ echo [This is a script file.]
 
 Sends to `stdout` each argument, one per line.  To have a multi-word statement on a single line, it must be passed as a single argument; see (Command Parsing)[#command-parsing] for details.
 
-# Conditional Command
+# if-else
 
-**Compile flag**: `-DUSE_CMD_CONDITIONAL`
+**Compile flag**: `-DUSE_CMD_IF_ELSE`
 
-**Usage**: `?: (conditional cmd) (if successful) [if failure]`
+**Usage**: `if-else (conditional cmd) (if successful) [if failure]`
 
 Runs the first argument as a full presh command, as though it was run through [`subcmd`](#subcmd).  If the exit code is zero, then the second argument is run as a full presh command).  If the first argument fails, then the third argument runs, or is skipped if it isn't given.
 
@@ -208,7 +245,7 @@ Test to make sure that [`chmod`](#chmod) correctly makes things not-writable.
 $ presh -c "\
   touch /tmp/file && \
   chmod 000 /tmp/file && \
-  ?: [touch /tmp/file] \
+  if-else [touch /tmp/file] \
       [echo [chmod is dumb]] \
       [echo [chmod works]]"
 ERROR touch: /tmp/file
@@ -222,7 +259,7 @@ Because precision shell [does not support `||` chaining](#chaining-commands), th
 ```bash
 presh -c "\
   dup 2 /dev/null ;
-  ?: [touch [/usr/bin/check-config my-config.rc]] \
+  if-else [touch [/usr/bin/check-config my-config.rc]] \
       noop \
       [exec /usr/bin/generate-default-config my-config.rc]
   "
@@ -391,6 +428,67 @@ Creates a symbolic link named dest file, pointing to src file.
 
 Creates a hard link named dest file, pointing to src file.
 
+### cat-fd
+
+**Compile flag**: `-DUSE_CMD_CAT_FD`
+
+**Usage**: `cat-fd (fd) [file 1 [file 2...]]`
+
+The first argument is the file descriptor to send the output to (1 == stdout, 2 == stderr, and others can be used by use of the dup commands).
+
+For each additional argument, in order, the command reads its contents and sends it, as-is, to the file descriptor.  If the command encounters a problem reading or accessing the file, the command will generate an error for that argument, but will keep going.
+
+This can be used with the [`dup-w`](#dup-w) and [`dup-a`](#dup-a) commands to perform a file copy operation.
+
+**Example 1:**
+
+Copy a file, and report that it succeeded.
+
+```bash
+$ echo "file contents" > a.txt
+$ presh -c "\
+  echo [Copying a.txt to b.txt] \
+  && dup-w 2 b.txt \
+  && cat-fd 2 a.txt \
+  && dup-w 2 &2 \
+  && echo [Completed copy]"
+```
+
+### env-cat-fd
+
+**Compile flag**: `-DUSE_CMD_ENV_CAT_FD`
+
+**Usage**: `env-cat-fd (fd) [file 1 [file 2...]]`
+
+This is similar to the Unix `envsubst` command.  It works just like [`cat-fd`](#cat-fd), but performs environment variable replacement on each input file.
+
+
+### write-fd
+
+**Compile flag**: `-DUSE_CMD_WRITE_FD`
+
+**Usage**: `write-fd (fd) [text] [text]`
+
+Writes to the file descriptor the precise text given.  Each argument is written as is without spaces between them, and no newline is inserted except where explicitly added to the text.
+
+**Example 1:**
+
+With the following script:
+
+```bash
+#! presh -f
+
+dup 12 new-file.txt
+write-fd 12 [text1] [text2] [text3\ntext4]
+```
+
+This will generate the file `new-file.txt` with the contents:
+
+```
+text1text2text3
+text4
+```
+
 ### sleep
 
 **Compile flag**: `-DUSE_CMD_SLEEP`
@@ -481,7 +579,7 @@ Run `echo` with output sent to the file `here.txt`, appending existing text.
 
 ```bash
 echo -n "foo" > here.txt
-presh -c "dup-a 1 here.txt && echo ' bar text' && echo more text"
+presh -c "dup-a 1 here.txt && echo [ bar text] && echo more text && dup-w 1 &1 && echo [complete]"
 ```
 
 And the file `here.txt` will contain:
@@ -491,6 +589,8 @@ foo bar text
 more
 text
 ```
+
+The final `dup-w 1 &1` restores stdout to the original stdout, allowing the `echo [complete]` to be seen on the console, and not written to `here.txt`.
 
 **Example 2:**
 

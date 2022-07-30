@@ -28,8 +28,8 @@ SOFTWARE.
 #define _FS_SHELL__COMMAND_LIST_
 
 #include "cmd_find_cmd.h"
-#include "cmd_conditional.h"
-#include "cmd_chdir.h"
+#include "cmd_cat.h"
+#include "cmd_cd.h"
 #include "cmd_chmod.h"
 #include "cmd_chown.h"
 #include "cmd_dup.h"
@@ -40,6 +40,7 @@ SOFTWARE.
 #include "cmd_fmode.h"
 #include "cmd_ln_h.h"
 #include "cmd_ln_s.h"
+#include "cmd_if_else.h"
 #include "cmd_kill_pid.h"
 #include "cmd_mkdir.h"
 #include "cmd_mknod_mkdev.h"
@@ -56,14 +57,15 @@ SOFTWARE.
 #include "cmd_subcmd.h"
 #include "cmd_touch_trunc.h"
 #include "cmd_wait_pid.h"
+#include "cmd_write_fd.h"
 #include "cmd_version.h"
 #include "cmd_err.h"
 
 
 #define CMD_GLOBAL_VARDEF \
             GLOBAL_VARDEF__FIND_CMD \
-            GLOBAL_VARDEF__CONDITIONAL \
-            GLOBAL_VARDEF__CHDIR \
+            GLOBAL_VARDEF__CAT_ENV_CAT \
+            GLOBAL_VARDEF__CD \
             GLOBAL_VARDEF__CHMOD \
             GLOBAL_VARDEF__CHOWN \
             GLOBAL_VARDEF__DUP \
@@ -74,6 +76,7 @@ SOFTWARE.
             GLOBAL_VARDEF__FMODE \
             GLOBAL_VARDEF__LN_H \
             GLOBAL_VARDEF__LN_S \
+            GLOBAL_VARDEF__IF_ELSE \
             GLOBAL_VARDEF__KILL_PID \
             GLOBAL_VARDEF__MKDIR \
             GLOBAL_VARDEF__MKNOD_MKDEV \
@@ -90,12 +93,13 @@ SOFTWARE.
             GLOBAL_VARDEF__SUBCMD \
             GLOBAL_VARDEF__TOUCH_TRUNC \
             GLOBAL_VARDEF__WAIT_PID \
+            GLOBAL_VARDEF__WRITE_FD \
             GLOBAL_VARDEF__VERSION \
             GLOBAL_VARDEF__ERR
 #define CMD_INITIALIZE \
             INITIALIZE__FIND_CMD \
-            INITIALIZE__CONDITIONAL \
-            INITIALIZE__CHDIR \
+            INITIALIZE__CAT_ENV_CAT \
+            INITIALIZE__CD \
             INITIALIZE__CHMOD \
             INITIALIZE__CHOWN \
             INITIALIZE__DUP \
@@ -106,6 +110,7 @@ SOFTWARE.
             INITIALIZE__FMODE \
             INITIALIZE__LN_H \
             INITIALIZE__LN_S \
+            INITIALIZE__IF_ELSE \
             INITIALIZE__KILL_PID \
             INITIALIZE__MKDIR \
             INITIALIZE__MKNOD_MKDEV \
@@ -122,12 +127,13 @@ SOFTWARE.
             INITIALIZE__SUBCMD \
             INITIALIZE__TOUCH_TRUNC \
             INITIALIZE__WAIT_PID \
+            INITIALIZE__WRITE_FD \
             INITIALIZE__VERSION \
             INITIALIZE__ERR
 #define CMD_STARTUP_CASE \
             STARTUP_CASE__FIND_CMD \
-            STARTUP_CASE__CONDITIONAL \
-            STARTUP_CASE__CHDIR \
+            STARTUP_CASE__CAT_ENV_CAT \
+            STARTUP_CASE__CD \
             STARTUP_CASE__CHMOD \
             STARTUP_CASE__CHOWN \
             STARTUP_CASE__DUP \
@@ -138,6 +144,7 @@ SOFTWARE.
             STARTUP_CASE__FMODE \
             STARTUP_CASE__LN_H \
             STARTUP_CASE__LN_S \
+            STARTUP_CASE__IF_ELSE \
             STARTUP_CASE__KILL_PID \
             STARTUP_CASE__MKDIR \
             STARTUP_CASE__MKNOD_MKDEV \
@@ -154,12 +161,13 @@ SOFTWARE.
             STARTUP_CASE__SUBCMD \
             STARTUP_CASE__TOUCH_TRUNC \
             STARTUP_CASE__WAIT_PID \
+            STARTUP_CASE__WRITE_FD \
             STARTUP_CASE__VERSION \
             STARTUP_CASE__ERR
 #define CMD_RUN_CASE \
             RUN_CASE__FIND_CMD \
-            RUN_CASE__CONDITIONAL \
-            RUN_CASE__CHDIR \
+            RUN_CASE__CAT_ENV_CAT \
+            RUN_CASE__CD \
             RUN_CASE__CHMOD \
             RUN_CASE__CHOWN \
             RUN_CASE__DUP \
@@ -170,6 +178,7 @@ SOFTWARE.
             RUN_CASE__FMODE \
             RUN_CASE__LN_H \
             RUN_CASE__LN_S \
+            RUN_CASE__IF_ELSE \
             RUN_CASE__KILL_PID \
             RUN_CASE__MKDIR \
             RUN_CASE__MKNOD_MKDEV \
@@ -186,12 +195,13 @@ SOFTWARE.
             RUN_CASE__SUBCMD \
             RUN_CASE__TOUCH_TRUNC \
             RUN_CASE__WAIT_PID \
+            RUN_CASE__WRITE_FD \
             RUN_CASE__VERSION \
             RUN_CASE__ERR
 #define CMD_REQUIRES_ADDL_ARG \
             REQUIRES_ADDL_ARG__FIND_CMD \
-            REQUIRES_ADDL_ARG__CONDITIONAL \
-            REQUIRES_ADDL_ARG__CHDIR \
+            REQUIRES_ADDL_ARG__CAT_ENV_CAT \
+            REQUIRES_ADDL_ARG__CD \
             REQUIRES_ADDL_ARG__CHMOD \
             REQUIRES_ADDL_ARG__CHOWN \
             REQUIRES_ADDL_ARG__DUP \
@@ -202,6 +212,7 @@ SOFTWARE.
             REQUIRES_ADDL_ARG__FMODE \
             REQUIRES_ADDL_ARG__LN_H \
             REQUIRES_ADDL_ARG__LN_S \
+            REQUIRES_ADDL_ARG__IF_ELSE \
             REQUIRES_ADDL_ARG__KILL_PID \
             REQUIRES_ADDL_ARG__MKDIR \
             REQUIRES_ADDL_ARG__MKNOD_MKDEV \
@@ -218,6 +229,7 @@ SOFTWARE.
             REQUIRES_ADDL_ARG__SUBCMD \
             REQUIRES_ADDL_ARG__TOUCH_TRUNC \
             REQUIRES_ADDL_ARG__WAIT_PID \
+            REQUIRES_ADDL_ARG__WRITE_FD \
             REQUIRES_ADDL_ARG__VERSION \
             REQUIRES_ADDL_ARG__ERR
 
@@ -226,8 +238,8 @@ enum CommandIndex {
 
 
             ENUM_LIST__FIND_CMD
-            ENUM_LIST__CONDITIONAL
-            ENUM_LIST__CHDIR
+            ENUM_LIST__CAT_ENV_CAT
+            ENUM_LIST__CD
             ENUM_LIST__CHMOD
             ENUM_LIST__CHOWN
             ENUM_LIST__DUP
@@ -238,6 +250,7 @@ enum CommandIndex {
             ENUM_LIST__FMODE
             ENUM_LIST__LN_H
             ENUM_LIST__LN_S
+            ENUM_LIST__IF_ELSE
             ENUM_LIST__KILL_PID
             ENUM_LIST__MKDIR
             ENUM_LIST__MKNOD_MKDEV
@@ -254,6 +267,7 @@ enum CommandIndex {
             ENUM_LIST__SUBCMD
             ENUM_LIST__TOUCH_TRUNC
             ENUM_LIST__WAIT_PID
+            ENUM_LIST__WRITE_FD
             ENUM_LIST__VERSION
             ENUM_LIST__ERR
 
@@ -261,8 +275,8 @@ enum CommandIndex {
 
 
             VIRTUAL_ENUM_LIST__FIND_CMD
-            VIRTUAL_ENUM_LIST__CONDITIONAL
-            VIRTUAL_ENUM_LIST__CHDIR
+            VIRTUAL_ENUM_LIST__CAT_ENV_CAT
+            VIRTUAL_ENUM_LIST__CD
             VIRTUAL_ENUM_LIST__CHMOD
             VIRTUAL_ENUM_LIST__CHOWN
             VIRTUAL_ENUM_LIST__DUP
@@ -273,6 +287,7 @@ enum CommandIndex {
             VIRTUAL_ENUM_LIST__FMODE
             VIRTUAL_ENUM_LIST__LN_H
             VIRTUAL_ENUM_LIST__LN_S
+            VIRTUAL_ENUM_LIST__IF_ELSE
             VIRTUAL_ENUM_LIST__KILL_PID
             VIRTUAL_ENUM_LIST__MKDIR
             VIRTUAL_ENUM_LIST__MKNOD_MKDEV
@@ -289,6 +304,7 @@ enum CommandIndex {
             VIRTUAL_ENUM_LIST__SUBCMD
             VIRTUAL_ENUM_LIST__TOUCH_TRUNC
             VIRTUAL_ENUM_LIST__WAIT_PID
+            VIRTUAL_ENUM_LIST__WRITE_FD
             VIRTUAL_ENUM_LIST__VERSION
             VIRTUAL_ENUM_LIST__ERR
 

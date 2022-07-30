@@ -143,16 +143,16 @@ char *_load_input_find_env_value(struct LoadInputState *data, char *name);
 
 struct LoadInputState *load_input_initialize(LoadInputContext *context) {
     int i;
-    struct LoadInputState *ret;
+    struct LoadInputState *ret = NULL;
     ret = malloc(sizeof(struct LoadInputState));
     if (ret == NULL) {
         stderrP(helper_str__malloc_failed);
-        return NULL;
+        goto OnError;
     }
 #ifdef USES_ENVIRONMENT
+    ret->env_buffer = NULL;
     if (context->uses_environment == 0) {
         ret->env_read_state = LOAD_INPUT_ENV_STATE_NO_PARSE;
-        ret->env_buffer = NULL;
     } else {
         ret->env_read_state = LOAD_INPUT_ENV_STATE_NORMAL;
 
@@ -160,10 +160,8 @@ struct LoadInputState *load_input_initialize(LoadInputContext *context) {
         ret->env_buffer = malloc(sizeof(char) * (MAX_ENVIRONMENT_NAME_LENGTH + 4));
         if (ret->env_buffer == NULL) {
             stderrP(helper_str__malloc_failed);
-            // We're in a bad state, so should we even try to clean up?
-            return NULL;
+            goto OnError;
         }
-
     }
 #endif /* USES_ENVIRONMENT */
 
@@ -171,6 +169,7 @@ struct LoadInputState *load_input_initialize(LoadInputContext *context) {
     ret->read_buffer = context->read_buffer;
     ret->read_buffer_size = context->read_buffer_size;
     ret->buffer_pos = 0;
+    ret->buffer_str = NULL;
 
     switch (context->input_type) {
 #ifdef USES_FD_READ
@@ -180,8 +179,7 @@ struct LoadInputState *load_input_initialize(LoadInputContext *context) {
             ret->buffer_str = malloc(sizeof(char) * (FD_READ_BUFFER_LENGTH + 1));
             if (ret->buffer_str == NULL) {
                 stderrP(helper_str__malloc_failed);
-                // We're in a bad state, so should we even try to clean up?
-                return NULL;
+                goto OnError;
             }
             ret->input.fd.fd = context->input.fd.fd;
             ret->buffer_str[0] = '\0';
@@ -205,8 +203,38 @@ struct LoadInputState *load_input_initialize(LoadInputContext *context) {
             ret->buffer_str = (char *) empty_string;
             break;
     }
-
     return ret;
+
+OnError:
+    free(context->read_buffer);
+#ifdef USES_FD_READ
+    if (context->input_type == DATA_SRC_MANAGED_FD) {
+        close(context->input.fd.fd);
+    }
+#endif
+    if (ret != NULL) {
+#ifdef USES_FD_READ
+        if (
+                ret->buffer_str != NULL &&
+                (context->input_type == DATA_SRC_MANAGED_FD
+                || context->input_type == DATA_SRC_STATIC_FD
+                || context->input_type == DATA_SRC_MANAGED_STRING)
+        ) {
+            free(ret->buffer_str);
+        }
+#endif
+
+#ifdef USES_ENVIRONMENT
+        if (ret->env_buffer != NULL) {
+            free(ret->env_buffer);
+        }
+#endif /* USES_ENVIRONMENT */
+    }
+    if (ret != NULL) {
+        free(ret);
+    }
+
+    return NULL;
 }
 
 
@@ -216,14 +244,17 @@ int load_input_close(struct LoadInputState *data) {
 #ifdef USES_ENVIRONMENT
     if (data->env_buffer != NULL) {
         free(data->env_buffer);
-        data->env_buffer = NULL;
     }
 #endif /* USES_ENVIRONMENT */
+
+    // This memory ownership was passed to this module.
+    free(data->read_buffer);
 
     switch (data->input_type) {
 #ifdef USES_FD_READ
         case DATA_SRC_MANAGED_FD:
             // close returns -1 for errors, so adding -1 would mask errors.
+            LOG(":: closing managed fd\n");
             if (close(data->input.fd.fd) != 0) {
                 ret++;
             }
@@ -235,6 +266,7 @@ int load_input_close(struct LoadInputState *data) {
             // fall through.
 #endif
         case DATA_SRC_MANAGED_STRING:
+            LOG(":: Freeing managed string\n");
             free(data->buffer_str);
             break;
         case DATA_SRC_STATIC_STRING:

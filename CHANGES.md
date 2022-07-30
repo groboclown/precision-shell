@@ -10,10 +10,14 @@
     * Added `export` command.  Including this command in the executable forces the environment variable usage to be enabled, but doesn't force environment variable parsing.
     * Altered `exec` to take a single argument, and if that command doesn't exist or isn't executable, tries to run the next argument, and so on.
     * Added `subcmd` now that the quote parse rewriting has made it trivial.
-    * Added "conditional" command (`?:`) now that `subcmd` shows how easy it is to write this.
+    * Added `if-else` command now that `subcmd` shows how easy it is to write this.
     * Added `cd` command.
     * Added `pwd` command.
+    * Added `cat` and `env-cat` commands.
+    * Added `write-fd` command.
     * Modified the noop command to also be called `#` to support comment like structures, and `#!` to allow for running presh scripts natively.
+    * Modified the `dup-w` command to back up the standard file descriptors so they can be restored.
+    * Fixed a bug in the `dup-*` commands where they did not correctly close file descriptors for opened files if the assigned-to file descriptor gets re-dup'd.
 
 
 ## v3.0.0

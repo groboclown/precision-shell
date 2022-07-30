@@ -190,7 +190,11 @@ extern const char cmd_name_dup_r__setup[];
 #define INITIALIZE__DUP \
             INITIALIZE__DUP_A \
             INITIALIZE__DUP_W \
-            INITIALIZE__DUP_R
+            INITIALIZE__DUP_R \
+            /* from cmd_dup.h.in:85 */ \
+            int dup_orig[3] = { dup(STDIN_FILENO), dup(STDOUT_FILENO), dup(STDERR_FILENO) }; \
+            /* original 1 << fd == bit*/ \
+            int dup_is_open = 0;
 #define STARTUP_CASE__DUP \
             STARTUP_CASE__DUP_A \
             STARTUP_CASE__DUP_W \
@@ -201,29 +205,47 @@ extern const char cmd_name_dup_r__setup[];
             RUN_CASE__DUP_R \
     case COMMAND_INDEX__DUP__TGT: \
         /* from cmd_dup.h.in:84 */ \
-            /* from cmd_dup.h.in:85 */ \
+            /* from cmd_dup.h.in:91 */ \
             LOG(":: dup "); \
-            if (strequal("&2", global_arg)) { \
-                LOG(" stderr\n"); \
-                global_arg3_i = STDERR_FILENO; \
-            } else if (strequal("&1", global_arg)) { \
-                LOG(" stdout\n"); \
-                global_arg3_i = STDOUT_FILENO; \
-            } else if (strequal("&0", global_arg)) { \
-                LOG(" stdin\n"); \
-                global_arg3_i = STDIN_FILENO; \
+            LOGLN(global_arg); \
+            /* arg2 is the target fd.*/ \
+            /* arg3 is the source fd.*/ \
+            if ( \
+                    global_arg2_i >= 0 && global_arg2_i < 32 \
+                    && ((dup_is_open & (1 << global_arg2_i)) != 0) \
+            ) { \
+                /* Close the stream first*/ \
+                LOG(":: closing target stream first\n"); \
+                global_err = close(global_arg2_i); \
+                if (global_err == -1) { \
+                    break; \
+                } \
+                dup_is_open &= ~(1 << global_arg2_i); \
+            } \
+            if (global_arg[0] == '&' && global_arg[2] == '\0') { \
+                tmp_val = global_arg[1] - '0'; \
+                if (tmp_val < 0 || tmp_val > 9) { \
+                    global_err = 1; \
+                    break; \
+                } \
+                global_arg3_i = tmp_val; \
+                if (tmp_val >= 0 && tmp_val <= 2) { \
+                    /* duplicate the original version of this one.*/ \
+                    global_arg3_i = dup_orig[tmp_val]; \
+                } \
             } else { \
-                LOGLN(global_arg); \
                 global_arg3_i = open( \
                     global_arg, global_arg1_i, global_fmode \
                 ); \
-            } \
-            if (global_arg3_i == -1) { \
-                global_err = -1; \
-            } else { \
-                if (dup2(global_arg3_i, global_arg2_i) == -1) { \
-                    global_err = 1; \
+                if (global_arg3_i == -1) { \
+                    global_err = -1; \
+                    break; \
+                } else if (global_arg3_i >= 0 && global_arg3_i < 32) { \
+                    dup_is_open |= (1 << global_arg3_i); \
                 } \
+            } \
+            if (dup2(global_arg3_i, global_arg2_i) == -1) { \
+                global_err = 1; \
             } \
         break;
 #define REQUIRES_ADDL_ARG__DUP \
