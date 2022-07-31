@@ -8,34 +8,7 @@ Sometimes, you don't need or want a full fledged shell.  You just have a few thi
 
 `presh` offers a [few commands and shell syntax](#what-it-does), and gives you the flexibility to select which ones to compile, which can make the executable smaller and provide extra security by not enabling commands that don't need to be run.  It's not POSIX conformant, and doesn't try to be.
 
-The tool has two goals - provide just enough commands for what you need to do, and make it small.
-
-Last build size:
-
-* Do-nothing build:
-  * glibc (Ubuntu): 819,656 bytes
-  * glibc (Arch): 778,280 bytes
-  * musl (Alpine): 21,944 bytes
-  * dietlibc (Alpine): 13,256 bytes
-* Minimal build:
-  * glibc: 823,752 bytes
-  * glibc (Arch): 778,280 bytes
-  * musl (Alpine): 21,944 bytes
-  * dietlibc (Alpine): 17,352 bytes
-* Standard buld:
-  * glibc (Ubuntu): 831,944 bytes
-  * glibc (Arch): 782,376 bytes
-  * musl (Alpine): 26,040 bytes
-  * dietlibc (Alpine): 17,352 bytes
-* Full build:
-  * glibc (Ubuntu): 831,944 bytes
-  * glibc (Arch): 786,472 bytes
-  * musl (Alpine): 30,136 bytes
-  * dietlibc (Alpine): 21,448 bytes
-
-*dietlibc [requires](https://www.fefe.de/dietlibc/FAQ.txt) that you either not distribute the compiled executable, or release the executable under GPL v2.*
-
-These file sizes are *statically compiled*, so they don't have any external dependencies other than the Linux OS.
+The tool has two goals - provide just enough commands for what you need to do, and [make it small](#compiled-size).
 
 
 ## What It Does
@@ -887,6 +860,40 @@ Some commands, like [`ln-s`](#ln-s), require an exact number of arguments.  Unle
 **Compile flag**: `-DUSE_STREAMING_INPUT`
 
 If you use the input-enabled build, then you can pass the argument `-` to have the tool read commands from stdin.
+
+
+## Compiled Size
+
+Last build size:
+
+* Do-nothing build:
+  * [glibc (Ubuntu)](#build-glibc.Dockerfile): 819,656 bytes
+  * [glibc (Arch)](#build-glibc-arch.Dockerfile): 778,280 bytes
+  * [musl (Alpine)](#build-musl.Dockerfile): 21,944 bytes
+  * [dietlibc (Alpine)](#build-dietlibc.Dockerfile): 13,256 bytes
+* Minimal build:
+  * glibc (Ubuntu): 823,752 bytes
+  * glibc (Arch): 778,280 bytes
+  * musl (Alpine): 21,944 bytes
+  * dietlibc (Alpine): 17,352 bytes
+* Standard buld:
+  * glibc (Ubuntu): 831,944 bytes
+  * glibc (Arch): 782,376 bytes
+  * musl (Alpine): 26,040 bytes
+  * dietlibc (Alpine): 17,352 bytes
+* Full build:
+  * glibc (Ubuntu): 836,040 bytes
+  * glibc (Arch): 794,664 bytes
+  * musl (Alpine): 30,136 bytes
+  * dietlibc (Alpine): 21,448 bytes
+
+*dietlibc [requires](https://www.fefe.de/dietlibc/FAQ.txt) that you either not distribute the compiled executable, or release the executable under GPL v2.*
+
+These file sizes are *statically compiled*, so they don't have any external dependencies other than the Linux OS.
+
+These were compiled within Docker containers, which are supplied in the code.  For each stdlib library (glibc, musl, dietlibc), the Linux distribution used to compile it is listed.  This is because the Arch Linux compile size is different than the Ubuntu compile size for the same library.  Your millage may differ depending on the distribution and compiler and other minor differences you use.
+
+dietlibc exhibits slightly different behavior than the other libraries, specifically around the [`signal`](#signal-wait) command.  Please see the command documentation for a description of the differences.  If you select a different library for your compilation, please ensure that the provided test suite passes.
 
 
 ## Developing
