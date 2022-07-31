@@ -19,7 +19,7 @@
     * Modified the noop command to also be called `#` to support comment like structures, and `#!` to allow for running presh scripts natively.
     * Modified the `dup-w` command to back up the standard file descriptors so they can be restored.
     * Fixed a bug in the `dup-*` commands where they did not correctly close file descriptors for opened files if the assigned-to file descriptor gets re-dup'd.
-* (tbd)
+* [1560595](1560595aa133553e5abb3b0553d7452dc8a9f28b)
     * Fixed a bug in the `;` processing that made it incorrectly reported as an argument to the previous command when the previous command generated an error.
 
 
