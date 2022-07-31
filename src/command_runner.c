@@ -91,7 +91,9 @@ int command_runner(struct ArgState *arg_state) {
             break;
         }
         global_arg = global_arg_state->arg;
-        // This is a long if/else block until error checking.
+
+        // Default to no error for this argument.
+        global_err = 0;
 
         // ==================================================================
         // Check end-of-command first.
@@ -119,9 +121,6 @@ int command_runner(struct ArgState *arg_state) {
             _err_count = 0;
             global_cmd = COMMAND_INDEX__FIND_CMD;
         } else {
-            // Default to no error.
-            global_err = 0;
-
             LOG(":: processing ");
             LOGLN(global_arg);
 

@@ -37,11 +37,11 @@ SOFTWARE.
 #include "cmd_exec.h"
 #include "cmd_exit.h"
 #include "cmd_export.h"
+#include "cmd_for_each.h"
 #include "cmd_fmode.h"
+#include "cmd_if_else.h"
 #include "cmd_ln_h.h"
 #include "cmd_ln_s.h"
-#include "cmd_loops.h"
-#include "cmd_if_else.h"
 #include "cmd_kill_pid.h"
 #include "cmd_mkdir.h"
 #include "cmd_mknod_mkdev.h"
@@ -58,6 +58,7 @@ SOFTWARE.
 #include "cmd_subcmd.h"
 #include "cmd_touch_trunc.h"
 #include "cmd_wait_pid.h"
+#include "cmd_while.h"
 #include "cmd_write_fd.h"
 #include "cmd_version.h"
 #include "cmd_err.h"
@@ -74,11 +75,11 @@ SOFTWARE.
             GLOBAL_VARDEF__EXEC \
             GLOBAL_VARDEF__EXIT \
             GLOBAL_VARDEF__EXPORT \
+            GLOBAL_VARDEF__FOR_EACH \
             GLOBAL_VARDEF__FMODE \
+            GLOBAL_VARDEF__IF_ELSE \
             GLOBAL_VARDEF__LN_H \
             GLOBAL_VARDEF__LN_S \
-            GLOBAL_VARDEF__LOOPS \
-            GLOBAL_VARDEF__IF_ELSE \
             GLOBAL_VARDEF__KILL_PID \
             GLOBAL_VARDEF__MKDIR \
             GLOBAL_VARDEF__MKNOD_MKDEV \
@@ -95,6 +96,7 @@ SOFTWARE.
             GLOBAL_VARDEF__SUBCMD \
             GLOBAL_VARDEF__TOUCH_TRUNC \
             GLOBAL_VARDEF__WAIT_PID \
+            GLOBAL_VARDEF__WHILE \
             GLOBAL_VARDEF__WRITE_FD \
             GLOBAL_VARDEF__VERSION \
             GLOBAL_VARDEF__ERR
@@ -109,11 +111,11 @@ SOFTWARE.
             INITIALIZE__EXEC \
             INITIALIZE__EXIT \
             INITIALIZE__EXPORT \
+            INITIALIZE__FOR_EACH \
             INITIALIZE__FMODE \
+            INITIALIZE__IF_ELSE \
             INITIALIZE__LN_H \
             INITIALIZE__LN_S \
-            INITIALIZE__LOOPS \
-            INITIALIZE__IF_ELSE \
             INITIALIZE__KILL_PID \
             INITIALIZE__MKDIR \
             INITIALIZE__MKNOD_MKDEV \
@@ -130,6 +132,7 @@ SOFTWARE.
             INITIALIZE__SUBCMD \
             INITIALIZE__TOUCH_TRUNC \
             INITIALIZE__WAIT_PID \
+            INITIALIZE__WHILE \
             INITIALIZE__WRITE_FD \
             INITIALIZE__VERSION \
             INITIALIZE__ERR
@@ -144,11 +147,11 @@ SOFTWARE.
             STARTUP_CASE__EXEC \
             STARTUP_CASE__EXIT \
             STARTUP_CASE__EXPORT \
+            STARTUP_CASE__FOR_EACH \
             STARTUP_CASE__FMODE \
+            STARTUP_CASE__IF_ELSE \
             STARTUP_CASE__LN_H \
             STARTUP_CASE__LN_S \
-            STARTUP_CASE__LOOPS \
-            STARTUP_CASE__IF_ELSE \
             STARTUP_CASE__KILL_PID \
             STARTUP_CASE__MKDIR \
             STARTUP_CASE__MKNOD_MKDEV \
@@ -165,6 +168,7 @@ SOFTWARE.
             STARTUP_CASE__SUBCMD \
             STARTUP_CASE__TOUCH_TRUNC \
             STARTUP_CASE__WAIT_PID \
+            STARTUP_CASE__WHILE \
             STARTUP_CASE__WRITE_FD \
             STARTUP_CASE__VERSION \
             STARTUP_CASE__ERR
@@ -179,11 +183,11 @@ SOFTWARE.
             RUN_CASE__EXEC \
             RUN_CASE__EXIT \
             RUN_CASE__EXPORT \
+            RUN_CASE__FOR_EACH \
             RUN_CASE__FMODE \
+            RUN_CASE__IF_ELSE \
             RUN_CASE__LN_H \
             RUN_CASE__LN_S \
-            RUN_CASE__LOOPS \
-            RUN_CASE__IF_ELSE \
             RUN_CASE__KILL_PID \
             RUN_CASE__MKDIR \
             RUN_CASE__MKNOD_MKDEV \
@@ -200,6 +204,7 @@ SOFTWARE.
             RUN_CASE__SUBCMD \
             RUN_CASE__TOUCH_TRUNC \
             RUN_CASE__WAIT_PID \
+            RUN_CASE__WHILE \
             RUN_CASE__WRITE_FD \
             RUN_CASE__VERSION \
             RUN_CASE__ERR
@@ -214,11 +219,11 @@ SOFTWARE.
             REQUIRES_ADDL_ARG__EXEC \
             REQUIRES_ADDL_ARG__EXIT \
             REQUIRES_ADDL_ARG__EXPORT \
+            REQUIRES_ADDL_ARG__FOR_EACH \
             REQUIRES_ADDL_ARG__FMODE \
+            REQUIRES_ADDL_ARG__IF_ELSE \
             REQUIRES_ADDL_ARG__LN_H \
             REQUIRES_ADDL_ARG__LN_S \
-            REQUIRES_ADDL_ARG__LOOPS \
-            REQUIRES_ADDL_ARG__IF_ELSE \
             REQUIRES_ADDL_ARG__KILL_PID \
             REQUIRES_ADDL_ARG__MKDIR \
             REQUIRES_ADDL_ARG__MKNOD_MKDEV \
@@ -235,6 +240,7 @@ SOFTWARE.
             REQUIRES_ADDL_ARG__SUBCMD \
             REQUIRES_ADDL_ARG__TOUCH_TRUNC \
             REQUIRES_ADDL_ARG__WAIT_PID \
+            REQUIRES_ADDL_ARG__WHILE \
             REQUIRES_ADDL_ARG__WRITE_FD \
             REQUIRES_ADDL_ARG__VERSION \
             REQUIRES_ADDL_ARG__ERR
@@ -253,11 +259,11 @@ enum CommandIndex {
             ENUM_LIST__EXEC
             ENUM_LIST__EXIT
             ENUM_LIST__EXPORT
+            ENUM_LIST__FOR_EACH
             ENUM_LIST__FMODE
+            ENUM_LIST__IF_ELSE
             ENUM_LIST__LN_H
             ENUM_LIST__LN_S
-            ENUM_LIST__LOOPS
-            ENUM_LIST__IF_ELSE
             ENUM_LIST__KILL_PID
             ENUM_LIST__MKDIR
             ENUM_LIST__MKNOD_MKDEV
@@ -274,6 +280,7 @@ enum CommandIndex {
             ENUM_LIST__SUBCMD
             ENUM_LIST__TOUCH_TRUNC
             ENUM_LIST__WAIT_PID
+            ENUM_LIST__WHILE
             ENUM_LIST__WRITE_FD
             ENUM_LIST__VERSION
             ENUM_LIST__ERR
@@ -291,11 +298,11 @@ enum CommandIndex {
             VIRTUAL_ENUM_LIST__EXEC
             VIRTUAL_ENUM_LIST__EXIT
             VIRTUAL_ENUM_LIST__EXPORT
+            VIRTUAL_ENUM_LIST__FOR_EACH
             VIRTUAL_ENUM_LIST__FMODE
+            VIRTUAL_ENUM_LIST__IF_ELSE
             VIRTUAL_ENUM_LIST__LN_H
             VIRTUAL_ENUM_LIST__LN_S
-            VIRTUAL_ENUM_LIST__LOOPS
-            VIRTUAL_ENUM_LIST__IF_ELSE
             VIRTUAL_ENUM_LIST__KILL_PID
             VIRTUAL_ENUM_LIST__MKDIR
             VIRTUAL_ENUM_LIST__MKNOD_MKDEV
@@ -312,6 +319,7 @@ enum CommandIndex {
             VIRTUAL_ENUM_LIST__SUBCMD
             VIRTUAL_ENUM_LIST__TOUCH_TRUNC
             VIRTUAL_ENUM_LIST__WAIT_PID
+            VIRTUAL_ENUM_LIST__WHILE
             VIRTUAL_ENUM_LIST__WRITE_FD
             VIRTUAL_ENUM_LIST__VERSION
             VIRTUAL_ENUM_LIST__ERR

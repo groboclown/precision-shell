@@ -8,34 +8,7 @@ Sometimes, you don't need or want a full fledged shell.  You just have a few thi
 
 `presh` offers a [few commands and shell syntax](#what-it-does), and gives you the flexibility to select which ones to compile, which can make the executable smaller and provide extra security by not enabling commands that don't need to be run.  It's not POSIX conformant, and doesn't try to be.
 
-The tool has two goals - provide just enough commands for what you need to do, and make it small.
-
-Last build size:
-
-* Do-nothing build:
-  * glibc (Ubuntu): 819,656 bytes
-  * glibc (Arch): 778,280 bytes
-  * musl (Alpine): 21,944 bytes
-  * dietlibc (Alpine): 13,256 bytes
-* Minimal build:
-  * glibc: 823,752 bytes
-  * glibc (Arch): 778,280 bytes
-  * musl (Alpine): 21,944 bytes
-  * dietlibc (Alpine): 17,352 bytes
-* Standard buld:
-  * glibc (Ubuntu): 831,944 bytes
-  * glibc (Arch): 782,376 bytes
-  * musl (Alpine): 26,040 bytes
-  * dietlibc (Alpine): 17,352 bytes
-* Full build:
-  * glibc (Ubuntu): 831,944 bytes
-  * glibc (Arch): 786,472 bytes
-  * musl (Alpine): 30,136 bytes
-  * dietlibc (Alpine): 21,448 bytes
-
-*dietlibc [requires](https://www.fefe.de/dietlibc/FAQ.txt) that you either not distribute the compiled executable, or release the executable under GPL v2.*
-
-These file sizes are *statically compiled*, so they don't have any external dependencies other than the Linux OS.
+The tool has two goals - provide just enough commands for what you need to do, and [make it small](#compiled-size).
 
 
 ## What It Does
@@ -68,13 +41,16 @@ The shell supports these commands:
 * [mkdev](#mkdev) - create a device OS node.
 * [touch](#touch) - <strike>Update the access and modification times of each file to the current time, or,</strike> if a file does not exist, it is created empty.
 * [trunc](#trunc) - Sets the file length to 0, and if the file does not exist, creates it.
-* [dup-r, dup-w, dup-a](#dup) - duplicates a file to a file descriptor for the remaining commands in this execution.
+* [dup-r, dup-w, dup-a](#dup-r-dup-w-dup-a) - duplicates a file to a file descriptor for the remaining commands in this execution.
 * [export](#export) - export an environment variable + value into the running process and to-be-run child processes.
 * [signal .. wait](#signal-wait) - wait for an OS signal before continuing.
 * [exec](#exec) - switch execution to a new process.
 * [spawn](#spawn) - launch a new process in the background.
 * [wait-pid](#wait-pid) - wait for a process started by `spawn` to end.
 * [kill-pid](#kill-pid) - send a signal to a process.
+* [for-each](#for-each) - loop over sub-arguments, setting an environment variable with the value and running a sub-command.
+* [while-error](#while-error) - run a sub-command until it ends without error.
+* [while-no-error](#while-no-error) - run a sub-command until it ends with an error.
 
 It also supports:
 * [Embedded Quoting](#command-parsing) by using the `[` and `]` symbols to allow easy deep quotes, like `exec [/usr/bin/echo [from native echo]]`
@@ -106,7 +82,6 @@ RUN echo Startup \
 * Report detailed error messages.
 * Change file timestamps.
 * Provide splat pattern replacements.
-* Looping
 * Anything with the network.
 * Tell you how to use it.  That's what this document is for.
 
@@ -361,16 +336,7 @@ $ ls -l a.txt
 
 This can include the higher bits, too, so that some commands that support it (and if the executing user has permissions to run it) can set the sticky bits.
 
-This command is added if any of these commands are added through compile flags, and they will in turn use this mode when working with files.
-
-* [`mkdir`](#mkdir)
-* [`touch`](#touch)
-* [`trunc`](#trunc)
-* [`mknod`](#mknod)
-* [`mkdev`](#mkdev)
-* [`dup-a`](#dup-a)
-* [`dup-r`](#dup-r)
-* [`dup-w`](#dup-w)
+This command is added if commands that have an implicit file mode are added through compile flags ([`mkdir`](#mkdir), [`touch`](#touch), [`trunc`](#trunc), [`mknod`](#mknod), [`mkdev`](#mkdev), and any [`dup`](#dup-r-dup-w-dup-a) commands.
 
 ### mkdir
 
@@ -438,7 +404,7 @@ The first argument is the file descriptor to send the output to (1 == stdout, 2 
 
 For each additional argument, in order, the command reads its contents and sends it, as-is, to the file descriptor.  If the command encounters a problem reading or accessing the file, the command will generate an error for that argument, but will keep going.
 
-This can be used with the [`dup-w`](#dup-w) and [`dup-a`](#dup-a) commands to perform a file copy operation.
+This can be used with the [`dup-w`](#dup-r-dup-w-dup-a) and [`dup-a`](#dup-r-dup-w-dup-a) commands to perform a file copy operation.
 
 **Example 1:**
 
@@ -571,7 +537,7 @@ You can also use the special files "&1" and "&2" to redirect stdout or stderr, r
 
 If this creates a file, the file will have the file permissions set in [`fmode`](#fmode).
 
-Note that this cannot be used for redirecting output from one command into another; that requires FIFO queues and job control, which this shell doesn't support.
+In order to redirect output from one command to input of another command, you must use a combination of [`mknod`](#mknod) to create a FIFO queue and [`spawn`](#spawn) to launch the first command in the background.
 
 **Example 1:**
 
@@ -756,11 +722,59 @@ presh -c "\
 
 Sends the signal number in the first argument to the processes in the following arguments.
 
+### for-each
+
+**Compile flag**: `-DUSE_CMD_FOR_EACH`
+
+**Usage**: `for-each (ENV_NAME) (value-list) (sub-command)`
+
+For each sub-argument in the value-list, set the environment variable name in the first argument to that sub-argument, and run the sub-command.  For the sub-command to be able to use the sub-argument, it will need to escape the environment variable.
+
+**Example 1:**
+
+Here, the `$` is escaped for the original shell that runs presh, then the $ is escaped for presh by doubling it (`$$`).
+
+```bash
+$ presh -c "for-each TEXT [first second [sub text] 3 4] [echo \$\${TEXT}]"
+first
+second
+sub text
+3
+4
+```
+
+### while-error
+
+**Compile flag**: `-DUSE_CMD_WHILE_ERROR`
+
+**Usage**: `while-error (error-sub-cmd) (loop-sub-cmd)`
+
+Executes the error sub command (first argument), and if it generates an error, runs the loop sub command (second argument) then repeats.  If the error sub-command executes and does not generate an error, then the statement ends.
+
+Both arguments are required.  If the loop block isn't necessary, then you can use [`noop`](#noop) as the second argument.
+
+**Example 1:**
+
+```bash
+presh -c "\
+  while-error \
+      [mv /tmp/config.txt config.txt] \
+      [sleep 5 ; exec [download-config /tmp/config.txt]]"
+```
+
+This will run `mv /tmp/config.txt config.txt`, and if it fails (in this case, because /tmp/config.txt does not exist), then it waits for 5 seconds then executes the native program `download-config /tmp/config.txt`.  This would be useful for a program that needs to download a file, but the file may not be available.
+
+### while-no-error
+
+**Compile flag**: `-DUSE_CMD_WHILE_NO_ERROR`
+
+**Usage**: `while-no-error (sub-cmd) (loop-sub-cmd)`
+
+Identical to [`while-error`](#while-error), except that it stops looping when the first argument's sub command generates an error.
+
 ### Chaining Commands
 
-Like most shells, you can chain commands together with `&&` and `;`.  `&&` stops the execution if the previous command failed and allows another command after it; and `;` resets the error count to 0 and allows another command to follow it.  If a new line is encountered, that acts like a `;`.  The common shell `||` chain (run if non-zero error code) is not supported.
-
-A [future feature](https://github.com/groboclown/precision-shell/issues/14) may allow changing the newline behavior via a compile flag.
+Like most shells, you can chain commands together with `&&` and `;`.  `&&` stops the execution if the previous command failed and allows another command after it; and `;` resets the error count to 0 and allows another command to follow it.  If a new line is encountered, that acts like a `;`.  The common shell `||` chain (run if non-zero error code) is not supported; instead, you will need to take advantage of the [if-else](#if-else) command.
 
 ```bash
 $ ls
@@ -778,6 +792,22 @@ echo def"
 abc
 def
 ```
+
+A `;` character erases the previous command's error state, which makes `&&` only sensitive to the previous command's error.
+
+```bash
+$ presh -c "touch a.txt \
+  ; rm a.txt \
+  ; # [ This next rm command should fail ] \
+  ; rm a.txt \
+  ; echo Continuing \
+  && echo Ending"
+ERROR rm: a.txt
+Continuing
+Ending
+```
+
+A [future feature](https://github.com/groboclown/precision-shell/issues/14) may allow changing the newline behavior via a compile flag.
 
 ### Environment Variables
 
@@ -803,8 +833,8 @@ The tool also supports invoking it with the arguments `-c "commands"` to simulat
 
 The parsing is kept simple, and follows these rules:
 
-* A space character (` `), tab, and linefeed (`\r`) separates arguments.
-* The parser will handle newlines (`\n`) differently depending on whether you use an input-enabled build or not.  With an input-enabled build, newlines are treated like inserting a `;` between commands, whereas a non-input-enabled build treats newlines like a space.
+* A space, tab (`\t`), and linefeed (`\r`) separates arguments.
+* The parser will interpret newlines (`\n`) like a semi-colon (`;`), which is the ignore-error command separator.  A [future feature](https://github.com/groboclown/precision-shell/issues/14) may allow changing the newline behavior via a compile flag.
 * Pairs of quote characters (`"` and `'`) can encapsulate text, allowing space characters and other quote characters to be part of an argument, rather than separating arguments.
 * Characters can be escaped by adding a backslash (`\`) character.  `\n` turns into a newline, `\r` into a linefeed, `\t` into a tab, and anything else is the character itself.  This is how quote characters can be added, as well as an alternate to adding a space to an argument.
 
@@ -830,6 +860,40 @@ Some commands, like [`ln-s`](#ln-s), require an exact number of arguments.  Unle
 **Compile flag**: `-DUSE_STREAMING_INPUT`
 
 If you use the input-enabled build, then you can pass the argument `-` to have the tool read commands from stdin.
+
+
+## Compiled Size
+
+Last build size:
+
+* Do-nothing build:
+  * [glibc (Ubuntu)](#build-glibc.Dockerfile): 819,656 bytes
+  * [glibc (Arch)](#build-glibc-arch.Dockerfile): 778,280 bytes
+  * [musl (Alpine)](#build-musl.Dockerfile): 21,944 bytes
+  * [dietlibc (Alpine)](#build-dietlibc.Dockerfile): 13,256 bytes
+* Minimal build:
+  * glibc (Ubuntu): 823,752 bytes
+  * glibc (Arch): 778,280 bytes
+  * musl (Alpine): 21,944 bytes
+  * dietlibc (Alpine): 17,352 bytes
+* Standard buld:
+  * glibc (Ubuntu): 831,944 bytes
+  * glibc (Arch): 782,376 bytes
+  * musl (Alpine): 26,040 bytes
+  * dietlibc (Alpine): 17,352 bytes
+* Full build:
+  * glibc (Ubuntu): 836,040 bytes
+  * glibc (Arch): 794,664 bytes
+  * musl (Alpine): 30,136 bytes
+  * dietlibc (Alpine): 21,448 bytes
+
+*dietlibc [requires](https://www.fefe.de/dietlibc/FAQ.txt) that you either not distribute the compiled executable, or release the executable under GPL v2.*
+
+These file sizes are *statically compiled*, so they don't have any external dependencies other than the Linux OS.
+
+These were compiled within Docker containers, which are supplied in the code.  For each stdlib library (glibc, musl, dietlibc), the Linux distribution used to compile it is listed.  This is because the Arch Linux compile size is different than the Ubuntu compile size for the same library.  Your millage may differ depending on the distribution and compiler and other minor differences you use.
+
+dietlibc exhibits slightly different behavior than the other libraries, specifically around the [`signal`](#signal-wait) command.  Please see the command documentation for a description of the differences.  If you select a different library for your compilation, please ensure that the provided test suite passes.
 
 
 ## Developing
