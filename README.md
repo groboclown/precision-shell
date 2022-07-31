@@ -537,7 +537,7 @@ You can also use the special files "&1" and "&2" to redirect stdout or stderr, r
 
 If this creates a file, the file will have the file permissions set in [`fmode`](#fmode).
 
-Note that this cannot be used for redirecting output from one command into another; that requires FIFO queues and job control, which this shell doesn't support.
+In order to redirect output from one command to input of another command, you must use a combination of [`mknod`](#mknod) to create a FIFO queue and [`spawn`](#spawn) to launch the first command in the background.
 
 **Example 1:**
 
