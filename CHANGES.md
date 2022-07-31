@@ -2,8 +2,8 @@
 
 * [d72dc56](d72dc569173a90cedab6bcb4fae9b534c2798e6c)
     * Switched argument and input parsing to a unified front.  This will allow for commands such as `envsubst` to be more easily implemented.
-    * Switched quoting to now be re-entrant.  The quote characters are now starting with '[' and ending with ']'.  This is a non-standard formatting, but allows interesting things like better support of the `exec` command. *This may be '(' and ')' before 4.0 releases.*
-* (tbd)
+    * Switched quoting to now be re-entrant.  The quote characters are now starting with '[' and ending with ']'.  This is a non-standard formatting, but allows interesting things like better support of the `exec` command.
+* [1acc7cd](1acc7cd17990abc6fdf4e721dd3098b5bcf95ec7)
     * Added `spawn` command.  Including this command in the executable forces the environment variable usage to be enabled, but doesn't force environment variable parsing.
     * Added `wait-pid` command.  Including this command in the executable forces the environment variable usage to be enabled, but doesn't force environment variable parsing.
     * Added `kill-pid` command.
@@ -19,6 +19,8 @@
     * Modified the noop command to also be called `#` to support comment like structures, and `#!` to allow for running presh scripts natively.
     * Modified the `dup-w` command to back up the standard file descriptors so they can be restored.
     * Fixed a bug in the `dup-*` commands where they did not correctly close file descriptors for opened files if the assigned-to file descriptor gets re-dup'd.
+* (tbd)
+    * Fixed a bug in the `;` processing that made it incorrectly reported as an argument to the previous command when the previous command generated an error.
 
 
 ## v3.0.0

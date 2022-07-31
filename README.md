@@ -820,7 +820,7 @@ abc
 def
 ```
 
-Unlike most shells, a `;` character does not erase the global error state, which makes `&&` sensitive to any error.
+A `;` character erases the previous command's error state, which makes `&&` only sensitive to the previous command's error.
 
 ```bash
 $ presh -c "touch a.txt \
@@ -830,13 +830,11 @@ $ presh -c "touch a.txt \
   ; echo Continuing \
   && echo Ending"
 ERROR rm: a.txt
-ERROR rm: ;
 Continuing
-FAIL &&
+Ending
 ```
 
 A [future feature](https://github.com/groboclown/precision-shell/issues/14) may allow changing the newline behavior via a compile flag.
-
 
 ### Environment Variables
 
