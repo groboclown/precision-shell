@@ -75,11 +75,11 @@ COMMANDS = \
 	cmd_exec.h \
 	cmd_exit.h \
 	cmd_export.h \
+	cmd_for_each.h \
 	cmd_fmode.h \
+	cmd_if_else.h \
 	cmd_ln_h.h \
 	cmd_ln_s.h \
-	cmd_loops.h \
-	cmd_if_else.h \
 	cmd_kill_pid.h \
 	cmd_mkdir.h \
 	cmd_mknod_mkdev.h \
@@ -96,6 +96,7 @@ COMMANDS = \
 	cmd_subcmd.h \
 	cmd_touch_trunc.h \
 	cmd_wait_pid.h \
+	cmd_while.h \
 	cmd_write_fd.h \
 	cmd_version.h \
 	cmd_err.h
