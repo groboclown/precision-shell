@@ -60,11 +60,17 @@ case "${BUILD_MODE}" in
             cmdarg="INCLUDE_ALL_COMMANDS=1"
         else
             for cmd in ${COMMANDS} ; do
+                # see version.h for mapping the command name to the
+                # command argument.
                 if [ ${cmd} = "input" ] ; then
-                    cmd_arg="-DUSE_STREAMING_INPUT=1"
+                    cmd_arg="-DUSE_STREAMING_INPUT"
+                elif [ ${cmd} = "enviro" ] ; then
+                    cmd_arg="-DUSE_ENVIROMENT_INPUT"
+                elif [ ${cmd} = "reqargs" ]
+                    cmd_arg="-DREQUIRE_FULL_CMD"
                 else
                     cmd_arg="$( echo ${cmd^^} | tr - _ )"
-                    cmd_arg="-DUSE_CMD_${cmd_arg}=1"
+                    cmd_arg="-DUSE_CMD_${cmd_arg}"
                 fi
                 if [ -z "${commands}" ] ; then
                     commands="${cmd_arg}"

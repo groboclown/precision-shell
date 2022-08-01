@@ -4,9 +4,9 @@
 
 ## Custom Built Shell With Only What You Need
 
-Sometimes, you don't need or want a full fledged shell.  You just have a few things that you need to do, and allowing more is a security issue.
+Sometimes, you don't need or want everyting that a shell or Linux environment can do.  You just have a few things that you need to do.  Adding more adds bloat to your Linux environment and broadens the attack surface.  As such, it's great for a Docker or Podman container shell.
 
-`presh` offers a [few commands and shell syntax](#what-it-does), and gives you the flexibility to select which ones to compile, which can make the executable smaller and provide extra security by not enabling commands that don't need to be run.  It's not POSIX conformant, and doesn't try to be.
+`presh` offers a [few commands and shell syntax](#what-it-does), and gives you the flexibility to select which ones to compile, which can make the executable smaller and provide extra security by not enabling commands that don't need to be run.  It's not POSIX conformant, and doesn't try to be.  Its syntax is [eclectic](#command-parsing) and doesn't hold your hand.
 
 The tool has two goals - provide just enough commands for what you need to do, and [make it small](#compiled-size).
 
@@ -15,42 +15,46 @@ The tool has two goals - provide just enough commands for what you need to do, a
 
 The shell supports these commands:
 
-* [version](#version) - prints the current version (cannot be disabled).
-* [noop](#noop) - do nothing.  The comment command.
-* [echo](#echo) - send text to `stdout`.
-* [if-else](#if-else-command) - run a command conditionally based on the error result of another.
-* [subcmd](#subcmd) - run an argument as a complete precision shell command.
-* [exit](#exit) - exits the command (or sub-command) with an exit code.
-* [cd](#cd) - change current working directory.
-* [pwd](#pwd) - display current working directory, or store it in an environment variable.
-* [fmode](#fmode) - set the octal file mode for other commands.
-* [rm](#rm) - remove files.
-* [rmdir](#rmdir) - remove empty directories.
-* [mv](#mv) - move a file from one name to another.
-* [fmode](#fmode) - set a default file permission.
-* [mkdir](#mkdir) - create an empty directory.
-* [chmod](#chmod) - change file permissions.
-* [chown](#chown) - change user and group owner for files.
-* [ln-s](#ln-s) - create a symbolic link.
-* [ln-h](#ln-h) - create a hard link.
-* [cat-fd](#cat-fd) - write the contents of a file to a file descriptor.
-* [env-cat-fd](#env-cat-fd) - write the contents of a file to a file descriptor, performing environment variable parsing on the source file.
-* [write-fd](#write-fd) - write the arguments to a file descriptor, either stdout or stdin, or those opened through the `dup-*` commands.
-* [sleep](#sleep) - wait for a number of seconds.
-* [mknod](#mknod) - create a FIFO or UNIX socket node.
-* [mkdev](#mkdev) - create a device OS node.
-* [touch](#touch) - <strike>Update the access and modification times of each file to the current time, or,</strike> if a file does not exist, it is created empty.
-* [trunc](#trunc) - Sets the file length to 0, and if the file does not exist, creates it.
-* [dup-r, dup-w, dup-a](#dup-r-dup-w-dup-a) - duplicates a file to a file descriptor for the remaining commands in this execution.
-* [export](#export) - export an environment variable + value into the running process and to-be-run child processes.
-* [signal .. wait](#signal-wait) - wait for an OS signal before continuing.
-* [exec](#exec) - switch execution to a new process.
-* [spawn](#spawn) - launch a new process in the background.
-* [wait-pid](#wait-pid) - wait for a process started by `spawn` to end.
-* [kill-pid](#kill-pid) - send a signal to a process.
-* [for-each](#for-each) - loop over sub-arguments, setting an environment variable with the value and running a sub-command.
-* [while-error](#while-error) - run a sub-command until it ends without error.
-* [while-no-error](#while-no-error) - run a sub-command until it ends with an error.
+* Output
+  * [echo](#echo) - send text to `stdout`.
+  * [dup-r, dup-w, dup-a](#dup-r-dup-w-dup-a) - duplicates a file (or file descriptor) to a specific file descriptor for the remaining commands in this execution.
+  * [cat-fd](#cat-fd) - write the contents of a file to a file descriptor.
+  * [env-cat-fd](#env-cat-fd) - write the contents of a file to a file descriptor, performing environment variable parsing on the source file.
+  * [write-fd](#write-fd) - write the arguments to a file descriptor, either stdout or stdin, or those opened through the `dup-*` commands.
+* Files
+  * [fmode](#fmode) - set the octal file mode for other commands that work with files.
+  * [rm](#rm) - remove files.
+  * [rmdir](#rmdir) - remove empty directories.
+  * [mv](#mv) - move a file from one name to another.
+  * [mkdir](#mkdir) - create an empty directory.
+  * [chmod](#chmod) - change file permissions.
+  * [chown](#chown) - change user and group owner for files.
+  * [ln-s](#ln-s) - create a symbolic link.
+  * [ln-h](#ln-h) - create a hard link.
+  * [touch](#touch) - <strike>Update the access and modification times of each file to the current time, or,</strike> if a file does not exist, it is created empty.
+  * [trunc](#trunc) - Sets the file length to 0, and if the file does not exist, creates it.
+  * [mknod](#mknod) - create a FIFO or UNIX socket node.
+  * [mkdev](#mkdev) - create a device OS node.
+* Command Execution
+  * [cd](#cd) - change current working directory, for relative file locations and executed command working directory.
+  * [export](#export) - export an environment variable + value into the running process and to-be-run child processes.
+  * [exec](#exec) - switch execution to a new process.
+  * [spawn](#spawn) - launch a new process in the background.
+  * [wait-pid](#wait-pid) - wait for a process started by `spawn` to end.
+  * [kill-pid](#kill-pid) - send a signal to a process.
+* Control Flow
+  * [if-else](#if-else-command) - run a command conditionally based on the error result of another.
+  * [subcmd](#subcmd) - run an argument as a complete precision shell command.
+  * [exit](#exit) - exits the command (or sub-command) with an exit code.
+  * [sleep](#sleep) - wait for a number of seconds.
+  * [signal .. wait](#signal-wait) - wait for an OS signal before continuing.
+  * [for-each](#for-each) - loop over sub-arguments, setting an environment variable with the value and running a sub-command.
+  * [while-error](#while-error) - run a sub-command until it ends without error.
+  * [while-no-error](#while-no-error) - run a sub-command until it ends with an error.
+* Usability
+  * [pwd](#pwd) - display current working directory, or store it in an environment variable.
+  * [version](#version) - prints the current version (cannot be disabled).
+  * [noop](#noop) - do nothing.  The comment command.
 
 It also supports:
 * [Embedded Quoting](#command-parsing) by using the `[` and `]` symbols to allow easy deep quotes, like `exec [/usr/bin/echo [from native echo]]`
@@ -59,21 +63,6 @@ It also supports:
 * [Script files](#script-files) - as an argument if used with `-f script-file-name`.
 * [Commands from stdin](#passing-commands-from-stdin) - With the `-` argument, commands are parsed from stdin.  **Without the streaming input flag, the shell will not read from stdin.**
 * [Environment variable parsing](#environment-variables) - the input values can be replaced with environment variables, when specified in the form `${VALUE}` (the standard shell form of `$VALUE` is not supported).
-
-`presh` works very well for Docker and Podman containers as the default shell, which is useful if you need file modifications to an image that has no shell.
-
-```Dockerfile
-FROM super-skinny-image:11.12
-
-COPY presh /bin/sh
-
-# Because /bin/sh is now the shell, run commands will
-#   run through it by executing "/bin/sh -c (arguments)"
-RUN echo Startup \
-    && rm /www/404.html /www/501.html \
-    && rmdir /tmp \
-    echo Complete
-```
 
 
 ## What It Doesn't Do
@@ -91,8 +80,6 @@ RUN echo Startup \
 The tool was built with container (Docker and Podman) images that use minimal OS resources.  Golang projects commonly build a single file, the executable, placed into a `FROM scratch` image.  In these environments, `presh` can be easily added to provide some minimal file manipulation.
 
 Additionally, you can build the tool with exactly the commands you need to run.  This limits the attack surface, making your install just that much safer.
-
-See [sample.Dockerfile](sample.Dockerfile) for an example of using it with Docker and a `FROM scratch`, to show that no OS setup is necessary to run the shell.
 
 
 ## How Do I Get It?
@@ -121,6 +108,26 @@ The commands that cannot be directly controlled for inclusion are:
 To run the build, you'll need basic C compiler, linker, and make.  If you have Python 3 installed, you can generate the command source files (they are bundled if you don't have it).
 
 The most common setup is to build it inside a Docker container for use in another container.  See [`Dockerfile`](Dockerfile) for how this is done.
+
+
+## Using It With Docker
+
+You can build it outside the container and bundle it in your container through a simple copy:
+
+```Dockerfile
+FROM super-skinny-image:11.12
+
+COPY presh /bin/sh
+
+# Because /bin/sh is now the shell, run commands will
+#   run through it by executing "/bin/sh -c (arguments)"
+RUN echo Startup \
+    && rm /www/404.html /www/501.html \
+    && rmdir /tmp \
+    echo Complete
+```
+
+You can also build it in a multi-stage Dockerfile.  See [sample.Dockerfile](sample.Dockerfile) for an example of using it with Docker and a `FROM scratch`, to show that no OS setup is necessary to run the shell.
 
 
 ## Help
@@ -203,14 +210,13 @@ In this situation, the `# [echo Worked]` line is interpreted as a no-op operatio
 
 Sends to `stdout` each argument, one per line.  To have a multi-word statement on a single line, it must be passed as a single argument; see (Command Parsing)[#command-parsing] for details.
 
-# if-else
+### if-else
 
 **Compile flag**: `-DUSE_CMD_IF_ELSE`
 
 **Usage**: `if-else (conditional cmd) (if successful) [if failure]`
 
 Runs the first argument as a full presh command, as though it was run through [`subcmd`](#subcmd).  If the exit code is zero, then the second argument is run as a full presh command).  If the first argument fails, then the third argument runs, or is skipped if it isn't given.
-
 
 **Example 1:**
 
@@ -862,7 +868,7 @@ Some commands, like [`ln-s`](#ln-s), require an exact number of arguments.  Unle
 If you use the input-enabled build, then you can pass the argument `-` to have the tool read commands from stdin.
 
 
-## Compiled Size
+# Compiled Size
 
 Last build size:
 
@@ -896,7 +902,22 @@ These were compiled within Docker containers, which are supplied in the code.  F
 dietlibc exhibits slightly different behavior than the other libraries, specifically around the [`signal`](#signal-wait) command.  Please see the command documentation for a description of the differences.  If you select a different library for your compilation, please ensure that the provided test suite passes.
 
 
-## Developing
+# Contributing
+
+To contribute to the project, submit a PR or open a bug.  All code submitted must be licensed under the MIT license.
+
+Contributing new commands requires (this list assumes that the change is for a single command contained in one file, but it can be multiple commands in a single file, or multiple files, each with their own command):
+
+1. Read through the [source readme file](src/README.md).  This describes how to add commands, though it's lacking on the details that go into a full change.
+2. Add cmd_mount.h.in in the src tree and include it in source control changes.
+3. Add the cmd_mount.h file to the src/Makefile header list and include the Makefile in source control changes.
+4. Generate the .h file by running make and add that to source control.
+5. Include the new USE_CMD_* in the flag list in the Makefile.command-flags file, both in the list of flags, and in the INCLUDE_ALL_COMMANDS list.
+6. Add new test scripts in the `tests` directory.  The [test readme file](tests/README.md) offers a brief overview of what goes into a test script.
+7. Add documentation in the root [README.md](README.md) file, both in the initial command listing, and the detailed description.
+
+
+# Developing
 
 A guide to the special format for command code is in the [source tree](src/README.md).
 
@@ -944,21 +965,6 @@ docker build -t local/presh-dietlibc -f build-dietlibc.Dockerfile . \
 To bump the version number, change the [version.txt](version.txt) file.  Version numbers must be in a dewey decimal format MAJOR.MINOR.PATCH (e.g. `1.2.3`).
 
 
-## Contributing
-
-To contribute to the project, submit a PR or open a bug.  All code submitted must be licensed under the MIT license.
-
-Contributing new commands requires (this list assumes that the change is for a single command contained in one file, but it can be multiple commands in a single file, or multiple files, each with their own command):
-
-1. Read through the [source readme file](src/README.md).  This describes how to add commands, though it's lacking on the details that go into a full change.
-2. Add cmd_mount.h.in in the src tree and include it in source control changes.
-3. Add the cmd_mount.h file to the src/Makefile header list and include the Makefile in source control changes.
-4. Generate the .h file by running make and add that to source control.
-5. Include the new USE_CMD_* in the flag list in the Makefile.command-flags file, both in the list of flags, and in the INCLUDE_ALL_COMMANDS list.
-6. Add new test scripts in the `tests` directory.  The [test readme file](tests/README.md) offers a brief overview of what goes into a test script.
-7. Add documentation in the root [README.md](README.md) file, both in the initial command listing, and the detailed description.
-
-
 ## Releasing
 
 Releases should:
@@ -970,7 +976,7 @@ Releases should:
 5. Author a new release in GitHub, with the title & tag set to the new version number.  No binary files are included here, but it auto-generates the source tarball.
 
 
-## License
+# License
 
 Precision Shell is licensed under the [MIT license](LICENSE).
 

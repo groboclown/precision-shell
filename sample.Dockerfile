@@ -1,15 +1,20 @@
 # Builds the precision shell tool in one container, then adds that built version into the
-# derived container.  This uses the musl library.
+# derived container.  This compiles with the musl library.
 FROM docker.io/library/alpine:3.10 AS builder
 WORKDIR /opt/code
 
-ARG BUILD_MODE=build
+# Adjust this value during the image build to alter which commands
+#   to include.
 ARG COMMANDS="chmod ln-s"
+
+
+ARG PRESH_BRANCH="v4.0.0"
 
 ENV \
 #    DEBUG=1 \
     BUILD_MODE=build \
     COMMANDS=$COMMANDS \
+    BRANCH=$PRESH_BRANCH \
     UID1=1 \
     UID2=2 \
     GID1=1 \
@@ -19,7 +24,7 @@ RUN \
        apk --no-cache update \
     && apk add build-base=0.5-r1 "bash=~5" "python3=~3.7" git \
     && rm -rf /tmp/* /var/cache/apk/* \
-    && git clone https://github.com/groboclown/precision-shell.git /opt/code/precision-shell \
+    && git clone --depth=1 --branch=$BRANCH https://github.com/groboclown/precision-shell.git /opt/code/precision-shell \
     && cd /opt/code/precision-shell \
     && echo 'LIBNAME=musl' >> version.txt \
     && ./build-tools/internal-docker-make.sh
