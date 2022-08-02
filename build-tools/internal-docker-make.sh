@@ -66,7 +66,7 @@ case "${BUILD_MODE}" in
                     cmd_arg="-DUSE_STREAMING_INPUT"
                 elif [ ${cmd} = "enviro" ] ; then
                     cmd_arg="-DUSE_ENVIROMENT_INPUT"
-                elif [ ${cmd} = "reqargs" ]
+                elif [ ${cmd} = "reqargs" ] ; then
                     cmd_arg="-DREQUIRE_FULL_CMD"
                 else
                     cmd_arg="$( echo ${cmd^^} | tr - _ )"
