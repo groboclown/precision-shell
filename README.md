@@ -949,10 +949,10 @@ Last build size:
   * musl (Alpine): 26,040 bytes
   * dietlibc (Alpine): 17,352 bytes
 * Full build:
-  * glibc (Ubuntu): 836,040 bytes
+  * glibc (Ubuntu): 840,136 bytes
   * glibc (Arch): 794,664 bytes
-  * musl (Alpine): 30,136 bytes
-  * dietlibc (Alpine): 21,448 bytes
+  * musl (Alpine): 34,232 bytes
+  * dietlibc (Alpine): 25,544 bytes
 
 *dietlibc [requires](https://www.fefe.de/dietlibc/FAQ.txt) that you either not distribute the compiled executable, or release the executable under GPL v2.*
 

@@ -11,4 +11,4 @@ Shows how precision shell can be used to enhance a ["distroless"](https://github
 
 The base server allows for a configuration file to set runtime parameters on how to set up the server.  Precision shell constructs this file from a template + environment variables, launches the program, and adds signal handlers for stopping execution.
 
-This could be shrunk down smaller by eliminating the debug commands.
+Presh adds 30,136 bytes by using the musl library.  This could be shrunk down smaller by eliminating the debug commands.
