@@ -763,7 +763,7 @@ In this example, because the environment variables REQUEST_PID and REQUEST_EXIT 
 
 ```bash
 presh -c "\
-  ?: \
+  if-then \
     [spawn [/usr/bin/process-request] REQUEST_PID] \
     [ \
       wait-pid \$\${REQUEST_PID} *REQUEST_EXIT && \
@@ -892,6 +892,13 @@ a b c
 a b c
 ```
 
+To escape an environment variable to not parse it or delay its parsing, use a double `$` character.  See [`wait-pid`](#wait-pid) for an example of where this is necessary.  In general, doubling-up the `$` to escape an environment variable is necessary in sub-commands when the environment variable is set inside other sub-commands.
+
+```bash
+$ presh "echo \$\${ABC}"
+${ABC}
+```
+
 ### Standard Script Flag
 
 The tool also supports invoking it with the arguments `-c "commands"` to simulate running the second argument as a script.
@@ -902,7 +909,7 @@ The parsing is kept simple, and follows these rules:
 
 * A space, tab (`\t`), and linefeed (`\r`) separates arguments.
 * The parser will interpret newlines (`\n`) like a semi-colon (`;`), which is the ignore-error command separator.  A [future feature](https://github.com/groboclown/precision-shell/issues/14) may allow changing the newline behavior via a compile flag.
-* Pairs of quote characters (`"` and `'`) can encapsulate text, allowing space characters and other quote characters to be part of an argument, rather than separating arguments.
+* Arguments are quoted with `[` and `]` pairs, and can be embedded in each other, so that a command like `echo [a [b]]` will output "a [b]" without needing to esacpe the `[` and `]` marks.
 * Characters can be escaped by adding a backslash (`\`) character.  `\n` turns into a newline, `\r` into a linefeed, `\t` into a tab, and anything else is the character itself.  This is how quote characters can be added, as well as an alternate to adding a space to an argument.
 
 ### Script Files
