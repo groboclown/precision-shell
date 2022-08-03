@@ -185,4 +185,4 @@ jobs:
       
       - name: build-test
         run: |
-          CONTAINER_RUNNER=podman recipies/_run_all.sh
+          CONTAINER_RUNNER=podman bash -x recipies/_run_all.sh
