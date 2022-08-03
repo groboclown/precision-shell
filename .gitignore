@@ -63,3 +63,7 @@ modules.order
 Module.symvers
 Mkfile.old
 dkms.conf
+
+# IDE
+.vscode/.browse*
+# Allow settings.json and c_cpp_properties.json

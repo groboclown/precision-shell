@@ -35,6 +35,8 @@ WithNamedStep(enum="FILE_STAT", name="file-stat",
 
 
     OnArg(
+        // Need to look at this output syntax.  Could have it
+        // report condensed output like 'ls -l' does.
         LOG(":: file-stat ");
         LOGLN(global_arg);
         global_err = stat(global_arg, &file_stat_buf);

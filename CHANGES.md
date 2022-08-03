@@ -1,3 +1,12 @@
+## v4.1.0
+
+* (tbd)
+    * Added `ls` command.
+    * Added `ls-t` command.
+    * Added `file-stat` command.  This is considered an *experimental* command at the moment.  It may change how it works in the future.
+    * Added recipes to show different scenarios for using Precision Shell in real-world situations.
+    * Fixed the internal docker build tool to have correct naming for the environment flag.
+
 ## v4.0.0
 
 * [d72dc56](d72dc569173a90cedab6bcb4fae9b534c2798e6c)
