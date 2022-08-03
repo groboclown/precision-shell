@@ -4,7 +4,7 @@
 
 ## Custom Built Shell With Only What You Need
 
-Sometimes, you don't need or want everyting that a shell or Linux environment can do.  You just have a few things that you need to do.  Adding more adds bloat to your Linux environment and broadens the attack surface.  As such, it's great for a Docker or Podman container shell, especially when running with a [distro-less container](https://github.com/GoogleContainerTools/distroless/).
+Sometimes, you don't need or want everyting that a shell or Linux environment can do.  You just have a few things that you need to do.  Adding more adds bloat to your Linux environment and broadens the attack surface.  **Precision Shell** lets you compile the shell to contain only what you need.  It works great as a default shell environment for a Docker or Podman container for when you need just that extra bit of runtime setup, especially when running with a [distro-less container](https://github.com/GoogleContainerTools/distroless/).
 
 `presh` offers a [few commands and shell syntax](#what-it-does), and gives you the flexibility to select which ones to compile, which can make the executable smaller and provide extra security by not enabling commands that don't need to be run.  It's not POSIX conformant, and doesn't try to be.  Its syntax is [eclectic](#command-parsing) and doesn't hold your hand.
 
