@@ -163,3 +163,26 @@ jobs:
         run: |
           podman build -t local/precision-shell-sample --build-arg FLAGS=INCLUDE_ALL_COMMANDS=1 .
           podman run --rm -t local/precision-shell-sample version
+
+
+  recipes:
+    name: Ensure the recipes build.
+    runs-on: ubuntu-latest
+    outputs:
+      version: ${{ steps.properties.outputs.version }}
+      changelog: ${{ steps.properties.outputs.changelog }}
+    steps:
+
+      # Check out current repository
+      - name: Fetch Sources
+        uses: actions/checkout@v3
+      
+      # Install tools
+      - name: Install Required tools
+        run: |
+          sudo apt-get update
+          sudo apt-get install podman
+      
+      - name: build-test
+        run: |
+          CONTAINER_RUNNER=podman recipies/_run_all.sh

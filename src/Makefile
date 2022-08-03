@@ -75,11 +75,13 @@ COMMANDS = \
 	cmd_exec.h \
 	cmd_exit.h \
 	cmd_export.h \
-	cmd_for_each.h \
+	cmd_file_stat.h \
 	cmd_fmode.h \
+	cmd_for_each.h \
 	cmd_if_else.h \
 	cmd_ln_h.h \
 	cmd_ln_s.h \
+	cmd_ls.h \
 	cmd_kill_pid.h \
 	cmd_mkdir.h \
 	cmd_mknod_mkdev.h \

@@ -2,6 +2,10 @@
 
 # Run the full test suite, over all combination of commands.
 # This can take a while to run.
+# Right now, there's 39 commands + 3 other flags, for a total of 42 combinations.
+# That's 2^42 combinations to try (4,398,046,511,104).
+# If 1 combination is run per second, that's 139,461 years.
+# So, a while.
 cd "$( dirname "$0" )"
 
 command_list_raw="$( egrep "^CMD_" ../Makefile.command-flags | cut -f 3 -d ' ' )"
