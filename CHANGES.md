@@ -2,7 +2,7 @@
 
 * [519e18f](519e18fab1c9413c83283f4eb4456a89d2acb591)
     * Fixed the internal docker build tool to have correct naming for the environment flag.
-* (tbd)
+* [a962acf](a962acf8af05a1ce14b4fc49f7cc86678300b093)
     * Added `ls` command.
     * Added `ls-t` command.
     * Added `file-stat` command.  This is considered an *experimental* command at the moment.  It may change how it works in the future.
