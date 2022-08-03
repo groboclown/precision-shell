@@ -53,7 +53,7 @@ ENV LISTEN_PORT 9000
 # Because Node doesn't install signal handlers on its own,
 # have presh listen for user signals.
 # This allows for the container to stop with Ctrl-C when
-# the user runs the container it with "-it" arguments.
+# the user runs the container with "-it" arguments.
 CMD noop [Use dup-w and env-cat-fd to update config.json] \
        [based on environment variables.] \
     && dup-w 8 config.json \
