@@ -909,8 +909,8 @@ The parsing is kept simple, and follows these rules:
 
 * A space, tab (`\t`), and linefeed (`\r`) separates arguments.
 * The parser will interpret newlines (`\n`) like a semi-colon (`;`), which is the ignore-error command separator.  A [future feature](https://github.com/groboclown/precision-shell/issues/14) may allow changing the newline behavior via a compile flag.
-* Arguments are quoted with `[` and `]` pairs, and can be embedded in each other, so that a command like `echo [a [b]]` will output "a [b]" without needing to esacpe the `[` and `]` marks.
-* Characters can be escaped by adding a backslash (`\`) character.  `\n` turns into a newline, `\r` into a linefeed, `\t` into a tab, and anything else is the character itself.  This is how quote characters can be added, as well as an alternate to adding a space to an argument.
+* Arguments are quoted with `[` and `]` pairs, and can be embedded in each other, so that a command like `echo [a [b]]` will output "a [b]" without needing to escape the `[` and `]` marks.
+* Characters can be escaped by adding a backslash (`\`) character.  `\n` turns into a newline, `\r` into a linefeed, `\t` into a tab, and anything else is the character itself (for example, inserting a backslash is the standard `\\`).
 
 ### Script Files
 
