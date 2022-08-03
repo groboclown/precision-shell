@@ -4,7 +4,7 @@
 
 ## Custom Built Shell With Only What You Need
 
-Sometimes, you don't need or want everyting that a shell or Linux environment can do.  You just have a few things that you need to do.  Adding more adds bloat to your Linux environment and broadens the attack surface.  As such, it's great for a Docker or Podman container shell.
+Sometimes, you don't need or want everyting that a shell or Linux environment can do.  You just have a few things that you need to do.  Adding more adds bloat to your Linux environment and broadens the attack surface.  As such, it's great for a Docker or Podman container shell, especially when running with a [distro-less container](https://github.com/GoogleContainerTools/distroless/).
 
 `presh` offers a [few commands and shell syntax](#what-it-does), and gives you the flexibility to select which ones to compile, which can make the executable smaller and provide extra security by not enabling commands that don't need to be run.  It's not POSIX conformant, and doesn't try to be.  Its syntax is [eclectic](#command-parsing) and doesn't hold your hand.
 
@@ -134,150 +134,30 @@ You can also build it in a multi-stage Dockerfile.  See [sample.Dockerfile](samp
 
 All commands and special build modes are described here.  To add in a compile flag, run the build like: `make COMMAND_FLAGS="-DUSE_CMD_ECHO -DUSE_CMD_RM"`
 
+### cat-fd
 
-### version
+**Compile flag**: `-DUSE_CMD_CAT_FD`
 
-**Compile flag**: *always present*
+**Usage**: `cat-fd (fd) [file 1 [file 2...]]`
 
-**Usage**: `version`
+The first argument is the file descriptor to send the output to (1 == stdout, 2 == stderr, and others can be used by use of the dup commands).
 
-Prints the version information to stdout.  Any additional arguments generates an error.
+For each additional argument, in order, the command reads its contents and sends it, as-is, to the file descriptor.  If the command encounters a problem reading or accessing the file, the command will generate an error for that argument, but will keep going.
 
-### noop
-
-**Compile flag**: `-DUSE_CMD_NOOP`
-
-**Usage**: `noop [arg1 [arg2 ...]]`
-
-**Usage**: `# [Some comment text.  Put inside quoting to protect against && and ;]`
-
-**Usage**: `#! /shebang/format/presh -f`
-
-Does nothing and ignores all arguments after it.
-
-**WARNING**  This does not work like you'd expect a normal comment to work.  This is a command, which means that ';' and '&&' will terminate it, so it's best to quote the arguments.  Also, it will be interpreted as a command for commands that take sub-commands as arguments.
-
-The noop can also be used to mask a file start shebang (`#!`) marker.  To work with presh, the precise format will need a space after the shebang mark, and include the `-f` argument to have the script be interpreted as a file.  This mode requires the [stream input flag](#script-files).
+This can be used with the [`dup-w`](#dup-r-dup-w-dup-a) and [`dup-a`](#dup-r-dup-w-dup-a) commands to perform a file copy operation.
 
 **Example 1:**
 
-A script file.
+Copy a file, and report that it succeeded.
 
 ```bash
-#! /usr/bin/presh -f
-
-echo [This is a script file.]
-```
-
-**Example 2:**
-
-Careful with characters; the no-op is a command.
-
-```bash
-$ presh -c " \
-  echo [Text 1] ; \
-  # echo [Text 2] ; echo [Text 3] ; \
-  # [echo [Text 4] ; echo [Text 5]] ; \
-  echo [Text 6]"
-Text 1
-Text 3
-Text 6
-```
-
-**Example 3:**
-
-Careful with location; the no-op is a command.
-
-```bash
+$ echo "file contents" > a.txt
 $ presh -c "\
-  touch a-file.txt && \
-  chmod 000 a-file.txt &&
-  if-else [touch a-file.txt] \
-    # [echo Worked] \
-    [echo [chmod does not work]] \
-    [echo [chmod works]]
-chmod does not work
-ERROR if-else: echo [chmod works]
-```
-
-In this situation, the `# [echo Worked]` line is interpreted as a no-op operation, so the failure line is `[echo [chmod does not work]]` and, because there's no termination for the `if-else` command, it generates an error for the extra parameter `[echo [chmod works]]`.
-
-### echo
-
-**Compile flag**: `-DUSE_CMD_ECHO`
-
-**Usage**: `echo [str1 [str2 ...]]`
-
-Sends to `stdout` each argument, one per line.  To have a multi-word statement on a single line, it must be passed as a single argument; see (Command Parsing)[#command-parsing] for details.
-
-### if-else
-
-**Compile flag**: `-DUSE_CMD_IF_ELSE`
-
-**Usage**: `if-else (conditional cmd) (if successful) [if failure]`
-
-Runs the first argument as a full presh command, as though it was run through [`subcmd`](#subcmd).  If the exit code is zero, then the second argument is run as a full presh command).  If the first argument fails, then the third argument runs, or is skipped if it isn't given.
-
-**Example 1:**
-
-Test to make sure that [`chmod`](#chmod) correctly makes things not-writable.
-
-```bash
-$ presh -c "\
-  touch /tmp/file && \
-  chmod 000 /tmp/file && \
-  if-else [touch /tmp/file] \
-      [echo [chmod is dumb]] \
-      [echo [chmod works]]"
-ERROR touch: /tmp/file
-chmod works
-```
-
-**Example 2:**
-
-Because precision shell [does not support `||` chaining](#chaining-commands), this can be simulated by using the conditional operation with the [`noop`](#noop) command.
-
-```bash
-presh -c "\
-  dup 2 /dev/null ;
-  if-else [touch [/usr/bin/check-config my-config.rc]] \
-      noop \
-      [exec /usr/bin/generate-default-config my-config.rc]
-  "
-```
-
-### subcmd
-
-**Compile flag**: `-DUSE_CMD_SUBCMD`
-
-**Usage**: `subcmd [command as an argument [command ...]]`
-
-Runs each argument as a whole command.
-
-**Example:**
-
-```bash
-presh -c "\
-  touch /tmp/file && \
-  subcmd [\
-    ln-s /tmp/file /tmp/foo && \
-    ln-s /tmp/file /tmp/bar \
-  ] ; \
-  echo done"
-```
-
-### exit
-
-**Compile flag**: `-DUSE_CMD_EXIT`
-
-**Usage**: `exit (exit code)`
-
-Quits the execution of the current command context with an exit code, and no other commands are parsed.  If the exit is within a sub-command, then the sub command exits.
-
-**Example:**
-
-```bash
-presh -c "subcmd [exit 1] && echo [should not run]"
+  echo [Copying a.txt to b.txt] \
+  && dup-w 2 b.txt \
+  && cat-fd 2 a.txt \
+  && dup-w 2 &2 \
+  && echo [Completed copy]"
 ```
 
 ### cd
@@ -288,71 +168,15 @@ presh -c "subcmd [exit 1] && echo [should not run]"
 
 Changes the current directory.  Useful for relative paths when running file commands, or when launching an executable to run inside a specific directory.
 
-### pwd
-
-**Compile flag**: `-DUSE_CMD_PWD`
-
-**Usage**: `pwd -`
-
-**Usage**: `pwd (env variable name)`
-
-When used with the argument `-`, the current working directory is written to stdout on its own line.  Otherwise, the environment variable name argument has the current working directory path stored in its value.
-
-Multiple arguments can be given, where the same rules apply for each argument.
-
-### rm
-
-**Compile flag**: `-DUSE_CMD_RM`
-
-**Usage**: `rm [file1 [file2 ...]]`
-
-Removes each file passed as an argument.  The command will attempt to remove each file, and if any of them fail, then the whole command fails with an exit code equal to the sum of the error codes.
-
-### rmdir
-
-**Compile flag**: `-DUSE_CMD_RMDIR`
-
-**Usage**: `rmdir [dir1 [dir2 ...]]`
-
-Removes each empty directory passed as an argument.  If a directory is not empty, the command will fail.  The command will attempt to remove each directory, and if any of them fail, then the whole command fails with an exit code equal to the sum of the number of failed files.
-
-### mv
-
-**Compile flag**: `-DUSE_CMD_MV`
-
-**Usage**: `mv (src file) (target file)`
-
-Renames the file referenced by the first argument to a new name referenced by the second argument.  If the operation fails, or if there is no second argument, then the command fails with an exit code of 1.
-
-### fmode
-
-**Compile flag**: *included automatically if the dependent commands are included; see below*
-
-**Usage**: `fmode (octal mode)`
-
-Changes an internal default file mode value to the given octal mode.  If never set, the default file mode value is `0644`.
-
-Example:
+**Example 1:**
 
 ```bash
-$ presh -c "fmode 765 ; touch a.txt"
-$ ls -l a.txt
--rwxrw-r-x 1 user user   0 Jan 19 09:51 a.txt 
+$ presh -c "\
+  cd /usr ; spawn [/usr/bin/pwd] ; sleep 1 ;
+  cd /lib ; spawn [/usr/bin/pwd]"
+/usr
+/lib
 ```
-
-This can include the higher bits, too, so that some commands that support it (and if the executing user has permissions to run it) can set the sticky bits.
-
-This command is added if commands that have an implicit file mode are added through compile flags ([`mkdir`](#mkdir), [`touch`](#touch), [`trunc`](#trunc), [`mknod`](#mknod), [`mkdev`](#mkdev), and any [`dup`](#dup-r-dup-w-dup-a) commands.
-
-### mkdir
-
-**Compile flag**: `-DUSE_CMD_MKDIR`
-
-**Usage**: `mkdir [file1 [file2 ...]]`
-
-Creates the listed directories.  The parent directory must exist, or it will generate an error.  If any creation fails, then the command fails with the number of failed directories.
-
-Each directory is created with the global file mode (see [`fmode`](#fmode)), with the user, group, and other executable flags also set.  To change this to something else, a [`chmod`](#chmod) must be run.
 
 ### chmod
 
@@ -383,147 +207,6 @@ This command will fail if the mode value is out of range or not a number.
 **Usage**: `chown (uid) (gid) [file1 [file2 ...]]`
 
 Changes the owner and group ID for each file, directory, or symlink argument.
-
-### ln-s
-
-**Compile flag**: `-DUSE_CMD_LN_S`
-
-**Usage**: `ln-s (src file) (dest file)`
-
-Creates a symbolic link named dest file, pointing to src file.
-
-### ln-h
-
-**Compile flag**: `-DUSE_CMD_LN_H`
-
-**Usage**: `ln-h (src file) (dest file)`
-
-Creates a hard link named dest file, pointing to src file.
-
-### cat-fd
-
-**Compile flag**: `-DUSE_CMD_CAT_FD`
-
-**Usage**: `cat-fd (fd) [file 1 [file 2...]]`
-
-The first argument is the file descriptor to send the output to (1 == stdout, 2 == stderr, and others can be used by use of the dup commands).
-
-For each additional argument, in order, the command reads its contents and sends it, as-is, to the file descriptor.  If the command encounters a problem reading or accessing the file, the command will generate an error for that argument, but will keep going.
-
-This can be used with the [`dup-w`](#dup-r-dup-w-dup-a) and [`dup-a`](#dup-r-dup-w-dup-a) commands to perform a file copy operation.
-
-**Example 1:**
-
-Copy a file, and report that it succeeded.
-
-```bash
-$ echo "file contents" > a.txt
-$ presh -c "\
-  echo [Copying a.txt to b.txt] \
-  && dup-w 2 b.txt \
-  && cat-fd 2 a.txt \
-  && dup-w 2 &2 \
-  && echo [Completed copy]"
-```
-
-### env-cat-fd
-
-**Compile flag**: `-DUSE_CMD_ENV_CAT_FD`
-
-**Usage**: `env-cat-fd (fd) [file 1 [file 2...]]`
-
-This is similar to the Unix `envsubst` command.  It works just like [`cat-fd`](#cat-fd), but performs environment variable replacement on each input file.
-
-
-### write-fd
-
-**Compile flag**: `-DUSE_CMD_WRITE_FD`
-
-**Usage**: `write-fd (fd) [text] [text]`
-
-Writes to the file descriptor the precise text given.  Each argument is written as is without spaces between them, and no newline is inserted except where explicitly added to the text.
-
-**Example 1:**
-
-With the following script:
-
-```bash
-#! presh -f
-
-dup 12 new-file.txt
-write-fd 12 [text1] [text2] [text3\ntext4]
-```
-
-This will generate the file `new-file.txt` with the contents:
-
-```
-text1text2text3
-text4
-```
-
-### sleep
-
-**Compile flag**: `-DUSE_CMD_SLEEP`
-
-**Usage**: `sleep [seconds [seconds ...]]`
-
-Sleeps for the number of seconds in the argument.  If no arguments are given, or if an argument is not a positive integer, then it does nothing (no error).  If multiple, positive integers are given, then it sleeps for the sum of them.
-
-### mknod
-
-**Compile flag**: `-DUSE_CMD_MKNOD`
-
-**Usage**: `mknod (node type) [file1 [file2 ...]]`
-
-Creates a special or ordinary file of the given type.  The node type is OS specific, but in general, the values supported are:
-
-* `p` - pipe (FIFO queue)
-* `s` - UNIX domain socket
-
-The created file will have the file permissions set in [`fmode`](#fmode).
-
-### mkdev
-
-**Compile flag**: `-DUSE_CMD_MKDEV`
-
-**Usage**: `mkdev (major version) (minor version) (node type) [file1 [file2 ...]]`
-
-The node type can be one of these:
-
-* `b` - block device
-* `c` and `u` - character device
-
-The major and minor version reflect the OS kernel specific device number.
-
-For example, to create the standard `/dev/null` device, you would run:
-
-```bash
-presh mkdev c 1 3 /dev/null
-```
-
-The created file will have the file permissions set in [`fmode`](#fmode).
-
-The execution of this command requires running with root level privileges, or the tool will report an error.
-
-### touch
-
-**Compile flag**: `-DUSE_CMD_TOUCH`
-
-**Usage**: `touch [file1 [file2 ...]]`
-
-For each argument, if it does not exist, it is created.  If the argument exists and is not a file, then the command fails.  **Warning:** Unlike the standard `touch` command, this will not update the modified time of the file.
-
-If this creates a file, the file will have the file permissions set in [`fmode`](#fmode).
-
-### trunc
-
-**Compile flag**: `-DUSE_CMD_TRUNC`
-
-**Usage**: `trunc [file1 [file2 ...]]`
-
-For each argument, sets the file length to 0 if the file exists, otherwise creates the file.  This is nearly identical to [touch](#touch), with the addition of setting file lengths to 0.
-
-If this creates a file, the file will have the file permissions set in [`fmode`](#fmode).
 
 ### dup-r, dup-w, dup-a
 
@@ -596,32 +279,21 @@ presh -c "dup-w 1 contents.txt \
     && exec /usr/sbin/sort"
 ```
 
-### export
+### echo
 
-**Compile flag**: `-DUSE_CMD_EXPORT`
+**Compile flag**: `-DUSE_CMD_ECHO`
 
-**Usage**: `export (ENV_NAME) (env value)`
+**Usage**: `echo [str1 [str2 ...]]`
 
-Export an environment variable + value into the running process and to-be-run child processes.
+Sends to `stdout` each argument, one per line.  To have a multi-word statement on a single line, it must be passed as a single argument; see (Command Parsing)[#command-parsing] for details.
 
+### env-cat-fd
 
-### signal-wait
+**Compile flag**: `-DUSE_CMD_ENV_CAT_FD`
 
-**Compile flag**: `-DUSE_CMD_SIGNAL`
+**Usage**: `env-cat-fd (fd) [file 1 [file 2...]]`
 
-**Usage**: `signal [signal1 [signal2]] [wait]`
-
-Waits for any of the OS signal number arguments before continuing.  If no signal is given (just `signal wait`), then it waits for a standard OS interruption, which will kill the whole process.
-
-Of note, once a signal is added to the list, it is registered for standard OS ignoring.  Only by adding the statement `wait` will the processing wait for the signal to be raised.  This can be used for interesting applications, such as:
-
-```bash
-presh -c "signal 2 ; signal 15 wait"
-```
-
-This will cause the shell to ignore SIGINT (2, usually sent by a ctrl-c input), and wait for SIGTERM (15).
-
-*Note that `dietlibc` does not support ignoring signals not waited on, and will exit with an error if the to-be-ignored signals are received.*
+This is similar to the Unix `envsubst` command.  It works just like [`cat-fd`](#cat-fd), but performs environment variable replacement on each input file.
 
 ### exec
 
@@ -652,6 +324,301 @@ Runs the native copy command to copy files with spaces in their names.  This sho
 ```bash
 presh -c "exec [/usr/bin/cp [source file.txt] [target file.txt]]"
 ```
+
+### exit
+
+**Compile flag**: `-DUSE_CMD_EXIT`
+
+**Usage**: `exit (exit code)`
+
+Quits the execution of the current command context with an exit code, and no other commands are parsed.  If the exit is within a sub-command, then the sub command exits.
+
+**Example:**
+
+```bash
+presh -c "\
+  subcmd [exit 1 ; echo [should not run 1]] && \
+  echo [should not run 2] ; \
+  echo [should run]"
+```
+
+The "should not run 1" line will not be reported, because the `exit 1` in the sub-command will stop all further command processing inside that sub-command.  The "should not run 2" will not run either, because it runs after the "&&", which will prevent the next command from running because the sub-command exited with a non-zero return code (1, from the exit argument).  Finally, the "should run" line is printed because the ";" ignores the global error state.
+
+### export
+
+**Compile flag**: `-DUSE_CMD_EXPORT`
+
+**Usage**: `export (ENV_NAME) (env value)`
+
+Export an environment variable + value into the running process and to-be-run child processes.
+
+### fmode
+
+**Compile flag**: *included automatically if the dependent commands are included; see below*
+
+**Usage**: `fmode (octal mode)`
+
+Changes an internal default file mode value to the given octal mode.  If never set, the default file mode value is `0644`.
+
+Example:
+
+```bash
+$ presh -c "fmode 765 ; touch a.txt"
+$ ls -l a.txt
+-rwxrw-r-x 1 user user   0 Jan 19 09:51 a.txt 
+```
+
+This can include the higher bits, too, so that some commands that support it (and if the executing user has permissions to run it) can set the sticky bits.
+
+This command is added if commands that have an implicit file mode are added through compile flags ([`mkdir`](#mkdir), [`touch`](#touch), [`trunc`](#trunc), [`mknod`](#mknod), [`mkdev`](#mkdev), and any [`dup`](#dup-r-dup-w-dup-a) commands.
+
+### for-each
+
+**Compile flag**: `-DUSE_CMD_FOR_EACH`
+
+**Usage**: `for-each (ENV_NAME) (value-list) (sub-command)`
+
+For each sub-argument in the value-list, set the environment variable name in the first argument to that sub-argument, and run the sub-command.  For the sub-command to be able to use the sub-argument, it will need to escape the environment variable.
+
+**Example 1:**
+
+Here, the `$` is escaped for the original shell that runs presh, then the $ is escaped for presh by doubling it (`$$`).
+
+```bash
+$ presh -c "for-each TEXT [first second [sub text] 3 4] [echo \$\${TEXT}]"
+first
+second
+sub text
+3
+4
+```
+
+### if-else
+
+**Compile flag**: `-DUSE_CMD_IF_ELSE`
+
+**Usage**: `if-else (conditional cmd) (if successful) [if failure]`
+
+Runs the first argument as a full presh command, as though it was run through [`subcmd`](#subcmd).  If the exit code is zero, then the second argument is run as a full presh command).  If the first argument fails, then the third argument runs, or is skipped if it isn't given.
+
+**Example 1:**
+
+Test to make sure that [`chmod`](#chmod) correctly makes things not-writable.
+
+```bash
+$ presh -c "\
+  touch /tmp/file && \
+  chmod 000 /tmp/file && \
+  if-else [touch /tmp/file] \
+      [echo [chmod is dumb]] \
+      [echo [chmod works]]"
+ERROR touch: /tmp/file
+chmod works
+```
+
+**Example 2:**
+
+Because precision shell [does not support `||` chaining](#chaining-commands), this can be simulated by using the conditional operation with the [`noop`](#noop) command.
+
+```bash
+presh -c "\
+  dup 2 /dev/null ;
+  if-else [touch [/usr/bin/check-config my-config.rc]] \
+      noop \
+      [exec /usr/bin/generate-default-config my-config.rc]
+  "
+```
+
+### kill-pid
+
+**Compile flag**: `-DUSE_CMD_KILL_PID`
+
+**Usage**: `kill-pid (signal) [pid 1 [pid 2 ...]]`
+
+Sends the signal number in the first argument to the processes in the following arguments.
+
+### ln-h
+
+**Compile flag**: `-DUSE_CMD_LN_H`
+
+**Usage**: `ln-h (src file) (dest file)`
+
+Creates a hard link named dest file, pointing to src file.
+
+### ln-s
+
+**Compile flag**: `-DUSE_CMD_LN_S`
+
+**Usage**: `ln-s (src file) (dest file)`
+
+Creates a symbolic link named dest file, pointing to src file.
+
+### mkdev
+
+**Compile flag**: `-DUSE_CMD_MKDEV`
+
+**Usage**: `mkdev (major version) (minor version) (node type) [file1 [file2 ...]]`
+
+The node type can be one of these:
+
+* `b` - block device
+* `c` and `u` - character device
+
+The major and minor version reflect the OS kernel specific device number.
+
+For example, to create the standard `/dev/null` device, you would run:
+
+```bash
+presh mkdev c 1 3 /dev/null
+```
+
+The created file will have the file permissions set in [`fmode`](#fmode).
+
+The execution of this command requires running with root level privileges, or the tool will report an error.
+
+### mkdir
+
+**Compile flag**: `-DUSE_CMD_MKDIR`
+
+**Usage**: `mkdir [file1 [file2 ...]]`
+
+Creates the listed directories.  The parent directory must exist, or it will generate an error.  If any creation fails, then the command fails with the number of failed directories.
+
+Each directory is created with the global file mode (see [`fmode`](#fmode)), with the user, group, and other executable flags also set.  To change this to something else, a [`chmod`](#chmod) must be run.
+
+### mknod
+
+**Compile flag**: `-DUSE_CMD_MKNOD`
+
+**Usage**: `mknod (node type) [file1 [file2 ...]]`
+
+Creates a special or ordinary file of the given type.  The node type is OS specific, but in general, the values supported are:
+
+* `p` - pipe (FIFO queue)
+* `s` - UNIX domain socket
+
+The created file will have the file permissions set in [`fmode`](#fmode).
+
+### mv
+
+**Compile flag**: `-DUSE_CMD_MV`
+
+**Usage**: `mv (src file) (target file)`
+
+Renames the file referenced by the first argument to a new name referenced by the second argument.  If the operation fails, or if there is no second argument, then the command fails with an exit code of 1.
+
+### noop
+
+**Compile flag**: `-DUSE_CMD_NOOP`
+
+**Usage**: `noop [arg1 [arg2 ...]]`
+
+**Usage**: `# [Some comment text.  Put inside quoting to protect against && and ;]`
+
+**Usage**: `#! /shebang/format/presh -f`
+
+Does nothing and ignores all arguments after it.
+
+**WARNING**  This does not work like you'd expect a normal comment to work.  This is a command, which means that ';' and '&&' will terminate it, so it's best to quote the arguments.  Also, it will be interpreted as a command for commands that take sub-commands as arguments.
+
+The noop can also be used to mask a file start shebang (`#!`) marker.  To work with presh, the precise format will need a space after the shebang mark, and include the `-f` argument to have the script be interpreted as a file.  This mode requires the [stream input flag](#script-files).
+
+**Example 1:**
+
+A script file.
+
+```bash
+#! /usr/bin/presh -f
+
+echo [This is a script file.]
+```
+
+**Example 2:**
+
+Careful with characters; the no-op is a command.
+
+```bash
+$ presh -c " \
+  echo [Text 1] ; \
+  # echo [Text 2] ; echo [Text 3] ; \
+  # [echo [Text 4] ; echo [Text 5]] ; \
+  echo [Text 6]"
+Text 1
+Text 3
+Text 6
+```
+
+**Example 3:**
+
+Careful with location; the no-op is a command.
+
+```bash
+$ presh -c "\
+  touch a-file.txt && \
+  chmod 000 a-file.txt &&
+  if-else [touch a-file.txt] \
+    # [echo Worked] \
+    [echo [chmod does not work]] \
+    [echo [chmod works]]
+chmod does not work
+ERROR if-else: echo [chmod works]
+```
+
+In this situation, the `# [echo Worked]` line is interpreted as a no-op operation, so the failure line is `[echo [chmod does not work]]` and, because there's no termination for the `if-else` command, it generates an error for the extra parameter `[echo [chmod works]]`.
+
+### pwd
+
+**Compile flag**: `-DUSE_CMD_PWD`
+
+**Usage**: `pwd -`
+
+**Usage**: `pwd (env variable name)`
+
+When used with the argument `-`, the current working directory is written to stdout on its own line.  Otherwise, the environment variable name argument has the current working directory path stored in its value.
+
+Multiple arguments can be given, where the same rules apply for each argument.
+
+### rm
+
+**Compile flag**: `-DUSE_CMD_RM`
+
+**Usage**: `rm [file1 [file2 ...]]`
+
+Removes each file passed as an argument.  The command will attempt to remove each file, and if any of them fail, then the whole command fails with an exit code equal to the sum of the error codes.
+
+### rmdir
+
+**Compile flag**: `-DUSE_CMD_RMDIR`
+
+**Usage**: `rmdir [dir1 [dir2 ...]]`
+
+Removes each empty directory passed as an argument.  If a directory is not empty, the command will fail.  The command will attempt to remove each directory, and if any of them fail, then the whole command fails with an exit code equal to the sum of the number of failed files.
+
+### signal-wait
+
+**Compile flag**: `-DUSE_CMD_SIGNAL`
+
+**Usage**: `signal [signal1 [signal2]] [wait]`
+
+Waits for any of the OS signal number arguments before continuing.  If no signal is given (just `signal wait`), then it waits for a standard OS interruption, which will kill the whole process.
+
+Of note, once a signal is added to the list, it is registered for standard OS ignoring.  Only by adding the statement `wait` will the processing wait for the signal to be raised.  This can be used for interesting applications, such as:
+
+```bash
+presh -c "signal 2 ; signal 15 wait"
+```
+
+This will cause the shell to ignore SIGINT (2, usually sent by a ctrl-c input), and wait for SIGTERM (15).
+
+*Note that `dietlibc` does not support ignoring signals not waited on, and will exit with an error if the to-be-ignored signals are received.*
+
+### sleep
+
+**Compile flag**: `-DUSE_CMD_SLEEP`
+
+**Usage**: `sleep [seconds [seconds ...]]`
+
+Sleeps for the number of seconds in the argument.  If no arguments are given, or if an argument is not a positive integer, then it does nothing (no error).  If multiple, positive integers are given, then it sleeps for the sum of them.
 
 ### spawn
 
@@ -688,6 +655,46 @@ presh -c "\
     kill-pid 15 \${FOREVER}"
 ```
 
+### subcmd
+
+**Compile flag**: `-DUSE_CMD_SUBCMD`
+
+**Usage**: `subcmd [command as an argument [command ...]]`
+
+Runs each argument as a whole command.
+
+**Example:**
+
+```bash
+presh -c "\
+  touch /tmp/file && \
+  subcmd [\
+    ln-s /tmp/file /tmp/foo && \
+    ln-s /tmp/file /tmp/bar \
+  ] ; \
+  echo done"
+```
+
+### touch
+
+**Compile flag**: `-DUSE_CMD_TOUCH`
+
+**Usage**: `touch [file1 [file2 ...]]`
+
+For each argument, if it does not exist, it is created.  If the argument exists and is not a file, then the command fails.  **Warning:** Unlike the standard `touch` command, this will not update the modified time of the file.
+
+If this creates a file, the file will have the file permissions set in [`fmode`](#fmode).
+
+### trunc
+
+**Compile flag**: `-DUSE_CMD_TRUNC`
+
+**Usage**: `trunc [file1 [file2 ...]]`
+
+For each argument, sets the file length to 0 if the file exists, otherwise creates the file.  This is nearly identical to [touch](#touch), with the addition of setting file lengths to 0.
+
+If this creates a file, the file will have the file permissions set in [`fmode`](#fmode).
+
 ### wait-pid
 
 **Compile flag**: `-DUSE_CMD_WAIT_PID`
@@ -720,35 +727,6 @@ presh -c "\
   "
 ```
 
-### kill-pid
-
-**Compile flag**: `-DUSE_CMD_KILL_PID`
-
-**Usage**: `kill-pid (signal) [pid 1 [pid 2 ...]]`
-
-Sends the signal number in the first argument to the processes in the following arguments.
-
-### for-each
-
-**Compile flag**: `-DUSE_CMD_FOR_EACH`
-
-**Usage**: `for-each (ENV_NAME) (value-list) (sub-command)`
-
-For each sub-argument in the value-list, set the environment variable name in the first argument to that sub-argument, and run the sub-command.  For the sub-command to be able to use the sub-argument, it will need to escape the environment variable.
-
-**Example 1:**
-
-Here, the `$` is escaped for the original shell that runs presh, then the $ is escaped for presh by doubling it (`$$`).
-
-```bash
-$ presh -c "for-each TEXT [first second [sub text] 3 4] [echo \$\${TEXT}]"
-first
-second
-sub text
-3
-4
-```
-
 ### while-error
 
 **Compile flag**: `-DUSE_CMD_WHILE_ERROR`
@@ -777,6 +755,43 @@ This will run `mv /tmp/config.txt config.txt`, and if it fails (in this case, be
 **Usage**: `while-no-error (sub-cmd) (loop-sub-cmd)`
 
 Identical to [`while-error`](#while-error), except that it stops looping when the first argument's sub command generates an error.
+
+### write-fd
+
+**Compile flag**: `-DUSE_CMD_WRITE_FD`
+
+**Usage**: `write-fd (fd) [text] [text]`
+
+Writes to the file descriptor the precise text given.  Each argument is written as is without spaces between them, and no newline is inserted except where explicitly added to the text.
+
+**Example 1:**
+
+With the following script:
+
+```bash
+#! presh -f
+
+dup 12 new-file.txt
+write-fd 12 [text1] [text2] [text3\ntext4]
+```
+
+This will generate the file `new-file.txt` with the contents:
+
+```
+text1text2text3
+text4
+```
+
+### version
+
+**Compile flag**: *always present*
+
+**Usage**: `version`
+
+Prints the version information to stdout.  Any additional arguments generates an error.
+
+
+
 
 ### Chaining Commands
 
