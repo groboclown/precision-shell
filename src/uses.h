@@ -141,7 +141,8 @@ SOFTWARE.
 
 // USES_SHARED_ITOA - shared integer to ascii code.
 #if    defined(USE_CMD_SPAWN) \
-    || defined(USE_CMD_WAIT_PID)
+    || defined(USE_CMD_WAIT_PID) \
+    || defined(USE_CMD_FILE_STAT)
 
 #define USES_SHARED_ITOA
 

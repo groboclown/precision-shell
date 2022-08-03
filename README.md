@@ -21,6 +21,9 @@ The shell supports these commands:
   * [cat-fd](#cat-fd) - write the contents of a file to a file descriptor.
   * [env-cat-fd](#env-cat-fd) - write the contents of a file to a file descriptor, performing environment variable parsing on the source file.
   * [write-fd](#write-fd) - write the arguments to a file descriptor, either stdout or stdin, or those opened through the `dup-*` commands.
+  * [ls](#ls) - list contents of a directory.
+  * [ls-t](#ls-t) - list contents and content type of a directory
+  * [file-stat](#file-stat) - describe a file
 * Files
   * [fmode](#fmode) - set the octal file mode for other commands that work with files.
   * [rm](#rm) - remove files.
@@ -67,7 +70,6 @@ It also supports:
 
 ## What It Doesn't Do
 
-* List files or file details.
 * Report detailed error messages.
 * Change file timestamps.
 * Provide splat pattern replacements.
@@ -352,6 +354,16 @@ The "should not run 1" line will not be reported, because the `exit 1` in the su
 
 Export an environment variable + value into the running process and to-be-run child processes.
 
+### file-stat
+
+**Compile flag**: `-DUSE_CMD_FILE_STAT`
+
+**Usage**: `file-stat some/file.txt`
+
+*NOTE: this is an experimental feature.  Output is expected to evolve.*
+
+List out information about the given file.
+
 ### fmode
 
 **Compile flag**: *included automatically if the dependent commands are included; see below*
@@ -452,6 +464,40 @@ Creates a hard link named dest file, pointing to src file.
 **Usage**: `ln-s (src file) (dest file)`
 
 Creates a symbolic link named dest file, pointing to src file.
+
+### ls
+
+**Compile flag**: `-DUSE_CMD_LS`
+
+**Usage**: `ls (directory1 (directory2 ...))`
+
+Outputs, one per line, each entry within the given directory to stdout.  It does not use splat patterns (e.g. `*.txt`), and only accepts directory names.  The output does not include the directory name for the input.
+
+Limited use as a diagnostic tool when inspecting an image.  Most securely constructed images should never use this command.
+
+### ls-t
+
+**Compile flag**: `-DUSE_CMD_LS_T`
+
+**Usage**: `ls-t (directory1 (directory2 ...))`
+
+Similar to [`ls`](#ls), but each line starts with a file-type letter:
+
+* `b` - block-type device
+* `c` - character-type device
+* `f` - normal file
+* `d` - directory
+* `p` - FIFO pipe
+* `l` - symbolic link
+* `s` - UNIX domain socket
+* `o` - other
+
+```bash
+$ presh -c "mkdir x ; touch x/a.txt ; mkdir x/o.d ; mknod p x/b.fifo ; ls-t x"
+f a.txt
+d o.d
+p b.fifo
+```
 
 ### mkdev
 
@@ -903,10 +949,10 @@ Last build size:
   * musl (Alpine): 26,040 bytes
   * dietlibc (Alpine): 17,352 bytes
 * Full build:
-  * glibc (Ubuntu): 836,040 bytes
+  * glibc (Ubuntu): 840,136 bytes
   * glibc (Arch): 794,664 bytes
-  * musl (Alpine): 30,136 bytes
-  * dietlibc (Alpine): 21,448 bytes
+  * musl (Alpine): 34,232 bytes
+  * dietlibc (Alpine): 25,544 bytes
 
 *dietlibc [requires](https://www.fefe.de/dietlibc/FAQ.txt) that you either not distribute the compiled executable, or release the executable under GPL v2.*
 

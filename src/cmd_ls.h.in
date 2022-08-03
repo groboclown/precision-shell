@@ -1,0 +1,140 @@
+/* MIT License
+
+Copyright (c) 2022 groboclown
+
+Permission is hereby granted, free of charge, to any person obtaining a copy
+of this software and associated documentation files (the "Software"), to deal
+in the Software without restriction, including without limitation the rights
+to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+copies of the Software, and to permit persons to whom the Software is
+furnished to do so, subject to the following conditions:
+
+The above copyright notice and this permission notice shall be included in all
+copies or substantial portions of the Software.
+
+THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+SOFTWARE. */
+
+AsOptionalUnion(file="ls-ls-f",
+
+
+AsOptional(command="LS",
+
+    WithNamedStep(enum="LS", name="ls",
+        OnArg(
+            LOG(":: ls ");
+            LOGLN(global_arg);
+
+            ls_dir_stream = opendir(global_arg);
+            if (ls_dir_stream == NULL) {
+                global_err = 1;
+                break;
+            }
+            while ((ls_dirent = readdir(ls_dir_stream)) != NULL) {
+                global_arg1_i = 0;
+                while (ls_dirent->d_name[global_arg1_i] == '.') {
+                    global_arg1_i++;
+                }
+                if (global_arg1_i <= 2 && ls_dirent->d_name[global_arg1_i] == 0) {
+                    // Skip '.' and '..' directories
+                    // This also implicitly skips any record with a zero length.
+                    continue;
+                }
+                stdoutPLn(ls_dirent->d_name);
+            }
+        )
+
+    )
+)
+
+
+AsOptional(command="LS_T",
+
+    WithNamedStep(enum="LS_T", name="ls-t",
+
+        OnArg(
+            LOG(":: ls-f ");
+            LOGLN(global_arg);
+
+            ls_dir_stream = opendir(global_arg);
+            if (ls_dir_stream == NULL) {
+                global_err = 1;
+                break;
+            }
+            while ((ls_dirent = readdir(ls_dir_stream)) != NULL) {
+                global_arg1_i = 0;
+                while (ls_dirent->d_name[global_arg1_i] == '.') {
+                    global_arg1_i++;
+                }
+                if (global_arg1_i <= 2 && ls_dirent->d_name[global_arg1_i] == 0) {
+                    // Skip '.' and '..' directories
+                    // This also implicitly skips any record with a zero length.
+                    continue;
+                }
+                switch (ls_dirent->d_type) {
+                    case DT_BLK:
+                        // block device
+                        stdoutP("b ");
+                        break;
+                    case DT_CHR:
+                        // character device
+                        stdoutP("c ");
+                        break;
+                    case DT_DIR:
+                        // directory
+                        stdoutP("d ");
+                        break;
+                    case DT_FIFO:
+                        // named pipe
+                        stdoutP("p ");
+                        break;
+                    case DT_LNK:
+                        // symbolic link
+                        stdoutP("l ");
+                        break;
+                    case DT_REG:
+                        // regular file
+                        stdoutP("f ");
+                        break;
+                    case DT_SOCK:
+                        // UNIX domain socket
+                        stdoutP("s ");
+                        break;
+                    case DT_UNKNOWN:
+                    default:
+                        // Some other file type
+                        stdoutP("o ");
+                        break;
+                }
+                stdoutPLn(ls_dirent->d_name);
+            }
+        )
+
+    )
+
+)
+
+
+
+WithAuxFor(commands=[ls, ls-t],
+
+#include <sys/types.h>
+#include <dirent.h>
+#include "output.h"
+#include "globals.h"
+#include "helpers.h"
+
+    WithVirtualStep(enum="LS_ANY",
+        OnInit(
+            DIR *ls_dir_stream;
+            struct dirent *ls_dirent;
+        )
+    )
+)
+
+)

@@ -3,6 +3,7 @@ FROM docker.io/library/alpine:3.10
 # This file is broken up to make rebuilds fast
 # by reusing previous layers that take a while to run.
 
+ARG BUILD_MODE=build
 ARG COMMANDS="chmod ln-s"
 
 WORKDIR /opt/code

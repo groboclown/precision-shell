@@ -125,10 +125,11 @@ SOFTWARE.
 
 
 // buffer must be global_itoa.  return should be stored in global_itoa_ptr
-char *shared_itoa(int value, char *buffer) {
+//    global_itoa_ptr = shared_itoa(some_val, global_itoa);
+char *shared_itoa(long int value, char *buffer) {
     // size of global_itoa == (3 * sizeof(int)) + 1, but we want to
     // write to -1 first, so...
-    char *itoa_ptr = buffer + (3 * sizeof(int));
+    char *itoa_ptr = buffer + (3 * sizeof(long int));
     int is_negative = 0;
     *itoa_ptr = '\0';
     if (value < 0) {
@@ -153,12 +154,14 @@ char *shared_itoa(int value, char *buffer) {
 
 #define ENUM_LIST__SHARED_ITOA
 #define VIRTUAL_ENUM_LIST__SHARED_ITOA \
-            /* from cmd_shared_virtual.h.in:98 */ \
+            /* from cmd_shared_virtual.h.in:99 */ \
             COMMAND_INDEX__DO_NOT_USE_ITOA,
 #define GLOBAL_VARDEF__SHARED_ITOA
 #define INITIALIZE__SHARED_ITOA \
-            /* from cmd_shared_virtual.h.in:100 */ \
-            char global_itoa[(3 * sizeof(int)) + 1]; \
+            /* from cmd_shared_virtual.h.in:101 */ \
+            /* A bit bigger than this size, to accomodate other things*/ \
+            /* that need a large buffer of data.*/ \
+            char global_itoa[(3 * sizeof(long int)) + 8]; \
             char *global_itoa_ptr;
 #define STARTUP_CASE__SHARED_ITOA
 #define RUN_CASE__SHARED_ITOA
