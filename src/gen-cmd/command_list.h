@@ -37,11 +37,13 @@ SOFTWARE.
 #include "cmd_exec.h"
 #include "cmd_exit.h"
 #include "cmd_export.h"
-#include "cmd_for_each.h"
+#include "cmd_file_stat.h"
 #include "cmd_fmode.h"
+#include "cmd_for_each.h"
 #include "cmd_if_else.h"
 #include "cmd_ln_h.h"
 #include "cmd_ln_s.h"
+#include "cmd_ls.h"
 #include "cmd_kill_pid.h"
 #include "cmd_mkdir.h"
 #include "cmd_mknod_mkdev.h"
@@ -75,11 +77,13 @@ SOFTWARE.
             GLOBAL_VARDEF__EXEC \
             GLOBAL_VARDEF__EXIT \
             GLOBAL_VARDEF__EXPORT \
-            GLOBAL_VARDEF__FOR_EACH \
+            GLOBAL_VARDEF__FILE_STAT \
             GLOBAL_VARDEF__FMODE \
+            GLOBAL_VARDEF__FOR_EACH \
             GLOBAL_VARDEF__IF_ELSE \
             GLOBAL_VARDEF__LN_H \
             GLOBAL_VARDEF__LN_S \
+            GLOBAL_VARDEF__LS_LS_F \
             GLOBAL_VARDEF__KILL_PID \
             GLOBAL_VARDEF__MKDIR \
             GLOBAL_VARDEF__MKNOD_MKDEV \
@@ -111,11 +115,13 @@ SOFTWARE.
             INITIALIZE__EXEC \
             INITIALIZE__EXIT \
             INITIALIZE__EXPORT \
-            INITIALIZE__FOR_EACH \
+            INITIALIZE__FILE_STAT \
             INITIALIZE__FMODE \
+            INITIALIZE__FOR_EACH \
             INITIALIZE__IF_ELSE \
             INITIALIZE__LN_H \
             INITIALIZE__LN_S \
+            INITIALIZE__LS_LS_F \
             INITIALIZE__KILL_PID \
             INITIALIZE__MKDIR \
             INITIALIZE__MKNOD_MKDEV \
@@ -147,11 +153,13 @@ SOFTWARE.
             STARTUP_CASE__EXEC \
             STARTUP_CASE__EXIT \
             STARTUP_CASE__EXPORT \
-            STARTUP_CASE__FOR_EACH \
+            STARTUP_CASE__FILE_STAT \
             STARTUP_CASE__FMODE \
+            STARTUP_CASE__FOR_EACH \
             STARTUP_CASE__IF_ELSE \
             STARTUP_CASE__LN_H \
             STARTUP_CASE__LN_S \
+            STARTUP_CASE__LS_LS_F \
             STARTUP_CASE__KILL_PID \
             STARTUP_CASE__MKDIR \
             STARTUP_CASE__MKNOD_MKDEV \
@@ -183,11 +191,13 @@ SOFTWARE.
             RUN_CASE__EXEC \
             RUN_CASE__EXIT \
             RUN_CASE__EXPORT \
-            RUN_CASE__FOR_EACH \
+            RUN_CASE__FILE_STAT \
             RUN_CASE__FMODE \
+            RUN_CASE__FOR_EACH \
             RUN_CASE__IF_ELSE \
             RUN_CASE__LN_H \
             RUN_CASE__LN_S \
+            RUN_CASE__LS_LS_F \
             RUN_CASE__KILL_PID \
             RUN_CASE__MKDIR \
             RUN_CASE__MKNOD_MKDEV \
@@ -219,11 +229,13 @@ SOFTWARE.
             REQUIRES_ADDL_ARG__EXEC \
             REQUIRES_ADDL_ARG__EXIT \
             REQUIRES_ADDL_ARG__EXPORT \
-            REQUIRES_ADDL_ARG__FOR_EACH \
+            REQUIRES_ADDL_ARG__FILE_STAT \
             REQUIRES_ADDL_ARG__FMODE \
+            REQUIRES_ADDL_ARG__FOR_EACH \
             REQUIRES_ADDL_ARG__IF_ELSE \
             REQUIRES_ADDL_ARG__LN_H \
             REQUIRES_ADDL_ARG__LN_S \
+            REQUIRES_ADDL_ARG__LS_LS_F \
             REQUIRES_ADDL_ARG__KILL_PID \
             REQUIRES_ADDL_ARG__MKDIR \
             REQUIRES_ADDL_ARG__MKNOD_MKDEV \
@@ -259,11 +271,13 @@ enum CommandIndex {
             ENUM_LIST__EXEC
             ENUM_LIST__EXIT
             ENUM_LIST__EXPORT
-            ENUM_LIST__FOR_EACH
+            ENUM_LIST__FILE_STAT
             ENUM_LIST__FMODE
+            ENUM_LIST__FOR_EACH
             ENUM_LIST__IF_ELSE
             ENUM_LIST__LN_H
             ENUM_LIST__LN_S
+            ENUM_LIST__LS_LS_F
             ENUM_LIST__KILL_PID
             ENUM_LIST__MKDIR
             ENUM_LIST__MKNOD_MKDEV
@@ -298,11 +312,13 @@ enum CommandIndex {
             VIRTUAL_ENUM_LIST__EXEC
             VIRTUAL_ENUM_LIST__EXIT
             VIRTUAL_ENUM_LIST__EXPORT
-            VIRTUAL_ENUM_LIST__FOR_EACH
+            VIRTUAL_ENUM_LIST__FILE_STAT
             VIRTUAL_ENUM_LIST__FMODE
+            VIRTUAL_ENUM_LIST__FOR_EACH
             VIRTUAL_ENUM_LIST__IF_ELSE
             VIRTUAL_ENUM_LIST__LN_H
             VIRTUAL_ENUM_LIST__LN_S
+            VIRTUAL_ENUM_LIST__LS_LS_F
             VIRTUAL_ENUM_LIST__KILL_PID
             VIRTUAL_ENUM_LIST__MKDIR
             VIRTUAL_ENUM_LIST__MKNOD_MKDEV
