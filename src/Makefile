@@ -103,6 +103,9 @@ COMMANDS = \
 	cmd_version.h \
 	cmd_err.h
 
+# Note: cmd_ls_ls.h is not enabled.  Either this should
+#   be used, or cmd_ls.h + cmd_file_stat.h, but not both.
+
 
 .PHONY: all
 all: clean src debug
