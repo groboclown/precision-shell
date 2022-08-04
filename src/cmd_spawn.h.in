@@ -87,9 +87,11 @@ WithVirtualStep(enum="SPAWN__CMD",
             // This launches a new executable and terminates this one immediately.
             execvp(shared_split_argv[0], (char * const*) shared_split_argv);
 
-            // If this code is reached, then exec failed to run.
-            // Unlike exec, fail immediately and don't keep going.
-            return 1;
+            // Exit rather than return.  A failed exec then performing
+            //   a return can cause a sub-command context to start running,
+            //   which is Very Bad.
+            _exit(1);
+
         } else {
             // Else this is the parent process.
             // Just slurp up this argument.
