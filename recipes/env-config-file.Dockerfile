@@ -16,14 +16,11 @@ FROM docker.io/library/alpine:3.10 AS presh-builder
 
 WORKDIR /opt/precision-shell
 
-# Adjust this value during the image build to alter which commands
-#   to include.
+# Adjust this value during the image build with `--build-arg`
+#   to alter which commands to include.
 ARG COMMANDS="dup-w env-cat-fd cat-fd spawn kill-pid wait-pid exec echo signal noop enviro"
 
-ENV \
-    BUILD_MODE=build \
-    COMMANDS=$COMMANDS \
-    UID1=1 UID2=2 GID1=1 GID2=2
+ENV COMMANDS=$COMMANDS
 
 COPY build-tools/ build-tools/
 COPY Makefile Makefile.command-flags version.txt ./
@@ -39,22 +36,20 @@ LABEL name="local/precision-shell-example"
 
 COPY --from=build-env /opt/app /opt/app
 
-# To debug the presh script.
+# To debug the presh script, this can use the presh-debug instead.
 # COPY --from=presh-builder /opt/precision-shell/out/presh-debug /bin/sh
 COPY --from=presh-builder /opt/precision-shell/out/presh /bin/sh
 
 WORKDIR /opt/app/hello_world
 
-# Get rid of the entrypoint.
-ENTRYPOINT []
-
 ENV LISTEN_PORT 9000
 
 # Because Node doesn't install signal handlers on its own,
-# have presh listen for user signals.
+#   have presh listen for user signals.
 # This allows for the container to stop with Ctrl-C when
-# the user runs the container with "-it" arguments.
-CMD noop [Use dup-w and env-cat-fd to update config.json] \
+#   the user runs the container with "-it" arguments.
+ENTRYPOINT \
+    noop [Use dup-w and env-cat-fd to update config.json] \
        [based on environment variables.] \
     && dup-w 8 config.json \
     && env-cat-fd 8 ../config.json.template \

@@ -2,7 +2,7 @@
 
 This directory includes different recipes and examples for using precision shell to solve different problems.
 
-These are constructed as Dockerfile files, as that's considered the target for precision shell.  Though they are located in this directory, they are intended to be run from the parent directory.  The `_run_all.sh` script runs all of them.
+These are constructed as Dockerfile files, as that's considered the target for precision shell.  Though they are located in this directory, they are intended to be run from the parent directory.  The `_build_all.sh` script creates all of them.
 
 
 ## env-config-file.Dockerfile
