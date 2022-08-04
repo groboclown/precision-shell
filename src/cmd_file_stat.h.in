@@ -27,6 +27,7 @@ AsOptional(command="file-stat",
 #include <sys/types.h>
 #include <sys/stat.h>
 #include <unistd.h>
+#include <sys/sysmacros.h>
 
 WithNamedStep(enum="FILE_STAT", name="file-stat",
     OnInit(
@@ -35,106 +36,112 @@ WithNamedStep(enum="FILE_STAT", name="file-stat",
 
 
     OnArg(
-        // Need to look at this output syntax.  Could have it
-        // report condensed output like 'ls -l' does.
+        // "ls -l" like format.
         LOG(":: file-stat ");
         LOGLN(global_arg);
+
         global_err = stat(global_arg, &file_stat_buf);
         if (global_err == 0) {
-            stdoutP("File type: ");
             switch (file_stat_buf.st_mode & S_IFMT) {
                 case S_IFSOCK:
-                    stdoutP("socket\n");
+                    stdoutP("s");
                     break;
                 case S_IFLNK:
-                    stdoutP("symbolic link\n");
+                    stdoutP("l");
                     break;
                 case S_IFREG:
-                    stdoutP("file\n");
+                    stdoutP("-");
                     break;
                 case S_IFBLK:
-                    stdoutP("block\n");
+                    stdoutP("b");
                     break;
                 case S_IFDIR:
-                    stdoutP("directory\n");
+                    stdoutP("d");
                     break;
                 case S_IFCHR:
-                    stdoutP("character\n");
+                    stdoutP("c");
                     break;
                 case S_IFIFO:
-                    stdoutP("fifo\n");
+                    stdoutP("p");
+                    break;
+                default:
+                    stdoutP("?");
                     break;
             }
-            stdoutP("Mode: ");
-            global_itoa[0] = '-';
             if ((file_stat_buf.st_mode & S_ISUID) != 0) {
-                global_itoa[0] = 'U';
-            }
-            global_itoa[1] = '-';
-            if ((file_stat_buf.st_mode & S_ISGID) != 0) {
-                global_itoa[1] = 'G';
-            }
-            global_itoa[2] = '-';
-            if ((file_stat_buf.st_mode & S_ISVTX) != 0) {
-                global_itoa[2] = 's';
+                stdoutP("t");
+            } else if ((file_stat_buf.st_mode & S_ISGID) != 0) {
+                stdoutP("s");
+            } else {
+                stdoutP("-");
             }
 
-            global_itoa[3] = '-';
             if ((file_stat_buf.st_mode & S_IRUSR) != 0) {
-                global_itoa[3] = 'r';
+                stdoutP("r");
+            } else {
+                stdoutP("-");
             }
-            global_itoa[4] = '-';
             if ((file_stat_buf.st_mode & S_IWUSR) != 0) {
-                global_itoa[4] = 'w';
+                stdoutP("w");
+            } else {
+                stdoutP("-");
             }
-            global_itoa[5] = '-';
             if ((file_stat_buf.st_mode & S_IXUSR) != 0) {
-                global_itoa[5] = 'x';
+                stdoutP("x");
+            } else {
+                stdoutP("-");
             }
 
-            global_itoa[6] = '-';
             if ((file_stat_buf.st_mode & S_IRGRP) != 0) {
-                global_itoa[6] = 'r';
+                stdoutP("r");
+            } else {
+                stdoutP("-");
             }
-            global_itoa[7] = '-';
             if ((file_stat_buf.st_mode & S_IWGRP) != 0) {
-                global_itoa[7] = 'w';
+                stdoutP("w");
+            } else {
+                stdoutP("-");
             }
-            global_itoa[8] = '-';
             if ((file_stat_buf.st_mode & S_IXGRP) != 0) {
-                global_itoa[8] = 'x';
+                stdoutP("x");
+            } else {
+                stdoutP("-");
             }
 
-            global_itoa[9] = '-';
             if ((file_stat_buf.st_mode & S_IROTH) != 0) {
-                global_itoa[9] = 'r';
+                stdoutP("r");
+            } else {
+                stdoutP("-");
             }
-            global_itoa[10] = '-';
             if ((file_stat_buf.st_mode & S_IWOTH) != 0) {
-                global_itoa[10] = 'w';
+                stdoutP("w");
+            } else {
+                stdoutP("-");
             }
-            global_itoa[11] = '-';
             if ((file_stat_buf.st_mode & S_IXOTH) != 0) {
-                global_itoa[11] = 'x';
+                stdoutP("x");
+            } else {
+                stdoutP("-");
             }
-            global_itoa[12] = '-';
-            if ((file_stat_buf.st_mode & S_IXOTH) != 0) {
-                global_itoa[12] = 'x';
-            }
-            global_itoa[13] = '\n';
-            global_itoa[14] = '\0';
-            stdoutP(global_itoa);
+            stdoutP(" ");
+            stdoutP(shared_itoa(file_stat_buf.st_nlink, global_itoa));
+            stdoutP(" ");
+            stdoutP(shared_itoa(file_stat_buf.st_uid, global_itoa));
+            stdoutP(" ");
+            stdoutP(shared_itoa(file_stat_buf.st_gid, global_itoa));
+            stdoutP(" ");
 
-            stdoutP("UID: ");
-            stdoutPLn(shared_itoa(file_stat_buf.st_uid, global_itoa));
-            stdoutP("GID: ");
-            stdoutPLn(shared_itoa(file_stat_buf.st_gid, global_itoa));
-            stdoutP("DevID: ");
-            stdoutPLn(shared_itoa(file_stat_buf.st_rdev, global_itoa));
-            stdoutP("Hard link count: ");
-            stdoutPLn(shared_itoa(file_stat_buf.st_nlink, global_itoa));
-            stdoutP("Bytes: ");
-            stdoutPLn(shared_itoa(file_stat_buf.st_size, global_itoa));
+            // st_rdev is unusable for device numbers like mkdev.
+            // split it up for normal values.
+            // stdoutP(shared_itoa(file_stat_buf.st_rdev, global_itoa));
+            stdoutP(shared_itoa(major(file_stat_buf.st_rdev), global_itoa));
+            stdoutP(" ");
+            stdoutP(shared_itoa(minor(file_stat_buf.st_rdev), global_itoa));
+
+            stdoutP(" ");
+            stdoutP(shared_itoa(file_stat_buf.st_size, global_itoa));
+            stdoutP(" ");
+            stdoutPLn(global_arg);
         }
     )
 
