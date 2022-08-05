@@ -27,7 +27,7 @@ RUN \
 # The real image.
 FROM scratch
 LABEL name="local/precision-shell" \
-      version="3.0.0"
+      version="4.2.0"
 
 # Set the executable under the file "/bin/sh", so that
 #   docker will use it as the default shell when it encounters

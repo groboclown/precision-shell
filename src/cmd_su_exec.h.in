@@ -1,0 +1,101 @@
+/*
+MIT License
+
+Copyright (c) 2022 groboclown
+
+Permission is hereby granted, free of charge, to any person obtaining a copy
+of this software and associated documentation files (the "Software"), to deal
+in the Software without restriction, including without limitation the rights
+to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+copies of the Software, and to permit persons to whom the Software is
+furnished to do so, subject to the following conditions:
+
+The above copyright notice and this permission notice shall be included in all
+copies or substantial portions of the Software.
+
+THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+SOFTWARE.
+*/
+AsOptional(command="su-exec",
+
+
+// Exec takes a single argument and parses it into arguments using the
+// input_loader.
+
+#include <stdlib.h>
+#include <stdio.h>
+#include <unistd.h>
+#include "args.h"
+#include "output.h"
+#include "globals.h"
+
+
+#ifdef DEBUG
+#define EXEC_DEBUG_REPORT \
+    LOG(":: Running command ["); \
+    LOG(shared_split_argv[0]); \
+    LOG("] with arguments ["); \
+    for (global_arg2_i = 0; shared_split_argv[global_arg2_i] != NULL; global_arg2_i++) { \
+        if (global_arg2_i > 0) { \
+            LOG("] ["); \
+        } \
+        LOG(shared_split_argv[global_arg2_i]); \
+    } \
+    LOG("]\n");
+#else
+#define EXEC_DEBUG_REPORT
+#endif
+
+
+WithNamedStep(enum="SU_EXEC", name="su-exec",
+    RequiresAnotherArg()
+
+    OnCmd(
+        // arg2: uid
+        global_cmd = COMMAND_INDEX__SHARED_INT2;
+        global_arg3_i = COMMAND_INDEX__SU_EXEC;
+    )
+
+    OnArg(
+        // arg1: gid 
+        LOG(":: storing gid ");
+        LOGLN(global_arg);
+        tmp_val = helper_arg_to_uint(global_arg, 10, 0xffff);
+        if (tmp_val < 0) {
+            global_err = 1;
+            global_cmd = COMMAND_INDEX__ERR;
+            break;
+        }
+        global_arg1_i = tmp_val;
+        global_cmd = COMMAND_INDEX__SU_EXEC__RUN;
+    )
+)
+
+WithVirtualStep(enum="SU_EXEC__RUN",
+
+    OnArg(
+        // Split the arguments.
+        SHARED_SPLIT__PARSE_ARG
+        EXEC_DEBUG_REPORT
+
+        // Delay switching UID and GID until the last possible moment.
+        // Note that gid is done first.
+        setgid(global_arg1_i);
+        setuid(global_arg2_i);
+        
+        // This launches a new executable and terminates this one immediately.
+        execvp(shared_split_argv[0], (char * const*) shared_split_argv);
+
+        // Unlike the normal exec, this must exit
+        // immediately due to the setuid/setgid.  We don't
+        // want unexpected commands running in an unexpected state.
+        _exit(1);
+    )
+)
+
+)

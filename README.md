@@ -281,6 +281,17 @@ presh -c "dup-w 1 contents.txt \
     && exec /usr/sbin/sort"
 ```
 
+**Example 5:**
+
+Perform file descriptor redirect, then restore it when complete.
+
+```bash
+presh -c "dup-w 1 contents.txt \
+    && echo foo bar baz \
+    && dup-w 1 &1 \
+    && echo [Wrote to contents.txt]"
+```
+
 ### echo
 
 **Compile flag**: `-DUSE_CMD_ECHO`
@@ -950,7 +961,7 @@ Last build size:
   * glibc (Arch): 778,280 bytes
   * musl (Alpine): 21,944 bytes
   * dietlibc (Alpine): 17,352 bytes
-* Standard buld:
+* Standard build:
   * glibc (Ubuntu): 831,944 bytes
   * glibc (Arch): 782,376 bytes
   * musl (Alpine): 26,040 bytes

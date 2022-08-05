@@ -73,7 +73,7 @@ extern const char cmd_name_spawn[];
 #define VIRTUAL_ENUM_LIST__SPAWN \
             /* from cmd_spawn.h.in:63 */ \
             COMMAND_INDEX__SPAWN__CMD, \
-            /* from cmd_spawn.h.in:102 */ \
+            /* from cmd_spawn.h.in:104 */ \
             COMMAND_INDEX__SPAWN__PID,
 #define GLOBAL_VARDEF__SPAWN \
             /* from cmd_spawn.h.in:53 */ \
@@ -111,9 +111,10 @@ extern const char cmd_name_spawn[];
             /* inhibits weird issues if there wasn't an executable argument.*/ \
             /* This launches a new executable and terminates this one immediately.*/ \
             execvp(shared_split_argv[0], (char * const*) shared_split_argv); \
-            /* If this code is reached, then exec failed to run.*/ \
-            /* Unlike exec, fail immediately and don't keep going.*/ \
-            return 1; \
+            /* Exit rather than return.  A failed exec then performing*/ \
+            /*   a return can cause a sub-command context to start running,*/ \
+            /*   which is Very Bad.*/ \
+            _exit(1); \
         } else { \
             /* Else this is the parent process.*/ \
             /* Just slurp up this argument.*/ \
@@ -122,8 +123,8 @@ extern const char cmd_name_spawn[];
         } \
         break; \
     case COMMAND_INDEX__SPAWN__PID: \
-        /* from cmd_spawn.h.in:102 */ \
-            /* from cmd_spawn.h.in:103 */ \
+        /* from cmd_spawn.h.in:104 */ \
+            /* from cmd_spawn.h.in:105 */ \
         /* Put the PID into the environment variable global_arg.*/ \
         /* This argument can only be run from the parent due to the logic above.*/ \
         global_itoa_ptr = shared_itoa(global_arg3_i, global_itoa); \

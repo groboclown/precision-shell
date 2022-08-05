@@ -91,7 +91,8 @@ SOFTWARE.
     || defined(USE_CMD_CHOWN) \
     || defined(USE_CMD_WRITE_FD) \
     || defined(USE_CMD_CAT_FD) \
-    || defined(USE_CMD_ENV_CAT_FD)
+    || defined(USE_CMD_ENV_CAT_FD) \
+    || defined(USE_CMD_SU_EXEC)
 
 #define USES_SHARED_INT
 
@@ -132,7 +133,8 @@ SOFTWARE.
     || defined(USE_CMD_IF_ELSE) \
     || defined(USE_CMD_WHILE_NO_ERROR) \
     || defined(USE_CMD_WHILE_ERROR) \
-    || defined(USE_CMD_FOR_EACH)
+    || defined(USE_CMD_FOR_EACH) \
+    || defined(USE_CMD_SU_EXEC)
 
 #define USES_SHARED_SPLIT_ARG
 

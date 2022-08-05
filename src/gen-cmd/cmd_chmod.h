@@ -38,13 +38,17 @@ SOFTWARE. */
 #include "helpers.h"
 
 
+
+    // Should this be added?
+
+    // RequiresAnotherArg()
 /* from cmd_chmod.h.in:31 */
 extern const char cmd_name_chmod__mode[];
 #define ENUM_LIST__CHMOD \
             /* from cmd_chmod.h.in:31 */ \
             COMMAND_INDEX__CHMOD__MODE,
 #define VIRTUAL_ENUM_LIST__CHMOD \
-            /* from cmd_chmod.h.in:44 */ \
+            /* from cmd_chmod.h.in:46 */ \
             COMMAND_INDEX__CHMOD__RUN,
 #define GLOBAL_VARDEF__CHMOD \
             /* from cmd_chmod.h.in:31 */ \
@@ -56,7 +60,7 @@ extern const char cmd_name_chmod__mode[];
 #define RUN_CASE__CHMOD \
     case COMMAND_INDEX__CHMOD__MODE: \
         /* from cmd_chmod.h.in:31 */ \
-            /* from cmd_chmod.h.in:32 */ \
+            /* from cmd_chmod.h.in:34 */ \
         LOG(":: using mode "); \
         LOGLN(global_arg); \
         global_cmd = COMMAND_INDEX__CHMOD__RUN; \
@@ -68,8 +72,8 @@ extern const char cmd_name_chmod__mode[];
         } \
         break; \
     case COMMAND_INDEX__CHMOD__RUN: \
-        /* from cmd_chmod.h.in:44 */ \
-            /* from cmd_chmod.h.in:45 */ \
+        /* from cmd_chmod.h.in:46 */ \
+            /* from cmd_chmod.h.in:47 */ \
         LOG(":: chmod on "); \
         LOGLN(global_arg); \
         global_err = chmod(global_arg, global_arg1_i); \
