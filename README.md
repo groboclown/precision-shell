@@ -730,7 +730,7 @@ Switches the current user to user id UID (not the user name) and group id GID (n
 
 Switches the current user to user id UID (not the user name) and group id GID (not the group name), and launches the third argument as a new process in the background.  If the fourth argument is given, then the launched PID is stored in that value and exported to the environment variables.
 
-Take note that, if the command execution fails to run, or the user ID cannot be changed, then the only way for presh to identify the failure is by inspecting the exit code through [`wait-pid`](#wait-pid)
+Take note that, if the command execution fails to run, or the user ID cannot be changed, then the only way for presh to identify the failure is by inspecting the exit code through [`wait-pid`](#wait-pid).
 
 ### subcmd
 
