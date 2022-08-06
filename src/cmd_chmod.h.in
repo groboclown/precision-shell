@@ -29,6 +29,8 @@ AsOptional(command="chmod",
 #include "helpers.h"
 
 WithNamedStep(enum="CHMOD__MODE", name="chmod",
+    // Should this be added?
+    // RequiresAnotherArg()
     OnArg(
         LOG(":: using mode ");
         LOGLN(global_arg);

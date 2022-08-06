@@ -6,6 +6,13 @@ set -x
 
 cd "$( dirname "$0" )/.."
 
+BUILD_MODE="${BUILD_MODE:-build}"
+UID1="${UID1:-1}"
+GID1="${UID1:-1}"
+UID2="${UID1:-2}"
+GID2="${UID1:-2}"
+export BUILD_MODE UID1 GID1 UID2 GID2
+
 apk --no-cache update
 apk add build-base=0.5-r1 curl tar xz python3 "bash=~5"
 mkdir -p /tmp/dietlibc

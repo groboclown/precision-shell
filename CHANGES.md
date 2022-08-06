@@ -1,3 +1,12 @@
+## v4.2.0
+
+* [3718300](37183007f552ad42b07fc21bbdd155cfac2726d2)
+    * Bug fix for spawn.  It now exits the forked process if the execution fails.
+* [b915b65](b915b65e077cd3a265a9cc54cee879429f13f6cf)
+    * Enhanced file-stat to report output more like "ls -l".
+* [c3b710e](c3b710ed5f9c2403534f2873c1fb7f047884777f)
+    * Added `su-spawn` and `su-exec` commands.
+
 ## v4.1.0
 
 * [519e18f](519e18fab1c9413c83283f4eb4456a89d2acb591)

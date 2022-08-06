@@ -42,7 +42,9 @@ The shell supports these commands:
   * [cd](#cd) - change current working directory, for relative file locations and executed command working directory.
   * [export](#export) - export an environment variable + value into the running process and to-be-run child processes.
   * [exec](#exec) - switch execution to a new process.
+  * [su-exec](#su-exec) - switch execution to a new process as another user and group ID.
   * [spawn](#spawn) - launch a new process in the background.
+  * [su-spawn](#su-spawn) - aunch a new process in the background as another user and group ID.
   * [wait-pid](#wait-pid) - wait for a process started by `spawn` to end.
   * [kill-pid](#kill-pid) - send a signal to a process.
 * Control Flow
@@ -279,6 +281,17 @@ presh -c "dup-w 1 contents.txt \
     && dup-w 1 sorted.txt \
     && dup-r 0 contents.txt \
     && exec /usr/sbin/sort"
+```
+
+**Example 5:**
+
+Perform file descriptor redirect, then restore it when complete.
+
+```bash
+presh -c "dup-w 1 contents.txt \
+    && echo foo bar baz \
+    && dup-w 1 &1 \
+    && echo [Wrote to contents.txt]"
 ```
 
 ### echo
@@ -701,6 +714,24 @@ presh -c "\
     kill-pid 15 \${FOREVER}"
 ```
 
+### su-exec
+
+**Compile flag**: `-DUSE_CMD_SU_EXEC`
+
+**Usage**: `su-exec (UID) (GID) (command as an argument)`
+
+Switches the current user to user id UID (not the user name) and group id GID (not the group name), then runs the third argument.  Unlike [`exec`](#exec), this will not keep running arguments if the first one fails to find a command but instead immediately exit the process.
+
+### su-spawn
+
+**Compile flag**: `-DUSE_CMD_SU_SPAWN`
+
+**Usage**: `su-spawn (UID) (GID) (command as an argument) [env for pid]`
+
+Switches the current user to user id UID (not the user name) and group id GID (not the group name), and launches the third argument as a new process in the background.  If the fourth argument is given, then the launched PID is stored in that value and exported to the environment variables.
+
+Take note that, if the command execution fails to run, or the user ID cannot be changed, then the only way for presh to identify the failure is by inspecting the exit code through [`wait-pid`](#wait-pid).
+
 ### subcmd
 
 **Compile flag**: `-DUSE_CMD_SUBCMD`
@@ -950,7 +981,7 @@ Last build size:
   * glibc (Arch): 778,280 bytes
   * musl (Alpine): 21,944 bytes
   * dietlibc (Alpine): 17,352 bytes
-* Standard buld:
+* Standard build:
   * glibc (Ubuntu): 831,944 bytes
   * glibc (Arch): 782,376 bytes
   * musl (Alpine): 26,040 bytes
