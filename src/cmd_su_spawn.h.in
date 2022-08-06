@@ -55,9 +55,6 @@ WithNamedStep(enum="SU_SPAWN", name="spawn",
     RequiresAnotherArg()
 
     OnCmd(
-    RequiresAnotherArg()
-
-    OnCmd(
         // arg2: uid
         global_cmd = COMMAND_INDEX__SHARED_INT2;
         global_arg3_i = COMMAND_INDEX__SU_SPAWN;
@@ -104,26 +101,33 @@ WithVirtualStep(enum="SU_SPAWN__CMD",
 
             // Delay switching UID and GID until the last possible moment.
             // Note that gid is done first.
-            setgid(global_arg1_i);
-            setuid(global_arg2_i);
+            global_arg1_i = setgid(global_arg1_i);
+            if (global_arg1_i >= 0) {
+                global_arg1_i = setuid(global_arg2_i);
+                if (global_arg1_i >= 0) {
+                    // This launches a new executable and terminates this one immediately.
+                    execvp(shared_split_argv[0], (char * const*) shared_split_argv);
+                }
+            }
 
-            // This launches a new executable and terminates this one immediately.
-            execvp(shared_split_argv[0], (char * const*) shared_split_argv);
 
             // Unlike the normal exec, this must exit
             // immediately due to the setuid/setgid.  We don't
             // want unexpected commands running in an unexpected state.
+            stderrP("Failed to su-spawn ");
+            stderrPLn(shared_split_argv[0]);
             _exit(1);
         } else {
             // Else this is the parent process.
             // Just slurp up this argument.
             // Then, if the env is next, post the pid to that.
-            global_cmd = COMMAND_INDEX__SPAWN__PID;
+            global_cmd = COMMAND_INDEX__SU_SPAWN__PID;
         }
     )
 )
 
-WithVirtualStep(enum="SPAWN__PID",
+// TODO this can be joined with the spawn command.
+WithVirtualStep(enum="SU_SPAWN__PID",
     OnArg(
         // Put the PID into the environment variable global_arg.
         // This argument can only be run from the parent due to the logic above.

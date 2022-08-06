@@ -36,7 +36,7 @@ AsOptional(command="su-exec",
 
 
 #ifdef DEBUG
-#define EXEC_DEBUG_REPORT \
+#define SU_EXEC_DEBUG_REPORT \
     LOG(":: Running command ["); \
     LOG(shared_split_argv[0]); \
     LOG("] with arguments ["); \
@@ -48,7 +48,7 @@ AsOptional(command="su-exec",
     } \
     LOG("]\n");
 #else
-#define EXEC_DEBUG_REPORT
+#define SU_EXEC_DEBUG_REPORT
 #endif
 
 
@@ -81,19 +81,24 @@ WithVirtualStep(enum="SU_EXEC__RUN",
     OnArg(
         // Split the arguments.
         SHARED_SPLIT__PARSE_ARG
-        EXEC_DEBUG_REPORT
+        SU_EXEC_DEBUG_REPORT
 
         // Delay switching UID and GID until the last possible moment.
         // Note that gid is done first.
-        setgid(global_arg1_i);
-        setuid(global_arg2_i);
-        
-        // This launches a new executable and terminates this one immediately.
-        execvp(shared_split_argv[0], (char * const*) shared_split_argv);
+        global_arg1_i = setgid(global_arg1_i);
+        if (global_arg1_i >= 0) {
+            global_arg1_i = setuid(global_arg2_i);
+            if (global_arg1_i >= 0) {
+                // This launches a new executable and terminates this one immediately.
+                execvp(shared_split_argv[0], (char * const*) shared_split_argv);
+            }
+        }
 
         // Unlike the normal exec, this must exit
         // immediately due to the setuid/setgid.  We don't
-        // want unexpected commands running in an unexpected state.
+        // want unexpected commands running with unexpected permissions.
+        stderrP("Failed to su-exec ");
+        stderrPLn(shared_split_argv[0]);
         _exit(1);
     )
 )

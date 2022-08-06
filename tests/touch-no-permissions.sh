@@ -3,8 +3,8 @@
 # desc: touch a file where the command does not have file access permissions
 # requires: +touch
 
-if [ "${UID1}" = "${UID2}" ] || [ "${GID1}" = "${GID2}" ] ; then
-    echo "?? SKIPPED because UID1 == UID2 (${UID1}) or GID1 == GID2 (${GID1})"
+if [ "${UID1}" = "${UID2}" ] || [ "${GID1}" = "${GID2}" ] || [ $( id -u ) != 0 ] ; then
+    echo "?? SKIPPED because UID1 == UID2 (${UID1}) or GID1 == GID2 (${GID1}) or not run as root"
     exit 0
 fi
 # Note: 'id' on BusyBox does not look up from ID, just from name.

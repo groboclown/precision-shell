@@ -3,8 +3,8 @@
 # desc: run mknod but with a bad node char.
 # requires: +mkdev
 
-if [ "${UID1}" = 0 ] || [ -z "${UID1}" ] ; then
-    echo "?? SKIPPED because UID1 is zero or not set"
+if [ "${UID1}" = 0 ] || [ -z "${UID1}" ] || [ $( id -u ) != 0 ] ; then
+    echo "?? SKIPPED because UID1 is zero or not set or not run as root"
     exit 0
 fi
 
