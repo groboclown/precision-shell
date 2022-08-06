@@ -1,7 +1,7 @@
 #!/bin/bash
 
 # desc: su-spawn when run without the right permissions
-# requires: +su-spawn
+# requires: +su-spawn +enviro +wait-pid +exit
 
 id_exec=$( which id )
 if [ -z "${UID1}" ] || [ -z "${UID2}" ] || [ -z "${GID1}" ] || [ -z "${GID2}" ] ; then
@@ -19,21 +19,29 @@ if [ -z "${user1}" ] || [ -z "${user2}" ] || [ -z "${group1}" ] || [ -z "${group
     exit 0
 fi
 
+# su-spawn with wrong permissions will not exit the main process,
+# but rather the spawned process will fail, and only by capturing the
+# wait result can we discover the true exit code.
+
 if [ "$( id -u )" != "0" ] ; then
     if [ "$( id -u )" != "${UID1}" ] ; then
-        "${FS}" -c "su-spawn [${UID1}] [${GID1}] [${id_exec} -u]" > out.txt 2>err.txt
+        "${FS}" -c "su-spawn [${UID1}] [${GID1}] [${id_exec} -u] PID && wait-pid \${PID} *E && exit \${E}" > out.txt 2>err.txt
         res=$?
     else
-        "${FS}" -c "su-spawn [${UID2}] [${GID2}] [${id_exec} -u]" > out.txt 2>err.txt
+        "${FS}" -c "su-spawn [${UID2}] [${GID2}] [${id_exec} -u] PID && wait-pid \${PID} *E && exit \${E}" > out.txt 2>err.txt
         res=$?
     fi
 else
-    su -s "${FS}" "${user2}" -c "su-spawn [${UID1}] [${GID1}] [${id_exec} -u]" > out.txt 2>err.txt
+    su -s "${FS}" "${user1}" -c "su-spawn [${UID2}] [${GID2}] [${id_exec} -u] PID && wait-pid \${PID} *E && exit \${E}" > out.txt 2>err.txt
     res=$?
 fi
 
 if [ ${res} -ne 1 ] ; then
     echo "Bad exit code: ${res}"
+    echo "stdout:"
+    cat out.txt
+    echo "stderr:"
+    cat err.txt
     exit 1
 fi
 
@@ -44,7 +52,7 @@ if [ -s out.txt ] ; then
     exit 1
 fi
 
-if [ "$( printf "Failed to su-exec ${id_exec}\n" )" != "$( cat err.txt )" ] ; then
+if [ "$( printf "Failed to su-spawn ${id_exec}\n" )" != "$( cat err.txt )" ] ; then
     echo "Generated invalid stderr"
     cat err.txt
     exit 1

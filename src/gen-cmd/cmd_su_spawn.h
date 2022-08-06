@@ -78,7 +78,7 @@ extern const char cmd_name_su_spawn[];
             COMMAND_INDEX__SU_SPAWN__PID,
 #define GLOBAL_VARDEF__SU_SPAWN \
             /* from cmd_su_spawn.h.in:53 */ \
-            const char cmd_name_su_spawn[] = "spawn";
+            const char cmd_name_su_spawn[] = "su-spawn";
 #define INITIALIZE__SU_SPAWN \
             /* from cmd_su_spawn.h.in:53 */ \
             command_list_names[COMMAND_INDEX__SU_SPAWN] = cmd_name_su_spawn;
@@ -113,7 +113,7 @@ extern const char cmd_name_su_spawn[];
         /* Split the arguments first.  This is inefficient for the*/ \
         /* parent, but cleans up debug output.*/ \
         SHARED_SPLIT__PARSE_ARG \
-        SPAWN_DEBUG_REPORT \
+        SU_SPAWN_DEBUG_REPORT \
         /* Fork the process.  This will have the potential to*/ \
         /* cause very weird behavior if no argument is given.*/ \
         global_arg3_i = fork(); \

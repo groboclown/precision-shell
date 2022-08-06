@@ -50,7 +50,7 @@ AsOptional(command="su-spawn",
 #endif
 
 
-WithNamedStep(enum="SU_SPAWN", name="spawn",
+WithNamedStep(enum="SU_SPAWN", name="su-spawn",
     // If this doesn't have another argument, bad things will happen.
     RequiresAnotherArg()
 
@@ -82,7 +82,7 @@ WithVirtualStep(enum="SU_SPAWN__CMD",
         // Split the arguments first.  This is inefficient for the
         // parent, but cleans up debug output.
         SHARED_SPLIT__PARSE_ARG
-        SPAWN_DEBUG_REPORT
+        SU_SPAWN_DEBUG_REPORT
 
 
         // Fork the process.  This will have the potential to

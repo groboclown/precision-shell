@@ -29,10 +29,10 @@ ENV \
 #    DEBUG=1 \
     BUILD_MODE=$BUILD_MODE \
     COMMANDS=$COMMANDS \
-    UID1=1 \
-    UID2=2 \
-    GID1=1 \
-    GID2=2
+    UID1=405 \
+    GID1=100 \
+    UID2=65534 \
+    GID2=65534
 
 RUN    echo 'LIBNAME=dietlibc' >> version.txt \
     && ./build-tools/internal-docker-make.sh
