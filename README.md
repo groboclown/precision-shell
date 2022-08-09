@@ -44,7 +44,7 @@ The shell supports these commands:
   * [exec](#exec) - switch execution to a new process.
   * [su-exec](#su-exec) - switch execution to a new process as another user and group ID.
   * [spawn](#spawn) - launch a new process in the background.
-  * [su-spawn](#su-spawn) - aunch a new process in the background as another user and group ID.
+  * [su-spawn](#su-spawn) - launch a new process in the background as another user and group ID.
   * [wait-pid](#wait-pid) - wait for a process started by `spawn` to end.
   * [kill-pid](#kill-pid) - send a signal to a process.
 * Control Flow
@@ -671,6 +671,31 @@ This will cause the shell to ignore SIGINT (2, usually sent by a ctrl-c input), 
 
 *Note that `dietlibc` does not support ignoring signals not waited on, and will exit with an error if the to-be-ignored signals are received.*
 
+**Example 1:**
+
+Run a process that doesn't listen for OS signals, and instead have the shell take that ownership.
+
+```bash
+#! /usr/bin/presh -f
+
+# [ Spawn the process ]
+spawn [/usr/sbin/my-server] SERVER_PID && subcmd [
+# [ Run this in a subcmd so that fail/pass of each of these instructions ]
+# [   only runs when the spawn started successfully. ]
+
+signal 1 2 9 15 17 wait
+
+# [ Force the child to die, in case the signal wasn't a SIGCHLD (17). ]
+kill-pid 15 ${NODE}
+
+# [ Capture the exit code of the spawned server. ]
+wait-pid ${NODE} *EXIT
+
+# [ Exit the script with the spawned server's exit code. ]
+exit ${EXIT}
+]
+```
+
 ### sleep
 
 **Compile flag**: `-DUSE_CMD_SLEEP`
@@ -1050,7 +1075,7 @@ To enable different commands in the compiled executable from the Docker build, r
 ```bash
 docker build \
   -t local/presh-${libname} -f build-${libname}.Dockerfile \
-  --build-arg COMMANDS="rm rmdir chmod chown"
+  --build-arg COMMANDS="rm rmdir chmod chown" \
   .
 ```
 
