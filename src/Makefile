@@ -98,6 +98,7 @@ COMMANDS = \
 	cmd_su_exec.h \
 	cmd_su_spawn.h \
 	cmd_subcmd.h \
+	cmd_timer.h \
 	cmd_touch_trunc.h \
 	cmd_wait_pid.h \
 	cmd_while.h \

@@ -1,0 +1,81 @@
+/*
+MIT License
+
+Copyright (c) 2022 groboclown
+
+Permission is hereby granted, free of charge, to any person obtaining a copy
+of this software and associated documentation files (the "Software"), to deal
+in the Software without restriction, including without limitation the rights
+to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+copies of the Software, and to permit persons to whom the Software is
+furnished to do so, subject to the following conditions:
+
+The above copyright notice and this permission notice shall be included in all
+copies or substantial portions of the Software.
+
+THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+SOFTWARE.
+*/
+AsOptionalUnion(file="timer_funcs",
+
+#include <time.h>
+#include "output.h"
+
+
+AsOptional(command="start-timer",
+
+    WithNamedStep(enum="START_TIMER", name="start-timer",
+        OnCmd(
+            LOG(":: start global timer\n");
+            timer_val = time(0);
+            global_cmd = COMMAND_INDEX__ERR;
+        )
+    )
+
+)
+
+
+AsOptional(command="elapsed-time",
+
+    WithNamedStep(enum="ELAPSED_TIME", name="elapsed-time",
+        OnCmd(
+            LOG(":: report elapsed time since timer start\n");
+            stdoutPLn(shared_itoa(difftime(time(0), timer_val), global_itoa));
+            global_cmd = COMMAND_INDEX__ERR;
+        )
+    )
+
+)
+
+
+AsOptional(command="export-elapsed-time",
+
+    WithNamedStep(enum="EXPORT_ELAPSED_TIME", name="export-elapsed-time",
+        OnArg(
+            LOG(":: storing elapsed time ");
+            global_itoa_ptr = shared_itoa(difftime(time(0), timer_val), global_itoa);
+            LOG(global_itoa_ptr);
+            LOG(" into env variable ");
+            LOGLN(global_arg);
+            global_err = setenv(global_arg, global_itoa_ptr, 1);
+        )
+    )
+
+)
+
+
+WithAuxFor(commands=[start-timer, elapsed-time, export-elapsed-time],
+
+    WithVirtualStep(enum="DO_NOT_USE_TIMER",
+        OnInit(
+            time_t timer_val = 0;
+        )
+    )
+)
+
+)
