@@ -2,6 +2,7 @@
 
 [![Build](https://github.com/groboclown/precision-shell/actions/workflows/build.yml/badge.svg)](https://github.com/groboclown/precision-shell/actions/workflows/build.yml)
 
+
 ## Custom Built Shell With Only What You Need
 
 Sometimes, you don't need or want everyting that a shell or Linux environment can do.  You just have a few things that you need to do.  Adding more adds bloat to your Linux environment and broadens the attack surface.  **Precision Shell** lets you compile the shell to contain only what you need.  It works great as a default shell environment for a Docker or Podman container for when you need just that extra bit of runtime setup, especially when running with a [distro-less container](https://github.com/GoogleContainerTools/distroless/).
@@ -44,9 +45,12 @@ The shell supports these commands:
   * [exec](#exec) - switch execution to a new process.
   * [su-exec](#su-exec) - switch execution to a new process as another user and group ID.
   * [spawn](#spawn) - launch a new process in the background.
-  * [su-spawn](#su-spawn) - aunch a new process in the background as another user and group ID.
+  * [su-spawn](#su-spawn) - launch a new process in the background as another user and group ID.
   * [wait-pid](#wait-pid) - wait for a process started by `spawn` to end.
   * [kill-pid](#kill-pid) - send a signal to a process.
+  * [start-timer](#start-timer) - start the global timer.  Queried with other commands.
+  * [elapsed-time](#elapsed-time) - prints number of seconds since the [start-timer](#start-timer) command was called.
+  * [export-elapsed-time](#export-elapsed-time) - records the number of seconds since the [start-timer](#start-timer) command was called into an environment variable.
 * Control Flow
   * [if-else](#if-else-command) - run a command conditionally based on the error result of another.
   * [subcmd](#subcmd) - run an argument as a complete precision shell command.
@@ -302,6 +306,24 @@ presh -c "dup-w 1 contents.txt \
 
 Sends to `stdout` each argument, one per line.  To have a multi-word statement on a single line, it must be passed as a single argument; see (Command Parsing)[#command-parsing] for details.
 
+### elapsed-time
+
+**Compile flag**: `-DUSE_CMD_ELAPSED_TIME`
+
+**Usage**: `elapsed-time`
+
+Sends to stdout the number of seconds since the [`start-timer`](#start-timer) command was called, or, if `start-timer` was never called, then time since the epoch.
+
+By including this command, it implies the inclusion of the `start-timer` command.
+
+**Example:**
+
+```bash
+presh -c "start-timer ; sleep 2 ; elapsed-time ; sleep 2 ; elapsed-time"
+2
+4
+```
+
 ### env-cat-fd
 
 **Compile flag**: `-DUSE_CMD_ENV_CAT_FD`
@@ -366,6 +388,23 @@ The "should not run 1" line will not be reported, because the `exit 1` in the su
 **Usage**: `export (ENV_NAME) (env value)`
 
 Export an environment variable + value into the running process and to-be-run child processes.
+
+### export-elapsed-time
+
+**Compile flag**: `-DUSE_CMD_EXPORT_ELAPSED_TIME`
+
+**Usage**: `export-elapsed-time [env-name [env-name ...]]`
+
+Stores in environment variables named in the arguments the number of seconds since the [`start-timer`](#start-timer) command was called, or, if `start-timer` was never called, then time since the epoch.
+
+By including this command, it implies the inclusion of the `start-timer` command.
+
+**Example:**
+
+```bash
+presh -c "start-timer ; sleep 5 ; export-elapsed-time TIME ; echo \${TIME}"
+5
+```
 
 ### file-stat
 
@@ -671,6 +710,31 @@ This will cause the shell to ignore SIGINT (2, usually sent by a ctrl-c input), 
 
 *Note that `dietlibc` does not support ignoring signals not waited on, and will exit with an error if the to-be-ignored signals are received.*
 
+**Example 1:**
+
+Run a process that doesn't listen for OS signals, and instead have the shell take that ownership.
+
+```bash
+#! /usr/bin/presh -f
+
+# [ Spawn the process ]
+spawn [/usr/sbin/my-server] SERVER_PID && subcmd [
+# [ Run this in a subcmd so that fail/pass of each of these instructions ]
+# [   only runs when the spawn started successfully. ]
+
+signal 1 2 9 15 17 wait
+
+# [ Force the child to die, in case the signal wasn't a SIGCHLD (17). ]
+kill-pid 15 ${NODE}
+
+# [ Capture the exit code of the spawned server. ]
+wait-pid ${NODE} *EXIT
+
+# [ Exit the script with the spawned server's exit code. ]
+exit ${EXIT}
+]
+```
+
 ### sleep
 
 **Compile flag**: `-DUSE_CMD_SLEEP`
@@ -714,6 +778,14 @@ presh -c "\
     kill-pid 15 \${FOREVER}"
 ```
 
+### start-timer
+
+**Compile flag**: `-DUSE_CMD_START_TIMER` (but is also included if [elapsed-time](#elapsed-time) or [export-elapsed-time](#export-elapsed-time) is included)
+
+**Usage**: `start-timer`
+
+Sets the current time in the global timer.  If never set, the global timer is set to the epoch.  This can be queried with the [elapsed-time](#elapsed-time) and [export-elapsed-time](#export-elapsed-time) commands.
+
 ### su-exec
 
 **Compile flag**: `-DUSE_CMD_SU_EXEC`
@@ -738,7 +810,7 @@ Take note that, if the command execution fails to run, or the user ID cannot be 
 
 **Usage**: `subcmd [command as an argument [command ...]]`
 
-Runs each argument as a whole command.
+Runs each argument as a whole command.  Useful when the sub-command must run only if the previous command succeeded to work around the [`&&`](#chaining-commands) limitation.
 
 **Example:**
 
@@ -1050,7 +1122,7 @@ To enable different commands in the compiled executable from the Docker build, r
 ```bash
 docker build \
   -t local/presh-${libname} -f build-${libname}.Dockerfile \
-  --build-arg COMMANDS="rm rmdir chmod chown"
+  --build-arg COMMANDS="rm rmdir chmod chown" \
   .
 ```
 

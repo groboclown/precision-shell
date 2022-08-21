@@ -1,3 +1,8 @@
+## v4.3.0
+
+* (?)
+    * Added `start-timer`, `elapsed-time`, and `export-elapsed-time` commands.
+
 ## v4.2.0
 
 * [3718300](37183007f552ad42b07fc21bbdd155cfac2726d2)

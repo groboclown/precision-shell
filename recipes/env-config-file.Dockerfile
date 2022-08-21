@@ -49,6 +49,10 @@ ENV LISTEN_PORT 9000
 #   have presh listen for user signals.
 # This allows for the container to stop with Ctrl-C when
 #   the user runs the container with "-it" arguments.
+# This also has the signal listener wait for signal 17, which is SIGCHLD.
+#   This means that, if the server stops on its own (say, a bug or an
+#   explicit, internal stop), then the shell will notice that.  Otherwise,
+#   the shell will not stop when the server stops.
 ENTRYPOINT \
     noop [Use dup-w and env-cat-fd to update config.json] \
        [based on environment variables.] \
@@ -60,7 +64,7 @@ ENTRYPOINT \
     && noop [Launch the server] \
     && spawn [/nodejs/bin/node server.js] NODE \
     && noop [Wait for an OS terminate signal] \
-    && signal 1 2 9 15 wait && \
+    && signal 1 2 9 15 17 wait && \
     && noop [Kill the server and wait for it to end.] \
     && echo [\nTerminating the server...] \
     && kill-pid 15 ${NODE} \

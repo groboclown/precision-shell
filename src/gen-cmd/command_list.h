@@ -60,6 +60,7 @@ SOFTWARE.
 #include "cmd_su_exec.h"
 #include "cmd_su_spawn.h"
 #include "cmd_subcmd.h"
+#include "cmd_timer.h"
 #include "cmd_touch_trunc.h"
 #include "cmd_wait_pid.h"
 #include "cmd_while.h"
@@ -102,6 +103,7 @@ SOFTWARE.
             GLOBAL_VARDEF__SU_EXEC \
             GLOBAL_VARDEF__SU_SPAWN \
             GLOBAL_VARDEF__SUBCMD \
+            GLOBAL_VARDEF__TIMER_FUNCS \
             GLOBAL_VARDEF__TOUCH_TRUNC \
             GLOBAL_VARDEF__WAIT_PID \
             GLOBAL_VARDEF__WHILE \
@@ -142,6 +144,7 @@ SOFTWARE.
             INITIALIZE__SU_EXEC \
             INITIALIZE__SU_SPAWN \
             INITIALIZE__SUBCMD \
+            INITIALIZE__TIMER_FUNCS \
             INITIALIZE__TOUCH_TRUNC \
             INITIALIZE__WAIT_PID \
             INITIALIZE__WHILE \
@@ -182,6 +185,7 @@ SOFTWARE.
             STARTUP_CASE__SU_EXEC \
             STARTUP_CASE__SU_SPAWN \
             STARTUP_CASE__SUBCMD \
+            STARTUP_CASE__TIMER_FUNCS \
             STARTUP_CASE__TOUCH_TRUNC \
             STARTUP_CASE__WAIT_PID \
             STARTUP_CASE__WHILE \
@@ -222,6 +226,7 @@ SOFTWARE.
             RUN_CASE__SU_EXEC \
             RUN_CASE__SU_SPAWN \
             RUN_CASE__SUBCMD \
+            RUN_CASE__TIMER_FUNCS \
             RUN_CASE__TOUCH_TRUNC \
             RUN_CASE__WAIT_PID \
             RUN_CASE__WHILE \
@@ -262,6 +267,7 @@ SOFTWARE.
             REQUIRES_ADDL_ARG__SU_EXEC \
             REQUIRES_ADDL_ARG__SU_SPAWN \
             REQUIRES_ADDL_ARG__SUBCMD \
+            REQUIRES_ADDL_ARG__TIMER_FUNCS \
             REQUIRES_ADDL_ARG__TOUCH_TRUNC \
             REQUIRES_ADDL_ARG__WAIT_PID \
             REQUIRES_ADDL_ARG__WHILE \
@@ -306,6 +312,7 @@ enum CommandIndex {
             ENUM_LIST__SU_EXEC
             ENUM_LIST__SU_SPAWN
             ENUM_LIST__SUBCMD
+            ENUM_LIST__TIMER_FUNCS
             ENUM_LIST__TOUCH_TRUNC
             ENUM_LIST__WAIT_PID
             ENUM_LIST__WHILE
@@ -349,6 +356,7 @@ enum CommandIndex {
             VIRTUAL_ENUM_LIST__SU_EXEC
             VIRTUAL_ENUM_LIST__SU_SPAWN
             VIRTUAL_ENUM_LIST__SUBCMD
+            VIRTUAL_ENUM_LIST__TIMER_FUNCS
             VIRTUAL_ENUM_LIST__TOUCH_TRUNC
             VIRTUAL_ENUM_LIST__WAIT_PID
             VIRTUAL_ENUM_LIST__WHILE
