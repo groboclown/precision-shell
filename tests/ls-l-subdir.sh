@@ -17,9 +17,11 @@ if [ ${res} -ne 0 ] ; then
 fi
 
 # sort output to ensure ordering doesn't mess up the test.
-if [ "$( printf "d-rwxr-xr-x 2 ${UID0} ${GID0} 0 0 4096 other-dir/dir-a\\n--rw-r--r-- 1 ${UID0} ${GID0} 0 0 0 other-dir/file-a.txt\\n--rw-r--r-- 1 ${UID0} ${GID0} 0 0 0 other-dir/file-b.txt\\n" )" != "$( cat out.txt | sort )" ] ; then
+if [ "$( printf -- "--rw-r--r-- 1 ${UID0} ${GID0} 0 0 0 other-dir/file-a.txt\\n--rw-r--r-- 1 ${UID0} ${GID0} 0 0 0 other-dir/file-b.txt\\nd-rwxr-xr-x 2 ${UID0} ${GID0} 0 0 4096 other-dir/dir-a\\n" )" != "$( cat out.txt | sort )" ] ; then
     echo "Generated invalid output to stdout"
     cat out.txt | sort
+    echo "Expected:"
+    printf -- "--rw-r--r-- 1 ${UID0} ${GID0} 0 0 0 other-dir/file-a.txt\\n--rw-r--r-- 1 ${UID0} ${GID0} 0 0 0 other-dir/file-b.txt\\nd-rwxr-xr-x 2 ${UID0} ${GID0} 0 0 4096 other-dir/dir-a\\n"
     exit 1
 fi
 
