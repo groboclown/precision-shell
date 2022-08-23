@@ -43,7 +43,7 @@ SOFTWARE.
 #include "cmd_if_else.h"
 #include "cmd_ln_h.h"
 #include "cmd_ln_s.h"
-#include "cmd_ls.h"
+#include "cmd_ls_ls.h"
 #include "cmd_kill_pid.h"
 #include "cmd_mkdir.h"
 #include "cmd_mknod_mkdev.h"

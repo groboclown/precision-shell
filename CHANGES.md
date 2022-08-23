@@ -1,7 +1,11 @@
 ## v4.3.0
 
-* (?)
+* [46389d4](46389d4603708726e3392c65cc719abae06faddf)
     * Added `start-timer`, `elapsed-time`, and `export-elapsed-time` commands.
+* [8b10ee5](8b10ee56efae796c1d94a8b71c741974574c5dbc)
+    * Cleaned up `gen-cmd` directory so that it matches the current command list.
+    * Fixed the make reference so that the right "ls" header is included.  This allows the `ls-l` command to now be buildable.
+    * Added tests for `ls-l`.
 
 ## v4.2.0
 
