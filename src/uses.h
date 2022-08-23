@@ -87,7 +87,7 @@ SOFTWARE.
     || defined(USE_CMD_EXPORT) \
     || defined(USE_CMD_WHILE_NO_ERROR) \
     || defined(USE_CMD_WHILE_ERROR) \
-    || defined(USE_CMD_FOR_EACH)
+    || defined(USE_CMD_FOR_EACH) 
 
 #define USES_SHARED_STR
 
@@ -104,7 +104,9 @@ SOFTWARE.
     || defined(USE_CMD_CAT_FD) \
     || defined(USE_CMD_ENV_CAT_FD) \
     || defined(USE_CMD_SU_EXEC) \
-    || defined(USE_CMD_SU_SPAWN)
+    || defined(USE_CMD_SU_SPAWN) \
+    || defined(USE_CMD_TEST_IPV4) \
+    || defined(USE_CMD_TEST_IPV6)
 
 #define USES_SHARED_INT
 

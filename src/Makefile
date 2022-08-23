@@ -98,6 +98,7 @@ COMMANDS = \
 	cmd_su_exec.h \
 	cmd_su_spawn.h \
 	cmd_subcmd.h \
+	cmd_test_connection.h \
 	cmd_timer.h \
 	cmd_touch_trunc.h \
 	cmd_wait_pid.h \
@@ -111,7 +112,7 @@ COMMANDS = \
 
 
 .PHONY: all
-all: clean src debug
+all: clean src debug $(OUTDIR)/test_server
 
 
 .PHONY: src
@@ -164,3 +165,8 @@ $(OUTDIR)/presh: $(SRC) $(COMMAND_HEADERS_DIR)/command_list.h
 $(OUTDIR)/presh-debug: $(SRC) $(COMMAND_HEADERS_DIR)/command_list.h
 	mkdir -p $(OUTDIR)
 	$(CC) $(CFLAGS) $(LFLAGS) $(DFLAGS) $(COMMAND_FLAGS) $? $(LDFLAGS) -o $@
+
+
+$(OUTDIR)/test_server: test_server.c
+	mkdir -p $(OUTDIR)
+	$(CC) $(CFLAGS) $(LFLAGS) $? $(LDFLAGS) -o $@

@@ -60,6 +60,9 @@ The shell supports these commands:
   * [for-each](#for-each) - loop over sub-arguments, setting an environment variable with the value and running a sub-command.
   * [while-error](#while-error) - run a sub-command until it ends without error.
   * [while-no-error](#while-no-error) - run a sub-command until it ends with an error.
+* Network
+  * [test-ipv4](#test-ipv4) - test whether an IPv4 address is listening on a given port number.
+  * [test-ipv6](#test-ipv6) - test whether an IPv6 address is listening on a given port number.
 * Usability
   * [pwd](#pwd) - display current working directory, or store it in an environment variable.
   * [version](#version) - prints the current version (cannot be disabled).
@@ -822,6 +825,38 @@ presh -c "\
     ln-s /tmp/file /tmp/bar \
   ] ; \
   echo done"
+```
+
+### test-ipv4
+
+**Compile flag:**: `-DUSE_CMD_TEST_IPV4`
+
+**Usage**: `test-ipv4 (ipv4-address) (port) (timeout)`
+
+Attempts to open a socket connection to the IPv4 server on the given port number.  If the server does not accept the connection within the given timeout seconds, then the command generates an error.
+
+**Example:**
+
+```bash
+presh -c "\
+  test-ipv4 127.0.0.1 80 5
+  "
+```
+
+### test-ipv6
+
+**Compile flag:**: `-DUSE_CMD_TEST_IPV6`
+
+**Usage**: `test-ipv4 (ipv4-address) (port) (timeout)`
+
+Attempts to open a socket connection to the IPv4 server on the given port number.  If the server does not accept the connection within the given timeout seconds, then the command generates an error.
+
+**Example:**
+
+```bash
+presh -c "\
+  test-ipv6 ::0 80 5
+  "
 ```
 
 ### touch

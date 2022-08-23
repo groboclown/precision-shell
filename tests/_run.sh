@@ -27,6 +27,7 @@ here="$( dirname "${myself}" )"
 export UID0=$( id -u )
 export GID0=$( id -g )
 export FS="$( get_abs_filename "${PRESH}" )"
+export FS_SERVER="$( dirname "${FS}" )/test_server"
 
 presh_supports="$( "${FS}" version )"
 
