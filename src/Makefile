@@ -81,7 +81,7 @@ COMMANDS = \
 	cmd_if_else.h \
 	cmd_ln_h.h \
 	cmd_ln_s.h \
-	cmd_ls.h \
+	cmd_ls_ls.h \
 	cmd_kill_pid.h \
 	cmd_mkdir.h \
 	cmd_mknod_mkdev.h \

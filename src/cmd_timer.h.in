@@ -45,7 +45,10 @@ AsOptional(command="elapsed-time",
     WithNamedStep(enum="ELAPSED_TIME", name="elapsed-time",
         OnCmd(
             LOG(":: report elapsed time since timer start\n");
-            stdoutPLn(shared_itoa(difftime(time(0), timer_val), global_itoa));
+            // difftime introduces a floating point dependency, which adds bloat.
+            // and all we need is just a simple subtraction.
+            // stdoutPLn(shared_itoa(difftime(time(0), timer_val), global_itoa));
+            stdoutPLn(shared_itoa(time(0) - timer_val, global_itoa));
             global_cmd = COMMAND_INDEX__ERR;
         )
     )
@@ -58,7 +61,10 @@ AsOptional(command="export-elapsed-time",
     WithNamedStep(enum="EXPORT_ELAPSED_TIME", name="export-elapsed-time",
         OnArg(
             LOG(":: storing elapsed time ");
-            global_itoa_ptr = shared_itoa(difftime(time(0), timer_val), global_itoa);
+            // difftime introduces a floating point dependency, which adds bloat.
+            // and all we need is just a simple subtraction.
+            // global_itoa_ptr = shared_itoa(difftime(time(0), timer_val), global_itoa);
+            global_itoa_ptr = shared_itoa(time(0) - timer_val, global_itoa);
             LOG(global_itoa_ptr);
             LOG(" into env variable ");
             LOGLN(global_arg);

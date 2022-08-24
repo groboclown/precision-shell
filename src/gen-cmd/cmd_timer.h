@@ -96,7 +96,10 @@ extern const char cmd_name_elapsed_time[];
         /* from cmd_timer.h.in:45 */ \
             /* from cmd_timer.h.in:46 */ \
             LOG(":: report elapsed time since timer start\n"); \
-            stdoutPLn(shared_itoa(difftime(time(0), timer_val), global_itoa)); \
+            /* difftime introduces a floating point dependency, which adds bloat.*/ \
+            /* and all we need is just a simple subtraction.*/ \
+            /* stdoutPLn(shared_itoa(difftime(time(0), timer_val), global_itoa));*/ \
+            stdoutPLn(shared_itoa(time(0) - timer_val, global_itoa)); \
             global_cmd = COMMAND_INDEX__ERR; \
         break;
 #define RUN_CASE__ELAPSED_TIME
@@ -120,25 +123,28 @@ extern const char cmd_name_elapsed_time[];
 
 
 
-/* from cmd_timer.h.in:58 */
+/* from cmd_timer.h.in:61 */
 extern const char cmd_name_export_elapsed_time[];
 #define ENUM_LIST__EXPORT_ELAPSED_TIME \
-            /* from cmd_timer.h.in:58 */ \
+            /* from cmd_timer.h.in:61 */ \
             COMMAND_INDEX__EXPORT_ELAPSED_TIME,
 #define VIRTUAL_ENUM_LIST__EXPORT_ELAPSED_TIME
 #define GLOBAL_VARDEF__EXPORT_ELAPSED_TIME \
-            /* from cmd_timer.h.in:58 */ \
+            /* from cmd_timer.h.in:61 */ \
             const char cmd_name_export_elapsed_time[] = "export-elapsed-time";
 #define INITIALIZE__EXPORT_ELAPSED_TIME \
-            /* from cmd_timer.h.in:58 */ \
+            /* from cmd_timer.h.in:61 */ \
             command_list_names[COMMAND_INDEX__EXPORT_ELAPSED_TIME] = cmd_name_export_elapsed_time;
 #define STARTUP_CASE__EXPORT_ELAPSED_TIME
 #define RUN_CASE__EXPORT_ELAPSED_TIME \
     case COMMAND_INDEX__EXPORT_ELAPSED_TIME: \
-        /* from cmd_timer.h.in:58 */ \
-            /* from cmd_timer.h.in:59 */ \
+        /* from cmd_timer.h.in:61 */ \
+            /* from cmd_timer.h.in:62 */ \
             LOG(":: storing elapsed time "); \
-            global_itoa_ptr = shared_itoa(difftime(time(0), timer_val), global_itoa); \
+            /* difftime introduces a floating point dependency, which adds bloat.*/ \
+            /* and all we need is just a simple subtraction.*/ \
+            /* global_itoa_ptr = shared_itoa(difftime(time(0), timer_val), global_itoa);*/ \
+            global_itoa_ptr = shared_itoa(time(0) - timer_val, global_itoa); \
             LOG(global_itoa_ptr); \
             LOG(" into env variable "); \
             LOGLN(global_arg); \
@@ -170,7 +176,7 @@ extern const char cmd_name_export_elapsed_time[];
             VIRTUAL_ENUM_LIST__START_TIMER \
             VIRTUAL_ENUM_LIST__ELAPSED_TIME \
             VIRTUAL_ENUM_LIST__EXPORT_ELAPSED_TIME \
-            /* from cmd_timer.h.in:74 */ \
+            /* from cmd_timer.h.in:80 */ \
             COMMAND_INDEX__DO_NOT_USE_TIMER,
 #define GLOBAL_VARDEF__TIMER_FUNCS \
             GLOBAL_VARDEF__START_TIMER \
@@ -180,7 +186,7 @@ extern const char cmd_name_export_elapsed_time[];
             INITIALIZE__START_TIMER \
             INITIALIZE__ELAPSED_TIME \
             INITIALIZE__EXPORT_ELAPSED_TIME \
-            /* from cmd_timer.h.in:75 */ \
+            /* from cmd_timer.h.in:81 */ \
             time_t timer_val = 0;
 #define STARTUP_CASE__TIMER_FUNCS \
             STARTUP_CASE__START_TIMER \

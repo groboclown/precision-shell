@@ -1080,24 +1080,24 @@ Last build size:
 
 * Do-nothing build:
   * [glibc (Ubuntu)](#build-glibc.Dockerfile): 819,656 bytes
-  * [glibc (Arch)](#build-glibc-arch.Dockerfile): 778,280 bytes
+  * [glibc (Arch)](#build-glibc-arch.Dockerfile): 700,432 bytes
   * [musl (Alpine)](#build-musl.Dockerfile): 21,944 bytes
   * [dietlibc (Alpine)](#build-dietlibc.Dockerfile): 13,256 bytes
 * Minimal build:
   * glibc (Ubuntu): 823,752 bytes
-  * glibc (Arch): 778,280 bytes
+  * glibc (Arch): 700,432 bytes
   * musl (Alpine): 21,944 bytes
   * dietlibc (Alpine): 17,352 bytes
 * Standard build:
   * glibc (Ubuntu): 831,944 bytes
-  * glibc (Arch): 782,376 bytes
+  * glibc (Arch): 704,528 bytes
   * musl (Alpine): 26,040 bytes
   * dietlibc (Alpine): 17,352 bytes
 * Full build:
-  * glibc (Ubuntu): 840,136 bytes
-  * glibc (Arch): 794,664 bytes
-  * musl (Alpine): 34,232 bytes
-  * dietlibc (Alpine): 25,544 bytes
+  * glibc (Ubuntu): 844,232 bytes
+  * glibc (Arch): 720,944 bytes
+  * musl (Alpine): 42,432 bytes
+  * dietlibc (Alpine): 29,640 bytes
 
 *dietlibc [requires](https://www.fefe.de/dietlibc/FAQ.txt) that you either not distribute the compiled executable, or release the executable under GPL v2.*
 
