@@ -31,6 +31,16 @@ SOFTWARE.
 // Special commands that imply other commands must be included.
 
 
+// USE_CMD_START_TIMER - this command is always included if any
+//   of the timer commands is also used.
+#if    defined(USE_CMD_ELAPSED_TIME) \
+    || defined(USE_CMD_EXPORT_ELAPSED_TIME)
+
+#define USE_CMD_START_TIMER 1
+
+#endif
+
+
 // --------------------------------------------------------------------------
 // Derived uses
 
@@ -68,6 +78,7 @@ SOFTWARE.
 #define USES_FMODE 1
 
 #endif
+
 
 // USES_SHARED_STR - shared logic for capturing an argument for later use.
 #if    defined(USE_CMD_LN_S) \
@@ -145,9 +156,12 @@ SOFTWARE.
 
 // USES_SHARED_ITOA - shared integer to ascii code.
 #if    defined(USE_CMD_SPAWN) \
+    || defined(USE_CMD_SU_SPAWN) \
     || defined(USE_CMD_WAIT_PID) \
     || defined(USE_CMD_FILE_STAT) \
-    || defined(USE_CMD_SU_SPAWN)
+    || defined(USE_CMD_LS_L) \
+    || defined(USE_CMD_ELAPSED_TIME) \
+    || defined(USE_CMD_EXPORT_ELAPSED_TIME)
 
 #define USES_SHARED_ITOA
 

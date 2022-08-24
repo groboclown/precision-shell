@@ -189,26 +189,26 @@ extern const char cmd_name_ls_t[];
 
 
 
-/* from cmd_ls_ls.h.in:137 */
+/* from cmd_ls_ls.h.in:136 */
 extern const char cmd_name_ls_l[];
 #define ENUM_LIST__LS_L \
-            /* from cmd_ls_ls.h.in:137 */ \
+            /* from cmd_ls_ls.h.in:136 */ \
             COMMAND_INDEX__LS_L,
 #define VIRTUAL_ENUM_LIST__LS_L
 #define GLOBAL_VARDEF__LS_L \
-            /* from cmd_ls_ls.h.in:137 */ \
+            /* from cmd_ls_ls.h.in:136 */ \
             const char cmd_name_ls_l[] = "ls-l";
 #define INITIALIZE__LS_L \
             /* from cmd_ls_ls.h.in:131 */ \
         struct stat ls_l_stat_buf; \
         char *ls_l_filename; \
-            /* from cmd_ls_ls.h.in:137 */ \
+            /* from cmd_ls_ls.h.in:136 */ \
             command_list_names[COMMAND_INDEX__LS_L] = cmd_name_ls_l;
 #define STARTUP_CASE__LS_L
 #define RUN_CASE__LS_L \
     case COMMAND_INDEX__LS_L: \
-        /* from cmd_ls_ls.h.in:137 */ \
-            /* from cmd_ls_ls.h.in:139 */ \
+        /* from cmd_ls_ls.h.in:136 */ \
+            /* from cmd_ls_ls.h.in:138 */ \
             LOG(":: ls-l "); \
             LOGLN(global_arg); \
             global_arg2_i = strlen(global_arg); \
@@ -245,8 +245,7 @@ extern const char cmd_name_ls_l[];
                 strcpy(ls_l_filename, global_arg); \
                 ls_l_filename[global_arg2_i] = '/'; \
                 strcpy(&(ls_l_filename[global_arg2_i + 1]), ls_dirent->d_name); \
-global_arg1_i = stat(ls_l_filename, &ls_l_stat_buf); \
-                /* if (stat(ls_l_filename, &ls_l_stat_buf) == 0) {*/ \
+                global_arg1_i = stat(ls_l_filename, &ls_l_stat_buf); \
                 if (global_arg1_i == 0) { \
                     switch (ls_l_stat_buf.st_mode & S_IFMT) { \
                         case S_IFSOCK: \
@@ -345,7 +344,7 @@ global_arg1_i = stat(ls_l_filename, &ls_l_stat_buf); \
                     /* Note: no date / time reported.*/ \
                     stdoutPLn(ls_l_filename); \
                 } else { \
-printf(":: stat(%s) == %d\n", ls_l_filename, global_arg1_i); \
+                    /* printf(":: stat(%s) == %d\n", ls_l_filename, global_arg1_i);*/ \
                     global_err++; \
                 } \
                 free(ls_l_filename); \
@@ -383,7 +382,7 @@ printf(":: stat(%s) == %d\n", ls_l_filename, global_arg1_i); \
             VIRTUAL_ENUM_LIST__LS \
             VIRTUAL_ENUM_LIST__LS_T \
             VIRTUAL_ENUM_LIST__LS_L \
-            /* from cmd_ls_ls.h.in:303 */ \
+            /* from cmd_ls_ls.h.in:301 */ \
             COMMAND_INDEX__LS_ANY,
 #define GLOBAL_VARDEF__LS_LS_F \
             GLOBAL_VARDEF__LS \
@@ -393,7 +392,7 @@ printf(":: stat(%s) == %d\n", ls_l_filename, global_arg1_i); \
             INITIALIZE__LS \
             INITIALIZE__LS_T \
             INITIALIZE__LS_L \
-            /* from cmd_ls_ls.h.in:304 */ \
+            /* from cmd_ls_ls.h.in:302 */ \
             DIR *ls_dir_stream; \
             struct dirent *ls_dirent;
 #define STARTUP_CASE__LS_LS_F \

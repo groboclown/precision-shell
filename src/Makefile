@@ -81,7 +81,7 @@ COMMANDS = \
 	cmd_if_else.h \
 	cmd_ln_h.h \
 	cmd_ln_s.h \
-	cmd_ls.h \
+	cmd_ls_ls.h \
 	cmd_kill_pid.h \
 	cmd_mkdir.h \
 	cmd_mknod_mkdev.h \
@@ -98,6 +98,7 @@ COMMANDS = \
 	cmd_su_exec.h \
 	cmd_su_spawn.h \
 	cmd_subcmd.h \
+	cmd_timer.h \
 	cmd_touch_trunc.h \
 	cmd_wait_pid.h \
 	cmd_while.h \
