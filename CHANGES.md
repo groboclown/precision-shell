@@ -1,3 +1,8 @@
+## v4.4.0
+
+* (?)
+    * Add new `test-ipv4` and `test-ipv6` commands that introduce network access.
+
 ## v4.3.0
 
 * [46389d4](46389d4603708726e3392c65cc719abae06faddf)

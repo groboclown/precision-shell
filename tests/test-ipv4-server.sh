@@ -13,6 +13,7 @@ server_pid=$!
 
 "${FS}" -c "test-ipv4 [127.0.0.1] 29446 3" > out.txt 2>err.txt
 res=$?
+kill -15 "${server_pid}"
 
 if [ ${res} -ne 0 ] ; then
     echo "Bad exit code: ${res}"

@@ -170,4 +170,20 @@ SOFTWARE.
 #endif
 
 
+// USES_SHARED_ADDRESS_IPV4 - allow connecting to ipv6 sockets and parsing ipv4 addresses
+#if     defined(USE_CMD_TEST_IPV4)
+
+#define USES_SHARED_ADDRESS_IPV4
+
+#endif
+
+
+// USES_SHARED_ADDRESS_IPV6 - allow connecting to ipv6 sockets and parsing ipv6 addresses
+#if     defined(USE_CMD_TEST_IPV6)
+
+#define USES_SHARED_ADDRESS_IPV6
+
+#endif
+
+
 #endif /* _FS_SHELL__USES_ */

@@ -13,6 +13,7 @@ server_pid=$!
 
 "${FS}" -c "test-ipv6 ::0 29446 3" > out.txt 2>err.txt
 res=$?
+kill -15 "${server_pid}"
 
 if [ ${res} -ne 0 ] ; then
     echo "Bad exit code: ${res}"
@@ -28,8 +29,6 @@ if [ -s out.txt ] || [ -s err.txt ] ; then
     cat err.txt
     exit 1
 fi
-
-kill -15 "${server_pid}"
 
 
 # should have: out.txt and err.txt and server-out.txt and server-err.txt

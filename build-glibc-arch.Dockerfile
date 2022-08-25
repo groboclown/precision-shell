@@ -16,6 +16,7 @@ COPY Makefile Makefile.command-flags version.txt ./
 COPY src/ src/
 COPY tests/ tests/
 
+# Change the list of commands to build with the "--build-arg COMMANDS='list' argument"
 ARG BUILD_MODE=build
 ARG COMMANDS="chmod ln-s"
 

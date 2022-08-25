@@ -90,6 +90,7 @@ COMMANDS = \
 	cmd_pwd.h \
 	cmd_rm.h \
 	cmd_rmdir.h \
+	cmd_shared_network.h \
 	cmd_shared_sub_args.h \
 	cmd_shared_virtual.h \
 	cmd_signal.h \
@@ -98,7 +99,8 @@ COMMANDS = \
 	cmd_su_exec.h \
 	cmd_su_spawn.h \
 	cmd_subcmd.h \
-	cmd_test_connection.h \
+	cmd_test_ipv4.h \
+	cmd_test_ipv6.h \
 	cmd_timer.h \
 	cmd_touch_trunc.h \
 	cmd_wait_pid.h \

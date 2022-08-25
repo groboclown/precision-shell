@@ -21,7 +21,7 @@ LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
 */
-AsOptionalUnion(file="test-connection",
+AsOptionalUnion(file="http-request",
 
 
 #include <arpa/inet.h>
@@ -36,19 +36,18 @@ AsOptionalUnion(file="test-connection",
 // The test uses:
 //    parsed address: test_connection_addr
 //    port number: global_arg2_i
-//    address family: global_arg1_i
-//    timeout: global_arg3_i
+//    path: global_arg
 
 
-WithOptional(command="test-ipv4",
+WithOptional(command="export-http-head-code",
 
-    WithNamedStep(enum="TEST_IPV4", name="test-ipv4",
+    WithNamedStep(enum="EXPORT_HTTP_HEAD_CODE", name="export-http-head-code",
 
         OnArg(
-            LOG(":: test ipv4 addr ");
+            LOG(":: http head request against ipv4 ");
             LOGLN(global_arg);
 
-            global_arg3_i = COMMAND_INDEX__TEST_CONNECTION__TIMEOUT;
+            global_arg3_i = COMMAND_INDEX__EXPORT_HTTP_HEAD_CODE;
             global_cmd = COMMAND_INDEX__SHARED_INT2;
 
             test_connection_addr.ip4.sin_family = AF_INET;
@@ -63,29 +62,6 @@ WithOptional(command="test-ipv4",
 
 )
 
-
-WithOptional(command="test-ipv6",
-
-    WithNamedStep(enum="TEST_IPV6", name="test-ipv6",
-
-        OnArg(
-            LOG(":: test ipv6 addr ");
-            LOGLN(global_arg);
-
-            global_arg3_i = COMMAND_INDEX__TEST_CONNECTION__TIMEOUT;
-            global_cmd = COMMAND_INDEX__SHARED_INT2;
-
-            test_connection_addr.ip6.sin6_family = AF_INET6;
-            tmp_val = inet_pton(AF_INET6, global_arg, &test_connection_addr.ip6.sin6_addr.s6_addr);
-            if (tmp_val <= 0) {
-                global_err = 1;
-                global_cmd = COMMAND_INDEX__ERR;
-            }
-        )
-
-    )
-
-)
 
 
 WithAuxFor(commands=[test-ipv4, test-ipv6],
