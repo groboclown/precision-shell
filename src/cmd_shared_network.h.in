@@ -28,6 +28,7 @@ AsOptionalUnion(file="shared-network",
 #include <arpa/inet.h>
 #include <netinet/in.h>
 #include <sys/socket.h>
+#include <sys/select.h>
 #include <errno.h>
 #include <fcntl.h>
 #include <stdio.h>
@@ -106,15 +107,6 @@ WithOptional(command="shared-address-ipv6", ifdef="USES_SHARED_ADDRESS_IPV6",
 
 
 WithAuxFor(commands=[shared-address-ipv4, shared-address-ipv6], ifdefs=[USES_SHARED_ADDRESS_IPV4, USES_SHARED_ADDRESS_IPV6],
-
-#include <arpa/inet.h>
-#include <netinet/in.h>
-#include <sys/socket.h>
-#include <errno.h>
-#include <fcntl.h>
-#include <stdio.h>
-#include <stdlib.h>
-#include <unistd.h>
 
 
 int shared_connect_address(
