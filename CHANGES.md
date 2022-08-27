@@ -1,7 +1,8 @@
 ## v4.4.0
 
 * (?)
-    * Add new `test-ipv4` and `test-ipv6` commands that introduce network access.
+    * Added new `test-ipv4` and `test-ipv6` commands that introduce network access.
+    * Added new `expect-http-get-response` and `expect-http-get-response-not` commands for checking HTTP GET response status codes against a known value.
     * Added new `elapsed-time-under` command to check if too much time has passed.
     * Added new command `export-host-lookup` to look up an IP address in the /etc/hosts file.
     * Added new build mode, `interactive`, to allow for creating an image suitable for manual exploration without running a build command.
