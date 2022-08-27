@@ -41,7 +41,7 @@ SOFTWARE.
 // the newline happens.  In Bash, the '-e' flag will
 // turn this into '&&'.
 // Changing this behavior is part of issue #14.
-static const char *_ReplaceNewline = ";";
+const char *ArgReplaceNewline = ";";
 
 
 // Configurable buffer size.
@@ -336,7 +336,7 @@ const Argument *args_advance_token(struct ArgState *state) {
                 if (parse_state == PARSE_SEARCH) {
                     // Outside text.  This is like a ';' or '&&' depending on the setup.
                     // Use that value instead of writing it to the argument value.
-                    state->arg_value.arg = _ReplaceNewline;
+                    state->arg_value.arg = ArgReplaceNewline;
                     LOG(":: Parsed newline as '");
                     LOG(state->arg_value.arg);
                     LOG("'\n");

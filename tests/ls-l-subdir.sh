@@ -17,11 +17,20 @@ if [ ${res} -ne 0 ] ; then
 fi
 
 # sort output to ensure ordering doesn't mess up the test.
-if [ "$( printf -- "--rw-r--r-- 1 ${UID0} ${GID0} 0 0 0 other-dir/file-a.txt\\n--rw-r--r-- 1 ${UID0} ${GID0} 0 0 0 other-dir/file-b.txt\\nd-rwxr-xr-x 2 ${UID0} ${GID0} 0 0 4096 other-dir/dir-a\\n" )" != "$( cat out.txt | sort )" ] ; then
+# Note that sorting has implementation differences; some
+# implementations put the "d-" before "--".
+line1="--rw-r--r-- 1 ${UID0} ${GID0} 0 0 0 other-dir/file-a.txt"
+line2="--rw-r--r-- 1 ${UID0} ${GID0} 0 0 0 other-dir/file-b.txt"
+line3="d-rwxr-xr-x 2 ${UID0} ${GID0} 0 0 4096 other-dir/dir-a"
+actual="$( cat out.txt | sort )"
+if \
+        [ "$( printf -- "${line1}\\n${line2}\\n${line3}\\n" )" != "${actual}" ] \
+     && [ "$( printf -- "${line3}\\n${line1}\\n${line2}\\n" )" != "${actual}" ] \
+; then
     echo "Generated invalid output to stdout"
-    cat out.txt | sort
+    echo "${actual}"
     echo "Expected:"
-    printf -- "--rw-r--r-- 1 ${UID0} ${GID0} 0 0 0 other-dir/file-a.txt\\n--rw-r--r-- 1 ${UID0} ${GID0} 0 0 0 other-dir/file-b.txt\\nd-rwxr-xr-x 2 ${UID0} ${GID0} 0 0 4096 other-dir/dir-a\\n"
+    printf -- "${line1}\\n${line2}\\n${line3}"
     exit 1
 fi
 

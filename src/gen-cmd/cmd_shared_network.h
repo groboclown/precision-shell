@@ -33,6 +33,7 @@ SOFTWARE.
 #include <arpa/inet.h>
 #include <netinet/in.h>
 #include <sys/socket.h>
+#include <sys/select.h>
 #include <errno.h>
 #include <fcntl.h>
 #include <stdio.h>
@@ -55,19 +56,19 @@ SOFTWARE.
 
 #define ENUM_LIST__SHARED_ADDRESS_IPV4
 #define VIRTUAL_ENUM_LIST__SHARED_ADDRESS_IPV4 \
-            /* from cmd_shared_network.h.in:46 */ \
+            /* from cmd_shared_network.h.in:47 */ \
             COMMAND_INDEX__SHARED_IPV4_ADDRESS,
 #define GLOBAL_VARDEF__SHARED_ADDRESS_IPV4
 #define INITIALIZE__SHARED_ADDRESS_IPV4 \
-            /* from cmd_shared_network.h.in:47 */ \
+            /* from cmd_shared_network.h.in:48 */ \
             /* Don't forget to set the port with:*/ \
             /*  shared_address_ip4.sin_port = htons(global_arg2_i);*/ \
             struct sockaddr_in shared_address_ip4;
 #define STARTUP_CASE__SHARED_ADDRESS_IPV4
 #define RUN_CASE__SHARED_ADDRESS_IPV4 \
     case COMMAND_INDEX__SHARED_IPV4_ADDRESS: \
-        /* from cmd_shared_network.h.in:46 */ \
-            /* from cmd_shared_network.h.in:53 */ \
+        /* from cmd_shared_network.h.in:47 */ \
+            /* from cmd_shared_network.h.in:54 */ \
             LOG(":: parsing ipv4 addr "); \
             LOGLN(global_arg); \
             global_cmd = global_arg2_i; \
@@ -108,19 +109,19 @@ SOFTWARE.
 
 #define ENUM_LIST__SHARED_ADDRESS_IPV6
 #define VIRTUAL_ENUM_LIST__SHARED_ADDRESS_IPV6 \
-            /* from cmd_shared_network.h.in:81 */ \
+            /* from cmd_shared_network.h.in:82 */ \
             COMMAND_INDEX__SHARED_IPV6_ADDRESS,
 #define GLOBAL_VARDEF__SHARED_ADDRESS_IPV6
 #define INITIALIZE__SHARED_ADDRESS_IPV6 \
-            /* from cmd_shared_network.h.in:83 */ \
+            /* from cmd_shared_network.h.in:84 */ \
             /* Don't forget to set the port with:*/ \
             /*  shared_address_ip6.sin6_port = htons(global_arg2_i);*/ \
             struct sockaddr_in6 shared_address_ip6;
 #define STARTUP_CASE__SHARED_ADDRESS_IPV6
 #define RUN_CASE__SHARED_ADDRESS_IPV6 \
     case COMMAND_INDEX__SHARED_IPV6_ADDRESS: \
-        /* from cmd_shared_network.h.in:81 */ \
-            /* from cmd_shared_network.h.in:89 */ \
+        /* from cmd_shared_network.h.in:82 */ \
+            /* from cmd_shared_network.h.in:90 */ \
             LOG(":: parsing ipv6 addr "); \
             LOGLN(global_arg); \
             global_cmd = global_arg2_i; \
@@ -145,19 +146,14 @@ SOFTWARE.
 #endif /* USES_SHARED_ADDRESS_IPV6 */
 
 
+
 #if defined(USES_SHARED_ADDRESS_IPV4) || defined(USES_SHARED_ADDRESS_IPV6)
 
 
-#include <arpa/inet.h>
-#include <netinet/in.h>
-#include <sys/socket.h>
-#include <errno.h>
-#include <fcntl.h>
-#include <stdio.h>
-#include <stdlib.h>
-#include <unistd.h>
 
-
+// Standard procedure for connecting to an IPv[4,6] socket.
+// Returns the socket file descriptor, or, if an error, returns -1.
+// Valid file descriptors must be explicitly closed (close(fd)) by the caller.
 int shared_connect_address(
         struct sockaddr *address, size_t address_size,
         int timeout_seconds) {

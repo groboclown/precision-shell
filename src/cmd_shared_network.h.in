@@ -106,9 +106,13 @@ WithOptional(command="shared-address-ipv6", ifdef="USES_SHARED_ADDRESS_IPV6",
 )
 
 
+
 WithAuxFor(commands=[shared-address-ipv4, shared-address-ipv6], ifdefs=[USES_SHARED_ADDRESS_IPV4, USES_SHARED_ADDRESS_IPV6],
 
 
+// Standard procedure for connecting to an IPv[4,6] socket.
+// Returns the socket file descriptor, or, if an error, returns -1.
+// Valid file descriptors must be explicitly closed (close(fd)) by the caller.
 int shared_connect_address(
         struct sockaddr *address, size_t address_size,
         int timeout_seconds) {

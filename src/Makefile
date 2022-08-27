@@ -70,6 +70,7 @@ COMMANDS = \
 	cmd_cd.h \
 	cmd_chmod.h \
 	cmd_chown.h \
+	cmd_dnslookup.h \
 	cmd_dup.h \
 	cmd_echo.h \
 	cmd_exec.h \
@@ -78,6 +79,7 @@ COMMANDS = \
 	cmd_file_stat.h \
 	cmd_fmode.h \
 	cmd_for_each.h \
+	cmd_http_request.h \
 	cmd_if_else.h \
 	cmd_ln_h.h \
 	cmd_ln_s.h \

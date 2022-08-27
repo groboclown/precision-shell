@@ -2,6 +2,12 @@
 
 * (?)
     * Add new `test-ipv4` and `test-ipv6` commands that introduce network access.
+    * Added new `elapsed-time-under` command to check if too much time has passed.
+    * Added new command `export-host-lookup` to look up an IP address in the /etc/hosts file.
+    * Added new build mode, `interactive`, to allow for creating an image suitable for manual exploration without running a build command.
+    * Fixed tests for `ls-l` to support different platform sort implementations.
+    * Added a recipe (delay-until-ready.Dockerfile) to show off how to combine loops, sleep, timers, and http checks to delay starting a command until dependencies are ready.
+    * Made "ArgReplaceNewline" external, to allow replacing its value, and for checking its value.
 
 ## v4.3.0
 

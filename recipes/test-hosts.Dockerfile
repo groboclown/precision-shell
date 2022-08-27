@@ -24,7 +24,7 @@ COPY tests/ tests/
 
 # Adjust this value during the image build with `--build-arg`
 #   to alter which commands to include.
-ARG COMMANDS="dup-w env-cat-fd cat-fd spawn kill-pid wait-pid exit signal echo subcmd noop enviro"
+ARG COMMANDS="cat-fd"
 
 ENV COMMANDS=$COMMANDS
 
@@ -50,22 +50,5 @@ ENV LISTEN_PORT 9000
 #   which isn't necessary, but added here for clairty about the separation
 #   of example code.
 ENTRYPOINT \
-    noop [Use dup-w and env-cat-fd to update config.json] \
-       [based on environment variables.] \
-    && dup-w 8 config.json \
-    && env-cat-fd 8 ../config.json.template \
-    && dup-w 8 /tmp/closed.txt \
-    && noop [Show the config to stdout for testing purposes] \
-    && noop [cat-fd 1 config.json] \
-    && subcmd [ \
-      && noop [Launch the server] \
-      && spawn [/nodejs/bin/node server.js] NODE \
-      && noop [Wait for an OS terminate signal] \
-      && signal 1 2 9 15 17 wait && \
-      && noop [Kill the server and wait for it to end.] \
-      && echo [\nTerminating the server...] \
-      && kill-pid 15 ${NODE} \
-      && wait-pid ${NODE} *EXIT \
-      && echo [Terminated.] \
-      && exit ${EXIT} \
-    ]
+    cat-fd 1 /etc/hosts \
+    ; cat-fd 1 /etc/resolv.conf

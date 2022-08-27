@@ -21,41 +21,59 @@ LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
 */
-AsOptionalUnion(file="http-request",
+
+AsOptionalUnion(file="http_request",
 
 
-#include <arpa/inet.h>
-#include <netinet/in.h>
-#include <sys/socket.h>
-#include <errno.h>
-#include <fcntl.h>
-#include <stdio.h>
-#include <stdlib.h>
-#include <unistd.h>
+// host port path expected-code
+//  host -> shared_address_ip4
+//  port -> global_arg2_i -> shared_address_ip4
+//  path -> global_arg_cached
+//  code -> global_arg
 
-// The test uses:
-//    parsed address: test_connection_addr
-//    port number: global_arg2_i
-//    path: global_arg
+AsOptional(command="expect-http-get-response",
+
+    WithNamedStep(enum="EXPECT_HTTP_GET_RESPONSE", name="expect-http-get-response",
+
+        OnCmd(
+            LOG(":: check http get response code equals\n");
+
+            // expect equals
+            global_arg1_i = 0;
+
+            // Argument 1: collect address into shared_address_ip4
+            global_cmd = COMMAND_INDEX__SHARED_IPV4_ADDRESS;
+
+            // Argument 2: collect port into global_arg2_i.
+            global_arg2_i = COMMAND_INDEX__SHARED_INT2;
+
+            // Argument 3: collect timeout + make connection.
+            global_arg3_i = COMMAND_INDEX__EXPECT_HTTP_GET_RESPONSE__PATH;
+        )
+
+    )
+
+)
 
 
-WithOptional(command="export-http-head-code",
+AsOptional(command="expect-http-get-response-not",
 
-    WithNamedStep(enum="EXPORT_HTTP_HEAD_CODE", name="export-http-head-code",
+    WithNamedStep(enum="EXPECT_HTTP_GET_RESPONSE_NOT", name="expect-http-get-response-not",
 
-        OnArg(
-            LOG(":: http head request against ipv4 ");
-            LOGLN(global_arg);
+        OnCmd(
+            LOG(":: check http get response code not equal\n");
 
-            global_arg3_i = COMMAND_INDEX__EXPORT_HTTP_HEAD_CODE;
-            global_cmd = COMMAND_INDEX__SHARED_INT2;
+            // expect not equals
+            global_arg1_i = 1;
 
-            test_connection_addr.ip4.sin_family = AF_INET;
-            tmp_val = inet_pton(AF_INET, global_arg, &test_connection_addr.ip4.sin_addr.s_addr);
-            if (tmp_val <= 0) {
-                global_err = 1;
-                global_cmd = COMMAND_INDEX__ERR;
-            }
+            // Argument 1: collect address into shared_address_ip4
+            global_cmd = COMMAND_INDEX__SHARED_IPV4_ADDRESS;
+
+            // Argument 2: collect port into global_arg2_i.
+            global_arg2_i = COMMAND_INDEX__SHARED_INT2;
+
+            // Argument 3: collect timeout + make connection.
+            global_arg3_i = COMMAND_INDEX__EXPECT_HTTP_GET_RESPONSE__PATH;
         )
 
     )
@@ -64,91 +82,118 @@ WithOptional(command="export-http-head-code",
 
 
 
-WithAuxFor(commands=[test-ipv4, test-ipv6],
+WithAuxFor(commands=[expect-http-get-response, expect-http-get-response-not],
 
-union test_connection_ip_addr {
-    struct sockaddr_in ip4;
-    struct sockaddr_in6 ip6;
-};
+    WithVirtualStep(enum="EXPECT_HTTP_GET_RESPONSE__PATH",
+        OnArg(
+            // Save off the path.
+            global_arg_cached = global_arg;
 
-    WithVirtualStep(enum="TEST_CONNECTION__TIMEOUT",
+            // load up the port, since we have it.
+            shared_address_ip4.sin_port = htons(global_arg2_i);
 
+            // get the expected code and make the request.
+            global_cmd = COMMAND_INDEX__EXPECT_HTTP_GET_RESPONSE__CODE;
+        )
+    )
+
+    WithVirtualStep(enum="EXPECT_HTTP_GET_RESPONSE__CODE",
         OnInit(
-            union test_connection_ip_addr test_connection_addr;
-            short int test_connection_sock = -1;
-            fd_set test_connection_fdset;
-            struct timeval test_connection_tv;
+            // Need just enough space to read in the first line.
+            //   We don't need the whole line, just enough to get the status code.
+            //   But this should be more than sufficient.
+            char http_response_code_parse[20];
         )
 
+        // host port path expected-code
+        //  host -> shared_address_ip4
+        //  port -> shared_address_ip4
+        //  path -> global_arg_cached
+        //  code -> global_arg
+        //  client socket -> tmp_val
+
         OnArg(
-            LOG(":: parsing timeout ");
+            LOG(":: expecting http response code ");
             LOGLN(global_arg);
-            global_arg3_i = helper_arg_to_uint(global_arg, 10, 0xffff);
-            if (global_arg3_i < 0) {
-                LOG(":: invalid integer for timeout\n");
-                global_err = 1;
-                global_cmd = COMMAND_INDEX__ERR;
+            // don't actually parse it.  we're going to just do a string comparison.
+
+            global_cmd = COMMAND_INDEX__ERR;
+            // Initialize global_error to the opposite of the expected
+            //   equality state.  If we're expecting no match, then every error
+            //   condition is considered an "ok" error response.
+            //   expects errr -> global_arg1_i == 1; 1 - global_arg1_i == 0.
+            //   expects ok -> global_arg1_i == 0; 1 - global_arg1_i == 1.
+            global_err = 1 - global_arg1_i;
+
+            // Perform connection.
+            tmp_val = shared_connect_address(
+                (struct sockaddr *)&shared_address_ip4, sizeof(shared_address_ip4), global_arg3_i);
+            if (tmp_val == -1) {
                 break;
             }
 
-            // Note: with the union, the family and port for ip4 and ip6
-            //   are on the same memory address.
-            test_connection_addr.ip4.sin_port = htons(global_arg2_i);
+            // send the data.
+            write(tmp_val, "GET ", 4);
+            write(tmp_val, global_arg_cached, strlen(global_arg_cached));
+            write(tmp_val, " HTTP/1.1\r\n\r\n", 13);
+            fsync(tmp_val);
 
-            // Perform connection.
-
-            test_connection_sock = socket(test_connection_addr.ip4.sin_family, SOCK_STREAM, 0);
-            fcntl(test_connection_sock, F_SETFL, O_NONBLOCK);
-
-            // Because the socket is in non-blocking mode,
-            // chances are that running connect will return an error with
-            //   errno == EINPROGRESS, meaning connection is in-progress.
-            if (test_connection_addr.ip4.sin_family == AF_INET) {
-                // printf("Connecting to %x port %d\n", test_connection_addr.ip4.sin_addr.s_addr, test_connection_addr.ip4.sin_port);
-                connect(
-                    test_connection_sock,
-                    (struct sockaddr *)&test_connection_addr.ip4,
-                    sizeof(struct sockaddr_in));
-            } else {
-                /*
-                printf("Connecting to ");
-                for (tmp_val = 0; tmp_val < sizeof(struct in6_addr); tmp_val++) {
-                    printf("%02x:", test_connection_addr.ip6.sin6_addr.s6_addr[tmp_val]);
-                }
-                printf(" port %d\n", test_connection_addr.ip4.sin_port);
-                */
-                connect(test_connection_sock,
-                    (struct sockaddr *)&test_connection_addr.ip6,
-                    sizeof(struct sockaddr_in6));
-            }
-            FD_ZERO(&test_connection_fdset);
-            FD_SET(test_connection_sock, &test_connection_fdset);
-            test_connection_tv.tv_sec = global_arg3_i;
-            test_connection_tv.tv_usec = 0;
-
-            // Default to not being open
-            global_err = 1;
-            if (select(test_connection_sock + 1, NULL, &test_connection_fdset, NULL, &test_connection_tv) == 1)
-            {
-                socklen_t len = sizeof(global_err);
-
-                getsockopt(test_connection_sock, SOL_SOCKET, SO_ERROR, &global_err, &len);
-
-                if (global_err == 0) {
-                    LOG(":: connection open\n");
-                } else {
-                    LOG(":: socket has error\n");
-                    // printf("socket error %d\n", global_err);
-                }
-            } else {
-                LOG(":: socket did not connect in time.\n");
+            // read in the response.  Just enough to get the protocol and the status code.
+            // Make sure we read in at most 1 less than the size of the buffer.
+            global_arg2_i = read(tmp_val, (void *)http_response_code_parse, 19);
+            // Nothing left to do with the socket.
+            // Close it; we don't care about what's left to read.
+            close(tmp_val);
+            if (global_arg2_i <= 0) {
+                LOG(":: failed to read from HTTP response.\n");
+                break;
             }
 
-            close(test_connection_sock);
-            global_cmd = COMMAND_INDEX__ERR;
+            // Force a zero-terminated string where the read finished.
+            // Because of the other checks, this isn't strictly necessary,
+            //   but adds a bit of extra safety.
+            http_response_code_parse[global_arg2_i] = '\0';
+            LOG(":: retrieved http response [");
+            LOG(http_response_code_parse);
+            LOG("]\n");
+
+            // find the status code.  If this is a valid http response, then
+            //  it's between spaces.  Never at index 0.
+            global_arg3_i = 0;
+
+            for (tmp_val = 0; tmp_val < global_arg2_i; tmp_val++) {
+                if (http_response_code_parse[tmp_val] == ' ') {
+                    http_response_code_parse[tmp_val] = '\0';
+                    if (global_arg3_i == 0 || global_arg3_i == tmp_val - 1) {
+                        // The start of the status code hasn't been set, or there was
+                        //   an extra space between HTTP/1 and the status code.  We'll be
+                        //   nice and extra lenient, even though the spec requires just 1
+                        //   space.
+                        global_arg3_i = tmp_val + 1;
+                    } else {
+                        // At this point, we know the pointer to the status code is
+                        // before the current position.  So check if they are equal.
+                        if (strcmp(&http_response_code_parse[global_arg3_i], global_arg) == 0) {
+                            LOG(":: response code matches expected value.\n");
+                            // It matched.  The error state should now be set to the
+                            //   if-equal state.
+                            global_err = 1 - global_err;
+                        }
+                        break;
+                    }
+                }
+            }
+
+            // Only for debugging purposes.  Because the LOG statement is stripped out
+            //   for non-debug builds, this if statement will also be removed.
+            if (global_err != 0) {
+                LOG(":: did not match expected value.\n");
+            }
         )
+
     )
 
 )
 
 )
+

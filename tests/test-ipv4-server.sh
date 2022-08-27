@@ -8,7 +8,7 @@ if [ ! -x "${FS_SERVER}" ] ; then
     exit 0
 fi
 
-"${FS_SERVER}" 29446 >server-out.txt 2>server-err.txt &
+"${FS_SERVER}" echo 29446 >server-out.txt 2>server-err.txt &
 server_pid=$!
 
 "${FS}" -c "test-ipv4 [127.0.0.1] 29446 3" > out.txt 2>err.txt

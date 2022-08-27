@@ -114,4 +114,11 @@ const Argument *args_advance_token(struct ArgState *state);
  */
 int args_close_tokenizer(struct ArgState *state);
 
+/**
+ * @brief pointer to the replacement text for a newline character.
+ * 
+ */
+extern const char *ArgReplaceNewline;
+
+
 #endif

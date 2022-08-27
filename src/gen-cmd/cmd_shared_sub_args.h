@@ -61,10 +61,10 @@ SOFTWARE.
         shared_split_arg = args_advance_token(shared_split_arg_state); \
         if (shared_split_arg->state == ARG_STATE_END) { \
             break; \
-        } else if (shared_split_arg->state == ARG_STATE_ERR) {\
+        } else if (shared_split_arg->state == ARG_STATE_ERR) { \
             global_err = 1; \
             break; \
-        } else {\
+        } else { \
             LOG(":: Parsed sub-arg '"); \
             LOG(shared_split_arg->arg); \
             LOG("'\n"); \

@@ -34,6 +34,7 @@ SOFTWARE.
 // USE_CMD_START_TIMER - this command is always included if any
 //   of the timer commands is also used.
 #if    defined(USE_CMD_ELAPSED_TIME) \
+    || defined(USE_CMD_ELAPSED_TIME_UNDER) \
     || defined(USE_CMD_EXPORT_ELAPSED_TIME)
 
 #define USE_CMD_START_TIMER 1
@@ -84,6 +85,7 @@ SOFTWARE.
 #if    defined(USE_CMD_LN_S) \
     || defined(USE_CMD_LN_H) \
     || defined(USE_CMD_MV) \
+    || defined(USE_CMD_EXPORT_HOST_LOOKUP) \
     || defined(USE_CMD_EXPORT) \
     || defined(USE_CMD_WHILE_NO_ERROR) \
     || defined(USE_CMD_WHILE_ERROR) \
@@ -106,7 +108,9 @@ SOFTWARE.
     || defined(USE_CMD_SU_EXEC) \
     || defined(USE_CMD_SU_SPAWN) \
     || defined(USE_CMD_TEST_IPV4) \
-    || defined(USE_CMD_TEST_IPV6)
+    || defined(USE_CMD_TEST_IPV6) \
+    || defined(USE_CMD_EXPECT_HTTP_GET_RESPONSE) \
+    || defined(USE_CMD_EXPECT_HTTP_GET_RESPONSE_NOT)
 
 #define USES_SHARED_INT
 
@@ -116,6 +120,7 @@ SOFTWARE.
 // USES_FD_READ - any command or capability that allows for reading from a file descriptor.
 #if    defined(USE_STREAMING_INPUT) \
     || defined(USE_CMD_CAT_FD) \
+    || defined(USE_CMD_EXPORT_HOST_LOOKUP) \
     || defined(USE_CMD_ENV_CAT_FD)
 
 #define USES_FD_READ
@@ -135,6 +140,7 @@ SOFTWARE.
 //    || defined(USE_CMD_SPAWN)
 //    || defined(USE_CMD_PWD)
 //    || defined(USE_CMD_WAIT_PID)
+//    || defined(USE_CMD_EXPORT_HOST_LOOKUP)
 
 #endif
 
@@ -144,6 +150,7 @@ SOFTWARE.
     || defined(USE_CMD_SPAWN) \
     || defined(USE_CMD_WAIT_PID) \
     || defined(USE_CMD_SUBCMD) \
+    || defined(USE_CMD_EXPORT_HOST_LOOKUP) \
     || defined(USE_CMD_IF_ELSE) \
     || defined(USE_CMD_WHILE_NO_ERROR) \
     || defined(USE_CMD_WHILE_ERROR) \
@@ -171,7 +178,9 @@ SOFTWARE.
 
 
 // USES_SHARED_ADDRESS_IPV4 - allow connecting to ipv6 sockets and parsing ipv4 addresses
-#if     defined(USE_CMD_TEST_IPV4)
+#if    defined(USE_CMD_TEST_IPV4) \
+    || defined(USE_CMD_EXPECT_HTTP_GET_RESPONSE) \
+    || defined(USE_CMD_EXPECT_HTTP_GET_RESPONSE_NOT)
 
 #define USES_SHARED_ADDRESS_IPV4
 
@@ -179,7 +188,7 @@ SOFTWARE.
 
 
 // USES_SHARED_ADDRESS_IPV6 - allow connecting to ipv6 sockets and parsing ipv6 addresses
-#if     defined(USE_CMD_TEST_IPV6)
+#if    defined(USE_CMD_TEST_IPV6)
 
 #define USES_SHARED_ADDRESS_IPV6
 
