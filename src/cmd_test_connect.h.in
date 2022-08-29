@@ -23,29 +23,25 @@ SOFTWARE.
 */
 
 
-WithOptional(command="test-ipv6",
+WithOptional(command="test-connect",
 
-    WithNamedStep(enum="TEST_IPV6", name="test-ipv6",
+    WithNamedStep(enum="TEST_CONNECT", name="test-connect",
 
         OnCmd(
-            LOG(":: test ipv6\n");
+            LOG(":: test connection\n");
 
-            // Argument 1: collect address into shared_address_ip6
-            global_cmd = COMMAND_INDEX__SHARED_IPV6_ADDRESS;
+            // Argument 1: collect address into shared_address_ip4
+            global_cmd = COMMAND_INDEX__SHARED_STR;
 
-            // Argument 2: collect port into global_arg2_i.
-            global_arg2_i = COMMAND_INDEX__SHARED_INT2;
+            // Argument 2: collect address + port into shared_network_addr.
+            global_arg3_i = COMMAND_INDEX__SHARED_SERVICE;
 
             // Argument 3: collect timeout + make connection.
-            global_arg3_i = COMMAND_INDEX__TEST_IPV6__TIMEOUT;
+            global_arg2_i = COMMAND_INDEX__TEST_CONNECT;
         )
 
-    )
-
-    WithVirtualStep(enum="TEST_IPV6__TIMEOUT",
-
         OnArg(
-            LOG(":: parsing ipv6 timeout ");
+            LOG(":: parsing connection timeout ");
             LOGLN(global_arg);
             global_arg3_i = helper_arg_to_uint(global_arg, 10, 0xffff);
             if (global_arg3_i < 0) {
@@ -55,13 +51,11 @@ WithOptional(command="test-ipv6",
                 break;
             }
 
-            shared_address_ip6.sin6_port = htons(global_arg2_i);
             global_cmd = COMMAND_INDEX__ERR;
             global_err = 0;
 
             // Perform connection.
-            tmp_val = shared_connect_address(
-                (struct sockaddr *)&shared_address_ip6, sizeof(shared_address_ip6), global_arg3_i);
+            tmp_val = shared_network_connect_address(&shared_network_addr, global_arg3_i);
             if (tmp_val == -1) {
                 global_err = 1;
                 break;

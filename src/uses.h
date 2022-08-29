@@ -86,6 +86,7 @@ SOFTWARE.
     || defined(USE_CMD_LN_H) \
     || defined(USE_CMD_MV) \
     || defined(USE_CMD_EXPORT_HOST_LOOKUP) \
+    || defined(USE_CMD_EXPORT_DNS_QUERY) \
     || defined(USE_CMD_EXPORT) \
     || defined(USE_CMD_WHILE_NO_ERROR) \
     || defined(USE_CMD_WHILE_ERROR) \
@@ -177,20 +178,19 @@ SOFTWARE.
 #endif
 
 
-// USES_SHARED_ADDRESS_IPV4 - allow connecting to ipv6 sockets and parsing ipv4 addresses
-#if    defined(USE_CMD_TEST_IPV4) \
+// USES_SHARED_SERVICE - allow connecting to and parsing an address + port
+#if    defined(USE_CMD_TEST_CONNECT) \
     || defined(USE_CMD_EXPECT_HTTP_GET_RESPONSE) \
-    || defined(USE_CMD_EXPECT_HTTP_GET_RESPONSE_NOT)
+    || defined(USE_CMD_EXPECT_HTTP_GET_RESPONSE_NOT)    
 
-#define USES_SHARED_ADDRESS_IPV4
+#define USES_SHARED_SERVICE
 
 #endif
 
+// USES_SHARED_ADDRESS - allow connecting to and parsing an address; port is separate.
+#if    defined(USE_CMD_EXPORT_HOST_LOOKUP)
 
-// USES_SHARED_ADDRESS_IPV6 - allow connecting to ipv6 sockets and parsing ipv6 addresses
-#if    defined(USE_CMD_TEST_IPV6)
-
-#define USES_SHARED_ADDRESS_IPV6
+#define USES_SHARED_ADDRESS
 
 #endif
 

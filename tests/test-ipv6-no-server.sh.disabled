@@ -1,10 +1,10 @@
 #!/bin/bash
 
 # This test fails when running inside docker.
-# desc: test-ipv6 with no running server on port 0.
-# requires: +test-ipv6
+# desc: test-connect with no running server on port 0 and ipv6.
+# requires: +test-connect
 
-"${FS}" -c "test-ipv6 ::0 0 3" > out.txt 2>err.txt
+"${FS}" -c "test-connect ::0 0 3" > out.txt 2>err.txt
 res=$?
 
 if [ ${res} -ne 1 ] ; then

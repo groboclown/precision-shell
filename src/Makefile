@@ -101,8 +101,7 @@ COMMANDS = \
 	cmd_su_exec.h \
 	cmd_su_spawn.h \
 	cmd_subcmd.h \
-	cmd_test_ipv4.h \
-	cmd_test_ipv6.h \
+	cmd_test_connect.h \
 	cmd_timer.h \
 	cmd_touch_trunc.h \
 	cmd_wait_pid.h \

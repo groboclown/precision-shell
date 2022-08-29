@@ -24,10 +24,11 @@ SOFTWARE.
 
 AsOptionalUnion(file="http_request",
 
+#define HTTP_TIMEOUT 60
 
 // host port path expected-code
-//  host -> shared_address_ip4
-//  port -> global_arg2_i -> shared_address_ip4
+//  host -> shared_network_addr
+//  port -> shared_network_addr
 //  path -> global_arg_cached
 //  code -> global_arg
 
@@ -41,14 +42,14 @@ AsOptional(command="expect-http-get-response",
             // expect equals
             global_arg1_i = 0;
 
-            // Argument 1: collect address into shared_address_ip4
-            global_cmd = COMMAND_INDEX__SHARED_IPV4_ADDRESS;
+            // Argument 1: collect address into shared_network_addr
+            global_cmd = COMMAND_INDEX__SHARED_STR;
 
-            // Argument 2: collect port into global_arg2_i.
-            global_arg2_i = COMMAND_INDEX__SHARED_INT2;
+            // Argument 2: collect address + port into shared_network_addr.
+            global_arg3_i = COMMAND_INDEX__SHARED_SERVICE;
 
-            // Argument 3: collect timeout + make connection.
-            global_arg3_i = COMMAND_INDEX__EXPECT_HTTP_GET_RESPONSE__PATH;
+            // Argument 3: path
+            global_arg2_i = COMMAND_INDEX__EXPECT_HTTP_GET_RESPONSE__PATH;
         )
 
     )
@@ -66,14 +67,14 @@ AsOptional(command="expect-http-get-response-not",
             // expect not equals
             global_arg1_i = 1;
 
-            // Argument 1: collect address into shared_address_ip4
-            global_cmd = COMMAND_INDEX__SHARED_IPV4_ADDRESS;
+            // Argument 1: collect address into shared_network_addr
+            global_cmd = COMMAND_INDEX__SHARED_STR;
 
-            // Argument 2: collect port into global_arg2_i.
-            global_arg2_i = COMMAND_INDEX__SHARED_INT2;
+            // Argument 2: collect address + port into shared_network_addr.
+            global_arg3_i = COMMAND_INDEX__SHARED_SERVICE;
 
-            // Argument 3: collect timeout + make connection.
-            global_arg3_i = COMMAND_INDEX__EXPECT_HTTP_GET_RESPONSE__PATH;
+            // Argument 3: path
+            global_arg2_i = COMMAND_INDEX__EXPECT_HTTP_GET_RESPONSE__PATH;
         )
 
     )
@@ -89,9 +90,6 @@ WithAuxFor(commands=[expect-http-get-response, expect-http-get-response-not],
             // Save off the path.
             global_arg_cached = global_arg;
 
-            // load up the port, since we have it.
-            shared_address_ip4.sin_port = htons(global_arg2_i);
-
             // get the expected code and make the request.
             global_cmd = COMMAND_INDEX__EXPECT_HTTP_GET_RESPONSE__CODE;
         )
@@ -106,8 +104,7 @@ WithAuxFor(commands=[expect-http-get-response, expect-http-get-response-not],
         )
 
         // host port path expected-code
-        //  host -> shared_address_ip4
-        //  port -> shared_address_ip4
+        //  host + port -> shared_network_addr
         //  path -> global_arg_cached
         //  code -> global_arg
         //  client socket -> tmp_val
@@ -126,8 +123,7 @@ WithAuxFor(commands=[expect-http-get-response, expect-http-get-response-not],
             global_err = 1 - global_arg1_i;
 
             // Perform connection.
-            tmp_val = shared_connect_address(
-                (struct sockaddr *)&shared_address_ip4, sizeof(shared_address_ip4), global_arg3_i);
+            tmp_val = shared_network_connect_address(&shared_network_addr, HTTP_TIMEOUT);
             if (tmp_val == -1) {
                 break;
             }

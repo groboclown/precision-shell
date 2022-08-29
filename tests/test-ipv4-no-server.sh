@@ -1,9 +1,9 @@
 #!/bin/bash
 
-# desc: test-ipv4 with no running server on port 0.
-# requires: +test-ipv4
+# desc: test-connect with no running server on port 0 on ipv4.
+# requires: +test-connect
 
-"${FS}" -c "test-ipv4 [127.0.0.1] 0 3" > out.txt 2>err.txt
+"${FS}" -c "test-connect [127.0.0.1] 0 3" > out.txt 2>err.txt
 res=$?
 
 if [ ${res} -ne 1 ] ; then
@@ -11,7 +11,7 @@ if [ ${res} -ne 1 ] ; then
     exit 1
 fi
 
-if [ "$( printf "ERROR test-ipv4: 3\n" )" != "$( cat err.txt )" ] ; then
+if [ "$( printf "ERROR test-connect: 3\n" )" != "$( cat err.txt )" ] ; then
     echo "Generated invalid stderr"
     cat err.txt
     exit 1

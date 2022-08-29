@@ -63,8 +63,7 @@ SOFTWARE.
 #include "cmd_su_exec.h"
 #include "cmd_su_spawn.h"
 #include "cmd_subcmd.h"
-#include "cmd_test_ipv4.h"
-#include "cmd_test_ipv6.h"
+#include "cmd_test_connect.h"
 #include "cmd_timer.h"
 #include "cmd_touch_trunc.h"
 #include "cmd_wait_pid.h"
@@ -111,8 +110,7 @@ SOFTWARE.
             GLOBAL_VARDEF__SU_EXEC \
             GLOBAL_VARDEF__SU_SPAWN \
             GLOBAL_VARDEF__SUBCMD \
-            GLOBAL_VARDEF__TEST_IPV4 \
-            GLOBAL_VARDEF__TEST_IPV6 \
+            GLOBAL_VARDEF__TEST_CONNECT \
             GLOBAL_VARDEF__TIMER_FUNCS \
             GLOBAL_VARDEF__TOUCH_TRUNC \
             GLOBAL_VARDEF__WAIT_PID \
@@ -157,8 +155,7 @@ SOFTWARE.
             INITIALIZE__SU_EXEC \
             INITIALIZE__SU_SPAWN \
             INITIALIZE__SUBCMD \
-            INITIALIZE__TEST_IPV4 \
-            INITIALIZE__TEST_IPV6 \
+            INITIALIZE__TEST_CONNECT \
             INITIALIZE__TIMER_FUNCS \
             INITIALIZE__TOUCH_TRUNC \
             INITIALIZE__WAIT_PID \
@@ -203,8 +200,7 @@ SOFTWARE.
             STARTUP_CASE__SU_EXEC \
             STARTUP_CASE__SU_SPAWN \
             STARTUP_CASE__SUBCMD \
-            STARTUP_CASE__TEST_IPV4 \
-            STARTUP_CASE__TEST_IPV6 \
+            STARTUP_CASE__TEST_CONNECT \
             STARTUP_CASE__TIMER_FUNCS \
             STARTUP_CASE__TOUCH_TRUNC \
             STARTUP_CASE__WAIT_PID \
@@ -249,8 +245,7 @@ SOFTWARE.
             RUN_CASE__SU_EXEC \
             RUN_CASE__SU_SPAWN \
             RUN_CASE__SUBCMD \
-            RUN_CASE__TEST_IPV4 \
-            RUN_CASE__TEST_IPV6 \
+            RUN_CASE__TEST_CONNECT \
             RUN_CASE__TIMER_FUNCS \
             RUN_CASE__TOUCH_TRUNC \
             RUN_CASE__WAIT_PID \
@@ -295,8 +290,7 @@ SOFTWARE.
             REQUIRES_ADDL_ARG__SU_EXEC \
             REQUIRES_ADDL_ARG__SU_SPAWN \
             REQUIRES_ADDL_ARG__SUBCMD \
-            REQUIRES_ADDL_ARG__TEST_IPV4 \
-            REQUIRES_ADDL_ARG__TEST_IPV6 \
+            REQUIRES_ADDL_ARG__TEST_CONNECT \
             REQUIRES_ADDL_ARG__TIMER_FUNCS \
             REQUIRES_ADDL_ARG__TOUCH_TRUNC \
             REQUIRES_ADDL_ARG__WAIT_PID \
@@ -345,8 +339,7 @@ enum CommandIndex {
             ENUM_LIST__SU_EXEC
             ENUM_LIST__SU_SPAWN
             ENUM_LIST__SUBCMD
-            ENUM_LIST__TEST_IPV4
-            ENUM_LIST__TEST_IPV6
+            ENUM_LIST__TEST_CONNECT
             ENUM_LIST__TIMER_FUNCS
             ENUM_LIST__TOUCH_TRUNC
             ENUM_LIST__WAIT_PID
@@ -394,8 +387,7 @@ enum CommandIndex {
             VIRTUAL_ENUM_LIST__SU_EXEC
             VIRTUAL_ENUM_LIST__SU_SPAWN
             VIRTUAL_ENUM_LIST__SUBCMD
-            VIRTUAL_ENUM_LIST__TEST_IPV4
-            VIRTUAL_ENUM_LIST__TEST_IPV6
+            VIRTUAL_ENUM_LIST__TEST_CONNECT
             VIRTUAL_ENUM_LIST__TIMER_FUNCS
             VIRTUAL_ENUM_LIST__TOUCH_TRUNC
             VIRTUAL_ENUM_LIST__WAIT_PID

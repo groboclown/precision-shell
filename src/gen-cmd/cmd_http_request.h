@@ -29,10 +29,11 @@ SOFTWARE.
 #define _FS_SHELL__CMD_HTTP_REQUEST_
 
 
+#define HTTP_TIMEOUT 60
 
 // host port path expected-code
-//  host -> shared_address_ip4
-//  port -> global_arg2_i -> shared_address_ip4
+//  host -> shared_network_addr
+//  port -> shared_network_addr
 //  path -> global_arg_cached
 //  code -> global_arg
 
@@ -42,31 +43,31 @@ SOFTWARE.
 
 
 
-/* from cmd_http_request.h.in:36 */
+/* from cmd_http_request.h.in:37 */
 extern const char cmd_name_expect_http_get_response[];
 #define ENUM_LIST__EXPECT_HTTP_GET_RESPONSE \
-            /* from cmd_http_request.h.in:36 */ \
+            /* from cmd_http_request.h.in:37 */ \
             COMMAND_INDEX__EXPECT_HTTP_GET_RESPONSE,
 #define VIRTUAL_ENUM_LIST__EXPECT_HTTP_GET_RESPONSE
 #define GLOBAL_VARDEF__EXPECT_HTTP_GET_RESPONSE \
-            /* from cmd_http_request.h.in:36 */ \
+            /* from cmd_http_request.h.in:37 */ \
             const char cmd_name_expect_http_get_response[] = "expect-http-get-response";
 #define INITIALIZE__EXPECT_HTTP_GET_RESPONSE \
-            /* from cmd_http_request.h.in:36 */ \
+            /* from cmd_http_request.h.in:37 */ \
             command_list_names[COMMAND_INDEX__EXPECT_HTTP_GET_RESPONSE] = cmd_name_expect_http_get_response;
 #define STARTUP_CASE__EXPECT_HTTP_GET_RESPONSE \
     case COMMAND_INDEX__EXPECT_HTTP_GET_RESPONSE: \
-        /* from cmd_http_request.h.in:36 */ \
-            /* from cmd_http_request.h.in:38 */ \
+        /* from cmd_http_request.h.in:37 */ \
+            /* from cmd_http_request.h.in:39 */ \
             LOG(":: check http get response code equals\n"); \
             /* expect equals*/ \
             global_arg1_i = 0; \
-            /* Argument 1: collect address into shared_address_ip4*/ \
-            global_cmd = COMMAND_INDEX__SHARED_IPV4_ADDRESS; \
-            /* Argument 2: collect port into global_arg2_i.*/ \
-            global_arg2_i = COMMAND_INDEX__SHARED_INT2; \
-            /* Argument 3: collect timeout + make connection.*/ \
-            global_arg3_i = COMMAND_INDEX__EXPECT_HTTP_GET_RESPONSE__PATH; \
+            /* Argument 1: collect address into shared_network_addr*/ \
+            global_cmd = COMMAND_INDEX__SHARED_STR; \
+            /* Argument 2: collect address + port into shared_network_addr.*/ \
+            global_arg3_i = COMMAND_INDEX__SHARED_SERVICE; \
+            /* Argument 3: path*/ \
+            global_arg2_i = COMMAND_INDEX__EXPECT_HTTP_GET_RESPONSE__PATH; \
         break;
 #define RUN_CASE__EXPECT_HTTP_GET_RESPONSE
 #define REQUIRES_ADDL_ARG__EXPECT_HTTP_GET_RESPONSE
@@ -89,31 +90,31 @@ extern const char cmd_name_expect_http_get_response[];
 
 
 
-/* from cmd_http_request.h.in:61 */
+/* from cmd_http_request.h.in:62 */
 extern const char cmd_name_expect_http_get_response_not[];
 #define ENUM_LIST__EXPECT_HTTP_GET_RESPONSE_NOT \
-            /* from cmd_http_request.h.in:61 */ \
+            /* from cmd_http_request.h.in:62 */ \
             COMMAND_INDEX__EXPECT_HTTP_GET_RESPONSE_NOT,
 #define VIRTUAL_ENUM_LIST__EXPECT_HTTP_GET_RESPONSE_NOT
 #define GLOBAL_VARDEF__EXPECT_HTTP_GET_RESPONSE_NOT \
-            /* from cmd_http_request.h.in:61 */ \
+            /* from cmd_http_request.h.in:62 */ \
             const char cmd_name_expect_http_get_response_not[] = "expect-http-get-response-not";
 #define INITIALIZE__EXPECT_HTTP_GET_RESPONSE_NOT \
-            /* from cmd_http_request.h.in:61 */ \
+            /* from cmd_http_request.h.in:62 */ \
             command_list_names[COMMAND_INDEX__EXPECT_HTTP_GET_RESPONSE_NOT] = cmd_name_expect_http_get_response_not;
 #define STARTUP_CASE__EXPECT_HTTP_GET_RESPONSE_NOT \
     case COMMAND_INDEX__EXPECT_HTTP_GET_RESPONSE_NOT: \
-        /* from cmd_http_request.h.in:61 */ \
-            /* from cmd_http_request.h.in:63 */ \
+        /* from cmd_http_request.h.in:62 */ \
+            /* from cmd_http_request.h.in:64 */ \
             LOG(":: check http get response code not equal\n"); \
             /* expect not equals*/ \
             global_arg1_i = 1; \
-            /* Argument 1: collect address into shared_address_ip4*/ \
-            global_cmd = COMMAND_INDEX__SHARED_IPV4_ADDRESS; \
-            /* Argument 2: collect port into global_arg2_i.*/ \
-            global_arg2_i = COMMAND_INDEX__SHARED_INT2; \
-            /* Argument 3: collect timeout + make connection.*/ \
-            global_arg3_i = COMMAND_INDEX__EXPECT_HTTP_GET_RESPONSE__PATH; \
+            /* Argument 1: collect address into shared_network_addr*/ \
+            global_cmd = COMMAND_INDEX__SHARED_STR; \
+            /* Argument 2: collect address + port into shared_network_addr.*/ \
+            global_arg3_i = COMMAND_INDEX__SHARED_SERVICE; \
+            /* Argument 3: path*/ \
+            global_arg2_i = COMMAND_INDEX__EXPECT_HTTP_GET_RESPONSE__PATH; \
         break;
 #define RUN_CASE__EXPECT_HTTP_GET_RESPONSE_NOT
 #define REQUIRES_ADDL_ARG__EXPECT_HTTP_GET_RESPONSE_NOT
@@ -139,9 +140,7 @@ extern const char cmd_name_expect_http_get_response_not[];
 
         // host port path expected-code
 
-        //  host -> shared_address_ip4
-
-        //  port -> shared_address_ip4
+        //  host + port -> shared_network_addr
 
         //  path -> global_arg_cached
 
@@ -156,9 +155,9 @@ extern const char cmd_name_expect_http_get_response_not[];
 #define VIRTUAL_ENUM_LIST__HTTP_REQUEST \
             VIRTUAL_ENUM_LIST__EXPECT_HTTP_GET_RESPONSE \
             VIRTUAL_ENUM_LIST__EXPECT_HTTP_GET_RESPONSE_NOT \
-            /* from cmd_http_request.h.in:87 */ \
+            /* from cmd_http_request.h.in:88 */ \
             COMMAND_INDEX__EXPECT_HTTP_GET_RESPONSE__PATH, \
-            /* from cmd_http_request.h.in:100 */ \
+            /* from cmd_http_request.h.in:98 */ \
             COMMAND_INDEX__EXPECT_HTTP_GET_RESPONSE__CODE,
 #define GLOBAL_VARDEF__HTTP_REQUEST \
             GLOBAL_VARDEF__EXPECT_HTTP_GET_RESPONSE \
@@ -166,7 +165,7 @@ extern const char cmd_name_expect_http_get_response_not[];
 #define INITIALIZE__HTTP_REQUEST \
             INITIALIZE__EXPECT_HTTP_GET_RESPONSE \
             INITIALIZE__EXPECT_HTTP_GET_RESPONSE_NOT \
-            /* from cmd_http_request.h.in:101 */ \
+            /* from cmd_http_request.h.in:99 */ \
             /* Need just enough space to read in the first line.*/ \
             /*   We don't need the whole line, just enough to get the status code.*/ \
             /*   But this should be more than sufficient.*/ \
@@ -178,18 +177,16 @@ extern const char cmd_name_expect_http_get_response_not[];
             RUN_CASE__EXPECT_HTTP_GET_RESPONSE \
             RUN_CASE__EXPECT_HTTP_GET_RESPONSE_NOT \
     case COMMAND_INDEX__EXPECT_HTTP_GET_RESPONSE__PATH: \
-        /* from cmd_http_request.h.in:87 */ \
-            /* from cmd_http_request.h.in:88 */ \
+        /* from cmd_http_request.h.in:88 */ \
+            /* from cmd_http_request.h.in:89 */ \
             /* Save off the path.*/ \
             global_arg_cached = global_arg; \
-            /* load up the port, since we have it.*/ \
-            shared_address_ip4.sin_port = htons(global_arg2_i); \
             /* get the expected code and make the request.*/ \
             global_cmd = COMMAND_INDEX__EXPECT_HTTP_GET_RESPONSE__CODE; \
         break; \
     case COMMAND_INDEX__EXPECT_HTTP_GET_RESPONSE__CODE: \
-        /* from cmd_http_request.h.in:100 */ \
-            /* from cmd_http_request.h.in:115 */ \
+        /* from cmd_http_request.h.in:98 */ \
+            /* from cmd_http_request.h.in:112 */ \
             LOG(":: expecting http response code "); \
             LOGLN(global_arg); \
             /* don't actually parse it.  we're going to just do a string comparison.*/ \
@@ -201,8 +198,7 @@ extern const char cmd_name_expect_http_get_response_not[];
             /*   expects ok -> global_arg1_i == 0; 1 - global_arg1_i == 1.*/ \
             global_err = 1 - global_arg1_i; \
             /* Perform connection.*/ \
-            tmp_val = shared_connect_address( \
-                (struct sockaddr *)&shared_address_ip4, sizeof(shared_address_ip4), global_arg3_i); \
+            tmp_val = shared_network_connect_address(&shared_network_addr, HTTP_TIMEOUT); \
             if (tmp_val == -1) { \
                 break; \
             } \

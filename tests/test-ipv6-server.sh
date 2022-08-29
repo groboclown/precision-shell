@@ -1,7 +1,7 @@
 #!/bin/bash
 
-# desc: test-ipv6 with no running server on port 0.
-# requires: +test-ipv6
+# desc: test-connect with no running server on port 0 and ipv6.
+# requires: +test-connect
 
 if [ ! -x "${FS_SERVER}" ] ; then
     echo "?? SKIPPED because the test server was not compiled (${FS_SERVER})"
@@ -11,7 +11,7 @@ fi
 "${FS_SERVER}" echo 29446 >server-out.txt 2>server-err.txt &
 server_pid=$!
 
-"${FS}" -c "test-ipv6 ::0 29446 3" > out.txt 2>err.txt
+"${FS}" -c "test-connect ::0 29446 3" > out.txt 2>err.txt
 res=$?
 kill -15 "${server_pid}"
 
