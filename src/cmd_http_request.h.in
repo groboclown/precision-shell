@@ -42,14 +42,12 @@ AsOptional(command="expect-http-get-response",
             // expect equals
             global_arg1_i = 0;
 
-            // Argument 1: collect address into shared_network_addr
-            global_cmd = COMMAND_INDEX__SHARED_STR;
-
-            // Argument 2: collect address + port into shared_network_addr.
-            global_arg3_i = COMMAND_INDEX__SHARED_SERVICE;
+            // Argument 1: collect address shared_connect_address
+            // Argument 2: collect port/service into global_arg_cached
+            global_cmd = COMMAND_INDEX__SHARED_CONNECT__ADDRESS;
 
             // Argument 3: path
-            global_arg2_i = COMMAND_INDEX__EXPECT_HTTP_GET_RESPONSE__PATH;
+            global_arg3_i = COMMAND_INDEX__EXPECT_HTTP_GET_RESPONSE__PATH;
         )
 
     )
@@ -67,14 +65,12 @@ AsOptional(command="expect-http-get-response-not",
             // expect not equals
             global_arg1_i = 1;
 
-            // Argument 1: collect address into shared_network_addr
-            global_cmd = COMMAND_INDEX__SHARED_STR;
-
-            // Argument 2: collect address + port into shared_network_addr.
-            global_arg3_i = COMMAND_INDEX__SHARED_SERVICE;
+            // Argument 1: collect address shared_connect_address
+            // Argument 2: collect port/service into global_arg_cached
+            global_cmd = COMMAND_INDEX__SHARED_CONNECT__ADDRESS;
 
             // Argument 3: path
-            global_arg2_i = COMMAND_INDEX__EXPECT_HTTP_GET_RESPONSE__PATH;
+            global_arg3_i = COMMAND_INDEX__EXPECT_HTTP_GET_RESPONSE__PATH;
         )
 
     )
@@ -88,7 +84,7 @@ WithAuxFor(commands=[expect-http-get-response, expect-http-get-response-not],
     WithVirtualStep(enum="EXPECT_HTTP_GET_RESPONSE__PATH",
         OnArg(
             // Save off the path.
-            global_arg_cached = global_arg;
+            expect_http_path = global_arg;
 
             // get the expected code and make the request.
             global_cmd = COMMAND_INDEX__EXPECT_HTTP_GET_RESPONSE__CODE;
@@ -97,6 +93,8 @@ WithAuxFor(commands=[expect-http-get-response, expect-http-get-response-not],
 
     WithVirtualStep(enum="EXPECT_HTTP_GET_RESPONSE__CODE",
         OnInit(
+            const char *expect_http_path = NULL;
+
             // Need just enough space to read in the first line.
             //   We don't need the whole line, just enough to get the status code.
             //   But this should be more than sufficient.
@@ -104,8 +102,9 @@ WithAuxFor(commands=[expect-http-get-response, expect-http-get-response-not],
         )
 
         // host port path expected-code
-        //  host + port -> shared_network_addr
-        //  path -> global_arg_cached
+        //  host -> shared_connect_address
+        //  port -> global_arg_cached
+        //  path -> expect_http_path
         //  code -> global_arg
         //  client socket -> tmp_val
 
@@ -123,19 +122,31 @@ WithAuxFor(commands=[expect-http-get-response, expect-http-get-response-not],
             global_err = 1 - global_arg1_i;
 
             // Perform connection.
-            tmp_val = shared_network_connect_address(&shared_network_addr, HTTP_TIMEOUT);
+            tmp_val = shared_connect_to_address(
+                shared_connect_address, global_arg_cached, HTTP_TIMEOUT,
+
+                // HTTP/3 allows UDP connections, but we aren't checking for that.
+                IPPROTO_TCP);
             if (tmp_val == -1) {
                 break;
             }
 
             // send the data.
+            LOG(":: connected to ");
+            LOG(shared_connect_address);
+            LOG(", port/service ");
+            LOG(global_arg_cached);
+            LOG("; sending GET ");
+            LOG(expect_http_path);
+            LOG(" HTTP/1.1\n");
             write(tmp_val, "GET ", 4);
-            write(tmp_val, global_arg_cached, strlen(global_arg_cached));
+            write(tmp_val, expect_http_path, strlen(expect_http_path));
             write(tmp_val, " HTTP/1.1\r\n\r\n", 13);
             fsync(tmp_val);
 
             // read in the response.  Just enough to get the protocol and the status code.
             // Make sure we read in at most 1 less than the size of the buffer.
+            LOG(":: Reading response\n");
             global_arg2_i = read(tmp_val, (void *)http_response_code_parse, 19);
             // Nothing left to do with the socket.
             // Close it; we don't care about what's left to read.
@@ -192,4 +203,3 @@ WithAuxFor(commands=[expect-http-get-response, expect-http-get-response-not],
 )
 
 )
-

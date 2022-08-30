@@ -92,7 +92,8 @@ COMMANDS = \
 	cmd_pwd.h \
 	cmd_rm.h \
 	cmd_rmdir.h \
-	cmd_shared_network.h \
+	cmd_shared_address.h \
+	cmd_shared_connect.h \
 	cmd_shared_sub_args.h \
 	cmd_shared_virtual.h \
 	cmd_signal.h \

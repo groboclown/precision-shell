@@ -24,7 +24,7 @@ COPY tests/ tests/
 
 # Adjust this value during the image build with `--build-arg`
 #   to alter which commands to include.
-ARG COMMANDS="elapsed-time-under export-elapsed-time exec expect-http-get-response expect-http-get-response-not sleep while-no-error subcmd spawn kill-pid wait-pid exit signal enviro echo"
+ARG COMMANDS="elapsed-time-under export-elapsed-time expect-http-get-response expect-http-get-response-not sleep while-no-error subcmd spawn kill-pid wait-pid exit signal enviro echo"
 
 ENV COMMANDS=$COMMANDS
 
@@ -47,7 +47,7 @@ COPY --from=presh-builder /opt/precision-shell/out/presh /bin/sh
 WORKDIR /opt/app/hello_world
 
 ENV LISTEN_PORT 3000
-ENV DEPENDENT_SERVICE 172.250.250.99
+ENV DEPENDENT_SERVICE dep9000
 
 # Delay start until a dependent service is running, or up to 5 minutes (300 seconds)
 # This service must be accessible as a sidecar container running on localhost
@@ -80,10 +80,14 @@ ENTRYPOINT \
 
 #  $ docker build -t presh/delay-until-ready -f recipes/delay-until-ready.Dockerfile .
 #  $ docker build -t presh/env-config-file -f recipes/env-config-file.Dockerfile .
-#  $ docker network create --subnet=172.250.250.0/24 delay-net
+#  $ docker network create delay-net
 #  $ docker run --rm -d -p 3000:3000 --network delay-net presh/delay-until-ready
-#  (the server will wait, and not be running yet.  Requests to it will fail.)
-#  $ docker run --rm -d -p 9000:9000 --network delay-net --ip 172.250.250.99 presh/env-config-file
+#  (the server is waiting for the dependent server to start, so requests will fail:)
+#  (other shell:
+#      $ curl http://127.0.0.1:3000
+#      curl: (56) Recv failure: Connection reset by peer
+#  )
+#  $ docker run --rm -d -p 9000:9000 --network delay-net --name dep9000 presh/env-config-file
 #  (now the first server will start accepting commands.)
 #  (other shell:
 #    $ curl http://127.0.0.1:3000

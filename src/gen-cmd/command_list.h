@@ -54,7 +54,8 @@ SOFTWARE.
 #include "cmd_pwd.h"
 #include "cmd_rm.h"
 #include "cmd_rmdir.h"
-#include "cmd_shared_network.h"
+#include "cmd_shared_address.h"
+#include "cmd_shared_connect.h"
 #include "cmd_shared_sub_args.h"
 #include "cmd_shared_virtual.h"
 #include "cmd_signal.h"
@@ -101,7 +102,8 @@ SOFTWARE.
             GLOBAL_VARDEF__PWD \
             GLOBAL_VARDEF__RM \
             GLOBAL_VARDEF__RMDIR \
-            GLOBAL_VARDEF__SHARED_NETWORK \
+            GLOBAL_VARDEF__SHARED_ADDRESS \
+            GLOBAL_VARDEF__SHARED_CONNECT \
             GLOBAL_VARDEF__SHARED_SUB_ARGS \
             GLOBAL_VARDEF__SHARED_VIRTUAL \
             GLOBAL_VARDEF__SIGNAL \
@@ -146,7 +148,8 @@ SOFTWARE.
             INITIALIZE__PWD \
             INITIALIZE__RM \
             INITIALIZE__RMDIR \
-            INITIALIZE__SHARED_NETWORK \
+            INITIALIZE__SHARED_ADDRESS \
+            INITIALIZE__SHARED_CONNECT \
             INITIALIZE__SHARED_SUB_ARGS \
             INITIALIZE__SHARED_VIRTUAL \
             INITIALIZE__SIGNAL \
@@ -191,7 +194,8 @@ SOFTWARE.
             STARTUP_CASE__PWD \
             STARTUP_CASE__RM \
             STARTUP_CASE__RMDIR \
-            STARTUP_CASE__SHARED_NETWORK \
+            STARTUP_CASE__SHARED_ADDRESS \
+            STARTUP_CASE__SHARED_CONNECT \
             STARTUP_CASE__SHARED_SUB_ARGS \
             STARTUP_CASE__SHARED_VIRTUAL \
             STARTUP_CASE__SIGNAL \
@@ -236,7 +240,8 @@ SOFTWARE.
             RUN_CASE__PWD \
             RUN_CASE__RM \
             RUN_CASE__RMDIR \
-            RUN_CASE__SHARED_NETWORK \
+            RUN_CASE__SHARED_ADDRESS \
+            RUN_CASE__SHARED_CONNECT \
             RUN_CASE__SHARED_SUB_ARGS \
             RUN_CASE__SHARED_VIRTUAL \
             RUN_CASE__SIGNAL \
@@ -281,7 +286,8 @@ SOFTWARE.
             REQUIRES_ADDL_ARG__PWD \
             REQUIRES_ADDL_ARG__RM \
             REQUIRES_ADDL_ARG__RMDIR \
-            REQUIRES_ADDL_ARG__SHARED_NETWORK \
+            REQUIRES_ADDL_ARG__SHARED_ADDRESS \
+            REQUIRES_ADDL_ARG__SHARED_CONNECT \
             REQUIRES_ADDL_ARG__SHARED_SUB_ARGS \
             REQUIRES_ADDL_ARG__SHARED_VIRTUAL \
             REQUIRES_ADDL_ARG__SIGNAL \
@@ -330,7 +336,8 @@ enum CommandIndex {
             ENUM_LIST__PWD
             ENUM_LIST__RM
             ENUM_LIST__RMDIR
-            ENUM_LIST__SHARED_NETWORK
+            ENUM_LIST__SHARED_ADDRESS
+            ENUM_LIST__SHARED_CONNECT
             ENUM_LIST__SHARED_SUB_ARGS
             ENUM_LIST__SHARED_VIRTUAL
             ENUM_LIST__SIGNAL
@@ -378,7 +385,8 @@ enum CommandIndex {
             VIRTUAL_ENUM_LIST__PWD
             VIRTUAL_ENUM_LIST__RM
             VIRTUAL_ENUM_LIST__RMDIR
-            VIRTUAL_ENUM_LIST__SHARED_NETWORK
+            VIRTUAL_ENUM_LIST__SHARED_ADDRESS
+            VIRTUAL_ENUM_LIST__SHARED_CONNECT
             VIRTUAL_ENUM_LIST__SHARED_SUB_ARGS
             VIRTUAL_ENUM_LIST__SHARED_VIRTUAL
             VIRTUAL_ENUM_LIST__SIGNAL

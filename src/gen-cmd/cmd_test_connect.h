@@ -52,17 +52,16 @@ extern const char cmd_name_test_connect[];
         /* from cmd_test_connect.h.in:28 */ \
             /* from cmd_test_connect.h.in:30 */ \
             LOG(":: test connection\n"); \
-            /* Argument 1: collect address into shared_address_ip4*/ \
-            global_cmd = COMMAND_INDEX__SHARED_STR; \
-            /* Argument 2: collect address + port into shared_network_addr.*/ \
-            global_arg3_i = COMMAND_INDEX__SHARED_SERVICE; \
+            /* Argument 1: collect address shared_connect_address*/ \
+            /* Argument 2: collect port/service into global_arg_cached*/ \
+            global_cmd = COMMAND_INDEX__SHARED_CONNECT__ADDRESS; \
             /* Argument 3: collect timeout + make connection.*/ \
-            global_arg2_i = COMMAND_INDEX__TEST_CONNECT; \
+            global_arg3_i = COMMAND_INDEX__TEST_CONNECT; \
         break;
 #define RUN_CASE__TEST_CONNECT \
     case COMMAND_INDEX__TEST_CONNECT: \
         /* from cmd_test_connect.h.in:28 */ \
-            /* from cmd_test_connect.h.in:43 */ \
+            /* from cmd_test_connect.h.in:41 */ \
             LOG(":: parsing connection timeout "); \
             LOGLN(global_arg); \
             global_arg3_i = helper_arg_to_uint(global_arg, 10, 0xffff); \
@@ -75,12 +74,15 @@ extern const char cmd_name_test_connect[];
             global_cmd = COMMAND_INDEX__ERR; \
             global_err = 0; \
             /* Perform connection.*/ \
-            tmp_val = shared_network_connect_address(&shared_network_addr, global_arg3_i); \
+            tmp_val = shared_connect_to_address( \
+                shared_connect_address, global_arg_cached, global_arg3_i, \
+                /* For now, only check for TCP connections.*/ \
+                IPPROTO_TCP); \
             if (tmp_val == -1) { \
                 global_err = 1; \
                 break; \
             } \
-            /* Nothing left to do with the socket.*/ \
+            /* Completed.  Close off the socket.*/ \
             close(tmp_val); \
         break;
 #define REQUIRES_ADDL_ARG__TEST_CONNECT

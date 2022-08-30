@@ -62,12 +62,11 @@ extern const char cmd_name_expect_http_get_response[];
             LOG(":: check http get response code equals\n"); \
             /* expect equals*/ \
             global_arg1_i = 0; \
-            /* Argument 1: collect address into shared_network_addr*/ \
-            global_cmd = COMMAND_INDEX__SHARED_STR; \
-            /* Argument 2: collect address + port into shared_network_addr.*/ \
-            global_arg3_i = COMMAND_INDEX__SHARED_SERVICE; \
+            /* Argument 1: collect address shared_connect_address*/ \
+            /* Argument 2: collect port/service into global_arg_cached*/ \
+            global_cmd = COMMAND_INDEX__SHARED_CONNECT__ADDRESS; \
             /* Argument 3: path*/ \
-            global_arg2_i = COMMAND_INDEX__EXPECT_HTTP_GET_RESPONSE__PATH; \
+            global_arg3_i = COMMAND_INDEX__EXPECT_HTTP_GET_RESPONSE__PATH; \
         break;
 #define RUN_CASE__EXPECT_HTTP_GET_RESPONSE
 #define REQUIRES_ADDL_ARG__EXPECT_HTTP_GET_RESPONSE
@@ -90,31 +89,30 @@ extern const char cmd_name_expect_http_get_response[];
 
 
 
-/* from cmd_http_request.h.in:62 */
+/* from cmd_http_request.h.in:60 */
 extern const char cmd_name_expect_http_get_response_not[];
 #define ENUM_LIST__EXPECT_HTTP_GET_RESPONSE_NOT \
-            /* from cmd_http_request.h.in:62 */ \
+            /* from cmd_http_request.h.in:60 */ \
             COMMAND_INDEX__EXPECT_HTTP_GET_RESPONSE_NOT,
 #define VIRTUAL_ENUM_LIST__EXPECT_HTTP_GET_RESPONSE_NOT
 #define GLOBAL_VARDEF__EXPECT_HTTP_GET_RESPONSE_NOT \
-            /* from cmd_http_request.h.in:62 */ \
+            /* from cmd_http_request.h.in:60 */ \
             const char cmd_name_expect_http_get_response_not[] = "expect-http-get-response-not";
 #define INITIALIZE__EXPECT_HTTP_GET_RESPONSE_NOT \
-            /* from cmd_http_request.h.in:62 */ \
+            /* from cmd_http_request.h.in:60 */ \
             command_list_names[COMMAND_INDEX__EXPECT_HTTP_GET_RESPONSE_NOT] = cmd_name_expect_http_get_response_not;
 #define STARTUP_CASE__EXPECT_HTTP_GET_RESPONSE_NOT \
     case COMMAND_INDEX__EXPECT_HTTP_GET_RESPONSE_NOT: \
-        /* from cmd_http_request.h.in:62 */ \
-            /* from cmd_http_request.h.in:64 */ \
+        /* from cmd_http_request.h.in:60 */ \
+            /* from cmd_http_request.h.in:62 */ \
             LOG(":: check http get response code not equal\n"); \
             /* expect not equals*/ \
             global_arg1_i = 1; \
-            /* Argument 1: collect address into shared_network_addr*/ \
-            global_cmd = COMMAND_INDEX__SHARED_STR; \
-            /* Argument 2: collect address + port into shared_network_addr.*/ \
-            global_arg3_i = COMMAND_INDEX__SHARED_SERVICE; \
+            /* Argument 1: collect address shared_connect_address*/ \
+            /* Argument 2: collect port/service into global_arg_cached*/ \
+            global_cmd = COMMAND_INDEX__SHARED_CONNECT__ADDRESS; \
             /* Argument 3: path*/ \
-            global_arg2_i = COMMAND_INDEX__EXPECT_HTTP_GET_RESPONSE__PATH; \
+            global_arg3_i = COMMAND_INDEX__EXPECT_HTTP_GET_RESPONSE__PATH; \
         break;
 #define RUN_CASE__EXPECT_HTTP_GET_RESPONSE_NOT
 #define REQUIRES_ADDL_ARG__EXPECT_HTTP_GET_RESPONSE_NOT
@@ -140,9 +138,11 @@ extern const char cmd_name_expect_http_get_response_not[];
 
         // host port path expected-code
 
-        //  host + port -> shared_network_addr
+        //  host -> shared_connect_address
 
-        //  path -> global_arg_cached
+        //  port -> global_arg_cached
+
+        //  path -> expect_http_path
 
         //  code -> global_arg
 
@@ -155,9 +155,9 @@ extern const char cmd_name_expect_http_get_response_not[];
 #define VIRTUAL_ENUM_LIST__HTTP_REQUEST \
             VIRTUAL_ENUM_LIST__EXPECT_HTTP_GET_RESPONSE \
             VIRTUAL_ENUM_LIST__EXPECT_HTTP_GET_RESPONSE_NOT \
-            /* from cmd_http_request.h.in:88 */ \
+            /* from cmd_http_request.h.in:84 */ \
             COMMAND_INDEX__EXPECT_HTTP_GET_RESPONSE__PATH, \
-            /* from cmd_http_request.h.in:98 */ \
+            /* from cmd_http_request.h.in:94 */ \
             COMMAND_INDEX__EXPECT_HTTP_GET_RESPONSE__CODE,
 #define GLOBAL_VARDEF__HTTP_REQUEST \
             GLOBAL_VARDEF__EXPECT_HTTP_GET_RESPONSE \
@@ -165,7 +165,8 @@ extern const char cmd_name_expect_http_get_response_not[];
 #define INITIALIZE__HTTP_REQUEST \
             INITIALIZE__EXPECT_HTTP_GET_RESPONSE \
             INITIALIZE__EXPECT_HTTP_GET_RESPONSE_NOT \
-            /* from cmd_http_request.h.in:99 */ \
+            /* from cmd_http_request.h.in:95 */ \
+            const char *expect_http_path = NULL; \
             /* Need just enough space to read in the first line.*/ \
             /*   We don't need the whole line, just enough to get the status code.*/ \
             /*   But this should be more than sufficient.*/ \
@@ -177,16 +178,16 @@ extern const char cmd_name_expect_http_get_response_not[];
             RUN_CASE__EXPECT_HTTP_GET_RESPONSE \
             RUN_CASE__EXPECT_HTTP_GET_RESPONSE_NOT \
     case COMMAND_INDEX__EXPECT_HTTP_GET_RESPONSE__PATH: \
-        /* from cmd_http_request.h.in:88 */ \
-            /* from cmd_http_request.h.in:89 */ \
+        /* from cmd_http_request.h.in:84 */ \
+            /* from cmd_http_request.h.in:85 */ \
             /* Save off the path.*/ \
-            global_arg_cached = global_arg; \
+            expect_http_path = global_arg; \
             /* get the expected code and make the request.*/ \
             global_cmd = COMMAND_INDEX__EXPECT_HTTP_GET_RESPONSE__CODE; \
         break; \
     case COMMAND_INDEX__EXPECT_HTTP_GET_RESPONSE__CODE: \
-        /* from cmd_http_request.h.in:98 */ \
-            /* from cmd_http_request.h.in:112 */ \
+        /* from cmd_http_request.h.in:94 */ \
+            /* from cmd_http_request.h.in:111 */ \
             LOG(":: expecting http response code "); \
             LOGLN(global_arg); \
             /* don't actually parse it.  we're going to just do a string comparison.*/ \
@@ -198,17 +199,28 @@ extern const char cmd_name_expect_http_get_response_not[];
             /*   expects ok -> global_arg1_i == 0; 1 - global_arg1_i == 1.*/ \
             global_err = 1 - global_arg1_i; \
             /* Perform connection.*/ \
-            tmp_val = shared_network_connect_address(&shared_network_addr, HTTP_TIMEOUT); \
+            tmp_val = shared_connect_to_address( \
+                shared_connect_address, global_arg_cached, HTTP_TIMEOUT, \
+                /* HTTP/3 allows UDP connections, but we aren't checking for that.*/ \
+                IPPROTO_TCP); \
             if (tmp_val == -1) { \
                 break; \
             } \
             /* send the data.*/ \
+            LOG(":: connected to "); \
+            LOG(shared_connect_address); \
+            LOG(", port/service "); \
+            LOG(global_arg_cached); \
+            LOG("; sending GET "); \
+            LOG(expect_http_path); \
+            LOG(" HTTP/1.1\n"); \
             write(tmp_val, "GET ", 4); \
-            write(tmp_val, global_arg_cached, strlen(global_arg_cached)); \
+            write(tmp_val, expect_http_path, strlen(expect_http_path)); \
             write(tmp_val, " HTTP/1.1\r\n\r\n", 13); \
             fsync(tmp_val); \
             /* read in the response.  Just enough to get the protocol and the status code.*/ \
             /* Make sure we read in at most 1 less than the size of the buffer.*/ \
+            LOG(":: Reading response\n"); \
             global_arg2_i = read(tmp_val, (void *)http_response_code_parse, 19); \
             /* Nothing left to do with the socket.*/ \
             /* Close it; we don't care about what's left to read.*/ \
@@ -272,4 +284,3 @@ extern const char cmd_name_expect_http_get_response_not[];
 
 
 #endif /* _FS_SHELL__CMD_HTTP_REQUEST_ */
-

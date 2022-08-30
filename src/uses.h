@@ -81,6 +81,23 @@ SOFTWARE.
 #endif
 
 
+// USES_SHARED_SERVICE - allow connecting to and parsing an address + port
+#if    defined(USE_CMD_TEST_CONNECT) \
+    || defined(USE_CMD_EXPECT_HTTP_GET_RESPONSE) \
+    || defined(USE_CMD_EXPECT_HTTP_GET_RESPONSE_NOT)    
+
+#define USES_SHARED_CONNECT
+
+#endif
+
+// USES_SHARED_ADDRESS - allow connecting to and parsing an address; port is separate.
+#if    defined(USE_CMD_EXPORT_HOST_LOOKUP)
+
+#define USES_SHARED_ADDRESS
+
+#endif
+
+
 // USES_SHARED_STR - shared logic for capturing an argument for later use.
 #if    defined(USE_CMD_LN_S) \
     || defined(USE_CMD_LN_H) \
@@ -90,7 +107,8 @@ SOFTWARE.
     || defined(USE_CMD_EXPORT) \
     || defined(USE_CMD_WHILE_NO_ERROR) \
     || defined(USE_CMD_WHILE_ERROR) \
-    || defined(USE_CMD_FOR_EACH) 
+    || defined(USE_CMD_FOR_EACH)  \
+    || defined(USES_SHARED_CONNECT)
 
 #define USES_SHARED_STR
 
@@ -151,7 +169,6 @@ SOFTWARE.
     || defined(USE_CMD_SPAWN) \
     || defined(USE_CMD_WAIT_PID) \
     || defined(USE_CMD_SUBCMD) \
-    || defined(USE_CMD_EXPORT_HOST_LOOKUP) \
     || defined(USE_CMD_IF_ELSE) \
     || defined(USE_CMD_WHILE_NO_ERROR) \
     || defined(USE_CMD_WHILE_ERROR) \
@@ -174,23 +191,6 @@ SOFTWARE.
     || defined(USE_CMD_EXPORT_ELAPSED_TIME)
 
 #define USES_SHARED_ITOA
-
-#endif
-
-
-// USES_SHARED_SERVICE - allow connecting to and parsing an address + port
-#if    defined(USE_CMD_TEST_CONNECT) \
-    || defined(USE_CMD_EXPECT_HTTP_GET_RESPONSE) \
-    || defined(USE_CMD_EXPECT_HTTP_GET_RESPONSE_NOT)    
-
-#define USES_SHARED_SERVICE
-
-#endif
-
-// USES_SHARED_ADDRESS - allow connecting to and parsing an address; port is separate.
-#if    defined(USE_CMD_EXPORT_HOST_LOOKUP)
-
-#define USES_SHARED_ADDRESS
 
 #endif
 

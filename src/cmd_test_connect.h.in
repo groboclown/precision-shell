@@ -30,14 +30,12 @@ WithOptional(command="test-connect",
         OnCmd(
             LOG(":: test connection\n");
 
-            // Argument 1: collect address into shared_address_ip4
-            global_cmd = COMMAND_INDEX__SHARED_STR;
-
-            // Argument 2: collect address + port into shared_network_addr.
-            global_arg3_i = COMMAND_INDEX__SHARED_SERVICE;
+            // Argument 1: collect address shared_connect_address
+            // Argument 2: collect port/service into global_arg_cached
+            global_cmd = COMMAND_INDEX__SHARED_CONNECT__ADDRESS;
 
             // Argument 3: collect timeout + make connection.
-            global_arg2_i = COMMAND_INDEX__TEST_CONNECT;
+            global_arg3_i = COMMAND_INDEX__TEST_CONNECT;
         )
 
         OnArg(
@@ -55,12 +53,16 @@ WithOptional(command="test-connect",
             global_err = 0;
 
             // Perform connection.
-            tmp_val = shared_network_connect_address(&shared_network_addr, global_arg3_i);
+            tmp_val = shared_connect_to_address(
+                shared_connect_address, global_arg_cached, global_arg3_i,
+
+                // For now, only check for TCP connections.
+                IPPROTO_TCP);
             if (tmp_val == -1) {
                 global_err = 1;
                 break;
             }
-            // Nothing left to do with the socket.
+            // Completed.  Close off the socket.
             close(tmp_val);
         )
 
