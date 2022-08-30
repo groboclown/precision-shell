@@ -1,6 +1,6 @@
 #!/bin/bash
 
-# desc: test-connect with a running server and ipv6.
+# desc: test-connect with a running server and localhost lookup.
 # requires: +test-connect
 
 if [ ! -x "${FS_SERVER}" ] ; then
@@ -11,7 +11,7 @@ fi
 "${FS_SERVER}" echo 29446 >server-out.txt 2>server-err.txt &
 server_pid=$!
 
-"${FS}" -c "test-connect ::0 29446 3" > out.txt 2>err.txt
+"${FS}" -c "test-connect localhost 29446 3" > out.txt 2>err.txt
 res=$?
 kill -15 "${server_pid}"
 

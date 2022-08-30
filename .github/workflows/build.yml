@@ -80,36 +80,6 @@ jobs:
         run: |
           podman build -f build-glibc-arch.Dockerfile -t glibc-arch:offline --build-arg BUILD_MODE=cmd-size .
 
-  dietlibc:
-    name: Build & Test with dietlibc
-    runs-on: ubuntu-latest
-    outputs:
-      version: ${{ steps.properties.outputs.version }}
-      changelog: ${{ steps.properties.outputs.changelog }}
-    steps:
-
-      # Check out current repository
-      - name: Fetch Sources
-        uses: actions/checkout@v3
-      
-      # Install tools
-      - name: Install Required tools
-        run: |
-          sudo apt-get update
-          sudo apt-get install podman
-      
-      - name: build-test
-        run: |
-          podman build -f build-dietlibc.Dockerfile -t dietlibc:offline --build-arg COMMANDS=ALL .
-
-      - name: cmd-test
-        run: |
-          podman build -f build-dietlibc.Dockerfile -t dietlibc:offline --build-arg BUILD_MODE=individual-cmd-test .
-
-      - name: file-size
-        run: |
-          podman build -f build-dietlibc.Dockerfile -t dietlibc:offline --build-arg BUILD_MODE=cmd-size .
-
   musl:
     name: Build & Test with musl
     runs-on: ubuntu-latest
@@ -139,6 +109,36 @@ jobs:
       - name: file-size
         run: |
           podman build -f build-musl.Dockerfile -t musl:offline --build-arg BUILD_MODE=cmd-size .
+
+  dietlibc:
+    name: Build & Test with dietlibc
+    runs-on: ubuntu-latest
+    outputs:
+      version: ${{ steps.properties.outputs.version }}
+      changelog: ${{ steps.properties.outputs.changelog }}
+    steps:
+
+      # Check out current repository
+      - name: Fetch Sources
+        uses: actions/checkout@v3
+      
+      # Install tools
+      - name: Install Required tools
+        run: |
+          sudo apt-get update
+          sudo apt-get install podman
+      
+      - name: build-test
+        run: |
+          podman build -f build-dietlibc.Dockerfile -t dietlibc:offline --build-arg COMMANDS=ALL .
+
+      - name: cmd-test
+        run: |
+          podman build -f build-dietlibc.Dockerfile -t dietlibc:offline --build-arg BUILD_MODE=individual-cmd-test .
+
+      - name: file-size
+        run: |
+          podman build -f build-dietlibc.Dockerfile -t dietlibc:offline --build-arg BUILD_MODE=cmd-size .
 
 
   sample:

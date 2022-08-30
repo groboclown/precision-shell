@@ -68,7 +68,7 @@ ENTRYPOINT \
     ; expect-http-get-response ${DEPENDENT_SERVICE} 9000 / 200 \
         && subcmd [ \
           spawn [/nodejs/bin/node server.js] NODE \
-          && signal 1 2 9 15 17 wait && \
+          && signal 1 2 9 15 17 wait \
           && echo [\nTerminating the server...] \
           && kill-pid 15 ${NODE} \
           && wait-pid ${NODE} *EXIT \

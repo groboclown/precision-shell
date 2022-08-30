@@ -115,10 +115,11 @@ const Argument *args_advance_token(struct ArgState *state);
 int args_close_tokenizer(struct ArgState *state);
 
 /**
- * @brief pointer to the replacement text for a newline character.
+ * @brief set how to handle newlines.
  * 
+ * @param state argument parser state
+ * @param replacement text to replace newline characters with.
  */
-extern const char *ArgReplaceNewline;
-
+void args_set_newline_replacement(struct ArgState *state, const char *replacement);
 
 #endif

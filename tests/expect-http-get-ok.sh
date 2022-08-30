@@ -1,17 +1,18 @@
 #!/bin/bash
 
-# desc: test-connect with a running server and ipv6.
-# requires: +test-connect
+# desc: expect that a running local server generates an expected http code.
+# requires: +expect-http-get-response
 
 if [ ! -x "${FS_SERVER}" ] ; then
     echo "?? SKIPPED because the test server was not compiled (${FS_SERVER})"
     exit 0
 fi
 
-"${FS_SERVER}" echo 29446 >server-out.txt 2>server-err.txt &
+printf "HTTP/1.1 200 OK\\r\\nContent-Type: text/plain\\r\\nContent-Length: 0\\r\\n\\r\\n" > server-response.txt
+"${FS_SERVER}" http1 29446 server-response.txt >server-out.txt 2>server-err.txt &
 server_pid=$!
 
-"${FS}" -c "test-connect ::0 29446 3" > out.txt 2>err.txt
+"${FS}" -c "expect-http-get-response localhost 29446 / 200" > out.txt 2>err.txt
 res=$?
 kill -15 "${server_pid}"
 
@@ -31,9 +32,9 @@ if [ -s out.txt ] || [ -s err.txt ] ; then
 fi
 
 
-# should have: out.txt and err.txt and server-out.txt and server-err.txt
+# should have: out.txt and err.txt and server-response.txt and server-out.txt and server-err.txt
 count="$( ls -1A | wc -l )"
-if [ ${count} != 4 ] ; then
+if [ ${count} != 5 ] ; then
     echo "Generated unexpected files:"
     ls -lA
     exit 1

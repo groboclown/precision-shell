@@ -59,7 +59,7 @@ ENTRYPOINT \
     noop [Launch the server] \
     && spawn [/nodejs/bin/node server.js] NODE \
     && noop [Wait for an OS terminate signal] \
-    && signal 1 2 9 15 17 wait && \
+    && signal 1 2 9 15 17 wait \
     && noop [Kill the server and wait for it to end.] \
     && echo [\nTerminating the server...] \
     && kill-pid 15 ${NODE} \

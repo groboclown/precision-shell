@@ -36,14 +36,6 @@ SOFTWARE.
 #include "load_input.h"
 
 
-// When a newline character is encountered, the
-// parsed arg points to this string instead of where
-// the newline happens.  In Bash, the '-e' flag will
-// turn this into '&&'.
-// Changing this behavior is part of issue #14.
-const char *ArgReplaceNewline = ";";
-
-
 // Configurable buffer size.
 //   By making this configurable, it means the tool is better
 //   able to be sized into memory constrained environments.
@@ -75,6 +67,9 @@ struct ArgState {
     int read_buffer_pos;
     int read_buffer_len;
     Argument arg_value;
+
+    // Changing this value from the CLI is part of issue #14.
+    const char *newline_replacement;
 };
 
 
@@ -98,6 +93,8 @@ struct ArgState *args_setup_tokenizer(const int src_argc, char *src_argv[], int 
         stderrP(helper_str__malloc_failed);
         return NULL;
     }
+
+    ret->newline_replacement = ";";
 
     // this read buffer memory has its ownership passed to the load_input.
     ret->read_buffer = malloc(sizeof(char) * PARSED_ARG_SIZE);
@@ -174,6 +171,7 @@ struct ArgState *args_setup_tokenizer(const int src_argc, char *src_argv[], int 
     ret->input_state = load_input_initialize(&input_context);
     if (ret->input_state == NULL) {
         // Error already reported.
+        // load_input_initialize freed the read buffer.
         goto OnError;
     }
     
@@ -187,6 +185,13 @@ OnError:
     }
     free(ret);
     return NULL;
+}
+
+// ---------------------------------------------
+// EOL handling function
+
+void args_set_newline_replacement(struct ArgState *state, const char *replacement) {
+    state->newline_replacement = replacement;
 }
 
 // ---------------------------------------------
@@ -336,7 +341,7 @@ const Argument *args_advance_token(struct ArgState *state) {
                 if (parse_state == PARSE_SEARCH) {
                     // Outside text.  This is like a ';' or '&&' depending on the setup.
                     // Use that value instead of writing it to the argument value.
-                    state->arg_value.arg = ArgReplaceNewline;
+                    state->arg_value.arg = state->newline_replacement;
                     LOG(":: Parsed newline as '");
                     LOG(state->arg_value.arg);
                     LOG("'\n");

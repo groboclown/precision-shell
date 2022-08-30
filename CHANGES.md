@@ -1,14 +1,17 @@
 ## v4.4.0
 
 * (?)
-    * Added new `test-connect` command that checks for whether a network port is accepting socket connections.
-    * Added new `expect-http-get-response` and `expect-http-get-response-not` commands for checking HTTP GET response status codes against a known value.
+    * Added network commands.
+        * Added new `test-connect` command that checks for whether a network port is accepting socket connections.
+        * Added new `expect-http-get-response` and `expect-http-get-response-not` commands for checking HTTP GET response status codes against a known value.
+        * Added new command `export-host-lookup` to look up an IP address and export it to an environment variable.  This is highly experimental, as it will use whatever address is discovered first, including IPv6, which may not be desired.
+        * Added new file size split; all non-network commands and network commands.
+        * Added a recipe (delay-until-ready.Dockerfile) to show off how to combine loops, sleep, timers, and http checks to delay starting a command until dependencies are ready.
     * Added new `elapsed-time-under` command to check if too much time has passed.
-    * Added new command `export-host-lookup` to look up an IP address and export it to an environment variable.  This is highly experimental, as it will use whatever address is discovered first, including IPv6, which may not be desired.
     * Added new build mode, `interactive`, to allow for creating an image suitable for manual exploration without running a build command.
     * Fixed tests for `ls-l` to support different platform sort implementations.
-    * Added a recipe (delay-until-ready.Dockerfile) to show off how to combine loops, sleep, timers, and http checks to delay starting a command until dependencies are ready.
-    * Made "ArgReplaceNewline" external, to allow replacing its value, and for checking its value.
+    * Made newline replacement behavior configurable.  Nothing takes advantage of this yet, but this is in preparation of future updates.
+    * Cleaned up recipe docker files.
 
 ## v4.3.0
 

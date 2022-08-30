@@ -51,6 +51,7 @@ The shell supports these commands:
   * [start-timer](#start-timer) - start the global timer.  Queried with other commands.
   * [elapsed-time](#elapsed-time) - prints number of seconds since the [start-timer](#start-timer) command was called.
   * [export-elapsed-time](#export-elapsed-time) - records the number of seconds since the [start-timer](#start-timer) command was called into an environment variable.
+  * [elapsed-time-under](#elapsed-time-under) - passes with an error code of 0 if the time since the [start-timer](#start-timer) command was called is under the given number of seconds.
 * Control Flow
   * [if-else](#if-else-command) - run a command conditionally based on the error result of another.
   * [subcmd](#subcmd) - run an argument as a complete precision shell command.
@@ -61,8 +62,10 @@ The shell supports these commands:
   * [while-error](#while-error) - run a sub-command until it ends without error.
   * [while-no-error](#while-no-error) - run a sub-command until it ends with an error.
 * Network
-  * [test-ipv4](#test-ipv4) - test whether an IPv4 address is listening on a given port number.
-  * [test-ipv6](#test-ipv6) - test whether an IPv6 address is listening on a given port number.
+  * [test-connect](#test-connect) - test whether a host is listening on a given port number.
+  * [export-host-lookup](#export-host-lookup) - exports to an environment variable the IP address of a hostname.
+  * [expect-http-get-response](#expect-http-get-response) - generates an error if an HTTP GET request to a host, port, path returns a status code that doesn't match an expected value.
+  * [expect-http-get-response-not](#expect-http-get-response) - generates an error if an HTTP GET request to a host, port, path returns a status code that matches an expected value.
 * Usability
   * [pwd](#pwd) - display current working directory, or store it in an environment variable.
   * [version](#version) - prints the current version (cannot be disabled).
@@ -82,7 +85,6 @@ It also supports:
 * Report detailed error messages.
 * Change file timestamps.
 * Provide splat pattern replacements.
-* Anything with the network.
 * Tell you how to use it.  That's what this document is for.
 
 
@@ -327,6 +329,25 @@ presh -c "start-timer ; sleep 2 ; elapsed-time ; sleep 2 ; elapsed-time"
 4
 ```
 
+### elapsed-time-under
+
+**Compile flag**: `-DUSE_CMD_ELAPSED_TIME_UNDER`
+
+**Usage**: `elapsed-time-under (seconds)`
+
+If the number of seconds since the last call to the [start-timer](#start-timer) command is less than the argument's value, then this generates an error code of 0.  If not, then it generates an error code of 1.
+
+**Example:**
+
+```bash
+#! /usr/bin/presh -f
+
+start-timer
+while-no-error [elapsed-time-under 30] [export-elapsed-time DURATION ; touch ${DURATION}.txt ; sleep 1]
+```
+
+This example creates 1 file every second for 30 seconds.
+
 ### env-cat-fd
 
 **Compile flag**: `-DUSE_CMD_ENV_CAT_FD`
@@ -408,6 +429,44 @@ By including this command, it implies the inclusion of the `start-timer` command
 presh -c "start-timer ; sleep 5 ; export-elapsed-time TIME ; echo \${TIME}"
 5
 ```
+
+### export-host-lookup
+
+**Compile flag**: `-DUSE_EXPORT_HOST_LOOKUP`
+
+**Usage**: `export-host-lookup (hostname) (ENV_NAME)`
+
+Exports to an environment variable the IP address of a hostname.
+
+### expect-http-get-response
+
+**Compile flag**: `-DUSE_CMD_EXPECT_HTTP_GET_RESPONSE`
+
+**Usage**: `expect-http-get-response (hostname) (port) (path) (response-code)`
+
+Performs a simple HTTP GET request to the given hostname and port, in the form:
+
+```
+GET (path) HTTP/1.1
+```
+
+If the response code from the server does not match the expected response code, then the command generates an error.
+
+### expect-http-get-response-not
+
+**Compile flag**: `-DUSE_CMD_EXPECT_HTTP_GET_RESPONSE_NOT`
+
+**Usage**: `expect-http-get-response-not (hostname) (port) (path) (response-code)`
+
+Performs a simple HTTP GET request to the given hostname and port, in the form:
+
+```
+GET (path) HTTP/1.1
+```
+
+If the response code from the server matches the expected response code, then the command generates an error.
+
+This command is functionally identical to [`export-host-lookup`](#export-host-lookup) except for whether the matched response code generates an error or not.
 
 ### file-stat
 
@@ -827,36 +886,39 @@ presh -c "\
   echo done"
 ```
 
-### test-ipv4
+### test-connect
 
-**Compile flag:**: `-DUSE_CMD_TEST_IPV4`
+**Compile flag:**: `-DUSE_CMD_TEST_CONNECT`
 
-**Usage**: `test-ipv4 (ipv4-address) (port) (timeout)`
+**Usage**: `test-connect (hostname) (port) (timeout)`
 
-Attempts to open a socket connection to the IPv4 server on the given port number.  If the server does not accept the connection within the given timeout seconds, then the command generates an error.
+Attempts to open a socket connection to the server on the given port or service name.  If the server does not accept the connection within the given timeout seconds, then the command generates an error.
 
-**Example:**
+**Example 1:**
+
+Connect to an IPv4 dot-notation host on port 80, with a maximum of 5 seconds waiting for a connection.
 
 ```bash
 presh -c "\
-  test-ipv4 127.0.0.1 80 5
+  test-connect 127.0.0.1 80 5
   "
 ```
 
-### test-ipv6
+**Example 2:**
 
-**Compile flag:**: `-DUSE_CMD_TEST_IPV6`
-
-**Usage**: `test-ipv4 (ipv4-address) (port) (timeout)`
-
-Attempts to open a socket connection to the IPv4 server on the given port number.  If the server does not accept the connection within the given timeout seconds, then the command generates an error.
-
-**Example:**
+Connect to an IPv6 colon-notation host on port 80, with a maximum of 5 seconds waiting for a connection.
 
 ```bash
-presh -c "\
-  test-ipv6 ::0 80 5
-  "
+presh -c "test-connect ::0 80 5"
+```
+
+**Example 3:**
+
+Connect to the server "google.com" using its registered service name "http", with a maximum of 2 seconds waiting for a connection.
+
+```bash
+presh -c "test-connect google.com http 2 && echo [We have Internet connectivity]"
+We have Internet connectivity
 ```
 
 ### touch
@@ -1093,11 +1155,16 @@ Last build size:
   * glibc (Arch): 704,528 bytes
   * musl (Alpine): 26,040 bytes
   * dietlibc (Alpine): 17,352 bytes
-* Full build:
+* Non-Network build:
   * glibc (Ubuntu): 844,232 bytes
   * glibc (Arch): 720,944 bytes
   * musl (Alpine): 42,432 bytes
   * dietlibc (Alpine): 29,640 bytes
+* Full build:
+  * glibc (Ubuntu): 1,077,992 bytes
+  * glibc (Arch): 921,936 bytes
+  * musl (Alpine): 71,104 bytes
+  * dietlibc (Alpine): 46,128 bytes
 
 *dietlibc [requires](https://www.fefe.de/dietlibc/FAQ.txt) that you either not distribute the compiled executable, or release the executable under GPL v2.*
 

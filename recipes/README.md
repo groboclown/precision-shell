@@ -33,3 +33,7 @@ d-rwxr-xr-x 2 0 0 0 0 4096 /opt/logs
 ```
 
 Presh adds 34,240 bytes to the docker image by using the musl library.  This could be shrunk down smaller by eliminating the debug commands.
+
+## delay-until-ready.Dockerfile
+
+Waits for a dependent service to start running before starting the service.  If the dependent service doesn't start within 5 minutes (300 seconds), then the service fails to run.

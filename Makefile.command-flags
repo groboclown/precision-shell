@@ -147,3 +147,55 @@ ifdef INCLUDE_STANDARD_COMMANDS
 		$(CMD_TRUNC) \
 		$(STREAMING_INPUT)
 endif
+
+ifdef INCLUDE_NON_NETWORK_COMMANDS
+	COMMAND_FLAGS += \
+		$(CMD_CAT_FD) \
+		$(CMD_CD) \
+		$(CMD_CHMOD) \
+		$(CMD_CHOWN) \
+		$(CMD_DUP_R) \
+		$(CMD_DUP_W) \
+		$(CMD_DUP_A) \
+		$(CMD_ECHO) \
+		$(CMD_ELAPSED_TIME) \
+		$(CMD_ELAPSED_TIME_UNDER) \
+		$(CMD_ENV_CAT_FD) \
+		$(CMD_EXEC) \
+		$(CMD_EXIT) \
+		$(CMD_EXPORT) \
+		$(CMD_EXPORT_ELAPSED_TIME) \
+		$(CMD_FILE_STAT) \
+		$(CMD_FOR_EACH) \
+		$(CMD_IF_ELSE) \
+		$(CMD_KILL_PID) \
+		$(CMD_LN_H) \
+		$(CMD_LN_S) \
+		$(CMD_LS) \
+		$(CMD_LS_T) \
+		$(CMD_LS_L) \
+		$(CMD_MKDEV) \
+		$(CMD_MKDIR) \
+		$(CMD_MKNOD) \
+		$(CMD_MV) \
+		$(CMD_NOOP) \
+		$(CMD_PWD) \
+		$(CMD_RM) \
+		$(CMD_RMDIR) \
+		$(CMD_SIGNAL) \
+		$(CMD_SLEEP) \
+		$(CMD_SPAWN) \
+		$(CMD_START_TIMER) \
+		$(CMD_SU_EXEC) \
+		$(CMD_SU_SPAWN) \
+		$(CMD_SUBCMD) \
+		$(CMD_TOUCH) \
+		$(CMD_TRUNC) \
+		$(CMD_WAIT_PID) \
+		$(CMD_WHILE_ERROR) \
+		$(CMD_WHILE_NO_ERROR) \
+		$(CMD_WRITE_FD) \
+		$(STREAMING_INPUT) \
+		$(REQUIRE_FULL_CMD) \
+		$(ENVIRO_INPUT)
+endif
