@@ -37,13 +37,16 @@ LABEL name="local/precision-shell-example"
 
 COPY --from=build-env /opt/app /opt/app
 
+# Set up the pre-built configuration file
+COPY recipes/support-files/config-complete.json /opt/app/hello_world/config.json
+
 # To debug the presh script, this can use the presh-debug instead.
 # COPY --from=presh-builder /opt/precision-shell/out/presh-debug /bin/sh
 COPY --from=presh-builder /opt/precision-shell/out/presh /bin/sh
 
 WORKDIR /opt/app/hello_world
 
-ENV LISTEN_PORT 9000
+ENV LISTEN_PORT 3000
 
 # Because Node doesn't install signal handlers on its own,
 #   have presh listen for user signals.

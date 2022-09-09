@@ -1,5 +1,6 @@
 #!/bin/bash
 
+# This test fails when running in some docker images that don't support ipv6.
 # desc: test-connect with a running server and ipv6.
 # requires: +test-connect
 

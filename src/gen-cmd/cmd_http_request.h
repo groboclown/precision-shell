@@ -25,8 +25,13 @@ SOFTWARE.
 */
 
 
-#ifndef _FS_SHELL__CMD_HTTP_REQUEST_
-#define _FS_SHELL__CMD_HTTP_REQUEST_
+#ifndef _FS_SHELL__CMD_EXPECT_HTTP_GET_RESPONSE_
+#define _FS_SHELL__CMD_EXPECT_HTTP_GET_RESPONSE_
+
+// Optional command expect-http-get-response
+
+#ifdef USE_CMD_EXPECT_HTTP_GET_RESPONSE
+
 
 
 #define HTTP_TIMEOUT 60
@@ -37,100 +42,6 @@ SOFTWARE.
 //  path -> global_arg_cached
 //  code -> global_arg
 
-// Optional command expect-http-get-response
-
-#ifdef USE_CMD_EXPECT_HTTP_GET_RESPONSE
-
-
-
-/* from cmd_http_request.h.in:37 */
-extern const char cmd_name_expect_http_get_response[];
-#define ENUM_LIST__EXPECT_HTTP_GET_RESPONSE \
-            /* from cmd_http_request.h.in:37 */ \
-            COMMAND_INDEX__EXPECT_HTTP_GET_RESPONSE,
-#define VIRTUAL_ENUM_LIST__EXPECT_HTTP_GET_RESPONSE
-#define GLOBAL_VARDEF__EXPECT_HTTP_GET_RESPONSE \
-            /* from cmd_http_request.h.in:37 */ \
-            const char cmd_name_expect_http_get_response[] = "expect-http-get-response";
-#define INITIALIZE__EXPECT_HTTP_GET_RESPONSE \
-            /* from cmd_http_request.h.in:37 */ \
-            command_list_names[COMMAND_INDEX__EXPECT_HTTP_GET_RESPONSE] = cmd_name_expect_http_get_response;
-#define STARTUP_CASE__EXPECT_HTTP_GET_RESPONSE \
-    case COMMAND_INDEX__EXPECT_HTTP_GET_RESPONSE: \
-        /* from cmd_http_request.h.in:37 */ \
-            /* from cmd_http_request.h.in:39 */ \
-            LOG(":: check http get response code equals\n"); \
-            /* expect equals*/ \
-            global_arg1_i = 0; \
-            /* Argument 1: collect address shared_connect_address*/ \
-            /* Argument 2: collect port/service into global_arg_cached*/ \
-            global_cmd = COMMAND_INDEX__SHARED_CONNECT__ADDRESS; \
-            /* Argument 3: path*/ \
-            global_arg3_i = COMMAND_INDEX__EXPECT_HTTP_GET_RESPONSE__PATH; \
-        break;
-#define RUN_CASE__EXPECT_HTTP_GET_RESPONSE
-#define REQUIRES_ADDL_ARG__EXPECT_HTTP_GET_RESPONSE
-
-#else /* USE_CMD_EXPECT_HTTP_GET_RESPONSE */
-
-#define ENUM_LIST__EXPECT_HTTP_GET_RESPONSE
-#define VIRTUAL_ENUM_LIST__EXPECT_HTTP_GET_RESPONSE
-#define GLOBAL_VARDEF__EXPECT_HTTP_GET_RESPONSE
-#define INITIALIZE__EXPECT_HTTP_GET_RESPONSE
-#define STARTUP_CASE__EXPECT_HTTP_GET_RESPONSE
-#define RUN_CASE__EXPECT_HTTP_GET_RESPONSE
-#define REQUIRES_ADDL_ARG__EXPECT_HTTP_GET_RESPONSE
-#endif /* USE_CMD_EXPECT_HTTP_GET_RESPONSE */
-
-
-// Optional command expect-http-get-response-not
-
-#ifdef USE_CMD_EXPECT_HTTP_GET_RESPONSE_NOT
-
-
-
-/* from cmd_http_request.h.in:60 */
-extern const char cmd_name_expect_http_get_response_not[];
-#define ENUM_LIST__EXPECT_HTTP_GET_RESPONSE_NOT \
-            /* from cmd_http_request.h.in:60 */ \
-            COMMAND_INDEX__EXPECT_HTTP_GET_RESPONSE_NOT,
-#define VIRTUAL_ENUM_LIST__EXPECT_HTTP_GET_RESPONSE_NOT
-#define GLOBAL_VARDEF__EXPECT_HTTP_GET_RESPONSE_NOT \
-            /* from cmd_http_request.h.in:60 */ \
-            const char cmd_name_expect_http_get_response_not[] = "expect-http-get-response-not";
-#define INITIALIZE__EXPECT_HTTP_GET_RESPONSE_NOT \
-            /* from cmd_http_request.h.in:60 */ \
-            command_list_names[COMMAND_INDEX__EXPECT_HTTP_GET_RESPONSE_NOT] = cmd_name_expect_http_get_response_not;
-#define STARTUP_CASE__EXPECT_HTTP_GET_RESPONSE_NOT \
-    case COMMAND_INDEX__EXPECT_HTTP_GET_RESPONSE_NOT: \
-        /* from cmd_http_request.h.in:60 */ \
-            /* from cmd_http_request.h.in:62 */ \
-            LOG(":: check http get response code not equal\n"); \
-            /* expect not equals*/ \
-            global_arg1_i = 1; \
-            /* Argument 1: collect address shared_connect_address*/ \
-            /* Argument 2: collect port/service into global_arg_cached*/ \
-            global_cmd = COMMAND_INDEX__SHARED_CONNECT__ADDRESS; \
-            /* Argument 3: path*/ \
-            global_arg3_i = COMMAND_INDEX__EXPECT_HTTP_GET_RESPONSE__PATH; \
-        break;
-#define RUN_CASE__EXPECT_HTTP_GET_RESPONSE_NOT
-#define REQUIRES_ADDL_ARG__EXPECT_HTTP_GET_RESPONSE_NOT
-
-#else /* USE_CMD_EXPECT_HTTP_GET_RESPONSE_NOT */
-
-#define ENUM_LIST__EXPECT_HTTP_GET_RESPONSE_NOT
-#define VIRTUAL_ENUM_LIST__EXPECT_HTTP_GET_RESPONSE_NOT
-#define GLOBAL_VARDEF__EXPECT_HTTP_GET_RESPONSE_NOT
-#define INITIALIZE__EXPECT_HTTP_GET_RESPONSE_NOT
-#define STARTUP_CASE__EXPECT_HTTP_GET_RESPONSE_NOT
-#define RUN_CASE__EXPECT_HTTP_GET_RESPONSE_NOT
-#define REQUIRES_ADDL_ARG__EXPECT_HTTP_GET_RESPONSE_NOT
-#endif /* USE_CMD_EXPECT_HTTP_GET_RESPONSE_NOT */
-
-
-
-#if defined(USE_CMD_EXPECT_HTTP_GET_RESPONSE) || defined(USE_CMD_EXPECT_HTTP_GET_RESPONSE_NOT)
 
 
 
@@ -148,46 +59,53 @@ extern const char cmd_name_expect_http_get_response_not[];
 
         //  client socket -> tmp_val
 
-
-#define ENUM_LIST__HTTP_REQUEST \
-            ENUM_LIST__EXPECT_HTTP_GET_RESPONSE \
-            ENUM_LIST__EXPECT_HTTP_GET_RESPONSE_NOT
-#define VIRTUAL_ENUM_LIST__HTTP_REQUEST \
-            VIRTUAL_ENUM_LIST__EXPECT_HTTP_GET_RESPONSE \
-            VIRTUAL_ENUM_LIST__EXPECT_HTTP_GET_RESPONSE_NOT \
-            /* from cmd_http_request.h.in:84 */ \
+/* from cmd_http_request.h.in:37 */
+extern const char cmd_name_expect_http_get_response[];
+#define ENUM_LIST__EXPECT_HTTP_GET_RESPONSE \
+            /* from cmd_http_request.h.in:37 */ \
+            COMMAND_INDEX__EXPECT_HTTP_GET_RESPONSE,
+#define VIRTUAL_ENUM_LIST__EXPECT_HTTP_GET_RESPONSE \
+            /* from cmd_http_request.h.in:55 */ \
             COMMAND_INDEX__EXPECT_HTTP_GET_RESPONSE__PATH, \
-            /* from cmd_http_request.h.in:94 */ \
+            /* from cmd_http_request.h.in:65 */ \
             COMMAND_INDEX__EXPECT_HTTP_GET_RESPONSE__CODE,
-#define GLOBAL_VARDEF__HTTP_REQUEST \
-            GLOBAL_VARDEF__EXPECT_HTTP_GET_RESPONSE \
-            GLOBAL_VARDEF__EXPECT_HTTP_GET_RESPONSE_NOT
-#define INITIALIZE__HTTP_REQUEST \
-            INITIALIZE__EXPECT_HTTP_GET_RESPONSE \
-            INITIALIZE__EXPECT_HTTP_GET_RESPONSE_NOT \
-            /* from cmd_http_request.h.in:95 */ \
+#define GLOBAL_VARDEF__EXPECT_HTTP_GET_RESPONSE \
+            /* from cmd_http_request.h.in:37 */ \
+            const char cmd_name_expect_http_get_response[] = "expect-http-get-response";
+#define INITIALIZE__EXPECT_HTTP_GET_RESPONSE \
+            /* from cmd_http_request.h.in:37 */ \
+            command_list_names[COMMAND_INDEX__EXPECT_HTTP_GET_RESPONSE] = cmd_name_expect_http_get_response; \
+            /* from cmd_http_request.h.in:66 */ \
             const char *expect_http_path = NULL; \
             /* Need just enough space to read in the first line.*/ \
             /*   We don't need the whole line, just enough to get the status code.*/ \
             /*   But this should be more than sufficient.*/ \
             char http_response_code_parse[20];
-#define STARTUP_CASE__HTTP_REQUEST \
-            STARTUP_CASE__EXPECT_HTTP_GET_RESPONSE \
-            STARTUP_CASE__EXPECT_HTTP_GET_RESPONSE_NOT
-#define RUN_CASE__HTTP_REQUEST \
-            RUN_CASE__EXPECT_HTTP_GET_RESPONSE \
-            RUN_CASE__EXPECT_HTTP_GET_RESPONSE_NOT \
+#define STARTUP_CASE__EXPECT_HTTP_GET_RESPONSE \
+    case COMMAND_INDEX__EXPECT_HTTP_GET_RESPONSE: \
+        /* from cmd_http_request.h.in:37 */ \
+            /* from cmd_http_request.h.in:39 */ \
+            LOG(":: check http get response code equals\n"); \
+            /* expect equals*/ \
+            global_arg1_i = 0; \
+            /* Argument 1: collect address shared_connect_address*/ \
+            /* Argument 2: collect port/service into global_arg_cached*/ \
+            global_cmd = COMMAND_INDEX__SHARED_CONNECT__ADDRESS; \
+            /* Argument 3: path*/ \
+            global_arg3_i = COMMAND_INDEX__EXPECT_HTTP_GET_RESPONSE__PATH; \
+        break;
+#define RUN_CASE__EXPECT_HTTP_GET_RESPONSE \
     case COMMAND_INDEX__EXPECT_HTTP_GET_RESPONSE__PATH: \
-        /* from cmd_http_request.h.in:84 */ \
-            /* from cmd_http_request.h.in:85 */ \
+        /* from cmd_http_request.h.in:55 */ \
+            /* from cmd_http_request.h.in:56 */ \
             /* Save off the path.*/ \
             expect_http_path = global_arg; \
             /* get the expected code and make the request.*/ \
             global_cmd = COMMAND_INDEX__EXPECT_HTTP_GET_RESPONSE__CODE; \
         break; \
     case COMMAND_INDEX__EXPECT_HTTP_GET_RESPONSE__CODE: \
-        /* from cmd_http_request.h.in:94 */ \
-            /* from cmd_http_request.h.in:111 */ \
+        /* from cmd_http_request.h.in:65 */ \
+            /* from cmd_http_request.h.in:82 */ \
             LOG(":: expecting http response code "); \
             LOGLN(global_arg); \
             /* don't actually parse it.  we're going to just do a string comparison.*/ \
@@ -267,20 +185,17 @@ extern const char cmd_name_expect_http_get_response_not[];
                 LOG(":: did not match expected value.\n"); \
             } \
         break;
-#define REQUIRES_ADDL_ARG__HTTP_REQUEST \
-            REQUIRES_ADDL_ARG__EXPECT_HTTP_GET_RESPONSE \
-            REQUIRES_ADDL_ARG__EXPECT_HTTP_GET_RESPONSE_NOT
+#define REQUIRES_ADDL_ARG__EXPECT_HTTP_GET_RESPONSE
 
-#else /* defined(USE_CMD_EXPECT_HTTP_GET_RESPONSE) || defined(USE_CMD_EXPECT_HTTP_GET_RESPONSE_NOT) */
+#else /* USE_CMD_EXPECT_HTTP_GET_RESPONSE */
 
-#define ENUM_LIST__HTTP_REQUEST
-#define VIRTUAL_ENUM_LIST__HTTP_REQUEST
-#define GLOBAL_VARDEF__HTTP_REQUEST
-#define INITIALIZE__HTTP_REQUEST
-#define STARTUP_CASE__HTTP_REQUEST
-#define RUN_CASE__HTTP_REQUEST
-#define REQUIRES_ADDL_ARG__HTTP_REQUEST
-#endif /* defined(USE_CMD_EXPECT_HTTP_GET_RESPONSE) || defined(USE_CMD_EXPECT_HTTP_GET_RESPONSE_NOT) */
+#define ENUM_LIST__EXPECT_HTTP_GET_RESPONSE
+#define VIRTUAL_ENUM_LIST__EXPECT_HTTP_GET_RESPONSE
+#define GLOBAL_VARDEF__EXPECT_HTTP_GET_RESPONSE
+#define INITIALIZE__EXPECT_HTTP_GET_RESPONSE
+#define STARTUP_CASE__EXPECT_HTTP_GET_RESPONSE
+#define RUN_CASE__EXPECT_HTTP_GET_RESPONSE
+#define REQUIRES_ADDL_ARG__EXPECT_HTTP_GET_RESPONSE
+#endif /* USE_CMD_EXPECT_HTTP_GET_RESPONSE */
 
-
-#endif /* _FS_SHELL__CMD_HTTP_REQUEST_ */
+#endif /* _FS_SHELL__CMD_EXPECT_HTTP_GET_RESPONSE_ */

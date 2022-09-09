@@ -10,6 +10,7 @@ fi
 
 "${FS_SERVER}" echo 29446 >server-out.txt 2>server-err.txt &
 server_pid=$!
+sleep 1
 
 "${FS}" -c "test-connect localhost 29446 3" > out.txt 2>err.txt
 res=$?

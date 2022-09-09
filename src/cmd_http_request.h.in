@@ -22,7 +22,8 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
 */
 
-AsOptionalUnion(file="http_request",
+AsOptional(command="expect-http-get-response",
+
 
 #define HTTP_TIMEOUT 60
 
@@ -32,7 +33,6 @@ AsOptionalUnion(file="http_request",
 //  path -> global_arg_cached
 //  code -> global_arg
 
-AsOptional(command="expect-http-get-response",
 
     WithNamedStep(enum="EXPECT_HTTP_GET_RESPONSE", name="expect-http-get-response",
 
@@ -51,35 +51,6 @@ AsOptional(command="expect-http-get-response",
         )
 
     )
-
-)
-
-
-AsOptional(command="expect-http-get-response-not",
-
-    WithNamedStep(enum="EXPECT_HTTP_GET_RESPONSE_NOT", name="expect-http-get-response-not",
-
-        OnCmd(
-            LOG(":: check http get response code not equal\n");
-
-            // expect not equals
-            global_arg1_i = 1;
-
-            // Argument 1: collect address shared_connect_address
-            // Argument 2: collect port/service into global_arg_cached
-            global_cmd = COMMAND_INDEX__SHARED_CONNECT__ADDRESS;
-
-            // Argument 3: path
-            global_arg3_i = COMMAND_INDEX__EXPECT_HTTP_GET_RESPONSE__PATH;
-        )
-
-    )
-
-)
-
-
-
-WithAuxFor(commands=[expect-http-get-response, expect-http-get-response-not],
 
     WithVirtualStep(enum="EXPECT_HTTP_GET_RESPONSE__PATH",
         OnArg(
@@ -199,7 +170,5 @@ WithAuxFor(commands=[expect-http-get-response, expect-http-get-response-not],
         )
 
     )
-
-)
 
 )

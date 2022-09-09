@@ -83,8 +83,7 @@ SOFTWARE.
 
 // USES_SHARED_SERVICE - allow connecting to and parsing an address + port
 #if    defined(USE_CMD_TEST_CONNECT) \
-    || defined(USE_CMD_EXPECT_HTTP_GET_RESPONSE) \
-    || defined(USE_CMD_EXPECT_HTTP_GET_RESPONSE_NOT)    
+    || defined(USE_CMD_EXPECT_HTTP_GET_RESPONSE)
 
 #define USES_SHARED_CONNECT
 
@@ -128,8 +127,7 @@ SOFTWARE.
     || defined(USE_CMD_SU_SPAWN) \
     || defined(USE_CMD_TEST_IPV4) \
     || defined(USE_CMD_TEST_IPV6) \
-    || defined(USE_CMD_EXPECT_HTTP_GET_RESPONSE) \
-    || defined(USE_CMD_EXPECT_HTTP_GET_RESPONSE_NOT)
+    || defined(USE_CMD_EXPECT_HTTP_GET_RESPONSE)
 
 #define USES_SHARED_INT
 
@@ -169,6 +167,7 @@ SOFTWARE.
     || defined(USE_CMD_SPAWN) \
     || defined(USE_CMD_WAIT_PID) \
     || defined(USE_CMD_SUBCMD) \
+    || defined(USE_CMD_NOT) \
     || defined(USE_CMD_IF_ELSE) \
     || defined(USE_CMD_WHILE_NO_ERROR) \
     || defined(USE_CMD_WHILE_ERROR) \

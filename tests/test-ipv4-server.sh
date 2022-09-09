@@ -1,6 +1,6 @@
 #!/bin/bash
 
-# desc: test-connect with no running server on port 0 on ipv4.
+# desc: test-connect with a running server using ipv4.
 # requires: +test-connect
 
 if [ ! -x "${FS_SERVER}" ] ; then

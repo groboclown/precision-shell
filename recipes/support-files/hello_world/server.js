@@ -1,6 +1,8 @@
 // Runs an HTTP server that responds with Hello World.
 
-var http = require('http');
+const http = require('http');
+const process = require('process');
+const os = require('os');
 
 // Load the configuration using the simplest reader.
 var config = require('./config.json');
@@ -11,6 +13,21 @@ var server = http.createServer(function (request, response) {
     response.writeHead(200, {"Content-Type": "text/plain"});
     response.end("Goodbye World\n");
     process.kill(process.pid, 'SIGTERM');
+    return;
+  }
+  if (request.url == '/pid') {
+    response.writeHead(200, {"Content-Type": "text/plain"});
+    response.end("" + process.pid + "\n");
+    return;
+  }
+  if (request.url == '/uid') {
+    response.writeHead(200, {"Content-Type": "text/plain"});
+    response.end("" + os.userInfo().uid + "\n");
+    return;
+  }
+  if (request.url == '/gid') {
+    response.writeHead(200, {"Content-Type": "text/plain"});
+    response.end("" + os.userInfo().gid + "\n");
     return;
   }
   response.writeHead(200, {"Content-Type": "text/plain"});

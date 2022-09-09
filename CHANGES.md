@@ -3,8 +3,9 @@
 * (?)
     * Added network commands.
         * Added new `test-connect` command that checks for whether a network port is accepting socket connections.
-        * Added new `expect-http-get-response` and `expect-http-get-response-not` commands for checking HTTP GET response status codes against a known value.
+        * Added new `expect-http-get-response` command for checking HTTP GET response status codes against a known value.
         * Added new command `export-host-lookup` to look up an IP address and export it to an environment variable.  This is highly experimental, as it will use whatever address is discovered first, including IPv6, which may not be desired.
+        * Added new command `not` to act similarly to the `subcmd` command, but it makes non-zero exit codes act like zero exit codes, and vice versa.
         * Added new file size split; all non-network commands and network commands.
         * Added a recipe (delay-until-ready.Dockerfile) to show off how to combine loops, sleep, timers, and http checks to delay starting a command until dependencies are ready.
     * Added new `elapsed-time-under` command to check if too much time has passed.

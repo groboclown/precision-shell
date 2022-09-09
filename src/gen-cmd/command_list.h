@@ -89,7 +89,7 @@ SOFTWARE.
             GLOBAL_VARDEF__FILE_STAT \
             GLOBAL_VARDEF__FMODE \
             GLOBAL_VARDEF__FOR_EACH \
-            GLOBAL_VARDEF__HTTP_REQUEST \
+            GLOBAL_VARDEF__EXPECT_HTTP_GET_RESPONSE \
             GLOBAL_VARDEF__IF_ELSE \
             GLOBAL_VARDEF__LN_H \
             GLOBAL_VARDEF__LN_S \
@@ -135,7 +135,7 @@ SOFTWARE.
             INITIALIZE__FILE_STAT \
             INITIALIZE__FMODE \
             INITIALIZE__FOR_EACH \
-            INITIALIZE__HTTP_REQUEST \
+            INITIALIZE__EXPECT_HTTP_GET_RESPONSE \
             INITIALIZE__IF_ELSE \
             INITIALIZE__LN_H \
             INITIALIZE__LN_S \
@@ -181,7 +181,7 @@ SOFTWARE.
             STARTUP_CASE__FILE_STAT \
             STARTUP_CASE__FMODE \
             STARTUP_CASE__FOR_EACH \
-            STARTUP_CASE__HTTP_REQUEST \
+            STARTUP_CASE__EXPECT_HTTP_GET_RESPONSE \
             STARTUP_CASE__IF_ELSE \
             STARTUP_CASE__LN_H \
             STARTUP_CASE__LN_S \
@@ -227,7 +227,7 @@ SOFTWARE.
             RUN_CASE__FILE_STAT \
             RUN_CASE__FMODE \
             RUN_CASE__FOR_EACH \
-            RUN_CASE__HTTP_REQUEST \
+            RUN_CASE__EXPECT_HTTP_GET_RESPONSE \
             RUN_CASE__IF_ELSE \
             RUN_CASE__LN_H \
             RUN_CASE__LN_S \
@@ -273,7 +273,7 @@ SOFTWARE.
             REQUIRES_ADDL_ARG__FILE_STAT \
             REQUIRES_ADDL_ARG__FMODE \
             REQUIRES_ADDL_ARG__FOR_EACH \
-            REQUIRES_ADDL_ARG__HTTP_REQUEST \
+            REQUIRES_ADDL_ARG__EXPECT_HTTP_GET_RESPONSE \
             REQUIRES_ADDL_ARG__IF_ELSE \
             REQUIRES_ADDL_ARG__LN_H \
             REQUIRES_ADDL_ARG__LN_S \
@@ -323,7 +323,7 @@ enum CommandIndex {
             ENUM_LIST__FILE_STAT
             ENUM_LIST__FMODE
             ENUM_LIST__FOR_EACH
-            ENUM_LIST__HTTP_REQUEST
+            ENUM_LIST__EXPECT_HTTP_GET_RESPONSE
             ENUM_LIST__IF_ELSE
             ENUM_LIST__LN_H
             ENUM_LIST__LN_S
@@ -372,7 +372,7 @@ enum CommandIndex {
             VIRTUAL_ENUM_LIST__FILE_STAT
             VIRTUAL_ENUM_LIST__FMODE
             VIRTUAL_ENUM_LIST__FOR_EACH
-            VIRTUAL_ENUM_LIST__HTTP_REQUEST
+            VIRTUAL_ENUM_LIST__EXPECT_HTTP_GET_RESPONSE
             VIRTUAL_ENUM_LIST__IF_ELSE
             VIRTUAL_ENUM_LIST__LN_H
             VIRTUAL_ENUM_LIST__LN_S
