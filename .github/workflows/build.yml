@@ -27,7 +27,7 @@ jobs:
         run: |
           sudo apt-get update
           sudo apt-get install podman
-          podman network create --ipv6 --gateway fd00::1:8:1 --subnet fd00::1:8:0/112 --gateway 10.90.0.1 --subnet 10.90.0.0/16 podnet1
+          podman network create --ipv6 --subnet fd00:0bca:85f3:17a0::/64 --subnet 10.90.0.0/16 podnet1
       
       - name: build-test
         run: |
@@ -66,7 +66,7 @@ jobs:
         run: |
           sudo apt-get update
           sudo apt-get install podman
-          podman network create --ipv6 --gateway fd00::1:8:1 --subnet fd00::1:8:0/112 --gateway 10.90.0.1 --subnet 10.90.0.0/16 podnet1
+          podman network create --ipv6 --subnet fd00:0bca:85f3:17a0::/64 --subnet 10.90.0.0/16 podnet1
       
       - name: build-test
         run: |
@@ -105,7 +105,7 @@ jobs:
         run: |
           sudo apt-get update
           sudo apt-get install podman
-          podman network create --ipv6 --gateway fd00::1:8:1 --subnet fd00::1:8:0/112 --gateway 10.90.0.1 --subnet 10.90.0.0/16 podnet1
+          podman network create --ipv6 --subnet fd00:0bca:85f3:17a0::/64 --subnet 10.90.0.0/16 podnet1
       
       - name: build-test
         run: |
@@ -138,7 +138,7 @@ jobs:
         run: |
           sudo apt-get update
           sudo apt-get install podman
-          podman network create --ipv6 --gateway fd00::1:8:1 --subnet fd00::1:8:0/112 --gateway 10.90.0.1 --subnet 10.90.0.0/16 podnet1
+          podman network create --ipv6 --subnet fd00:0bca:85f3:17a0::/64 --subnet 10.90.0.0/16 podnet1
       
       - name: build-test
         run: |
