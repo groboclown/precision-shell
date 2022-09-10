@@ -38,7 +38,6 @@ jobs:
 
       - name: build-test
         run: |
-          podman network create --ipv6 podnet1 || echo "podnet1 already exists"
           podman build --network=podnet1 -f build-glibc.Dockerfile -t glibc:offline --build-arg COMMANDS=ALL .
       # Podman on Ubuntu is a buggy version that causes this to look up the
       # image online, rather than look in the local repo.
@@ -49,12 +48,10 @@ jobs:
      
       - name: cmd-test
         run: |
-          podman network create --ipv6 podnet1 || echo "podnet1 already exists"
           podman build --network=podnet1 -f build-glibc.Dockerfile -t glibc:offline --build-arg BUILD_MODE=individual-cmd-test .
       
       - name: file-size
         run: |
-          podman network create --ipv6 podnet1 || echo "podnet1 already exists"
           podman build --network=podnet1 -f build-glibc.Dockerfile -t glibc:offline --build-arg BUILD_MODE=cmd-size .
 
   glibc-arch:
@@ -75,12 +72,9 @@ jobs:
           sudo apt-get update
           sudo apt-get install podman
       
-      # Setup an ipv6 container network so that the
-      #     commands that use it work as expected.
-      
       - name: build-test
         run: |
-          podman network create --ipv6 podnet1 || echo "podnet1 already exists"
+          podman network create --ipv6 --subnet=fd00:0bca:85f3:17a0::/64 podnet1 || echo "podnet1 already exists"
           podman build --network=podnet1 -f build-glibc-arch.Dockerfile -t glibc-arch:offline --build-arg COMMANDS=ALL .
       # Podman on Ubuntu is a buggy version that causes this to look up the
       # image online, rather than look in the local repo.
@@ -91,12 +85,12 @@ jobs:
      
       - name: cmd-test
         run: |
-          podman network create --ipv6 podnet1 || echo "podnet1 already exists"
+          podman network create --ipv6 --subnet=fd00:0bca:85f3:17a0::/64 podnet1 || echo "podnet1 already exists"
           podman build --network=podnet1 -f build-glibc-arch.Dockerfile -t glibc-arch:offline --build-arg BUILD_MODE=individual-cmd-test .
       
       - name: file-size
         run: |
-          podman network create --ipv6 podnet1 || echo "podnet1 already exists"
+          podman network create --ipv6 --subnet=fd00:0bca:85f3:17a0::/64 podnet1 || echo "podnet1 already exists"
           podman build --network=podnet1 -f build-glibc-arch.Dockerfile -t glibc-arch:offline --build-arg BUILD_MODE=cmd-size .
 
   musl:
@@ -121,17 +115,17 @@ jobs:
       
       - name: build-test
         run: |
-          podman network create --ipv6 podnet1 || echo "podnet1 already exists"
+          podman network create --ipv6 --subnet=fd00:0bca:85f3:17a0::/64 podnet1 || echo "podnet1 already exists"
           podman build --network=podnet1 -f build-musl.Dockerfile -t musl:offline --build-arg COMMANDS=ALL .
       
       - name: cmd-test
         run: |
-          podman network create --ipv6 podnet1 || echo "podnet1 already exists"
+          podman network create --ipv6 --subnet=fd00:0bca:85f3:17a0::/64 podnet1 || echo "podnet1 already exists"
           podman build --network=podnet1 -f build-musl.Dockerfile -t musl:offline --build-arg BUILD_MODE=individual-cmd-test .
       
       - name: file-size
         run: |
-          podman network create --ipv6 podnet1 || echo "podnet1 already exists"
+          podman network create --ipv6 --subnet=fd00:0bca:85f3:17a0::/64 podnet1 || echo "podnet1 already exists"
           podman build --network=podnet1 -f build-musl.Dockerfile -t musl:offline --build-arg BUILD_MODE=cmd-size .
 
   dietlibc:
@@ -156,17 +150,17 @@ jobs:
       
       - name: build-test
         run: |
-          podman network create --ipv6 podnet1 || echo "podnet1 already exists"
+          podman network create --ipv6 --subnet=fd00:0bca:85f3:17a0::/64 podnet1 || echo "podnet1 already exists"
           podman build --network=podnet1 -f build-dietlibc.Dockerfile -t dietlibc:offline --build-arg COMMANDS=ALL .
 
       - name: cmd-test
         run: |
-          podman network create --ipv6 podnet1 || echo "podnet1 already exists"
+          podman network create --ipv6 --subnet=fd00:0bca:85f3:17a0::/64 podnet1 || echo "podnet1 already exists"
           podman build --network=podnet1 -f build-dietlibc.Dockerfile -t dietlibc:offline --build-arg BUILD_MODE=individual-cmd-test .
 
       - name: file-size
         run: |
-          podman network create --ipv6 podnet1 || echo "podnet1 already exists"
+          podman network create --ipv6 --subnet=fd00:0bca:85f3:17a0::/64 podnet1 || echo "podnet1 already exists"
           podman build --network=podnet1 -f build-dietlibc.Dockerfile -t dietlibc:offline --build-arg BUILD_MODE=cmd-size .
 
 
