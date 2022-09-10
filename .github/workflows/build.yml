@@ -75,7 +75,7 @@ jobs:
       - name: build-test
         run: |
           podman network create --ipv6 --subnet=fd00:0bca:85f3:17a0::/64 podnet1 || echo "podnet1 already exists"
-          podman build --network=podnet1 -f build-glibc-arch.Dockerfile -t glibc-arch:offline --build-arg COMMANDS=ALL .
+          podman build --network=/home/runner/.config/cni/net.d/podnet1.conflist -f build-glibc-arch.Dockerfile -t glibc-arch:offline --build-arg COMMANDS=ALL .
       # Podman on Ubuntu is a buggy version that causes this to look up the
       # image online, rather than look in the local repo.
       # https://github.com/containers/podman/issues/11181
