@@ -75,7 +75,7 @@ jobs:
       - name: build-test
         run: |
           podman network create --ipv6 --subnet=fd00:0bca:85f3:17a0::/64 podnet1 || echo "podnet1 already exists"
-          podman build --network=/home/runner/.config/cni/net.d/podnet1.conflist -f build-glibc-arch.Dockerfile -t glibc-arch:offline --build-arg COMMANDS=ALL .
+          podman build --network=podnet1 -f build-glibc-arch.Dockerfile -t glibc-arch:offline --build-arg COMMANDS=ALL .
       # Podman on Ubuntu is a buggy version that causes this to look up the
       # image online, rather than look in the local repo.
       # https://github.com/containers/podman/issues/11181
@@ -148,19 +148,22 @@ jobs:
           sudo apt-get update
           sudo apt-get install podman
       
+      # Setup an ipv6 container network so that the
+      #     commands that use it work as expected.
+      - name: Setup Network
+        run: |
+          sudo podman network create --ipv6 --subnet=fd00:0bca:85f3:17a0::/64 podnet1
+      
       - name: build-test
         run: |
-          podman network create --ipv6 --subnet=fd00:0bca:85f3:17a0::/64 podnet1 || echo "podnet1 already exists"
           podman build --network=podnet1 -f build-dietlibc.Dockerfile -t dietlibc:offline --build-arg COMMANDS=ALL .
 
       - name: cmd-test
         run: |
-          podman network create --ipv6 --subnet=fd00:0bca:85f3:17a0::/64 podnet1 || echo "podnet1 already exists"
           podman build --network=podnet1 -f build-dietlibc.Dockerfile -t dietlibc:offline --build-arg BUILD_MODE=individual-cmd-test .
 
       - name: file-size
         run: |
-          podman network create --ipv6 --subnet=fd00:0bca:85f3:17a0::/64 podnet1 || echo "podnet1 already exists"
           podman build --network=podnet1 -f build-dietlibc.Dockerfile -t dietlibc:offline --build-arg BUILD_MODE=cmd-size .
 
 
