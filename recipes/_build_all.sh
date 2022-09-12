@@ -31,7 +31,7 @@ errs=0
 declare -a err_names
 for name in ${this_dir}/*.Dockerfile ; do
     base="$( basename "${name}" .Dockerfile )"
-    "${CONTAINER_RUNNER}" build -t "local/presh-${base}:build" -f "${name}" .
+    "${CONTAINER_RUNNER}" build --network presh-net -t "local/presh-${base}:build" -f "${name}" .
     if [ $? != 0 ] ; then
         errs=$(( errs + 1 ))
         err_names+=("${name}")

@@ -12,6 +12,9 @@ printf "HTTP/1.1 200 OK\\r\\nContent-Type: text/plain\\r\\nContent-Length: 0\\r\
 "${FS_SERVER}" http1 29446 server-response.txt >server-out.txt 2>server-err.txt &
 server_pid=$!
 
+# Give a bit of time for the server to start
+sleep 1
+
 "${FS}" -c "expect-http-get-response localhost 29446 / 200" > out.txt 2>err.txt
 res=$?
 kill -15 "${server_pid}"
