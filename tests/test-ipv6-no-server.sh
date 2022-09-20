@@ -7,7 +7,7 @@
 "${FS}" -c "test-connect ::0 0 3" > out.txt 2>err.txt
 res=$?
 
-if [ ${res} -ne 1 ] ; then
+if [ ${res} -ne 3 ] ; then
     echo "Bad exit code: ${res}"
     exit 1
 fi
