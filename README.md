@@ -55,6 +55,7 @@ The shell supports these commands:
 * Control Flow
   * [if-else](#if-else-command) - run a command conditionally based on the error result of another.
   * [subcmd](#subcmd) - run an argument as a complete precision shell command.
+  * [not](#not) - run an argument as a complete precision shell command, and invert the error code (non-zero becomes zero, zero becomes 1).
   * [exit](#exit) - exits the command (or sub-command) with an exit code.
   * [sleep](#sleep) - wait for a number of seconds.
   * [signal .. wait](#signal-wait) - wait for an OS signal before continuing.
@@ -65,7 +66,6 @@ The shell supports these commands:
   * [test-connect](#test-connect) - test whether a host is listening on a given port number.
   * [export-host-lookup](#export-host-lookup) - exports to an environment variable the IP address of a hostname.
   * [expect-http-get-response](#expect-http-get-response) - generates an error if an HTTP GET request to a host, port, path returns a status code that doesn't match an expected value.
-  * [expect-http-get-response-not](#expect-http-get-response) - generates an error if an HTTP GET request to a host, port, path returns a status code that matches an expected value.
 * Usability
   * [pwd](#pwd) - display current working directory, or store it in an environment variable.
   * [version](#version) - prints the current version (cannot be disabled).
@@ -452,22 +452,6 @@ GET (path) HTTP/1.1
 
 If the response code from the server does not match the expected response code, then the command generates an error.
 
-### expect-http-get-response-not
-
-**Compile flag**: `-DUSE_CMD_EXPECT_HTTP_GET_RESPONSE_NOT`
-
-**Usage**: `expect-http-get-response-not (hostname) (port) (path) (response-code)`
-
-Performs a simple HTTP GET request to the given hostname and port, in the form:
-
-```
-GET (path) HTTP/1.1
-```
-
-If the response code from the server matches the expected response code, then the command generates an error.
-
-This command is functionally identical to [`export-host-lookup`](#export-host-lookup) except for whether the matched response code generates an error or not.
-
 ### file-stat
 
 **Compile flag**: `-DUSE_CMD_FILE_STAT`
@@ -725,6 +709,14 @@ ERROR if-else: echo [chmod works]
 ```
 
 In this situation, the `# [echo Worked]` line is interpreted as a no-op operation, so the failure line is `[echo [chmod does not work]]` and, because there's no termination for the `if-else` command, it generates an error for the extra parameter `[echo [chmod works]]`.
+
+### not
+
+**Compile flag**: `-DUSE_CMD_NOT`
+
+**Usage**: `not [command]`
+
+Similar to the [subcmd](#subcmd), this runs the argument as its own, complete precision shell command.  When the command exits, the `not` command will invert the exit code, such that an exit code of `0` becomes `1`, and any non-zero exit code becomes `0`.
 
 ### pwd
 
