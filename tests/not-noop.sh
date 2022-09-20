@@ -11,14 +11,14 @@ if [ ${res} -ne 1 ] ; then
     exit 1
 fi
 
-if [ "$( printf "1\\n2\\n" )" != "$( cat out.txt )" ] ; then
-    echo "Generated invalid stdout"
+# -s : file exists and not empty
+if [ -s out.txt ] ; then
+    echo "Generated stdout with contents"
     cat out.txt
     exit 1
 fi
 
-# -s : file exists and not empty
-if [ -s err.txt ] ; then
+if [ "$( printf "ERROR not: noop\\n" )" != "$( cat err.txt )" ] ; then
     echo "Generated output to stderr"
     cat err.txt
     exit 1
