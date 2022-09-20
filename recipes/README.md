@@ -5,6 +5,15 @@ This directory includes different recipes and examples for using precision shell
 These are constructed as Dockerfile files, as that's considered the target for precision shell.  Though they are located in this directory, they are intended to be run from the parent directory.  The `_build_all.sh` script creates all of them.
 
 
+## signal-awareness.Dockerfile
+
+Shows how to add external signal handling to the launched process.
+
+Because the nodejs process does not run from a shell, but instead directly, the process does not, by default, setup signal handlers to deal with things like a user "Ctrl-C" input to stop the process.  If the process is run as a daemon (which is normal in production), then this isn't a problem.  However, if you run the container for testing, this can be a pain, as you need to run `docker kill (name)` to stop the container.
+
+Presh adds 26,040 bytes by using the musl library.  This could be shrunk down smaller by eliminating the debug commands.
+
+
 ## env-config-file.Dockerfile
 
 Shows how precision shell can be used to enhance a ["distroless"](https://github.com/GoogleContainerTools/distroless/) container.
@@ -33,3 +42,9 @@ d-rwxr-xr-x 2 0 0 0 0 4096 /opt/logs
 ```
 
 Presh adds 34,240 bytes to the docker image by using the musl library.  This could be shrunk down smaller by eliminating the debug commands.
+
+## delay-until-ready.Dockerfile
+
+Waits for a dependent service to start running before starting the service.  If the dependent service doesn't start within 5 minutes (300 seconds), then the service fails to run.
+
+Presh adds 46,528 bytes by using the musl library.  This could be shrunk down smaller by eliminating the debug commands.

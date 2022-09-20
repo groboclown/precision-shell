@@ -6,12 +6,14 @@ cd "$( dirname "$0" )"
 
 command_set_names=(
     "all commands" \
+    "non-network commands" \
     "standard commands" \
     "minimal commands" \
     "no commands"
 )
 command_sets=(
     "INCLUDE_ALL_COMMANDS=1" \
+    "INCLUDE_NON_NETWORK_COMMANDS=1" \
     "INCLUDE_STANDARD_COMMANDS=1"
     "INCLUDE_MINIMAL_COMMANDS=1" \
     "COMMAND_FLAGS=" \
@@ -42,5 +44,5 @@ while [ $i -lt ${set_count} ] ; do
     i=$(( i + 1 ))
 done
 
-cat "${sizefile}" | sort | head -n 30
+cat "${sizefile}"
 rm "${sizefile}"

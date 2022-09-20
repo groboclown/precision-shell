@@ -32,6 +32,7 @@ SOFTWARE.
 #include "cmd_cd.h"
 #include "cmd_chmod.h"
 #include "cmd_chown.h"
+#include "cmd_dnslookup.h"
 #include "cmd_dup.h"
 #include "cmd_echo.h"
 #include "cmd_exec.h"
@@ -40,6 +41,7 @@ SOFTWARE.
 #include "cmd_file_stat.h"
 #include "cmd_fmode.h"
 #include "cmd_for_each.h"
+#include "cmd_http_request.h"
 #include "cmd_if_else.h"
 #include "cmd_ln_h.h"
 #include "cmd_ln_s.h"
@@ -52,6 +54,8 @@ SOFTWARE.
 #include "cmd_pwd.h"
 #include "cmd_rm.h"
 #include "cmd_rmdir.h"
+#include "cmd_shared_address.h"
+#include "cmd_shared_connect.h"
 #include "cmd_shared_sub_args.h"
 #include "cmd_shared_virtual.h"
 #include "cmd_signal.h"
@@ -60,6 +64,7 @@ SOFTWARE.
 #include "cmd_su_exec.h"
 #include "cmd_su_spawn.h"
 #include "cmd_subcmd.h"
+#include "cmd_test_connect.h"
 #include "cmd_timer.h"
 #include "cmd_touch_trunc.h"
 #include "cmd_wait_pid.h"
@@ -75,6 +80,7 @@ SOFTWARE.
             GLOBAL_VARDEF__CD \
             GLOBAL_VARDEF__CHMOD \
             GLOBAL_VARDEF__CHOWN \
+            GLOBAL_VARDEF__DNSLOOKUP \
             GLOBAL_VARDEF__DUP \
             GLOBAL_VARDEF__ECHO \
             GLOBAL_VARDEF__EXEC \
@@ -83,6 +89,7 @@ SOFTWARE.
             GLOBAL_VARDEF__FILE_STAT \
             GLOBAL_VARDEF__FMODE \
             GLOBAL_VARDEF__FOR_EACH \
+            GLOBAL_VARDEF__EXPECT_HTTP_GET_RESPONSE \
             GLOBAL_VARDEF__IF_ELSE \
             GLOBAL_VARDEF__LN_H \
             GLOBAL_VARDEF__LN_S \
@@ -95,6 +102,8 @@ SOFTWARE.
             GLOBAL_VARDEF__PWD \
             GLOBAL_VARDEF__RM \
             GLOBAL_VARDEF__RMDIR \
+            GLOBAL_VARDEF__SHARED_ADDRESS \
+            GLOBAL_VARDEF__SHARED_CONNECT \
             GLOBAL_VARDEF__SHARED_SUB_ARGS \
             GLOBAL_VARDEF__SHARED_VIRTUAL \
             GLOBAL_VARDEF__SIGNAL \
@@ -103,6 +112,7 @@ SOFTWARE.
             GLOBAL_VARDEF__SU_EXEC \
             GLOBAL_VARDEF__SU_SPAWN \
             GLOBAL_VARDEF__SUBCMD \
+            GLOBAL_VARDEF__TEST_CONNECT \
             GLOBAL_VARDEF__TIMER_FUNCS \
             GLOBAL_VARDEF__TOUCH_TRUNC \
             GLOBAL_VARDEF__WAIT_PID \
@@ -116,6 +126,7 @@ SOFTWARE.
             INITIALIZE__CD \
             INITIALIZE__CHMOD \
             INITIALIZE__CHOWN \
+            INITIALIZE__DNSLOOKUP \
             INITIALIZE__DUP \
             INITIALIZE__ECHO \
             INITIALIZE__EXEC \
@@ -124,6 +135,7 @@ SOFTWARE.
             INITIALIZE__FILE_STAT \
             INITIALIZE__FMODE \
             INITIALIZE__FOR_EACH \
+            INITIALIZE__EXPECT_HTTP_GET_RESPONSE \
             INITIALIZE__IF_ELSE \
             INITIALIZE__LN_H \
             INITIALIZE__LN_S \
@@ -136,6 +148,8 @@ SOFTWARE.
             INITIALIZE__PWD \
             INITIALIZE__RM \
             INITIALIZE__RMDIR \
+            INITIALIZE__SHARED_ADDRESS \
+            INITIALIZE__SHARED_CONNECT \
             INITIALIZE__SHARED_SUB_ARGS \
             INITIALIZE__SHARED_VIRTUAL \
             INITIALIZE__SIGNAL \
@@ -144,6 +158,7 @@ SOFTWARE.
             INITIALIZE__SU_EXEC \
             INITIALIZE__SU_SPAWN \
             INITIALIZE__SUBCMD \
+            INITIALIZE__TEST_CONNECT \
             INITIALIZE__TIMER_FUNCS \
             INITIALIZE__TOUCH_TRUNC \
             INITIALIZE__WAIT_PID \
@@ -157,6 +172,7 @@ SOFTWARE.
             STARTUP_CASE__CD \
             STARTUP_CASE__CHMOD \
             STARTUP_CASE__CHOWN \
+            STARTUP_CASE__DNSLOOKUP \
             STARTUP_CASE__DUP \
             STARTUP_CASE__ECHO \
             STARTUP_CASE__EXEC \
@@ -165,6 +181,7 @@ SOFTWARE.
             STARTUP_CASE__FILE_STAT \
             STARTUP_CASE__FMODE \
             STARTUP_CASE__FOR_EACH \
+            STARTUP_CASE__EXPECT_HTTP_GET_RESPONSE \
             STARTUP_CASE__IF_ELSE \
             STARTUP_CASE__LN_H \
             STARTUP_CASE__LN_S \
@@ -177,6 +194,8 @@ SOFTWARE.
             STARTUP_CASE__PWD \
             STARTUP_CASE__RM \
             STARTUP_CASE__RMDIR \
+            STARTUP_CASE__SHARED_ADDRESS \
+            STARTUP_CASE__SHARED_CONNECT \
             STARTUP_CASE__SHARED_SUB_ARGS \
             STARTUP_CASE__SHARED_VIRTUAL \
             STARTUP_CASE__SIGNAL \
@@ -185,6 +204,7 @@ SOFTWARE.
             STARTUP_CASE__SU_EXEC \
             STARTUP_CASE__SU_SPAWN \
             STARTUP_CASE__SUBCMD \
+            STARTUP_CASE__TEST_CONNECT \
             STARTUP_CASE__TIMER_FUNCS \
             STARTUP_CASE__TOUCH_TRUNC \
             STARTUP_CASE__WAIT_PID \
@@ -198,6 +218,7 @@ SOFTWARE.
             RUN_CASE__CD \
             RUN_CASE__CHMOD \
             RUN_CASE__CHOWN \
+            RUN_CASE__DNSLOOKUP \
             RUN_CASE__DUP \
             RUN_CASE__ECHO \
             RUN_CASE__EXEC \
@@ -206,6 +227,7 @@ SOFTWARE.
             RUN_CASE__FILE_STAT \
             RUN_CASE__FMODE \
             RUN_CASE__FOR_EACH \
+            RUN_CASE__EXPECT_HTTP_GET_RESPONSE \
             RUN_CASE__IF_ELSE \
             RUN_CASE__LN_H \
             RUN_CASE__LN_S \
@@ -218,6 +240,8 @@ SOFTWARE.
             RUN_CASE__PWD \
             RUN_CASE__RM \
             RUN_CASE__RMDIR \
+            RUN_CASE__SHARED_ADDRESS \
+            RUN_CASE__SHARED_CONNECT \
             RUN_CASE__SHARED_SUB_ARGS \
             RUN_CASE__SHARED_VIRTUAL \
             RUN_CASE__SIGNAL \
@@ -226,6 +250,7 @@ SOFTWARE.
             RUN_CASE__SU_EXEC \
             RUN_CASE__SU_SPAWN \
             RUN_CASE__SUBCMD \
+            RUN_CASE__TEST_CONNECT \
             RUN_CASE__TIMER_FUNCS \
             RUN_CASE__TOUCH_TRUNC \
             RUN_CASE__WAIT_PID \
@@ -239,6 +264,7 @@ SOFTWARE.
             REQUIRES_ADDL_ARG__CD \
             REQUIRES_ADDL_ARG__CHMOD \
             REQUIRES_ADDL_ARG__CHOWN \
+            REQUIRES_ADDL_ARG__DNSLOOKUP \
             REQUIRES_ADDL_ARG__DUP \
             REQUIRES_ADDL_ARG__ECHO \
             REQUIRES_ADDL_ARG__EXEC \
@@ -247,6 +273,7 @@ SOFTWARE.
             REQUIRES_ADDL_ARG__FILE_STAT \
             REQUIRES_ADDL_ARG__FMODE \
             REQUIRES_ADDL_ARG__FOR_EACH \
+            REQUIRES_ADDL_ARG__EXPECT_HTTP_GET_RESPONSE \
             REQUIRES_ADDL_ARG__IF_ELSE \
             REQUIRES_ADDL_ARG__LN_H \
             REQUIRES_ADDL_ARG__LN_S \
@@ -259,6 +286,8 @@ SOFTWARE.
             REQUIRES_ADDL_ARG__PWD \
             REQUIRES_ADDL_ARG__RM \
             REQUIRES_ADDL_ARG__RMDIR \
+            REQUIRES_ADDL_ARG__SHARED_ADDRESS \
+            REQUIRES_ADDL_ARG__SHARED_CONNECT \
             REQUIRES_ADDL_ARG__SHARED_SUB_ARGS \
             REQUIRES_ADDL_ARG__SHARED_VIRTUAL \
             REQUIRES_ADDL_ARG__SIGNAL \
@@ -267,6 +296,7 @@ SOFTWARE.
             REQUIRES_ADDL_ARG__SU_EXEC \
             REQUIRES_ADDL_ARG__SU_SPAWN \
             REQUIRES_ADDL_ARG__SUBCMD \
+            REQUIRES_ADDL_ARG__TEST_CONNECT \
             REQUIRES_ADDL_ARG__TIMER_FUNCS \
             REQUIRES_ADDL_ARG__TOUCH_TRUNC \
             REQUIRES_ADDL_ARG__WAIT_PID \
@@ -284,6 +314,7 @@ enum CommandIndex {
             ENUM_LIST__CD
             ENUM_LIST__CHMOD
             ENUM_LIST__CHOWN
+            ENUM_LIST__DNSLOOKUP
             ENUM_LIST__DUP
             ENUM_LIST__ECHO
             ENUM_LIST__EXEC
@@ -292,6 +323,7 @@ enum CommandIndex {
             ENUM_LIST__FILE_STAT
             ENUM_LIST__FMODE
             ENUM_LIST__FOR_EACH
+            ENUM_LIST__EXPECT_HTTP_GET_RESPONSE
             ENUM_LIST__IF_ELSE
             ENUM_LIST__LN_H
             ENUM_LIST__LN_S
@@ -304,6 +336,8 @@ enum CommandIndex {
             ENUM_LIST__PWD
             ENUM_LIST__RM
             ENUM_LIST__RMDIR
+            ENUM_LIST__SHARED_ADDRESS
+            ENUM_LIST__SHARED_CONNECT
             ENUM_LIST__SHARED_SUB_ARGS
             ENUM_LIST__SHARED_VIRTUAL
             ENUM_LIST__SIGNAL
@@ -312,6 +346,7 @@ enum CommandIndex {
             ENUM_LIST__SU_EXEC
             ENUM_LIST__SU_SPAWN
             ENUM_LIST__SUBCMD
+            ENUM_LIST__TEST_CONNECT
             ENUM_LIST__TIMER_FUNCS
             ENUM_LIST__TOUCH_TRUNC
             ENUM_LIST__WAIT_PID
@@ -328,6 +363,7 @@ enum CommandIndex {
             VIRTUAL_ENUM_LIST__CD
             VIRTUAL_ENUM_LIST__CHMOD
             VIRTUAL_ENUM_LIST__CHOWN
+            VIRTUAL_ENUM_LIST__DNSLOOKUP
             VIRTUAL_ENUM_LIST__DUP
             VIRTUAL_ENUM_LIST__ECHO
             VIRTUAL_ENUM_LIST__EXEC
@@ -336,6 +372,7 @@ enum CommandIndex {
             VIRTUAL_ENUM_LIST__FILE_STAT
             VIRTUAL_ENUM_LIST__FMODE
             VIRTUAL_ENUM_LIST__FOR_EACH
+            VIRTUAL_ENUM_LIST__EXPECT_HTTP_GET_RESPONSE
             VIRTUAL_ENUM_LIST__IF_ELSE
             VIRTUAL_ENUM_LIST__LN_H
             VIRTUAL_ENUM_LIST__LN_S
@@ -348,6 +385,8 @@ enum CommandIndex {
             VIRTUAL_ENUM_LIST__PWD
             VIRTUAL_ENUM_LIST__RM
             VIRTUAL_ENUM_LIST__RMDIR
+            VIRTUAL_ENUM_LIST__SHARED_ADDRESS
+            VIRTUAL_ENUM_LIST__SHARED_CONNECT
             VIRTUAL_ENUM_LIST__SHARED_SUB_ARGS
             VIRTUAL_ENUM_LIST__SHARED_VIRTUAL
             VIRTUAL_ENUM_LIST__SIGNAL
@@ -356,6 +395,7 @@ enum CommandIndex {
             VIRTUAL_ENUM_LIST__SU_EXEC
             VIRTUAL_ENUM_LIST__SU_SPAWN
             VIRTUAL_ENUM_LIST__SUBCMD
+            VIRTUAL_ENUM_LIST__TEST_CONNECT
             VIRTUAL_ENUM_LIST__TIMER_FUNCS
             VIRTUAL_ENUM_LIST__TOUCH_TRUNC
             VIRTUAL_ENUM_LIST__WAIT_PID

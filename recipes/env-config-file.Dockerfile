@@ -24,7 +24,7 @@ COPY tests/ tests/
 
 # Adjust this value during the image build with `--build-arg`
 #   to alter which commands to include.
-ARG COMMANDS="dup-w env-cat-fd cat-fd spawn kill-pid wait-pid exit signal echo  noop enviro"
+ARG COMMANDS="dup-w env-cat-fd cat-fd spawn kill-pid wait-pid exit signal echo subcmd noop enviro"
 
 ENV COMMANDS=$COMMANDS
 
@@ -45,14 +45,10 @@ WORKDIR /opt/app/hello_world
 
 ENV LISTEN_PORT 9000
 
-# Because Node doesn't install signal handlers on its own,
-#   have presh listen for user signals.
-# This allows for the container to stop with Ctrl-C when
-#   the user runs the container with "-it" arguments.
-# This also has the signal listener wait for signal 17, which is SIGCHLD.
-#   This means that, if the server stops on its own (say, a bug or an
-#   explicit, internal stop), then the shell will notice that.  Otherwise,
-#   the shell will not stop when the server stops.
+# See the "signal-awareness.Dockerfile" to see why the
+#   spawn / signal trapping is added.  All of that is added in the "subcmd";
+#   which isn't necessary, but added here for clairty about the separation
+#   of example code.
 ENTRYPOINT \
     noop [Use dup-w and env-cat-fd to update config.json] \
        [based on environment variables.] \
@@ -61,13 +57,15 @@ ENTRYPOINT \
     && dup-w 8 /tmp/closed.txt \
     && noop [Show the config to stdout for testing purposes] \
     && noop [cat-fd 1 config.json] \
-    && noop [Launch the server] \
-    && spawn [/nodejs/bin/node server.js] NODE \
-    && noop [Wait for an OS terminate signal] \
-    && signal 1 2 9 15 17 wait && \
-    && noop [Kill the server and wait for it to end.] \
-    && echo [\nTerminating the server...] \
-    && kill-pid 15 ${NODE} \
-    && wait-pid ${NODE} *EXIT \
-    && echo [Terminated.] \
-    && exit ${EXIT}
+    && subcmd [ \
+      && noop [Launch the server] \
+      && spawn [/nodejs/bin/node server.js] NODE \
+      && noop [Wait for an OS terminate signal] \
+      && signal 1 2 9 15 17 wait \
+      && noop [Kill the server and wait for it to end.] \
+      && echo [\nTerminating the server...] \
+      && kill-pid 15 ${NODE} \
+      && wait-pid ${NODE} *EXIT \
+      && echo [Terminated.] \
+      && exit ${EXIT} \
+    ]

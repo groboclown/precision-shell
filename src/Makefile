@@ -70,6 +70,7 @@ COMMANDS = \
 	cmd_cd.h \
 	cmd_chmod.h \
 	cmd_chown.h \
+	cmd_dnslookup.h \
 	cmd_dup.h \
 	cmd_echo.h \
 	cmd_exec.h \
@@ -78,6 +79,7 @@ COMMANDS = \
 	cmd_file_stat.h \
 	cmd_fmode.h \
 	cmd_for_each.h \
+	cmd_http_request.h \
 	cmd_if_else.h \
 	cmd_ln_h.h \
 	cmd_ln_s.h \
@@ -90,6 +92,8 @@ COMMANDS = \
 	cmd_pwd.h \
 	cmd_rm.h \
 	cmd_rmdir.h \
+	cmd_shared_address.h \
+	cmd_shared_connect.h \
 	cmd_shared_sub_args.h \
 	cmd_shared_virtual.h \
 	cmd_signal.h \
@@ -98,6 +102,7 @@ COMMANDS = \
 	cmd_su_exec.h \
 	cmd_su_spawn.h \
 	cmd_subcmd.h \
+	cmd_test_connect.h \
 	cmd_timer.h \
 	cmd_touch_trunc.h \
 	cmd_wait_pid.h \
@@ -111,7 +116,7 @@ COMMANDS = \
 
 
 .PHONY: all
-all: clean src debug
+all: clean src debug $(OUTDIR)/test_server
 
 
 .PHONY: src
@@ -164,3 +169,8 @@ $(OUTDIR)/presh: $(SRC) $(COMMAND_HEADERS_DIR)/command_list.h
 $(OUTDIR)/presh-debug: $(SRC) $(COMMAND_HEADERS_DIR)/command_list.h
 	mkdir -p $(OUTDIR)
 	$(CC) $(CFLAGS) $(LFLAGS) $(DFLAGS) $(COMMAND_FLAGS) $? $(LDFLAGS) -o $@
+
+
+$(OUTDIR)/test_server: test_server.c
+	mkdir -p $(OUTDIR)
+	$(CC) $(CFLAGS) $(LFLAGS) $? $(LDFLAGS) -o $@

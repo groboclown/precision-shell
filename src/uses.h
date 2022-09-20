@@ -34,6 +34,7 @@ SOFTWARE.
 // USE_CMD_START_TIMER - this command is always included if any
 //   of the timer commands is also used.
 #if    defined(USE_CMD_ELAPSED_TIME) \
+    || defined(USE_CMD_ELAPSED_TIME_UNDER) \
     || defined(USE_CMD_EXPORT_ELAPSED_TIME)
 
 #define USE_CMD_START_TIMER 1
@@ -80,14 +81,33 @@ SOFTWARE.
 #endif
 
 
+// USES_SHARED_SERVICE - allow connecting to and parsing an address + port
+#if    defined(USE_CMD_TEST_CONNECT) \
+    || defined(USE_CMD_EXPECT_HTTP_GET_RESPONSE)
+
+#define USES_SHARED_CONNECT
+
+#endif
+
+// USES_SHARED_ADDRESS - allow connecting to and parsing an address; port is separate.
+#if    defined(USE_CMD_EXPORT_HOST_LOOKUP)
+
+#define USES_SHARED_ADDRESS
+
+#endif
+
+
 // USES_SHARED_STR - shared logic for capturing an argument for later use.
 #if    defined(USE_CMD_LN_S) \
     || defined(USE_CMD_LN_H) \
     || defined(USE_CMD_MV) \
+    || defined(USE_CMD_EXPORT_HOST_LOOKUP) \
+    || defined(USE_CMD_EXPORT_DNS_QUERY) \
     || defined(USE_CMD_EXPORT) \
     || defined(USE_CMD_WHILE_NO_ERROR) \
     || defined(USE_CMD_WHILE_ERROR) \
-    || defined(USE_CMD_FOR_EACH)
+    || defined(USE_CMD_FOR_EACH)  \
+    || defined(USES_SHARED_CONNECT)
 
 #define USES_SHARED_STR
 
@@ -104,7 +124,10 @@ SOFTWARE.
     || defined(USE_CMD_CAT_FD) \
     || defined(USE_CMD_ENV_CAT_FD) \
     || defined(USE_CMD_SU_EXEC) \
-    || defined(USE_CMD_SU_SPAWN)
+    || defined(USE_CMD_SU_SPAWN) \
+    || defined(USE_CMD_TEST_IPV4) \
+    || defined(USE_CMD_TEST_IPV6) \
+    || defined(USE_CMD_EXPECT_HTTP_GET_RESPONSE)
 
 #define USES_SHARED_INT
 
@@ -114,6 +137,7 @@ SOFTWARE.
 // USES_FD_READ - any command or capability that allows for reading from a file descriptor.
 #if    defined(USE_STREAMING_INPUT) \
     || defined(USE_CMD_CAT_FD) \
+    || defined(USE_CMD_EXPORT_HOST_LOOKUP) \
     || defined(USE_CMD_ENV_CAT_FD)
 
 #define USES_FD_READ
@@ -133,6 +157,7 @@ SOFTWARE.
 //    || defined(USE_CMD_SPAWN)
 //    || defined(USE_CMD_PWD)
 //    || defined(USE_CMD_WAIT_PID)
+//    || defined(USE_CMD_EXPORT_HOST_LOOKUP)
 
 #endif
 
@@ -142,6 +167,7 @@ SOFTWARE.
     || defined(USE_CMD_SPAWN) \
     || defined(USE_CMD_WAIT_PID) \
     || defined(USE_CMD_SUBCMD) \
+    || defined(USE_CMD_NOT) \
     || defined(USE_CMD_IF_ELSE) \
     || defined(USE_CMD_WHILE_NO_ERROR) \
     || defined(USE_CMD_WHILE_ERROR) \

@@ -1,0 +1,156 @@
+// GENERATED FROM cmd_shared_address.h.in.  DO NOT EDIT.
+
+/*
+MIT License
+
+Copyright (c) 2022 groboclown
+
+Permission is hereby granted, free of charge, to any person obtaining a copy
+of this software and associated documentation files (the "Software"), to deal
+in the Software without restriction, including without limitation the rights
+to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+copies of the Software, and to permit persons to whom the Software is
+furnished to do so, subject to the following conditions:
+
+The above copyright notice and this permission notice shall be included in all
+copies or substantial portions of the Software.
+
+THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+SOFTWARE.
+*/
+
+#ifndef _FS_SHELL__CMD_SHARED_ADDRESS_
+#define _FS_SHELL__CMD_SHARED_ADDRESS_
+
+// Optional command shared-address
+
+#ifdef USES_SHARED_ADDRESS
+
+
+// Standard Network Communication Tools
+
+#include <arpa/inet.h>
+#include <netinet/in.h>
+#include <sys/socket.h>
+#include <sys/select.h>
+#include <netdb.h>
+#include <errno.h>
+#include <fcntl.h>
+#include <stdio.h>
+#include <stdlib.h>
+#include <unistd.h>
+
+
+union shared_network_sockaddr_t {
+    // struct sockaddr_in6:
+    //    sa_family_t     sin6_family;
+    //    in_port_t       sin6_port;
+    //    uint32_t        sin6_flowinfo;
+    //    struct in6_addr sin6_addr;
+    //    (address structure: unsigned char s6_addr[16];)
+    //    uint32_t        sin6_scope_id;
+    // struct sockaddr_in:
+    //    sa_family_t    sin_family;
+    //    in_port_t      sin_port;
+    //    struct in_addr sin_addr;
+    //    (address structure: uint32_t s_addr;)
+
+    // So, for this union, these are the same location:
+    //    ip4.sin_family and ip6.sin6_family
+    //    ip4.sin6_port and ip6.sin6_port
+
+    struct sockaddr_in ip4;
+    struct sockaddr_in6 ip6;
+    struct sockaddr any_address;
+};
+
+typedef struct {
+    union shared_network_sockaddr_t addr;
+    int family;
+    int sock_type;
+    int protocol;
+    socklen_t addr_len;
+} shared_network_socketaddr_t;
+
+#define IP_ADDRESS_STRING_LEN INET6_ADDRSTRLEN
+
+
+
+    // Collects the current argument as the IP address into the
+    // union_shared_sockaddr_t structure.
+    // Pass the next command to run in global_arg2_i.
+    // Don't forget to set the port number:
+    //      shared_network_addr.ip4.sin_port = htos(port number);
+
+#define ENUM_LIST__SHARED_ADDRESS
+#define VIRTUAL_ENUM_LIST__SHARED_ADDRESS \
+            /* from cmd_shared_address.h.in:80 */ \
+            COMMAND_INDEX__SHARED_ADDRESS,
+#define GLOBAL_VARDEF__SHARED_ADDRESS
+#define INITIALIZE__SHARED_ADDRESS \
+            /* from cmd_shared_address.h.in:81 */ \
+            shared_network_socketaddr_t shared_network_addr; \
+            struct addrinfo *shared_network_addrinfo; \
+            struct addrinfo *shared_network_addrinfo_next; \
+            char shared_network_addr_str[IP_ADDRESS_STRING_LEN];
+#define STARTUP_CASE__SHARED_ADDRESS
+#define RUN_CASE__SHARED_ADDRESS \
+    case COMMAND_INDEX__SHARED_ADDRESS: \
+        /* from cmd_shared_address.h.in:80 */ \
+            /* from cmd_shared_address.h.in:88 */ \
+            LOG(":: discovering ip address for "); \
+            LOGLN(global_arg); \
+            /* Assume an error until we get the value.*/ \
+            global_err = 1; \
+            global_cmd = COMMAND_INDEX__ERR; \
+            shared_network_addrinfo = NULL; \
+            tmp_val = getaddrinfo(global_arg, NULL, NULL, &shared_network_addrinfo); \
+            if (tmp_val == 0 && shared_network_addrinfo != NULL) { \
+                for ( \
+                        shared_network_addrinfo_next = shared_network_addrinfo; \
+                        shared_network_addrinfo_next != NULL; \
+                        shared_network_addrinfo_next = shared_network_addrinfo_next->ai_next) { \
+                    if (shared_network_addrinfo_next->ai_addrlen <= sizeof(union shared_network_sockaddr_t)) { \
+                        memcpy(&shared_network_addr.addr.any_address, shared_network_addrinfo_next->ai_addr, shared_network_addrinfo_next->ai_addrlen); \
+                        shared_network_addr.addr_len = shared_network_addrinfo_next->ai_addrlen; \
+                        shared_network_addr.family = shared_network_addrinfo_next->ai_family; \
+                        shared_network_addr.sock_type = shared_network_addrinfo_next->ai_socktype; \
+                        shared_network_addr.protocol = shared_network_addrinfo_next->ai_protocol; \
+                        /* Not 100% needed in all cases, but very useful for debugging.*/ \
+                        if (shared_network_addr.family == AF_INET6) { \
+                            inet_ntop(shared_network_addr.family, &shared_network_addr.addr.ip6.sin6_addr, shared_network_addr_str, IP_ADDRESS_STRING_LEN); \
+                        } else if (shared_network_addr.family == AF_INET) { \
+                            inet_ntop(shared_network_addr.family, &shared_network_addr.addr.ip4.sin_addr, shared_network_addr_str, IP_ADDRESS_STRING_LEN); \
+                        } else { \
+                            /* Keep looking*/ \
+                            continue; \
+                        } \
+                        LOG(":: mapped to "); \
+                        LOGLN(shared_network_addr_str); \
+                        global_cmd = global_arg2_i; \
+                        global_err = 0; \
+                        break; \
+                    } \
+                } \
+                freeaddrinfo(shared_network_addrinfo); \
+            } \
+        break;
+#define REQUIRES_ADDL_ARG__SHARED_ADDRESS
+
+#else /* USES_SHARED_ADDRESS */
+
+#define ENUM_LIST__SHARED_ADDRESS
+#define VIRTUAL_ENUM_LIST__SHARED_ADDRESS
+#define GLOBAL_VARDEF__SHARED_ADDRESS
+#define INITIALIZE__SHARED_ADDRESS
+#define STARTUP_CASE__SHARED_ADDRESS
+#define RUN_CASE__SHARED_ADDRESS
+#define REQUIRES_ADDL_ARG__SHARED_ADDRESS
+#endif /* USES_SHARED_ADDRESS */
+
+#endif /* _FS_SHELL__CMD_SHARED_ADDRESS_ */

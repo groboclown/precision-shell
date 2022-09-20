@@ -61,8 +61,8 @@ VOLUME /opt/logs
 #   the shell will not stop when the server stops.
 ENTRYPOINT \
     noop [The image has user "nonroot" set to uid 65532] \
-      [and group "nonroot" set to gid 65532] \
-      [In this example, the /opt/logs directory has the wrong permissions] \
+      [and group "nonroot" set to gid 65532.] \
+      [In this example, the /opt/logs directory has "unexpected" permissions] \
       [because of the VOLUME command above.] \
     && chown 65532 65532 /opt/logs \
     && noop [Debug the changed ownership] \
@@ -70,7 +70,7 @@ ENTRYPOINT \
     && noop [Launch the server as the non-root user.] \
     && su-spawn 65532 65532 [/nodejs/bin/node server.js] NODE \
     && noop [Wait for an OS terminate signal.  17 means the child process died.] \
-    && signal 1 2 9 15 17 wait && \
+    && signal 1 2 9 15 17 wait \
     && noop [Kill the server and wait for it to end.] \
     && echo [\nTerminating the server...] \
     && kill-pid 15 ${NODE} \

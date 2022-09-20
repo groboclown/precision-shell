@@ -54,6 +54,10 @@ case "${BUILD_MODE}" in
 
         ls -lAS out/presh*
         ;;
+    interactive)
+        # Do nothing, to allow a shell to run with the image.
+
+        ;;
     *)
         commands=""
         if [ "${COMMANDS}" = "ALL" ] ; then

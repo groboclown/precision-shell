@@ -26,14 +26,20 @@ AsOptionalUnion(file="timer_funcs",
 #include <time.h>
 #include "output.h"
 
+// difftime introduces a floating point dependency, which adds bloat.
+// and all we need is just a simple subtraction.
+#define SECONDS_SINCE_START ((int) (time(NULL) - timer_val))
 
 AsOptional(command="start-timer",
 
     WithNamedStep(enum="START_TIMER", name="start-timer",
         OnCmd(
             LOG(":: start global timer\n");
-            timer_val = time(0);
+            timer_val = time(NULL);
             global_cmd = COMMAND_INDEX__ERR;
+            
+            // DEBUG
+            // printf(":: timer start %ld\n", timer_val);
         )
     )
 
@@ -45,11 +51,38 @@ AsOptional(command="elapsed-time",
     WithNamedStep(enum="ELAPSED_TIME", name="elapsed-time",
         OnCmd(
             LOG(":: report elapsed time since timer start\n");
-            // difftime introduces a floating point dependency, which adds bloat.
-            // and all we need is just a simple subtraction.
             // stdoutPLn(shared_itoa(difftime(time(0), timer_val), global_itoa));
-            stdoutPLn(shared_itoa(time(0) - timer_val, global_itoa));
+            stdoutPLn(shared_itoa(SECONDS_SINCE_START, global_itoa));
             global_cmd = COMMAND_INDEX__ERR;
+        )
+    )
+
+)
+
+
+AsOptional(command="elapsed-time-under",
+
+    WithNamedStep(enum="ELAPSED_TIME_UNDER", name="elapsed-time-under",
+        OnArg(
+            LOG(":: check if the elapsed time is less than ");
+            LOGLN(global_arg);
+
+            global_cmd = COMMAND_INDEX__ERR;
+            global_err = 1;
+
+            global_arg1_i = helper_arg_to_uint(global_arg, 10, 0xffff);
+            if (global_arg1_i >= 0) {
+                // difftime introduces a floating point dependency, which adds bloat.
+
+                if (SECONDS_SINCE_START < (time_t) global_arg1_i) {
+                    LOG("::  Yes, it is less than the expected value.\n");
+                    global_err = 0;
+                
+                // DEBUG
+                // } else {
+                //     printf(":: No: %ld - %ld = %d >= %d\n", time(NULL), timer_val, SECONDS_SINCE_START, global_arg1_i);
+                }
+            }
         )
     )
 
@@ -64,7 +97,7 @@ AsOptional(command="export-elapsed-time",
             // difftime introduces a floating point dependency, which adds bloat.
             // and all we need is just a simple subtraction.
             // global_itoa_ptr = shared_itoa(difftime(time(0), timer_val), global_itoa);
-            global_itoa_ptr = shared_itoa(time(0) - timer_val, global_itoa);
+            global_itoa_ptr = shared_itoa(SECONDS_SINCE_START, global_itoa);
             LOG(global_itoa_ptr);
             LOG(" into env variable ");
             LOGLN(global_arg);
@@ -75,10 +108,16 @@ AsOptional(command="export-elapsed-time",
 )
 
 
-WithAuxFor(commands=[start-timer, elapsed-time, export-elapsed-time],
+WithAuxFor(commands=[start-timer, elapsed-time, elapsed-time-under, export-elapsed-time],
 
     WithVirtualStep(enum="DO_NOT_USE_TIMER",
-        OnInit(
+        GlobalDefs(
+            // For many use cases, the timer must go outside the sub-command,
+            //   and so it can't be in the "OnInit", which is sub-command local.
+            //   So instead, it is put in the global space.
+            //   For an example, the delay-until-ready.Dockerfile only works
+            //   when this is global.  Otherwise, the timer check inside the loop
+            //   always fails.
             time_t timer_val = 0;
         )
     )
