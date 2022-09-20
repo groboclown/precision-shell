@@ -7,12 +7,12 @@
 "${FS}" -c "test-connect ::0 0 3" > out.txt 2>err.txt
 res=$?
 
-if [ ${res} -ne 3 ] ; then
+if [ ${res} -ne 1 ] ; then
     echo "Bad exit code: ${res}"
     exit 1
 fi
 
-if [ "$( printf "ERROR test-ipv6: 3\n" )" != "$( cat err.txt )" ] ; then
+if [ "$( printf "ERROR test-connect: 3\n" )" != "$( cat err.txt )" ] ; then
     echo "Generated invalid stderr"
     cat err.txt
     exit 1
