@@ -89,6 +89,7 @@ COMMANDS = \
 	cmd_mknod_mkdev.h \
 	cmd_mv.h \
 	cmd_noop.h \
+	cmd_not.h \
 	cmd_pwd.h \
 	cmd_rm.h \
 	cmd_rmdir.h \

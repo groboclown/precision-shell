@@ -15,6 +15,8 @@ server_pid=$!
 "${FS}" -c "expect-http-get-response localhost 29446 / 210" > out.txt 2>err.txt
 res=$?
 kill -15 "${server_pid}"
+# Ensure these files were added.
+touch server-out.txt server-err.txt
 
 if [ ${res} -ne 1 ] ; then
     echo "Bad exit code: ${res}"

@@ -51,6 +51,7 @@ SOFTWARE.
 #include "cmd_mknod_mkdev.h"
 #include "cmd_mv.h"
 #include "cmd_noop.h"
+#include "cmd_not.h"
 #include "cmd_pwd.h"
 #include "cmd_rm.h"
 #include "cmd_rmdir.h"
@@ -99,6 +100,7 @@ SOFTWARE.
             GLOBAL_VARDEF__MKNOD_MKDEV \
             GLOBAL_VARDEF__MV \
             GLOBAL_VARDEF__NOOP \
+            GLOBAL_VARDEF__NOT \
             GLOBAL_VARDEF__PWD \
             GLOBAL_VARDEF__RM \
             GLOBAL_VARDEF__RMDIR \
@@ -145,6 +147,7 @@ SOFTWARE.
             INITIALIZE__MKNOD_MKDEV \
             INITIALIZE__MV \
             INITIALIZE__NOOP \
+            INITIALIZE__NOT \
             INITIALIZE__PWD \
             INITIALIZE__RM \
             INITIALIZE__RMDIR \
@@ -191,6 +194,7 @@ SOFTWARE.
             STARTUP_CASE__MKNOD_MKDEV \
             STARTUP_CASE__MV \
             STARTUP_CASE__NOOP \
+            STARTUP_CASE__NOT \
             STARTUP_CASE__PWD \
             STARTUP_CASE__RM \
             STARTUP_CASE__RMDIR \
@@ -237,6 +241,7 @@ SOFTWARE.
             RUN_CASE__MKNOD_MKDEV \
             RUN_CASE__MV \
             RUN_CASE__NOOP \
+            RUN_CASE__NOT \
             RUN_CASE__PWD \
             RUN_CASE__RM \
             RUN_CASE__RMDIR \
@@ -283,6 +288,7 @@ SOFTWARE.
             REQUIRES_ADDL_ARG__MKNOD_MKDEV \
             REQUIRES_ADDL_ARG__MV \
             REQUIRES_ADDL_ARG__NOOP \
+            REQUIRES_ADDL_ARG__NOT \
             REQUIRES_ADDL_ARG__PWD \
             REQUIRES_ADDL_ARG__RM \
             REQUIRES_ADDL_ARG__RMDIR \
@@ -333,6 +339,7 @@ enum CommandIndex {
             ENUM_LIST__MKNOD_MKDEV
             ENUM_LIST__MV
             ENUM_LIST__NOOP
+            ENUM_LIST__NOT
             ENUM_LIST__PWD
             ENUM_LIST__RM
             ENUM_LIST__RMDIR
@@ -382,6 +389,7 @@ enum CommandIndex {
             VIRTUAL_ENUM_LIST__MKNOD_MKDEV
             VIRTUAL_ENUM_LIST__MV
             VIRTUAL_ENUM_LIST__NOOP
+            VIRTUAL_ENUM_LIST__NOT
             VIRTUAL_ENUM_LIST__PWD
             VIRTUAL_ENUM_LIST__RM
             VIRTUAL_ENUM_LIST__RMDIR

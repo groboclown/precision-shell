@@ -1,6 +1,6 @@
 ## v4.4.0
 
-* (?)
+* [cd15bd8](cd15bd8ab8fef0651616aacfe7e93fddbf6a096f)
     * Added network commands.
         * Added new `test-connect` command that checks for whether a network port is accepting socket connections.
         * Added new `expect-http-get-response` command for checking HTTP GET response status codes against a known value.
@@ -13,6 +13,7 @@
     * Fixed tests for `ls-l` to support different platform sort implementations.
     * Made newline replacement behavior configurable.  Nothing takes advantage of this yet, but this is in preparation of future updates.
     * Cleaned up recipe docker files.
+    * Switched Git Actions for the build from podman to docker.  This is due to issues with Git Actions' podman networking with IPv6.
 
 ## v4.3.0
 
