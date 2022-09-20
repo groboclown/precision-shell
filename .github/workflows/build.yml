@@ -114,7 +114,6 @@ jobs:
       
       # Setup an ipv6 container network so that the
       #     commands that use it work as expected.
-      # Podman can't use the network build option as non-root.
       - name: Setup Network
         run: |
           docker network create --ipv6 --subnet=fd00:0bca:85f3:17a0::/64 netv6
@@ -129,7 +128,7 @@ jobs:
 
       - name: file-size
         run: |
-          podman build --network netv6 -f build-dietlibc.Dockerfile -t dietlibc:offline --build-arg BUILD_MODE=cmd-size .
+          docker build --network netv6 -f build-dietlibc.Dockerfile -t dietlibc:offline --build-arg BUILD_MODE=cmd-size .
 
 
   sample:
