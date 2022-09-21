@@ -1,3 +1,9 @@
+## v4.4.1
+
+* (?)
+    * Added `ls-l` documentation.
+    * Removed unused `cmd_ls.h.in` file.  It was no longer used after migration to include the `ls-l` command.
+
 ## v4.4.0
 
 * [cd15bd8](cd15bd8ab8fef0651616aacfe7e93fddbf6a096f)

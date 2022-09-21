@@ -569,9 +569,83 @@ Creates a symbolic link named dest file, pointing to src file.
 
 **Usage**: `ls (directory1 (directory2 ...))`
 
-Outputs, one per line, each entry within the given directory to stdout.  It does not use splat patterns (e.g. `*.txt`), and only accepts directory names.  The output does not include the directory name for the input.
+Outputs, one per line, each entry within the given directory to stdout.  It does not use splat patterns (e.g. `*.txt`), and only accepts directory names.
 
-Limited use as a diagnostic tool when inspecting an image.  Most securely constructed images should never use this command.
+The output does not include the directory name for the input.  This means if multiple directory arguments are passed, you won't be able to tell which directory the files belong to.
+
+Limited use as a diagnostic tool when inspecting an image.  Most securely constructed images should never include this command.
+
+**Example:**
+
+```bash
+$ presh -c "mkdir x ; mkdir y ; touch x/a.txt ; touch y/b.txt ; ls-l x y"
+a.txt
+b.txt
+```
+
+### ls-l
+
+**Compile flag**: `-DUSE_CMD_LS_L`
+
+**Usage**: `ls-l (directory1 (directory2 ...))`
+
+Generates an output similar to the output for the standard Unix `ls -lA` command.  Output is sent to stdout.  Non-directory arguments generate errors.
+
+Limited use as a diagnostic tool when inspecting an image.  Most securely constructed images should never include this command.
+
+The output format has these columns:
+
+1. File attributes.  Each character indicates a different attribute.
+  1. File type.
+    * `-` regular file
+    * `d` directory
+    * `l` symbolic link
+    * `b` block-type device
+    * `c` character-type device
+    * `s` UNIX domain socket
+    * `p` FIFO pipe
+    * `?` other file type
+  2. Sticky flag.  `t` means the userid is "sticky", `s` means the groupid is "sticky", and `-` means no sticky flag.
+  3. Owning user read access.  `r` for allowed, `-` for not.
+  4. Owning user write access. `w` for allowed, `-` for not.
+  5. Owning user execute access.  `x` for allowed, `-` for not.
+  6. Owning group read access.  `r` for allowed, `-` for not.
+  7. Owning group write access. `w` for allowed, `-` for not.
+  8. Owning group execute access.  `x` for allowed, `-` for not.
+  6. Other read access.  `r` for allowed, `-` for not.
+  7. Other write access. `w` for allowed, `-` for not.
+  8. Other execute access.  `x` for allowed, `-` for not.
+2. Number of hard links to this file.
+3. Owning user ID (numeric, not name)
+4. Owning group ID (numeric, not name)
+5. Device major number
+6. Device minor number
+7. File size, in bytes
+8. File name, including directory.
+
+The command does not report modified or created times.
+
+**Example 1:**
+
+```bash
+$ presh -c "mkdir x ; mkdir y ; touch x/a.txt ; mkdir x/o.d ; mknod p y/b.fifo ; ls-l x y"
+d-rwxr-xr-x 2 1000 1000 0 0 4096 x/o.d
+--rw-r--r-- 1 1000 1000 0 0 0 x/a.txt
+p-rw-r--r-- 1 1000 1000 0 0 0 y/b.fifo
+```
+
+**Example 2:**
+
+The `ls-l` command does not work on files; only directory paths.
+
+```bash
+$ presh -c "ls-l /dev/null"
+ERROR ls-l: /dev/null
+$ presh -c "ls-l /dev"
+...
+c-rw-rw-rw- 1 0 0 1 3 0 /dev/null
+...
+```
 
 ### ls-t
 
@@ -589,6 +663,10 @@ Similar to [`ls`](#ls), but each line starts with a file-type letter:
 * `l` - symbolic link
 * `s` - UNIX domain socket
 * `o` - other
+
+Limited use as a diagnostic tool when inspecting an image.  Most securely constructed images should never include this command.
+
+**Example:**
 
 ```bash
 $ presh -c "mkdir x ; touch x/a.txt ; mkdir x/o.d ; mknod p x/b.fifo ; ls-t x"
