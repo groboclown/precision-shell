@@ -17,7 +17,7 @@ FROM docker.io/library/alpine:3.10 AS presh-builder
 WORKDIR /opt/precision-shell
 
 COPY build-tools/ build-tools/
-COPY Makefile Makefile.command-flags version.txt ./
+COPY Makefile Makefile.command-flags Makefile.compiler-flags version.txt ./
 COPY src/ src/
 COPY tests/ tests/
 
