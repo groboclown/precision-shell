@@ -7,7 +7,7 @@ ARG FLAGS="INCLUDE_ALL_COMMANDS=1"
 
 WORKDIR /opt/code
 
-COPY Makefile.command-flags version.txt ./
+COPY Makefile.command-flags Makefile.compiler-flags version.txt ./
 COPY build-tools/generate-command-template.py build-tools/
 COPY src/ src/
 
