@@ -3,8 +3,8 @@
 * [3ef7cf6](3ef7cf6ad76fa289490d71c8c7bd6e64e4cd5c5b)
     * Added `ls-l` documentation.
     * Removed unused `cmd_ls.h.in` file.  It was no longer used after migration to include the `ls-l` command.
-* (?)
-    * Added support for clang and llvm compile chain.
+* [cf373ca](cf373cabe1785d9a2c728ac8fb0113f1a433eeeb)
+    * Added support for clang+llvm compile chain.
     * Clarified documentation around version numbering, for how documentation and platform support changes trigger patch version increases, not minor version increases.
 
 
