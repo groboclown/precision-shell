@@ -48,8 +48,8 @@ ifneq '' '$(findstring clang, $(CC))'
         -g
 
 
-else ifneq '' '$(findstring gcc, $(CC))'
-    # GCC compiler
+else
+    # Default; assume GCC compatible compiler
 
     MINFLAGS = \
         -fno-builtin-strlen \
@@ -80,6 +80,4 @@ else ifneq '' '$(findstring gcc, $(CC))'
     LFLAGS = -static -static-libgcc
     DFLAGS = -DDEBUG=1 -g
 
-else
-    $(error Unknown compiler $(CC); only gcc and clang are currently supported.)
 endif
