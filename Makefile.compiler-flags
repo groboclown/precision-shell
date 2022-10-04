@@ -4,15 +4,13 @@ ifneq '' '$(findstring clang, $(CC))'
 
     MINFLAGS = \
         -fbinutils-version=4.0 \
+        -fno-keep-static-consts \
         -fcommon \
         -fdiscard-value-names \
-        -feliminate-unused-debug-types \
         -ffast-math \
         -fjump-tables \
         -fmax-type-align=0 \
-        -falign-loops=0 \
         -fpack-struct=0 \
-        -munaligned-access \
         -fno-access-control \
         -fno-debug-macro \
         -fno-exceptions \
@@ -20,14 +18,22 @@ ifneq '' '$(findstring clang, $(CC))'
         -fno-unroll-loops \
         -freroll-loops \
         -fshort-enums \
-        -fno-keep-static-consts \
         -fno-threadsafe-statics \
         -Oz \
         -g0 \
         -s
 
+    # not supported in clang 13:
+    #    -falign-loops=0 \
+    #    
+
+    # not sure the right way to use these:
     #   -malign-branch-boundary=0 \
     #	-fmerge-all-constraints \
+
+    # Not used
+    #    -feliminate-unused-debug-types \
+    #    -munaligned-access \
 
 
     LFLAGS = -static
@@ -37,7 +43,7 @@ ifneq '' '$(findstring clang, $(CC))'
         -DDEBUG=1 \
         -fstandalone-debug \
         -gcodeview \
-        -gdwarf \
+        -gdwarf-5 \
         -gembed-source \
         -g
 

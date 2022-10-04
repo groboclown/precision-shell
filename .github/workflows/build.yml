@@ -69,6 +69,37 @@ jobs:
         run: |
           docker build --network netv6 -f build-glibc-arch.Dockerfile -t glibc-arch:offline --build-arg BUILD_MODE=cmd-size .
 
+  clang-musl:
+    name: Build & Test with clang / musl
+    runs-on: ubuntu-latest
+    outputs:
+      version: ${{ steps.properties.outputs.version }}
+      changelog: ${{ steps.properties.outputs.changelog }}
+    steps:
+
+      # Check out current repository
+      - name: Fetch Sources
+        uses: actions/checkout@v3
+      
+      # Setup an ipv6 container network so that the
+      #     commands that use it work as expected.
+      # Podman can't use the network build option as non-root.
+      - name: Setup Network
+        run: |
+          docker network create --ipv6 --subnet=fd00:0bca:85f3:17a0::/64 netv6
+
+      - name: build-test
+        run: |
+          docker build --network netv6 -f build-clang.Dockerfile -t clang:offline --build-arg COMMANDS=ALL .
+      
+      - name: cmd-test
+        run: |
+          docker build --network netv6 -f build-clang.Dockerfile -t clang:offline --build-arg BUILD_MODE=individual-cmd-test .
+      
+      - name: file-size
+        run: |
+          docker build --network netv6 -f build-clang.Dockerfile -t clang:offline --build-arg BUILD_MODE=cmd-size .
+
   musl:
     name: Build & Test with musl
     runs-on: ubuntu-latest
