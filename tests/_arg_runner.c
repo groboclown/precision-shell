@@ -35,6 +35,16 @@ SOFTWARE.
 
 static char *SECOND_ARG = "-c";
 
+#ifdef DEBUG
+#define LOG0(x) printf(x)
+#define LOG1(x, y) printf(x, y)
+#define LOG3(a, b, c, d) printf(a, b, c, d)
+#else
+#define LOG0(x)
+#define LOG1(x, y)
+#define LOG3(a, b, c, d)
+#endif
+
 
 int main(const int argc, char *argv[]) {
     FILE *fin;
@@ -47,15 +57,15 @@ int main(const int argc, char *argv[]) {
         printf("Usage: %s (cmd name) (argument file name)\n", argv[0]);
         return 1;
     }
-    // printf("Opening file %s\n", argv[2]);
+    LOG1("Opening file %s\n", argv[2]);
     fin = fopen(argv[2], "r");
-    // printf("  ... seeking to end\n");
+    LOG0("  ... seeking to end\n");
     fseek(fin, 0L, SEEK_END);
-    // printf("  ... finding position\n");
+    LOG0("  ... finding position\n");
     file_size = ftell(fin);
-    // printf("  ... seeking back to start\n");
+    LOG0("  ... seeking back to start\n");
     fseek(fin, 0L, SEEK_SET);
-    // printf("  ... reading %ld bytes\n", file_size);
+    LOG1("  ... reading %ld bytes\n", file_size);
 
     arg = malloc(sizeof(char) * file_size);
     if (arg == NULL) {
@@ -70,7 +80,7 @@ int main(const int argc, char *argv[]) {
     }
     exec_argv[2] = arg;
 
-    // printf("  ... running %s %s %s\n", exec_argv[0], exec_argv[1], exec_argv[2]);
+    LOG3("  ... running %s %s %s\n", exec_argv[0], exec_argv[1], exec_argv[2]);
 
     execvp(exec_argv[0], (char * const*) exec_argv);
 

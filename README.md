@@ -1213,26 +1213,31 @@ Last build size:
 * Do-nothing build:
   * [glibc (Ubuntu)](#build-glibc.Dockerfile): 819,656 bytes
   * [glibc (Arch)](#build-glibc-arch.Dockerfile): 700,432 bytes
+  * [clang/musl (Alpine)](#build-clang.Dockerfile): 25,752 bytes
   * [musl (Alpine)](#build-musl.Dockerfile): 21,944 bytes
   * [dietlibc (Alpine)](#build-dietlibc.Dockerfile): 13,256 bytes
 * Minimal build:
   * glibc (Ubuntu): 823,752 bytes
   * glibc (Arch): 700,432 bytes
+  * clang (Alpine): 25,752 bytes
   * musl (Alpine): 21,944 bytes
   * dietlibc (Alpine): 17,352 bytes
 * Standard build:
   * glibc (Ubuntu): 831,944 bytes
   * glibc (Arch): 704,528 bytes
+  * clang (Alpine): 29,848 bytes
   * musl (Alpine): 26,040 bytes
   * dietlibc (Alpine): 17,352 bytes
 * Non-Network build:
   * glibc (Ubuntu): 844,232 bytes
   * glibc (Arch): 720,944 bytes
+  * clang (Alpine): 46,240 bytes
   * musl (Alpine): 42,432 bytes
   * dietlibc (Alpine): 29,640 bytes
 * Full build:
   * glibc (Ubuntu): 1,077,992 bytes
   * glibc (Arch): 921,936 bytes
+  * clang (Alpine): 74,912 bytes
   * musl (Alpine): 71,104 bytes
   * dietlibc (Alpine): 46,128 bytes
 
@@ -1317,6 +1322,8 @@ Releases should:
 3. Ensure the builds pass.  These run as part of the GitHub actions.
 4. The root [README.md](README.md) file is updated with the latest binary file sizes.  The automated builds include the file sizes.
 5. Author a new release in GitHub, with the title & tag set to the new version number.  No binary files are included here, but it auto-generates the source tarball.
+
+Version numbers generally follow the guideline of bug fixes increment the patch (third number), added functionality but not backwards incompatible increases the minor (second number), and backwards incompatible changes increases the major (first number).  Some things such as documentation improvements or added platform support, which does not change the functionality of the tool itself, trigger a release, but these will increase the patch number.
 
 
 # License

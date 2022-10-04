@@ -1,0 +1,83 @@
+
+ifneq '' '$(findstring clang, $(CC))'
+    # CLANG / LLVM compiler
+
+    MINFLAGS = \
+        -fbinutils-version=4.0 \
+        -fno-keep-static-consts \
+        -fcommon \
+        -fdiscard-value-names \
+        -ffast-math \
+        -fjump-tables \
+        -fmax-type-align=0 \
+        -fpack-struct=0 \
+        -fno-access-control \
+        -fno-debug-macro \
+        -fno-exceptions \
+        -fno-signed-char \
+        -fno-unroll-loops \
+        -freroll-loops \
+        -fshort-enums \
+        -fno-threadsafe-statics \
+        -Oz \
+        -g0 \
+        -s
+
+    # not supported in clang 13:
+    #    -falign-loops=0 \
+    #    
+
+    # not sure the right way to use these:
+    #   -malign-branch-boundary=0 \
+    #	-fmerge-all-constraints \
+
+    # Not used
+    #    -feliminate-unused-debug-types \
+    #    -munaligned-access \
+
+
+    LFLAGS = -static
+
+
+    DFLAGS = \
+        -DDEBUG=1 \
+        -fstandalone-debug \
+        -gcodeview \
+        -gdwarf-5 \
+        -gembed-source \
+        -g
+
+
+else
+    # Default; assume GCC compatible compiler
+
+    MINFLAGS = \
+        -fno-builtin-strlen \
+        -fomit-frame-pointer \
+        -ffunction-sections \
+        -fdata-sections \
+        -fno-guess-branch-probability \
+        -funsigned-char \
+        -fno-unwind-tables \
+        -fno-asynchronous-unwind-tables \
+        -fno-builtin-printf \
+        -Os \
+        -fvisibility=hidden \
+        -g0 \
+        -s \
+        -fno-strict-aliasing \
+        -fno-align-functions \
+        -fno-align-jumps \
+        -fno-align-loops \
+        -fno-align-labels
+
+    #	-Oz \
+
+    # Allow inline.
+    # 	-finline-limit=0 \
+
+
+    LFLAGS = -static -static-libgcc
+    DFLAGS = -DDEBUG=1 -g
+
+endif

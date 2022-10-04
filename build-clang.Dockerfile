@@ -1,4 +1,4 @@
-FROM docker.io/library/ubuntu:22.04
+FROM docker.io/library/alpine:3.16
 
 # This file is broken up to make rebuilds fast
 # by reusing previous layers that take a while to run.
@@ -6,10 +6,11 @@ FROM docker.io/library/ubuntu:22.04
 WORKDIR /opt/code
 
 RUN \
-       apt-get update \
-    && apt-get -y install "build-essential=12.9ubuntu3" "python3.10-minimal" \
-    && ln -s /usr/bin/python3.10 /usr/bin/python3 \
-    && rm -rf /tmp/* /var/cache/apt/*
+       apk --no-cache update \
+    && apk add \
+        python3 "bash=~5.1" \
+        "make=~4.3" "clang=~13.0" "clang-dev=~13.0" "lld=~13.0" \
+        "libc-dev=~0.7" "gcc=~11"
 
 COPY build-tools/ build-tools/
 COPY \
@@ -27,6 +28,8 @@ ARG COMMANDS="chmod ln-s"
 
 ENV \
 #    DEBUG=1 \
+    CC=clang \
+    LIBRARY_PATH=/usr/bin/lld.ld \
     BUILD_MODE=$BUILD_MODE \
     COMMANDS=$COMMANDS \
     UID1=1 \
@@ -34,5 +37,5 @@ ENV \
     GID1=1 \
     GID2=2
 
-RUN    echo 'LIBNAME=glibc' >> version.txt \
+RUN    echo 'LIBNAME=llvm' >> version.txt \
     && ./build-tools/internal-docker-make.sh
