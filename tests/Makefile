@@ -1,6 +1,6 @@
+include ../Makefile.compiler-flags
 BINDIR = ../out
 OUTDIR = ../out/tests
-LFLAGS = -static -static-libgcc
 
 # Debug versions are not tested, because they include a bunch
 #   of extra output.

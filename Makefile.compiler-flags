@@ -1,0 +1,79 @@
+
+ifneq '' '$(findstring clang, $(CC))'
+    # CLANG / LLVM compiler
+
+    MINFLAGS = \
+        -fbinutils-version=4.0 \
+        -fcommon \
+        -fdiscard-value-names \
+        -feliminate-unused-debug-types \
+        -ffast-math \
+        -fjump-tables \
+        -fmax-type-align=0 \
+        -falign-loops=0 \
+        -fpack-struct=0 \
+        -munaligned-access \
+        -fno-access-control \
+        -fno-debug-macro \
+        -fno-exceptions \
+        -fno-signed-char \
+        -fno-unroll-loops \
+        -freroll-loops \
+        -fshort-enums \
+        -fno-keep-static-consts \
+        -fno-threadsafe-statics \
+        -Oz \
+        -g0 \
+        -s
+
+    #   -malign-branch-boundary=0 \
+    #	-fmerge-all-constraints \
+
+
+    LFLAGS = -static
+
+
+    DFLAGS = \
+        -DDEBUG=1 \
+        -fstandalone-debug \
+        -gcodeview \
+        -gdwarf \
+        -gembed-source \
+        -g
+
+
+else ifneq '' '$(findstring gcc, $(CC))'
+    # GCC compiler
+
+    MINFLAGS = \
+        -fno-builtin-strlen \
+        -fomit-frame-pointer \
+        -ffunction-sections \
+        -fdata-sections \
+        -fno-guess-branch-probability \
+        -funsigned-char \
+        -fno-unwind-tables \
+        -fno-asynchronous-unwind-tables \
+        -fno-builtin-printf \
+        -Os \
+        -fvisibility=hidden \
+        -g0 \
+        -s \
+        -fno-strict-aliasing \
+        -fno-align-functions \
+        -fno-align-jumps \
+        -fno-align-loops \
+        -fno-align-labels
+
+    #	-Oz \
+
+    # Allow inline.
+    # 	-finline-limit=0 \
+
+
+    LFLAGS = -static -static-libgcc
+    DFLAGS = -DDEBUG=1 -g
+
+else
+    $(error Unknown compiler $(CC); only gcc and clang are currently supported.)
+endif

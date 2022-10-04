@@ -1318,6 +1318,8 @@ Releases should:
 4. The root [README.md](README.md) file is updated with the latest binary file sizes.  The automated builds include the file sizes.
 5. Author a new release in GitHub, with the title & tag set to the new version number.  No binary files are included here, but it auto-generates the source tarball.
 
+Version numbers generally follow the guideline of bug fixes increment the patch (third number), added functionality but not backwards incompatible increases the minor (second number), and backwards incompatible changes increases the major (first number).  Some things such as documentation improvements or added platform support, which does not change the functionality of the tool itself, trigger a release, but these will increase the patch number.
+
 
 # License
 

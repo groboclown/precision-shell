@@ -1,8 +1,12 @@
 ## v4.4.1
 
-* (?)
+* [3ef7cf6](3ef7cf6ad76fa289490d71c8c7bd6e64e4cd5c5b)
     * Added `ls-l` documentation.
     * Removed unused `cmd_ls.h.in` file.  It was no longer used after migration to include the `ls-l` command.
+* (?)
+    * Added support for clang and llvm compile chain.
+    * Clarified documentation around version numbering, for how documentation and platform support changes trigger patch version increases, not minor version increases.
+
 
 ## v4.4.0
 
@@ -21,6 +25,7 @@
     * Cleaned up recipe docker files.
     * Switched Git Actions for the build from podman to docker.  This is due to issues with Git Actions' podman networking with IPv6.
 
+
 ## v4.3.0
 
 * [46389d4](46389d4603708726e3392c65cc719abae06faddf)
@@ -29,6 +34,7 @@
     * Cleaned up `gen-cmd` directory so that it matches the current command list.
     * Fixed the make reference so that the right "ls" header is included.  This allows the `ls-l` command to now be buildable.
     * Added tests for `ls-l`.
+
 
 ## v4.2.0
 
@@ -39,6 +45,7 @@
 * [93f6ecb](93f6ecb72ec93d34f16fcc300d71562cec040e9e)
     * Added `su-spawn` and `su-exec` commands.
 
+
 ## v4.1.0
 
 * [519e18f](519e18fab1c9413c83283f4eb4456a89d2acb591)
@@ -48,6 +55,7 @@
     * Added `ls-t` command.
     * Added `file-stat` command.  This is considered an *experimental* command at the moment.  It may change how it works in the future.
     * Added recipes to show different scenarios for using Precision Shell in real-world situations.
+
 
 ## v4.0.0
 

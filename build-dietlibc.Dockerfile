@@ -18,7 +18,12 @@ RUN \
 ENV CC="diet cc"
 
 COPY build-tools/ build-tools/
-COPY Makefile Makefile.command-flags version.txt ./
+COPY \
+    Makefile \
+    Makefile.command-flags \
+    Makefile.compiler-flags \
+    version.txt \
+    ./
 COPY src/ src/
 COPY tests/ tests/
 
