@@ -1265,6 +1265,11 @@ Contributing new commands requires (this list assumes that the change is for a s
 7. Add documentation in the root [README.md](README.md) file, both in the initial command listing, and the detailed description.
 
 
+## Reporting Security Issues
+
+If you think you discovered an issue that allows for a remote attack on computer running Precision Shell, please open a bug report with enough information to describe what it is, then a representative with the project will reach out to find out more information on a private channel if it's determined to be severe enough to fix without reporting too much information.
+
+
 # Developing
 
 A guide to the special format for command code is in the [source tree](src/README.md).
