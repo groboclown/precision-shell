@@ -569,9 +569,83 @@ Creates a symbolic link named dest file, pointing to src file.
 
 **Usage**: `ls (directory1 (directory2 ...))`
 
-Outputs, one per line, each entry within the given directory to stdout.  It does not use splat patterns (e.g. `*.txt`), and only accepts directory names.  The output does not include the directory name for the input.
+Outputs, one per line, each entry within the given directory to stdout.  It does not use splat patterns (e.g. `*.txt`), and only accepts directory names.
 
-Limited use as a diagnostic tool when inspecting an image.  Most securely constructed images should never use this command.
+The output does not include the directory name for the input.  This means if multiple directory arguments are passed, you won't be able to tell which directory the files belong to.
+
+Limited use as a diagnostic tool when inspecting an image.  Most securely constructed images should never include this command.
+
+**Example:**
+
+```bash
+$ presh -c "mkdir x ; mkdir y ; touch x/a.txt ; touch y/b.txt ; ls-l x y"
+a.txt
+b.txt
+```
+
+### ls-l
+
+**Compile flag**: `-DUSE_CMD_LS_L`
+
+**Usage**: `ls-l (directory1 (directory2 ...))`
+
+Generates an output similar to the output for the standard Unix `ls -lA` command.  Output is sent to stdout.  Non-directory arguments generate errors.
+
+Limited use as a diagnostic tool when inspecting an image.  Most securely constructed images should never include this command.
+
+The output format has these columns:
+
+1. File attributes.  Each character indicates a different attribute.
+  1. File type.
+    * `-` regular file
+    * `d` directory
+    * `l` symbolic link
+    * `b` block-type device
+    * `c` character-type device
+    * `s` UNIX domain socket
+    * `p` FIFO pipe
+    * `?` other file type
+  2. Sticky flag.  `t` means the userid is "sticky", `s` means the groupid is "sticky", and `-` means no sticky flag.
+  3. Owning user read access.  `r` for allowed, `-` for not.
+  4. Owning user write access. `w` for allowed, `-` for not.
+  5. Owning user execute access.  `x` for allowed, `-` for not.
+  6. Owning group read access.  `r` for allowed, `-` for not.
+  7. Owning group write access. `w` for allowed, `-` for not.
+  8. Owning group execute access.  `x` for allowed, `-` for not.
+  6. Other read access.  `r` for allowed, `-` for not.
+  7. Other write access. `w` for allowed, `-` for not.
+  8. Other execute access.  `x` for allowed, `-` for not.
+2. Number of hard links to this file.
+3. Owning user ID (numeric, not name)
+4. Owning group ID (numeric, not name)
+5. Device major number
+6. Device minor number
+7. File size, in bytes
+8. File name, including directory.
+
+The command does not report modified or created times.
+
+**Example 1:**
+
+```bash
+$ presh -c "mkdir x ; mkdir y ; touch x/a.txt ; mkdir x/o.d ; mknod p y/b.fifo ; ls-l x y"
+d-rwxr-xr-x 2 1000 1000 0 0 4096 x/o.d
+--rw-r--r-- 1 1000 1000 0 0 0 x/a.txt
+p-rw-r--r-- 1 1000 1000 0 0 0 y/b.fifo
+```
+
+**Example 2:**
+
+The `ls-l` command does not work on files; only directory paths.
+
+```bash
+$ presh -c "ls-l /dev/null"
+ERROR ls-l: /dev/null
+$ presh -c "ls-l /dev"
+...
+c-rw-rw-rw- 1 0 0 1 3 0 /dev/null
+...
+```
 
 ### ls-t
 
@@ -589,6 +663,10 @@ Similar to [`ls`](#ls), but each line starts with a file-type letter:
 * `l` - symbolic link
 * `s` - UNIX domain socket
 * `o` - other
+
+Limited use as a diagnostic tool when inspecting an image.  Most securely constructed images should never include this command.
+
+**Example:**
 
 ```bash
 $ presh -c "mkdir x ; touch x/a.txt ; mkdir x/o.d ; mknod p x/b.fifo ; ls-t x"
@@ -1135,26 +1213,31 @@ Last build size:
 * Do-nothing build:
   * [glibc (Ubuntu)](#build-glibc.Dockerfile): 819,656 bytes
   * [glibc (Arch)](#build-glibc-arch.Dockerfile): 700,432 bytes
+  * [clang/musl (Alpine)](#build-clang.Dockerfile): 25,752 bytes
   * [musl (Alpine)](#build-musl.Dockerfile): 21,944 bytes
   * [dietlibc (Alpine)](#build-dietlibc.Dockerfile): 13,256 bytes
 * Minimal build:
   * glibc (Ubuntu): 823,752 bytes
   * glibc (Arch): 700,432 bytes
+  * clang (Alpine): 25,752 bytes
   * musl (Alpine): 21,944 bytes
   * dietlibc (Alpine): 17,352 bytes
 * Standard build:
   * glibc (Ubuntu): 831,944 bytes
   * glibc (Arch): 704,528 bytes
+  * clang (Alpine): 29,848 bytes
   * musl (Alpine): 26,040 bytes
   * dietlibc (Alpine): 17,352 bytes
 * Non-Network build:
   * glibc (Ubuntu): 844,232 bytes
   * glibc (Arch): 720,944 bytes
+  * clang (Alpine): 46,240 bytes
   * musl (Alpine): 42,432 bytes
   * dietlibc (Alpine): 29,640 bytes
 * Full build:
   * glibc (Ubuntu): 1,077,992 bytes
   * glibc (Arch): 921,936 bytes
+  * clang (Alpine): 74,912 bytes
   * musl (Alpine): 71,104 bytes
   * dietlibc (Alpine): 46,128 bytes
 
@@ -1180,6 +1263,11 @@ Contributing new commands requires (this list assumes that the change is for a s
 5. Include the new USE_CMD_* in the flag list in the Makefile.command-flags file, both in the list of flags, and in the INCLUDE_ALL_COMMANDS list.
 6. Add new test scripts in the `tests` directory.  The [test readme file](tests/README.md) offers a brief overview of what goes into a test script.
 7. Add documentation in the root [README.md](README.md) file, both in the initial command listing, and the detailed description.
+
+
+## Reporting Security Issues
+
+If you think you discovered an issue that allows for a remote attack on computer running Precision Shell, please open a bug report with enough information to describe what it is, then a representative with the project will reach out to find out more information on a private channel if it's determined to be severe enough to fix without reporting too much information.
 
 
 # Developing
@@ -1239,6 +1327,8 @@ Releases should:
 3. Ensure the builds pass.  These run as part of the GitHub actions.
 4. The root [README.md](README.md) file is updated with the latest binary file sizes.  The automated builds include the file sizes.
 5. Author a new release in GitHub, with the title & tag set to the new version number.  No binary files are included here, but it auto-generates the source tarball.
+
+Version numbers generally follow the guideline of bug fixes increment the patch (third number), added functionality but not backwards incompatible increases the minor (second number), and backwards incompatible changes increases the major (first number).  Some things such as documentation improvements or added platform support, which does not change the functionality of the tool itself, trigger a release, but these will increase the patch number.
 
 
 # License

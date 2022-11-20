@@ -1,6 +1,6 @@
 include ../version.txt
 include ../Makefile.command-flags
-
+include ../Makefile.compiler-flags
 
 .SUFFIXES: .h.in .h
 
@@ -12,41 +12,6 @@ MKCMDLIST = $(CMD_TEMPLATE_SCRIPT) --cmd-list .in
 
 # Include the version number from the version.txt
 CFLAGS += -DVERSION_NUMBER=\"$(VERSION)-$(LIBNAME)\"
-
-# See the compile-size-test.sh for investigation into
-#   which compile flags makes the smallest executable.
-# MINFLAGS = -g0 -s -Oz -Os -fomit-frame-pointer -fno-strict-aliasing -fno-align-functions -fno-align-jumps -fno-align-loops -fno-align-labels
-MINFLAGS = \
-	-fno-builtin-strlen \
-	-fomit-frame-pointer \
-	-ffunction-sections \
-	-fdata-sections \
-	-fno-guess-branch-probability \
-	-funsigned-char \
-	-fno-unwind-tables \
-	-fno-asynchronous-unwind-tables \
-	-fno-builtin-printf \
-	-Os \
-	-fvisibility=hidden \
-	-g0 \
-	-s \
-	-fno-strict-aliasing \
-	-fno-align-functions \
-	-fno-align-jumps \
-	-fno-align-loops \
-	-fno-align-labels
-#	-Oz \
-#	-falign-functions=1 \
-#	-falign-jumps=1 \
-#	-falign-labels=1 \
-#	-falign-loops=1 \
-
-# Allow inline.
-# 	-finline-limit=0 \
-
-
-LFLAGS = -static -static-libgcc
-DFLAGS = -DDEBUG=1 -g
 
 COMMAND_HEADERS_DIR = ./gen-cmd
 
@@ -162,14 +127,18 @@ $(COMMAND_HEADERS_DIR)/command_list.h: $(COMMANDS)
 		|| $(MKCMDLIST) $(COMMANDS) $*.h
 
 
+# clang can only take one .c file as input.
+
 $(OUTDIR)/presh: $(SRC) $(COMMAND_HEADERS_DIR)/command_list.h
 	mkdir -p $(OUTDIR)
-	$(CC) $(CFLAGS) $(LFLAGS) $(MINFLAGS) $(COMMAND_FLAGS) $? $(LDFLAGS) -o $@
+	cat $(SRC) > $(OUTDIR)/_presh-all.c
+	$(CC) $(CFLAGS) $(LFLAGS) $(MINFLAGS) $(COMMAND_FLAGS) $(OUTDIR)/_presh-all.c $(LDFLAGS) -o $@
 
 
 $(OUTDIR)/presh-debug: $(SRC) $(COMMAND_HEADERS_DIR)/command_list.h
 	mkdir -p $(OUTDIR)
-	$(CC) $(CFLAGS) $(LFLAGS) $(DFLAGS) $(COMMAND_FLAGS) $? $(LDFLAGS) -o $@
+	cat $(SRC) > $(OUTDIR)/_presh-all.c
+	$(CC) $(CFLAGS) $(LFLAGS) $(DFLAGS) $(COMMAND_FLAGS) $(OUTDIR)/_presh-all.c $(LDFLAGS) -o $@
 
 
 $(OUTDIR)/test_server: test_server.c
