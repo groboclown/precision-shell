@@ -28,7 +28,7 @@ fi
 # Note that, to use the ipv6 network during the build time, this requires some
 #  special magic that's different between podman and docker.
 BUILD_CMD=("${CONTAINER_RUNNER}" build --network=presh-net)
-if [ $( "${CONTAINER_RUNNER}" --version | cut -f 1 -d ' ' ) == "docker" ] ; then
+if [ $( "${CONTAINER_RUNNER}" --version | cut -f 1 -d ' ' ) != "podman" ] ; then
     if
         ! "${CONTAINER_RUNNER}" buildx create --name=presh-build --driver=docker-container --driver-opt="network=presh-net"
     then
@@ -37,7 +37,9 @@ if [ $( "${CONTAINER_RUNNER}" --version | cut -f 1 -d ' ' ) == "docker" ] ; then
     fi
     BUILD_CMD=("${CONTAINER_RUNNER}" buildx build --builder=presh-build)
 else
-    echo "Using ${CONTAINER_RUNNER} - calling it by the old build style."
+    echo "Using:"
+    ${CONTAINER_RUNNER} --version
+    echo "Invoking it by the old build style."
 fi
 
 cd "$( dirname "$0" )/.."
@@ -47,8 +49,9 @@ errs=0
 declare -a err_names
 for name in ${this_dir}/*.Dockerfile ; do
     base="$( basename "${name}" .Dockerfile )"
-    "${BUILD_CMD[@]}" -t "local/presh-${base}:build" -f "${name}" .
-    if [ $? != 0 ] ; then
+    if
+        ! "${BUILD_CMD[@]}" -t "local/presh-${base}:build" -f "${name}" .
+    then
         errs=$(( errs + 1 ))
         err_names+=("${name}")
     fi
