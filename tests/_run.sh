@@ -6,9 +6,12 @@ test -x "${PRESH}" || exit 99
 
 # Check for IPv6 compatibility.
 # Do this by checking if any network interface is active with an IPv6 address.
-IPV6=no
-if [ -n "$( ip -6 addr )" ] ; then
-    IPV6=yes
+if [ -z "${IPV6}" ] ; then
+    if [ -n "$( ip -6 addr || : )" ] ; then
+        IPV6=yes
+    else
+        IPV6=no
+    fi
 fi
 
 RUNNER=/bin/bash
