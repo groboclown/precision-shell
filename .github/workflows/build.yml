@@ -29,7 +29,7 @@ jobs:
           docker network create --ipv6 --subnet=fd00:0bca:85f3:17a0::/64 netv6
       - name: Setup Builder
         run: |
-          docker buildx create --name=ip6 --driver=docker-container --driver-opt="network=ipv6"
+          docker buildx create --name=ip6 --driver=docker-container --driver-opt="network=netv6"
 
       - name: build-test
         run: |
@@ -64,7 +64,7 @@ jobs:
           docker network create --ipv6 --subnet=fd00:0bca:85f3:17a0::/64 netv6
       - name: Setup Builder
         run: |
-          docker buildx create --name=ip6 --driver=docker-container --driver-opt="network=ipv6"
+          docker buildx create --name=ip6 --driver=docker-container --driver-opt="network=netv6"
 
       - name: build-test
         run: |
@@ -99,7 +99,7 @@ jobs:
           docker network create --ipv6 --subnet=fd00:0bca:85f3:17a0::/64 netv6
       - name: Setup Builder
         run: |
-          docker buildx create --name=ip6 --driver=docker-container --driver-opt="network=ipv6"
+          docker buildx create --name=ip6 --driver=docker-container --driver-opt="network=netv6"
 
       - name: build-test
         run: |
@@ -134,7 +134,7 @@ jobs:
           docker network create --ipv6 --subnet=fd00:0bca:85f3:17a0::/64 netv6
       - name: Setup Builder
         run: |
-          docker buildx create --name=ip6 --driver=docker-container --driver-opt="network=ipv6"
+          docker buildx create --name=ip6 --driver=docker-container --driver-opt="network=netv6"
 
 
       - name: build-test
@@ -170,7 +170,7 @@ jobs:
           docker network create --ipv6 --subnet=fd00:0bca:85f3:17a0::/64 netv6
       - name: Setup Builder
         run: |
-          docker buildx create --name=ip6 --driver=docker-container --driver-opt="network=ipv6"
+          docker buildx create --name=ip6 --driver=docker-container --driver-opt="network=netv6"
       
       - name: build-test
         run: |

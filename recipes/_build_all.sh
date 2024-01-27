@@ -21,8 +21,14 @@ if ! "${CONTAINER_RUNNER}" network ls | grep presh-net >/dev/null 2>&1 ; then
         echo "Failed to create ipv6 network for the tests.  Cannot proceed."
         exit 1
     fi
+
+    # Note... this method works with the new version of docker, but not with podman.
     if \
         ! "${CONTAINER_RUNNER}" buildx create --name=presh-build --driver=docker-container --driver-opt="network=presh-net"
+    ; then
+        echo "Failed to create IPv6 network builder for the tests.  Cannot proceed."
+        exit 1
+    fi
 fi
 
 cd "$( dirname "$0" )/.."
