@@ -20,16 +20,6 @@ jobs:
       - name: Fetch Sources
         uses: actions/checkout@v3
 
-      # Setup an ipv6 container network so that the
-      #     commands that use it work as expected.
-      # Podman can't use the network build option as non-root.
-      # With the newer version of docker, we can only pass the network flag to a new builder, and use that.
-      - name: Setup Network
-        run: |
-          cat /etc/docker/daemon.json && \
-          cp .github/workflows/docker-daemon.json /etc/docker/daemon.json && \
-          sudo systemctl restart docker
-
       - name: build-test
         run: |
           docker build -f build-glibc.Dockerfile -t glibc:offline --build-arg COMMANDS=ALL .
@@ -53,29 +43,18 @@ jobs:
       # Check out current repository
       - name: Fetch Sources
         uses: actions/checkout@v3
-      
-      # Setup an ipv6 container network so that the
-      #     commands that use it work as expected.
-      # Podman can't use the network build option as non-root.
-      # With the newer version of docker, we can only pass the network flag to a new builder, and use that.
-      - name: Setup Network
-        run: |
-          docker network create --ipv6 --subnet=fd00:0bca:85f3:17a0::/64 netv6
-      - name: Setup Builder
-        run: |
-          docker buildx create --name=ip6 --driver=docker-container --driver-opt="network=netv6"
 
       - name: build-test
         run: |
-          docker buildx build --builder=ip6 -f build-glibc-arch.Dockerfile -t glibc-arch:offline --build-arg COMMANDS=ALL .
+          docker build -f build-glibc-arch.Dockerfile -t glibc-arch:offline --build-arg COMMANDS=ALL .
      
       - name: cmd-test
         run: |
-          docker buildx build --builder=ip6 -f build-glibc-arch.Dockerfile -t glibc-arch:offline --build-arg BUILD_MODE=individual-cmd-test .
+          docker build -f build-glibc-arch.Dockerfile -t glibc-arch:offline --build-arg BUILD_MODE=individual-cmd-test .
       
       - name: file-size
         run: |
-          docker buildx build --builder=ip6 -f build-glibc-arch.Dockerfile -t glibc-arch:offline --build-arg BUILD_MODE=cmd-size .
+          docker build -f build-glibc-arch.Dockerfile -t glibc-arch:offline --build-arg BUILD_MODE=cmd-size .
 
   clang-musl:
     name: Build & Test with clang / musl
@@ -88,29 +67,18 @@ jobs:
       # Check out current repository
       - name: Fetch Sources
         uses: actions/checkout@v3
-      
-      # Setup an ipv6 container network so that the
-      #     commands that use it work as expected.
-      # Podman can't use the network build option as non-root.
-      # With the newer version of docker, we can only pass the network flag to a new builder, and use that.
-      - name: Setup Network
-        run: |
-          docker network create --ipv6 --subnet=fd00:0bca:85f3:17a0::/64 netv6
-      - name: Setup Builder
-        run: |
-          docker buildx create --name=ip6 --driver=docker-container --driver-opt="network=netv6"
 
       - name: build-test
         run: |
-          docker buildx build --builder=ip6 -f build-clang.Dockerfile -t clang:offline --build-arg COMMANDS=ALL .
+          docker build -f build-clang.Dockerfile -t clang:offline --build-arg COMMANDS=ALL .
       
       - name: cmd-test
         run: |
-          docker buildx build --builder=ip6 -f build-clang.Dockerfile -t clang:offline --build-arg BUILD_MODE=individual-cmd-test .
+          docker build -f build-clang.Dockerfile -t clang:offline --build-arg BUILD_MODE=individual-cmd-test .
       
       - name: file-size
         run: |
-          docker buildx build --builder=ip6 -f build-clang.Dockerfile -t clang:offline --build-arg BUILD_MODE=cmd-size .
+          docker build -f build-clang.Dockerfile -t clang:offline --build-arg BUILD_MODE=cmd-size .
 
   musl:
     name: Build & Test with musl
@@ -123,30 +91,18 @@ jobs:
       # Check out current repository
       - name: Fetch Sources
         uses: actions/checkout@v3
-      
-      # Setup an ipv6 container network so that the
-      #     commands that use it work as expected.
-      # Podman can't use the network build option as non-root.
-      # With the newer version of docker, we can only pass the network flag to a new builder, and use that.
-      - name: Setup Network
-        run: |
-          docker network create --ipv6 --subnet=fd00:0bca:85f3:17a0::/64 netv6
-      - name: Setup Builder
-        run: |
-          docker buildx create --name=ip6 --driver=docker-container --driver-opt="network=netv6"
-
 
       - name: build-test
         run: |
-          docker buildx build --builder=ip6 -f build-musl.Dockerfile -t musl:offline --build-arg COMMANDS=ALL .
+          docker build -f build-musl.Dockerfile -t musl:offline --build-arg COMMANDS=ALL .
       
       - name: cmd-test
         run: |
-          docker buildx build --builder=ip6 -f build-musl.Dockerfile -t musl:offline --build-arg BUILD_MODE=individual-cmd-test .
+          docker build -f build-musl.Dockerfile -t musl:offline --build-arg BUILD_MODE=individual-cmd-test .
       
       - name: file-size
         run: |
-          docker buildx build --builder=ip6 -f build-musl.Dockerfile -t musl:offline --build-arg BUILD_MODE=cmd-size .
+          docker build -f build-musl.Dockerfile -t musl:offline --build-arg BUILD_MODE=cmd-size .
 
   dietlibc:
     name: Build & Test with dietlibc
@@ -160,28 +116,42 @@ jobs:
       - name: Fetch Sources
         uses: actions/checkout@v3
       
-      # Setup an ipv6 container network so that the
-      #     commands that use it work as expected.
-      # Podman can't use the network build option as non-root.
-      # With the newer version of docker, we can only pass the network flag to a new builder, and use that.
-      - name: Setup Network
-        run: |
-          docker network create --ipv6 --subnet=fd00:0bca:85f3:17a0::/64 netv6
-      - name: Setup Builder
-        run: |
-          docker buildx create --name=ip6 --driver=docker-container --driver-opt="network=netv6"
-      
       - name: build-test
         run: |
-          docker buildx build --builder=ip6 -f build-dietlibc.Dockerfile -t dietlibc:offline --build-arg COMMANDS=ALL .
+          docker build -f build-dietlibc.Dockerfile -t dietlibc:offline --build-arg COMMANDS=ALL .
 
       - name: cmd-test
         run: |
-          docker buildx build --builder=ip6 -f build-dietlibc.Dockerfile -t dietlibc:offline --build-arg BUILD_MODE=individual-cmd-test .
+          docker build -f build-dietlibc.Dockerfile -t dietlibc:offline --build-arg BUILD_MODE=individual-cmd-test .
 
       - name: file-size
         run: |
-          docker buildx build --builder=ip6 -f build-dietlibc.Dockerfile -t dietlibc:offline --build-arg BUILD_MODE=cmd-size .
+          docker build -f build-dietlibc.Dockerfile -t dietlibc:offline --build-arg BUILD_MODE=cmd-size .
+
+  podman-dietlibc:
+    name: Build & Test with dietlibc
+    runs-on: ubuntu-latest
+    outputs:
+      version: ${{ steps.properties.outputs.version }}
+      changelog: ${{ steps.properties.outputs.changelog }}
+    steps:
+
+      # Check out current repository
+      - name: Fetch Sources
+        uses: actions/checkout@v3
+      
+      - name: build-test
+        run: |
+          podman build -f build-dietlibc.Dockerfile -t dietlibc:offline --build-arg COMMANDS=ALL .
+
+      - name: cmd-test
+        run: |
+          podman build -f build-dietlibc.Dockerfile -t dietlibc:offline --build-arg BUILD_MODE=individual-cmd-test .
+
+      - name: file-size
+        run: |
+          podman build -f build-dietlibc.Dockerfile -t dietlibc:offline --build-arg BUILD_MODE=cmd-size .
+
 
 
   sample:

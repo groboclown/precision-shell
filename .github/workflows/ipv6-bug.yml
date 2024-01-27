@@ -24,3 +24,31 @@ jobs:
           echo 'FROM docker.io/library/alpine:3.19' > Dockerfile
           sudo podman network create --ipv6 --subnet=fd00:0bca:85f3:17a0::/64 podnet1
           sudo podman build --network podnet1 -t test-ipv6:local .
+
+  try-docker-ipv6:
+    name: Run docker with ipv6 network during build
+    runs-on: ubuntu-latest
+    outputs:
+      version: ${{ steps.properties.outputs.version }}
+      changelog: ${{ steps.properties.outputs.changelog }}
+    steps:
+
+      # Check out current repository
+      - name: Fetch Sources
+        uses: actions/checkout@v3
+      
+      # Setup an ipv6 container network so that the
+      #     commands that use it work as expected.
+      # Podman can't use the network build option as non-root.
+      # With the newer version of docker, we can only pass the network flag to a new builder, and use that.
+      - name: Setup Network
+        run: |
+          docker network create --ipv6 --subnet=fd00:0bca:85f3:17a0::/64 netv6
+      - name: Setup Builder
+        run: |
+          docker buildx create --name=ip6 --driver=docker-container --driver-opt="network=netv6"
+
+      - name: build-test
+        run: |
+          docker buildx build --builder=ip6 -f build-glibc-arch.Dockerfile -t glibc-arch:offline --build-arg COMMANDS=ALL .
+     
