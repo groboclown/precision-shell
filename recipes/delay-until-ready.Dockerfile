@@ -12,7 +12,7 @@ RUN npm ci --omit=dev
 
 # ---------------------------------------------------------------------------
 # Create precision shell
-FROM docker.io/library/alpine:3.10 AS presh-builder
+FROM docker.io/library/alpine:3.19 AS presh-builder
 
 WORKDIR /opt/precision-shell
 
@@ -32,7 +32,7 @@ RUN build-tools/build-with-alpine-musl.sh
 
 # ---------------------------------------------------------------------------
 # The real image, using what was just built.
-FROM gcr.io/distroless/nodejs:18
+FROM gcr.io/distroless/nodejs20-debian12
 LABEL name="local/precision-shell-example"
 
 COPY --from=build-env /opt/app /opt/app

@@ -1,4 +1,4 @@
-FROM docker.io/library/alpine:3.10
+FROM docker.io/library/alpine:3.19
 
 # This is controlled through the docker build argument "--build-arg FLAGS=(value)"
 # Use this to list the commands to include.  See Makefile.command-flags for
@@ -27,7 +27,7 @@ RUN \
 # The real image.
 FROM scratch
 LABEL name="local/precision-shell" \
-      version="4.4.0"
+      version="4.5.0"
 
 # Set the executable under the file "/bin/sh", so that
 #   docker will use it as the default shell when it encounters

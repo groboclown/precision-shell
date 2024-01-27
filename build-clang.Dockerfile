@@ -1,4 +1,4 @@
-FROM docker.io/library/alpine:3.16
+FROM docker.io/library/alpine:3.19
 
 # This file is broken up to make rebuilds fast
 # by reusing previous layers that take a while to run.
@@ -8,9 +8,9 @@ WORKDIR /opt/code
 RUN \
        apk --no-cache update \
     && apk add \
-        python3 "bash=~5.1" \
-        "make=~4.3" "clang=~13.0" "clang-dev=~13.0" "lld=~13.0" \
-        "libc-dev=~0.7" "gcc=~11"
+        python3 bash \
+        make clang clang-dev lld \
+        libc-dev gcc
 
 COPY build-tools/ build-tools/
 COPY \

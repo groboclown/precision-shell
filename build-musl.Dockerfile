@@ -7,7 +7,7 @@ WORKDIR /opt/code
 
 RUN \
        apk --no-cache update \
-    && apk add build-base=0.5-r1 "bash=~5" "python3=~3.7" \
+    && apk add build-base bash python3 \
     && rm -rf /tmp/* /var/cache/apk/*
 
 # Change the list of commands to build with the "--build-arg COMMANDS='list' argument"
