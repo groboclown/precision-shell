@@ -2,7 +2,7 @@
 
 # This test fails when running inside docker.
 # desc: test-connect with no running server on port 0 and ipv6.
-# requires: +test-connect
+# requires: +test-connect +ipv6
 
 "${FS}" -c "test-connect ::0 0 3" > out.txt 2>err.txt
 res=$?

@@ -129,7 +129,7 @@ jobs:
           docker build -f build-dietlibc.Dockerfile -t dietlibc:offline --build-arg BUILD_MODE=cmd-size .
 
   podman-dietlibc:
-    name: Build & Test with dietlibc
+    name: Build & Test with dietlibc and podman
     runs-on: ubuntu-latest
     outputs:
       version: ${{ steps.properties.outputs.version }}

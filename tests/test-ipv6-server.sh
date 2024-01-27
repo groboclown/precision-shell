@@ -2,7 +2,7 @@
 
 # This test fails when running in some docker images that don't support ipv6.
 # desc: test-connect with a running server and ipv6.
-# requires: +test-connect
+# requires: +test-connect +ipv6
 
 if [ ! -x "${FS_SERVER}" ] ; then
     echo "?? SKIPPED because the test server was not compiled (${FS_SERVER})"

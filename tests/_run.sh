@@ -4,6 +4,13 @@
 test -d "${TEST_TMP_DIR}" || exit 99
 test -x "${PRESH}" || exit 99
 
+# Check for IPv6 compatibility.
+# Do this by checking if any network interface is active with an IPv6 address.
+IPV6=no
+if [ -n "$( ip -6 addr )" ] ; then
+    IPV6=yes
+fi
+
 RUNNER=/bin/bash
 if [ "${DEBUG}" = "1" ] ; then
     RUNNER="${RUNNER} -x"
@@ -51,27 +58,38 @@ for test_name in "$@" ; do
         dorun=1
         if [ ! -z "${requirements}" ] ; then
             for req_name in ${requirements} ; do
-                grep_res_match=-ne
-                missing_message="missing"
-                if [ "${req_name:0:1}" = "-" ] ; then
-                    # leading - means that it must not be set.
-                    grep_res_match=-eq
-                    req_name="+${req_name:1}"
-                    missing_message="includes"
-                fi
-
-                # Note explicit space after the name;
-                #   this helps prevent commands like "rm" from running "rmdir"
-                #   commands, and will work because version is always last.
-                echo "${presh_supports}" | grep "${req_name} " >/dev/null 2>&1
-                if [ $? ${grep_res_match} 0 ] && [ "${req_name}" != "+version" ] ; then
-                    # "+version" is always last, so doesn't have the trailing space,
-                    # but it must always exist, so don't skip.
-                    if [ "${QUIET}" != 1 ]; then
-                        echo "?? SKIPPED because ${FS} does not support ${requirements} (${missing_message} ${req_name})"
+                if [ "${req_name}" = "+ipv6" ] ; then
+                    # IPv6 is a very special feature that requires the running environment to support it.
+                    if [ "${IPV6}" = "no" ] ; then
+                        if [ "${QUIET}" != 1 ]; then
+                            echo "?? SKIPPED because ${FS} does not support ${requirements} (IPv6 not supported in environment)"
+                        fi
+                        dorun=0
+                        break
                     fi
-                    dorun=0
-                    break
+                else
+                    grep_res_match=-ne
+                    missing_message="missing"
+                    if [ "${req_name:0:1}" = "-" ] ; then
+                        # leading - means that it must not be set.
+                        grep_res_match=-eq
+                        req_name="+${req_name:1}"
+                        missing_message="includes"
+                    fi
+
+                    # Note explicit space after the name;
+                    #   this helps prevent commands like "rm" from running "rmdir"
+                    #   commands, and will work because version is always last.
+                    echo "${presh_supports}" | grep "${req_name} " >/dev/null 2>&1
+                    if [ $? ${grep_res_match} 0 ] && [ "${req_name}" != "+version" ] ; then
+                        # "+version" is always last, so doesn't have the trailing space,
+                        # but it must always exist, so don't skip.
+                        if [ "${QUIET}" != 1 ]; then
+                            echo "?? SKIPPED because ${FS} does not support ${requirements} (${missing_message} ${req_name})"
+                        fi
+                        dorun=0
+                        break
+                    fi
                 fi
             done
         fi
