@@ -21,6 +21,6 @@ jobs:
         run: |
           cd /tmp
           mkdir test-ipv6
-          echo 'FROM docker.io/library/alpine:3.10' > Dockerfile
+          echo 'FROM docker.io/library/alpine:3.19' > Dockerfile
           sudo podman network create --ipv6 --subnet=fd00:0bca:85f3:17a0::/64 podnet1
           sudo podman build --network podnet1 -t test-ipv6:local .
