@@ -14,7 +14,7 @@ GID2="${UID1:-2}"
 export BUILD_MODE UID1 GID1 UID2 GID2
 
 apk --no-cache update
-apk add build-base=0.5-r1 curl tar xz python3 "bash=~5"
+apk add build-base curl tar xz python3 bash
 mkdir -p /tmp/dietlibc
 curl -o /tmp/dietlibc.tar.xz https://www.fefe.de/dietlibc/dietlibc-0.34.tar.xz
 xz -d /tmp/dietlibc.tar.xz

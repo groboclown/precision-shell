@@ -191,5 +191,5 @@ jobs:
       
       - name: build-test
         run: |
-          CONTAINER_RUNNER=docker recipes/_build_all.sh
-          CONTAINER_RUNNER=docker recipes/tests/run_all.sh
+          recipes/_build_all.sh
+          recipes/tests/run_all.sh
