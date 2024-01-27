@@ -1,7 +1,7 @@
 /*
 MIT License
 
-Copyright (c) 2022 groboclown
+Copyright (c) 2022,2024 groboclown
 
 Permission is hereby granted, free of charge, to any person obtaining a copy
 of this software and associated documentation files (the "Software"), to deal
@@ -32,6 +32,7 @@ SOFTWARE.
  * See "commands.c" for a list of supported commands.
  */
 #include <stddef.h>
+#include "vcompat.h"
 #include "globals.h"
 #include "args.h"
 #include "command_runner.h"
@@ -44,7 +45,7 @@ int main(const int argc, char *argv[]) {
     // Initialize the argument parser.
     struct ArgState *arg_state = args_setup_tokenizer(
         argc, argv,
-#ifdef USE_ENVIROMENT_INPUT
+#ifdef USE_ENVIRONMENT_INPUT
         1
 #else
         0

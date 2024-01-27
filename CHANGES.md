@@ -1,3 +1,10 @@
+## v4.5.0
+
+* []()
+    * Moved `USE_ENVIROMENT_INPUT` (the typo version) to now be standardized as `USE_ENVIRONMENT_INPUT`.  In order to not break backwards compatibility, the old one is still supported.
+    * Fixed various typos and grammar usage in the `README.md` file.
+    * Added the license text to the top of the `version.h` file.
+
 ## v4.4.1
 
 * [3ef7cf6](3ef7cf6ad76fa289490d71c8c7bd6e64e4cd5c5b)
