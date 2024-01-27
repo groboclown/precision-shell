@@ -26,24 +26,21 @@ jobs:
       # With the newer version of docker, we can only pass the network flag to a new builder, and use that.
       - name: Setup Network
         run: |
-          cp .github/workflows/docker-daemon.json /etc/docker/daemon.json
+          cat /etc/docker/daemon.json && \
+          cp .github/workflows/docker-daemon.json /etc/docker/daemon.json && \
           sudo systemctl restart docker
-          docker network create --ipv6 --subnet=fd00:0bca:85f3:17a0::/64 netv6
-      - name: Setup Builder
-        run: |
-          docker buildx create --name=ip6 --driver=docker-container --driver-opt="network=netv6"
 
       - name: build-test
         run: |
-          docker buildx build --builder=ip6 -f build-glibc.Dockerfile -t glibc:offline --build-arg COMMANDS=ALL .
+          docker build -f build-glibc.Dockerfile -t glibc:offline --build-arg COMMANDS=ALL .
      
       - name: cmd-test
         run: |
-          docker buildx build --builder=ip6 -f build-glibc.Dockerfile -t glibc:offline --build-arg BUILD_MODE=individual-cmd-test .
+          docker build -f build-glibc.Dockerfile -t glibc:offline --build-arg BUILD_MODE=individual-cmd-test .
       
       - name: file-size
         run: |
-          docker buildx build --builder=ip6 -f build-glibc.Dockerfile -t glibc:offline --build-arg BUILD_MODE=cmd-size .
+          docker build -f build-glibc.Dockerfile -t glibc:offline --build-arg BUILD_MODE=cmd-size .
 
   glibc-arch:
     name: Build & Test with glibc on Arch Linux
