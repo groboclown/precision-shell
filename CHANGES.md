@@ -5,6 +5,7 @@
     * Fixed various typos and grammar usage in the `README.md` file.
     * Added the license text to the top of the `version.h` file.
     * After coming back to the project with a long quiet period, it looks like the builds are suffering from bit rot.  A lot of work went into getting them working again.
+    * Fixed a bug that affects some versions of LLVM, where mixing source and non-source debugging information can cause a compiler crash.
 
 ## v4.4.1
 

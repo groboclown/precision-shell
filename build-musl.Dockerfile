@@ -1,4 +1,4 @@
-FROM docker.io/library/alpine:3.10
+FROM docker.io/library/alpine:3.19
 
 # This file is broken up to make rebuilds fast
 # by reusing previous layers that take a while to run.
