@@ -1,6 +1,12 @@
 
 ifneq '' '$(findstring clang, $(CC))'
     # CLANG / LLVM compiler
+    #
+    # clang -Wall -pedantic
+    #       -Wno-unused-variable
+    #       -Wno-switch -I./gen-cmd -I. -static
+    #       -fstandalone-debug -gcodeview -gdwarf-5 -gembed-source -g $MANY_DARGS ../out/_presh-all.c  -o ../out/presh-debug
+
 
     MINFLAGS = \
         -fbinutils-version=4.0 \
@@ -41,11 +47,15 @@ ifneq '' '$(findstring clang, $(CC))'
 
     DFLAGS = \
         -DDEBUG=1 \
-        -fstandalone-debug \
         -gcodeview \
-        -gdwarf-5 \
-        -gembed-source \
-        -g
+        -gdwarf-5
+        #-gembed-source \
+        #-fstandalone-debug \
+        # -g
+        # Careful with these flags.  They can ask LLVM to mix source and no-source debugging information,
+        # which conflict to each other.  This can cause a crash on some versions of clang.
+        # It was fixed in:
+        # https://github.com/llvm/llvm-project/commit/87e22bdd2bd6d77d782f9d64b3e3ae5bdcd5080d
 
 
 else

@@ -19,7 +19,7 @@ GID2="${GID2:-65534}"
 export BUILD_MODE UID1 GID1 UID2 GID2
 
 apk --no-cache update
-apk add build-base=0.5-r1 "bash=~5" "python3=~3.7"
+apk add build-base bash python3
 rm -rf /tmp/* /var/cache/apk/*
 echo 'LIBNAME=musl' >> version.txt
 exec ./build-tools/internal-docker-make.sh

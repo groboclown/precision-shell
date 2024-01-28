@@ -1,7 +1,7 @@
 /*
 MIT License
 
-Copyright (c) 2022 groboclown
+Copyright (c) 2022,2024 groboclown
 
 Permission is hereby granted, free of charge, to any person obtaining a copy
 of this software and associated documentation files (the "Software"), to deal
@@ -25,6 +25,7 @@ SOFTWARE.
 #define _FS_SHELL__USES_
 
 // The first includes.
+#include "vcompat.h"
 
 
 // --------------------------------------------------------------------------
@@ -146,7 +147,7 @@ SOFTWARE.
 
 
 // USES_ENVIRONMENT - any command or capability that performs management of environment variables.
-#if    defined(USE_ENVIROMENT_INPUT) \
+#if    defined(USE_ENVIRONMENT_INPUT) \
     || defined(USE_CMD_ENV_CAT_FD)
 
 #define USES_ENVIRONMENT

@@ -8,6 +8,10 @@ res=$?
 
 if [ ${res} -ne 0 ] ; then
     echo "Bad exit code: ${res}"
+    echo "stdout:"
+    cat out.txt
+    echo "stderr:"
+    cat err.txt
     exit 1
 fi
 

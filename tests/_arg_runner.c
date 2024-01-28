@@ -45,10 +45,18 @@ static char *SECOND_ARG = "-c";
 #define LOG3(a, b, c, d)
 #endif
 
+// Depending on the architecture, the size_t can affect the printf %d or %ld replacement.
+#if __SIZEOF_POINTER__ == 4
+#define RAM_ALLOCATION_FAILURE "Failed to allocate %d bytes of RAM\n"
+#define FILE_READ_FAILURE "Expected to read %d bytes, but read %d bytes.\n"
+#else
+#define RAM_ALLOCATION_FAILURE "Failed to allocate %ld bytes of RAM\n"
+#define FILE_READ_FAILURE "Expected to read %ld bytes, but read %ld bytes.\n"
+#endif
 
 int main(const int argc, char *argv[]) {
     FILE *fin;
-    long int file_size;
+    size_t file_size;
     char *arg;
     size_t count;
     char *exec_argv[] = { argv[1], SECOND_ARG, NULL, NULL };
@@ -69,13 +77,13 @@ int main(const int argc, char *argv[]) {
 
     arg = malloc(sizeof(char) * file_size);
     if (arg == NULL) {
-        printf("Failed to allocate %ld bytes of RAM\n", file_size);
+        printf(RAM_ALLOCATION_FAILURE, file_size);
         return 1;
     }
     count = fread((void *) arg, sizeof(char), file_size, fin);
     fclose(fin);
     if (count != file_size) {
-        printf("Expected to read %ld bytes, but read %ld bytes.\n", file_size, count);
+        printf(FILE_READ_FAILURE, file_size, count);
         return 1;
     }
     exec_argv[2] = arg;

@@ -10,19 +10,8 @@ fi
 
 CONTAINER_RUNNER="${CONTAINER_RUNNER:-docker}"
 
-# Random, private ipv6 subnet.
-IPV6_PRIVATE_SUBNET="${IPV6_PRIVATE_SUBNET:-fd76:0bca:85f3:17a0::/64}"
-
 # ipv6 is required for some of the networking tests.
-"${CONTAINER_RUNNER}" network ls | grep presh-net >/dev/null 2>&1
-if [ $? != 0 ] ; then
-    
-    "${CONTAINER_RUNNER}" network create --ipv6 --subnet "${IPV6_PRIVATE_SUBNET}" presh-net
-    if [ $? != 0 ] ; then
-        echo "Failed to create ipv6 network for the tests.  Cannot proceed."
-        exit 1
-    fi
-fi
+BUILD_CMD=("${CONTAINER_RUNNER}" build)
 
 cd "$( dirname "$0" )/.."
 this_dir="recipes"
@@ -31,8 +20,9 @@ errs=0
 declare -a err_names
 for name in ${this_dir}/*.Dockerfile ; do
     base="$( basename "${name}" .Dockerfile )"
-    "${CONTAINER_RUNNER}" build --network presh-net -t "local/presh-${base}:build" -f "${name}" .
-    if [ $? != 0 ] ; then
+    if
+        ! "${BUILD_CMD[@]}" -t "local/presh-${base}:build" -f "${name}" .
+    then
         errs=$(( errs + 1 ))
         err_names+=("${name}")
     fi
@@ -45,6 +35,5 @@ else
     echo "Completed without errors."
 fi
 
-"${CONTAINER_RUNNER}" network rm presh-net
 
 exit ${errs}

@@ -5,7 +5,7 @@
 
 ## Custom Built Shell With Only What You Need
 
-Sometimes, you don't need or want everyting that a shell or Linux environment can do.  You just have a few things that you need to do.  Adding more adds bloat to your Linux environment and broadens the attack surface.  **Precision Shell** lets you compile the shell to contain only what you need.  It works great as a default shell environment for a Docker or Podman container for when you need just that extra bit of runtime setup, especially when running with a [distro-less container](https://github.com/GoogleContainerTools/distroless/).
+Sometimes, you don't need or want everything that a shell or Linux environment can do.  You just have a few things that you need to do.  Adding more adds bloat to your Linux environment and broadens the attack surface.  **Precision Shell** lets you compile the shell to contain only what you need.  It works great as a default shell environment for a Docker or Podman container for when you need just that extra bit of runtime setup, especially when running with a [distro-less container](https://github.com/GoogleContainerTools/distroless/).
 
 `presh` offers a [few commands and shell syntax](#what-it-does), and gives you the flexibility to select which ones to compile, which can make the executable smaller and provide extra security by not enabling commands that don't need to be run.  It's not POSIX conformant, and doesn't try to be.  Its syntax is [eclectic](#command-parsing) and doesn't hold your hand.
 
@@ -90,14 +90,14 @@ It also supports:
 
 ## Why Would I Need It?
 
-The tool was built with container (Docker and Podman) images that use minimal OS resources.  Golang projects commonly build a single file, the executable, placed into a `FROM scratch` image.  In these environments, `presh` can be easily added to provide some minimal file manipulation.
+The tool was built for container (Docker and Podman) images that use minimal OS resources.  Golang projects commonly build a single file, the executable, placed into a `FROM scratch` image.  In these environments, `presh` can be easily added to provide some minimal file manipulation.
 
 Additionally, you can build the tool with exactly the commands you need to run.  This limits the attack surface, making your install just that much safer.
 
 
 ## How Do I Get It?
 
-Because of the goals for the shell, no compiled version is distributed.  You're expected to build it from source yourself.
+Because of the goals for the shell, it does not distribute a compiled version.  You're expected to build it from source yourself.
 
 You can build it directly and set the included commands:
 
@@ -120,7 +120,7 @@ The commands that cannot be directly controlled for inclusion are:
 
 To run the build, you'll need basic C compiler, linker, and make.  If you have Python 3 installed, you can generate the command source files (they are bundled if you don't have it).
 
-The most common setup is to build it inside a Docker container for use in another container.  See [`Dockerfile`](Dockerfile) for how this is done.
+The most common setup is to build it inside a Docker container for use in another container.  See the [`Dockerfile`](Dockerfile) for how this is done.
 
 
 ## Using It With Docker
@@ -309,7 +309,7 @@ presh -c "dup-w 1 contents.txt \
 
 **Usage**: `echo [str1 [str2 ...]]`
 
-Sends to `stdout` each argument, one per line.  To have a multi-word statement on a single line, it must be passed as a single argument; see (Command Parsing)[#command-parsing] for details.
+Sends to `stdout` each argument, one per line.  To have a multi-word statement on a single line, it must be passed as a single argument; see [Command Parsing](#command-parsing) for details.
 
 ### elapsed-time
 
@@ -1148,7 +1148,7 @@ A [future feature](https://github.com/groboclown/precision-shell/issues/14) may 
 
 ### Environment Variables
 
-**Compile flag**: `-DUSE_ENVIROMENT_INPUT`
+**Compile flag**: `-DUSE_ENVIRONMENT_INPUT`
 
 With environment variable parsing enabled, argument parsing will replace text in the form `${VALUE}` with the environment variable contained in the `${}` marks.  Currently, these are not expanded into multiple arguments, but instead will be considered part of a single argument.  Because the [`echo`](#echo) command outputs one argument per line, this shows the behavior clearly:
 
