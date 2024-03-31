@@ -1,0 +1,4 @@
+The Precision Shell Interactive Host.
+Running on Alpine Linux.
+
+Use 'tmux' to easily manage multiple, parallel shells.

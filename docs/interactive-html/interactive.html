@@ -1,0 +1,40 @@
+<!doctype html>
+<title>Interactive Precision Shell</title>
+
+<script src="build/libv86.js"></script>
+<script>
+"use strict";
+
+window.onload = function()
+{
+    var emulator = new V86({
+        wasm_path: "build/v86.wasm",
+        memory_size: 512 * 1024 * 1024,
+        vga_memory_size: 8 * 1024 * 1024,
+        screen_container: document.getElementById("screen_container"),
+
+        hda: {
+            url: "images/alpine-hdd.img",
+            // set to true if you want to load it asynchrously during runtime (for this option we need to run a webserver that supports the Range header)
+            // NOTE: async: false is slow but proved to be more realiable
+            async: false,
+
+            // This needs to be the size of the raw disk.
+            size: 1 * 1024 * 1024 * 1024,
+            // See the `disk_size` item in the packer template.
+        },
+        cdrom: {
+            url: "images/alpine-html-v3.19-x86.iso"
+        },
+
+        acpi: false,
+        autostart: true,
+    });
+};
+</script>
+
+<!-- A minimal structure for the ScreenAdapter defined in browser/screen.js -->
+<div id="screen_container">
+    <div style="white-space: pre; font: 14px monospace; line-height: 14px"></div>
+    <canvas style="display: none"></canvas>
+</div>
