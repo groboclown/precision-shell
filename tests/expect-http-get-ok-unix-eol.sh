@@ -9,15 +9,34 @@ if [ ! -x "${FS_SERVER}" ] ; then
 fi
 
 printf "HTTP/1.1 200 OK\\nContent-Type: text/plain\\nContent-Length: 0\\n\\n" > server-response.txt
-"${FS_SERVER}" http1 29446 server-response.txt >server-out.txt 2>server-err.txt &
-server_pid=$!
+if ! \
+    "${UTIL_DIR}/launch_tcp_server.sh" \
+    server-port.txt server-pid.txt \
+    server-out.txt server-err.txt \
+    http1 server-response.txt \
+; then
+    echo "Server launch failed."
+    exit 1
+fi
+port="$( cat server-port.txt )" || exit 1
+server_pid="$( cat server-pid.txt )" || exit 1
 
-"${FS}" -c "expect-http-get-response localhost 29446 / 200" > out.txt 2>err.txt
+"${FS}" -c "expect-http-get-response localhost ${port} / 200" > out.txt 2>err.txt
 res=$?
-kill -15 "${server_pid}"
+kill -15 "${server_pid}" || true
+# Ensure these files were added.
+touch server-out.txt server-err.txt server-port.txt server-pid.txt
 
 if [ ${res} -ne 0 ] ; then
     echo "Bad exit code: ${res}"
+    echo "stdout:"
+    cat out.txt
+    echo "stderr:"
+    cat err.txt
+    echo "server-stdout:"
+    cat server-out.txt
+    echo "server-stderr:"
+    cat server-err.txt
     exit 1
 fi
 
@@ -28,13 +47,16 @@ if [ -s out.txt ] || [ -s err.txt ] ; then
     cat out.txt
     echo "stderr:"
     cat err.txt
+    echo "server-stdout:"
+    cat server-out.txt
+    echo "server-stderr:"
+    cat server-err.txt
     exit 1
 fi
 
-
-# should have: out.txt and err.txt and server-response.txt and server-out.txt and server-err.txt
+# should have: out.txt and err.txt and server-response.txt and server-out.txt and server-err.txt and server-port.txt and server-pid.txt
 count="$( ls -1A | wc -l )"
-if [ ${count} != 5 ] ; then
+if [ ${count} != 7 ] ; then
     echo "Generated unexpected files:"
     ls -lA
     exit 1

@@ -1,4 +1,4 @@
-FROM docker.io/library/alpine:3.10
+FROM docker.io/library/alpine:3.19
 
 # This file is broken up to make rebuilds fast
 # by reusing previous layers that take a while to run.
@@ -7,7 +7,7 @@ WORKDIR /opt/code
 
 RUN \
        apk --no-cache update \
-    && apk add build-base=0.5-r1 curl tar xz python3 "bash=~5" \
+    && apk add build-base=0.5-r3 curl tar xz "bash=~5" "python3=~3.11" \
     && mkdir -p /opt/dietlibc \
     && curl -o /tmp/dietlibc.tar.xz https://www.fefe.de/dietlibc/dietlibc-0.34.tar.xz \
     && xz -d /tmp/dietlibc.tar.xz \

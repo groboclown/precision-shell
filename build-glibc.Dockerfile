@@ -7,7 +7,7 @@ WORKDIR /opt/code
 
 RUN \
        apt-get update \
-    && apt-get -y install "build-essential=12.9ubuntu3" "python3.10-minimal" \
+    && apt-get -y install "build-essential=12.9ubuntu3" "python3.10-minimal" "iproute2" \
     && ln -s /usr/bin/python3.10 /usr/bin/python3 \
     && rm -rf /tmp/* /var/cache/apt/*
 

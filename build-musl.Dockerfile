@@ -1,4 +1,4 @@
-FROM docker.io/library/alpine:3.10
+FROM docker.io/library/alpine:3.19
 
 # This file is broken up to make rebuilds fast
 # by reusing previous layers that take a while to run.
@@ -7,7 +7,7 @@ WORKDIR /opt/code
 
 RUN \
        apk --no-cache update \
-    && apk add build-base=0.5-r1 "bash=~5" "python3=~3.7" \
+    && apk add build-base=0.5-r3 "bash=~5" "python3=~3.11" \
     && rm -rf /tmp/* /var/cache/apk/*
 
 # Change the list of commands to build with the "--build-arg COMMANDS='list' argument"
