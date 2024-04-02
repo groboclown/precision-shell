@@ -152,6 +152,9 @@ jobs:
         run: |
           podman build -t local/precision-shell-sample --build-arg FLAGS=INCLUDE_ALL_COMMANDS=1 .
           podman run --rm -t local/precision-shell-sample version
+      
+      # Note: running the 'sample.Dockerfile' isn't supported, because
+      # it may reference a pre-release label that won't exist until release.
 
 
   recipes:

@@ -1,6 +1,6 @@
 ## v4.4.2
 
-* []()
+* [1ee5968](1ee5968a8e0da8842b19e6b544f564a9da5aa683)
     * Fixed the `cmd_mkdir` to build correctly with LLVM.
     * Fixed clang+llvm issues with debug compile flags.  It used to contain conflicting argument flags which would cause a crash on some versions of llvm.
     * Updated the `tests/_run.sh` to recognize IPv6 capabilities.  This works around environments where IPv6 is not available.
@@ -8,6 +8,8 @@
     * Extracted the HTTP status line buffer size into a definition, instead of a magic number.
     * Updated example Alpine Linux docker version to 3.19.
     * Updated Ubuntu Linux docker to install `iproute2` to allow for network tests.
+* []()
+    * Updated recipies and other build tools to use more modern tool versions.
 
 
 ## v4.4.1

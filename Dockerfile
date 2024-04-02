@@ -1,4 +1,4 @@
-FROM docker.io/library/alpine:3.10
+FROM docker.io/library/alpine:3.19
 
 # This is controlled through the docker build argument "--build-arg FLAGS=(value)"
 # Use this to list the commands to include.  See Makefile.command-flags for
@@ -13,9 +13,8 @@ COPY src/ src/
 
 ENV FLAGS=$FLAGS
 
-RUN \
-       apk --no-cache update \
-    && apk add "build-base=~0" \
+RUN set -x \
+    && apk --no-cache add "build-base=~0" \
     && rm -rf /tmp/* /var/cache/apk/* \
     && echo 'LIBNAME=musl' >> version.txt \
     && cd src && make ${FLAGS}
@@ -27,7 +26,7 @@ RUN \
 # The real image.
 FROM scratch
 LABEL name="local/precision-shell" \
-      version="4.4.0"
+      version="4.4.2"
 
 # Set the executable under the file "/bin/sh", so that
 #   docker will use it as the default shell when it encounters
