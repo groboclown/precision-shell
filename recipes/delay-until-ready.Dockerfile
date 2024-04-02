@@ -25,8 +25,11 @@ COPY tests/ tests/
 # Adjust this value during the image build with `--build-arg`
 #   to alter which commands to include.
 ARG COMMANDS="elapsed-time-under export-elapsed-time expect-http-get-response expect-http-get-response-not sleep while-no-error subcmd spawn kill-pid wait-pid exit signal enviro echo"
+ARG IPV6=""
 
-ENV COMMANDS=$COMMANDS
+ENV \
+    COMMANDS=$COMMANDS \
+    IPV6=$IPV6
 
 RUN build-tools/build-with-alpine-musl.sh
 
@@ -46,8 +49,12 @@ COPY --from=presh-builder /opt/precision-shell/out/presh /bin/sh
 
 WORKDIR /opt/app/hello_world
 
-ENV LISTEN_PORT 3000
-ENV DEPENDENT_SERVICE dep9000
+ARG LISTEN_PORT="3000"
+ARG DEPENDENT_SERVICE="dep9000"
+
+ENV \
+    LISTEN_PORT=$LISTEN_PORT \
+    DEPENDENT_SERVICE=$DEPENDENT_SERVICE
 
 # Delay start until a dependent service is running, or up to 5 minutes (300 seconds)
 # This service must be accessible as a sidecar container running on localhost

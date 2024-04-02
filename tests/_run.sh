@@ -7,7 +7,7 @@ test -x "${PRESH}" || exit 99
 # Check for IPv6 compatibility.
 # Do this by checking if any network interface is active with an IPv6 address.
 if [ -z "${IPV6}" ] ; then
-    if [ -n "$( ip -6 addr || : )" ] ; then
+    if [ -n "$( ip -6 addr || true )" ] ; then
         IPV6=yes
     else
         IPV6=no

@@ -7,8 +7,8 @@ WORKDIR /opt/code
 
 # Arch has rolling updates, so specific version numbers on
 #   installed packages, and even on the label, aren't stable.
-RUN \
-       pacman -Sy --noconfirm python3 \
+RUN set -x \
+    && pacman -Sy --noconfirm python3 \
     && rm -rf /tmp/* /var/cache/pacman/*
 
 COPY build-tools/ build-tools/
@@ -24,11 +24,13 @@ COPY tests/ tests/
 # Change the list of commands to build with the "--build-arg COMMANDS='list' argument"
 ARG BUILD_MODE=build
 ARG COMMANDS="chmod ln-s"
+ARG IPV6=""
 
 ENV \
 #    DEBUG=1 \
     BUILD_MODE=$BUILD_MODE \
     COMMANDS=$COMMANDS \
+    IPV6=$IPV6 \
     UID1=1 \
     UID2=2 \
     GID1=1 \

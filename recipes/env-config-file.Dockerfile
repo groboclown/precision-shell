@@ -25,8 +25,11 @@ COPY tests/ tests/
 # Adjust this value during the image build with `--build-arg`
 #   to alter which commands to include.
 ARG COMMANDS="dup-w env-cat-fd cat-fd spawn kill-pid wait-pid exit signal echo subcmd noop enviro"
+ARG IPV6=""
 
-ENV COMMANDS=$COMMANDS
+ENV \
+    COMMANDS=$COMMANDS \
+    IPV6=$IPV6
 
 RUN build-tools/build-with-alpine-musl.sh
 
@@ -43,7 +46,10 @@ COPY --from=presh-builder /opt/precision-shell/out/presh /bin/sh
 
 WORKDIR /opt/app/hello_world
 
-ENV LISTEN_PORT 9000
+ARG LISTEN_PORT="9000"
+
+ENV \
+    LISTEN_PORT=$LISTEN_PORT
 
 # See the "signal-awareness.Dockerfile" to see why the
 #   spawn / signal trapping is added.  All of that is added in the "subcmd";

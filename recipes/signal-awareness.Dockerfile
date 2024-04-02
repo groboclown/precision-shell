@@ -25,8 +25,11 @@ COPY tests/ tests/
 # Adjust this value during the image build with `--build-arg`
 #   to alter which commands to include.
 ARG COMMANDS="spawn kill-pid wait-pid exit signal echo noop enviro"
+ARG IPV6=""
 
-ENV COMMANDS=$COMMANDS
+ENV \
+    COMMANDS=$COMMANDS \
+    IPV6=$IPV6
 
 RUN build-tools/build-with-alpine-musl.sh
 
@@ -46,7 +49,10 @@ COPY --from=presh-builder /opt/precision-shell/out/presh /bin/sh
 
 WORKDIR /opt/app/hello_world
 
-ENV LISTEN_PORT 3000
+ARG LISTEN_PORT=3000
+
+ENV \
+    LISTEN_PORT=$LISTEN_PORT
 
 # Because Node doesn't install signal handlers on its own,
 #   have presh listen for user signals.

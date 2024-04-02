@@ -26,8 +26,11 @@ COPY tests/ tests/
 #   to alter which commands to include.
 #   Adding in "ls" and "file-stat" for exploring permissions.
 ARG COMMANDS="su-spawn kill-pid wait-pid signal chown exit enviro noop ls file-stat echo"
+ARG IPV6=""
 
-ENV COMMANDS=$COMMANDS
+ENV \
+    COMMANDS=$COMMANDS \
+    IPV6=$IPV6
 
 RUN build-tools/build-with-alpine-musl.sh
 
@@ -47,7 +50,10 @@ COPY --from=presh-builder /opt/precision-shell/out/presh /bin/sh
 
 WORKDIR /opt/app/hello_world
 
-ENV LISTEN_PORT 3000
+ARG LISTEN_PORT=3000
+
+ENV \
+    LISTEN_PORT=$LISTEN_PORT
 
 VOLUME /opt/logs
 
