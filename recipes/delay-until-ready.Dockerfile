@@ -29,7 +29,8 @@ ARG IPV6=""
 
 ENV \
     COMMANDS=$COMMANDS \
-    IPV6=$IPV6
+    IPV6=$IPV6 \
+    VIRTUAL_NETWORK=yes
 
 RUN build-tools/build-with-alpine-musl.sh
 
