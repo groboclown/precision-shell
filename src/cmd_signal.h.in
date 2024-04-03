@@ -26,13 +26,40 @@ AsOptional(command="signal",
 
 #include <signal.h>
 
-void signal_empty_handler(int);
+void signal_handler(int);
+#ifdef USES_ENVIRONMENT
+const char *signal_env_name;
+#define SIGNAL_ENV_CAPTURE \
+    if (signal_env_name != NULL) { \
+        char signal_itoa[(3 * sizeof(long int)) + 8]; \
+        char *itoa_ptr; \
+        itoa_ptr = shared_itoa(signal, signal_itoa); \
+        LOG(":: Set env "); \
+        LOG(signal_env_name); \
+        LOG(" to captured signal "); \
+        LOGLN(itoa_ptr); \
+        setenv(signal_env_name, itoa_ptr, 1); \
+    }
+
+#define SIGNAL_ENV_STORE \
+    if (global_arg[0] == '*') { \
+        signal_env_name = &global_arg[1]; \
+        setenv(signal_env_name, "0", 1); \
+        LOG(":: storing signal number into "); \
+        LOGLN(signal_env_name); \
+        break; \
+    }
+#else
+#define SIGNAL_ENV_CAPTURE
+#define SIGNAL_ENV_STORE
+#endif
 
     WithNamedStep(enum="signal", name="signal",
         GlobalDefs(
 
-void signal_empty_handler(int signal) {
+void signal_handler(int signal) {
     LOG(":: handled signal\n");
+    SIGNAL_ENV_CAPTURE;
 }
 
         )
@@ -72,8 +99,14 @@ void signal_empty_handler(int signal) {
                 global_cmd = COMMAND_INDEX__ERR;
                 break;
             }
-            // "wait" hasn't been found yet, so each argument is a
-            //   signal number.
+
+            // "wait" hasn't been found yet.
+
+            // If environment usage is on, then extra handling for
+            // capturing the signal number to an env can be done.
+            SIGNAL_ENV_STORE;
+
+            // Otherwise, the argument is a signal number.
             global_arg1_i = helper_arg_to_uint(global_arg, 10, 0xffff);
             if (global_arg1_i < 0) {
                 global_err = 1;
@@ -81,10 +114,11 @@ void signal_empty_handler(int signal) {
                 global_cmd = COMMAND_INDEX__ERR;
                 break;
             }
+
             LOG(":: signal ");
             LOGLN(global_arg);
             sigaddset(&global_signal_set, global_arg1_i);
-            signal(global_arg1_i, &signal_empty_handler);
+            signal(global_arg1_i, &signal_handler);
         )
     )
 
