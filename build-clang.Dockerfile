@@ -33,6 +33,7 @@ ENV \
     BUILD_MODE=$BUILD_MODE \
     COMMANDS=$COMMANDS \
     IPV6=$IPV6 \
+    VIRTUAL_NETWORK=yes \
     UID1=1 \
     UID2=2 \
     GID1=1 \
