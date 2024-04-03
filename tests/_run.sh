@@ -71,6 +71,16 @@ for test_name in "$@" ; do
                         dorun=0
                         break
                     fi
+                elif [ "${req_name}" = "-virtual-network" ] ; then
+                    # Some docker networks will act like there's something listening
+                    # on all ports, regardless if there's actually a service listening.
+                    if [ "${VIRTUAL_NETWORK}" = "yes" ] ; then
+                        if [ "${QUIET}" != 1 ]; then
+                            echo "?? SKIPPED because ${FS} does not support ${requirements} (environment has virtual network)"
+                        fi
+                        dorun=0
+                        break
+                    fi
                 else
                     grep_res_match=-ne
                     missing_message="missing"
