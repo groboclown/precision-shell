@@ -11,17 +11,16 @@
 FS_ABS="$( cd "$( dirname "${FS}" )" ; pwd )/$( basename "${FS}" )" || exit 1
 
 "${FS}" -c "\
-    signal *SIG 13 1 2 9 15 17 && \
-    spawn [[${FS_ABS}] -c [expect-http-get-response localhost 0 / 200]] EXP && \
-    wait-pid \${EXP} *X1 && \
-    echo [exit:\${X1};sig:\${SIG}]" \
+    signal *SIG 13 && \
+    expect-http-get-response localhost 0 / 200 ; \
+    echo [exit:\${?};sig:\${SIG}]" \
  > out.txt 2>err.txt
 res=$?
 
 # There are two possible good solutions here.
 # 1. Exit code != 0, which means expect-http-get-response failed.
 #    The signal should not be set.
-
+# 2. Exit code == 0 but signal == 13.
 
 if [ ${res} -ne 0 ] ; then
     # Exit code here can be very high, for several reasons.
@@ -34,9 +33,14 @@ if [ ${res} -ne 0 ] ; then
 fi
 
 # -s : file exists and not empty
-if [ -s out.txt ]; then
-    echo "Generated output to stdout"
+if \
+    [ "$( printf "exit:0;sig:13" )" != "$( cat out.txt )" ] \
+    && [ "$( printf "exit:1;sig:0" )" != "$( cat out.txt )" ] \
+; then
+    echo "Generated bad output to stdout"
     cat out.txt
+    echo "stderr:"
+    cat err.txt
     exit 1
 fi
 

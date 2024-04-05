@@ -3,12 +3,12 @@
 # Run the test suite for each command that can be enabled.
 cd "$( dirname "$0" )"
 
-command_list_raw="$( egrep "^CMD_" ../Makefile.command-flags | cut -f 3 -d ' ' )"
+command_list_raw="$( grep -E "^CMD_" ../Makefile.command-flags | cut -f 3 -d ' ' )"
 
 # Extra Flag Combos - see "gen-extra-flag-combos.sh"
-streaming_arg="$( egrep "^STREAMING_INPUT = " ../Makefile.command-flags | cut -f 3 -d ' ' )"
-reqargs_arg="$( egrep "^REQUIRE_FULL_CMD = " ../Makefile.command-flags | cut -f 3 -d ' ' )"
-enviro_arg="$( egrep "^ENVIRO_INPUT = " ../Makefile.command-flags | cut -f 3 -d ' ' )"
+streaming_arg="$( grep -E "^STREAMING_INPUT = " ../Makefile.command-flags | cut -f 3 -d ' ' )"
+reqargs_arg="$( grep -E "^REQUIRE_FULL_CMD = " ../Makefile.command-flags | cut -f 3 -d ' ' )"
+enviro_arg="$( grep -E "^ENVIRO_INPUT = " ../Makefile.command-flags | cut -f 3 -d ' ' )"
 
 # Slimmed down flag combinations, for ones that matter.
 extra_flag_combos=( \

@@ -8,7 +8,7 @@ WORKDIR /opt/code
 ARG COMMANDS="chmod ln-s"
 
 
-ARG PRESH_BRANCH="v4.4.2"
+ARG PRESH_BRANCH="v4.5.0"
 
 ENV \
 #    DEBUG=1 \

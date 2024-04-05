@@ -1,5 +1,11 @@
-## v4.4.2
+## v4.5.0
 
+* []()
+    * Added storing trapped signal numbers into an environment with `signal`, if environment usage is enabled.
+    * Added storing the previous command's exit code, if environment usage is enabled and a command that uses numbers is on.
+    * Fixed `noop` debug statements to correctly print the comment.
+    * Fixed `cat-fd` to exit with an error if the write fails.
+    * Fixed `dup-r` debug to correctly report the command name.
 * [1ee5968](1ee5968a8e0da8842b19e6b544f564a9da5aa683)
     * Fixed the `cmd_mkdir` to build correctly with LLVM.
     * Fixed clang+llvm issues with debug compile flags.  It used to contain conflicting argument flags which would cause a crash on some versions of llvm.

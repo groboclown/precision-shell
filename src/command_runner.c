@@ -1,7 +1,7 @@
 /*
 MIT License
 
-Copyright (c) 2022 groboclown
+Copyright (c) 2022,2024 groboclown
 
 Permission is hereby granted, free of charge, to any person obtaining a copy
 of this software and associated documentation files (the "Software"), to deal
@@ -71,6 +71,8 @@ int command_runner(struct ArgState *arg_state) {
     //   preserve count, this should be a copy of the input argument.
     char global_cmd_name[PARSED_ARG_SIZE] = "";
 
+    int global_last_err = 0;
+
     // Marker that there's an error in the current command.
     int global_err = 0;
 
@@ -116,6 +118,14 @@ int command_runner(struct ArgState *arg_state) {
 #ifdef REQUIRE_FULL_CMD
             _err_count += _on_cmd_end(global_cmd_name, global_cmd);
 #endif
+            global_last_err = _err_count;
+#if defined(USES_ENVIRONMENT) && defined(USES_SHARED_ITOA)
+            // Set the previous command's exit code to the $? value.
+            LOG(":: storing last command exit code (");
+            LOG(shared_itoa(global_last_err, global_itoa));
+            LOG(") to ${?}\n");
+            setenv("?", shared_itoa(global_last_err, global_itoa), 1);
+#endif            
             // ";" ignores any errors, resetting the error count.
             LOG(":: ;\n");
             _err_count = 0;

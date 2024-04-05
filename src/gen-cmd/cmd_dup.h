@@ -134,7 +134,7 @@ extern const char cmd_name_dup_r__setup[];
     case COMMAND_INDEX__DUP_R__SETUP: \
         /* from cmd_dup.h.in:56 */ \
             /* from cmd_dup.h.in:57 */ \
-            LOG(":: preparing dup-w\n"); \
+            LOG(":: preparing dup-r\n"); \
             global_arg1_i = O_WRONLY | O_CREAT | O_TRUNC; \
             global_cmd = COMMAND_INDEX__SHARED_INT2; \
             /* shared int will call this index when it's done.*/ \

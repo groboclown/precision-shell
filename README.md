@@ -828,9 +828,9 @@ Removes each empty directory passed as an argument.  If a directory is not empty
 
 **Compile flag**: `-DUSE_CMD_SIGNAL`
 
-**Usage**: `signal [signal1 [signal2]] [wait]`
+**Usage**: `signal [*ENV] [signal1 [signal2]] [wait]`
 
-Waits for any of the OS signal number arguments before continuing.  If no signal is given (just `signal wait`), then it waits for a standard OS interruption, which will kill the whole process.
+Traps OS signal numbers passed as arguments.  If `wait` is given, then waits for any listed signal to occur before continuing.  If no signal is given (just `signal wait`), then it waits for a standard OS interruption, which will kill the whole process.  If the command includes a `*ENV` (where `ENV` is some environment name) argument, and Pres has [environment variable parsing](#environment-variables) enabled, then the shell stores trapped OS signal numbers in the environment variable.
 
 Of note, once a signal is added to the list, it is registered for standard OS ignoring.  Only by adding the statement `wait` will the processing wait for the signal to be raised.  This can be used for interesting applications, such as:
 
@@ -857,14 +857,25 @@ spawn [/usr/sbin/my-server] SERVER_PID && subcmd [
 signal 1 2 9 15 17 wait
 
 # [ Force the child to die, in case the signal wasn't a SIGCHLD (17). ]
-kill-pid 15 ${NODE}
+kill-pid 15 ${SERVER_PID}
 
 # [ Capture the exit code of the spawned server. ]
-wait-pid ${NODE} *EXIT
+wait-pid ${SERVER_PID} *EXIT
 
 # [ Exit the script with the spawned server's exit code. ]
 exit ${EXIT}
 ]
+```
+
+**Example 2:**
+
+Run a process that might generate an unexpected error.
+
+```bash
+#! /usr/bin/presh -f
+
+FIXME
+
 ```
 
 ### sleep
@@ -1168,6 +1179,8 @@ To escape an environment variable to not parse it or delay its parsing, use a do
 $ presh "echo \$\${ABC}"
 ${ABC}
 ```
+
+Along with the normal environment variables, it also adds the shell-like `${?}` environment reference to allow `;` separated commands to capture the error code of the previous command.  Note that this adds the environment variable `?`; it's not just a shell variable.
 
 ### Standard Script Flag
 

@@ -3,7 +3,7 @@
 /*
 MIT License
 
-Copyright (c) 2022 groboclown
+Copyright (c) 2022,2024 groboclown
 
 Permission is hereby granted, free of charge, to any person obtaining a copy
 of this software and associated documentation files (the "Software"), to deal
@@ -35,65 +35,68 @@ SOFTWARE.
 
 #include <signal.h>
 
-void signal_handler(int);
+void signal_empty_handler(int);
 #ifdef USES_ENVIRONMENT
-const char *signal_env_name;
+
+#define SIGNAL_ENV_DATA \
+    char signal_env_name[PARSED_ARG_SIZE] = ""; \
+    char signal_itoa[(3 * sizeof(long int)) + 8];
+
 #define SIGNAL_ENV_CAPTURE \
-    if (signal_env_name != NULL) { \
-        char signal_itoa[(3 * sizeof(long int)) + 8]; \
-        char *itoa_ptr; \
-        itoa_ptr = shared_itoa(signal, signal_itoa); \
+    if (signal_env_name[0] != '\0') { \
         LOG(":: Set env "); \
         LOG(signal_env_name); \
         LOG(" to captured signal "); \
-        LOGLN(itoa_ptr); \
-        setenv(signal_env_name, itoa_ptr, 1); \
+        LOGLN(shared_itoa(global_arg1_i, signal_itoa)); \
+        setenv(signal_env_name, shared_itoa(global_arg1_i, signal_itoa), 1); \
     }
 
 #define SIGNAL_ENV_STORE \
     if (global_arg[0] == '*') { \
-        signal_env_name = &global_arg[1]; \
+        strcpy(signal_env_name, global_arg + 1); \
         setenv(signal_env_name, "0", 1); \
         LOG(":: storing signal number into "); \
         LOGLN(signal_env_name); \
         break; \
     }
+
 #else
+#define SIGNAL_ENV_DATA
 #define SIGNAL_ENV_CAPTURE
 #define SIGNAL_ENV_STORE
 #endif
 
 
-/* from cmd_signal.h.in:57 */
+/* from cmd_signal.h.in:60 */
 extern const char cmd_name_signal[];
 #define ENUM_LIST__SIGNAL \
-            /* from cmd_signal.h.in:57 */ \
+            /* from cmd_signal.h.in:60 */ \
             COMMAND_INDEX__SIGNAL,
 #define VIRTUAL_ENUM_LIST__SIGNAL
 #define GLOBAL_VARDEF__SIGNAL \
-            /* from cmd_signal.h.in:57 */ \
+            /* from cmd_signal.h.in:60 */ \
             const char cmd_name_signal[] = "signal"; \
-            /* from cmd_signal.h.in:58 */ \
-void signal_handler(int signal) { \
+            /* from cmd_signal.h.in:61 */ \
+void signal_empty_handler(int signal) { \
     LOG(":: handled signal\n"); \
-    SIGNAL_ENV_CAPTURE; \
 }
 #define INITIALIZE__SIGNAL \
-            /* from cmd_signal.h.in:57 */ \
+            /* from cmd_signal.h.in:60 */ \
             command_list_names[COMMAND_INDEX__SIGNAL] = cmd_name_signal; \
-            /* from cmd_signal.h.in:66 */ \
-            sigset_t global_signal_set;
+            /* from cmd_signal.h.in:68 */ \
+            sigset_t global_signal_set; \
+            SIGNAL_ENV_DATA;
 #define STARTUP_CASE__SIGNAL \
     case COMMAND_INDEX__SIGNAL: \
-        /* from cmd_signal.h.in:57 */ \
-            /* from cmd_signal.h.in:70 */ \
+        /* from cmd_signal.h.in:60 */ \
+            /* from cmd_signal.h.in:73 */ \
             LOG(":: Initializing for signal handling\n"); \
             sigemptyset(&global_signal_set); \
         break;
 #define RUN_CASE__SIGNAL \
     case COMMAND_INDEX__SIGNAL: \
-        /* from cmd_signal.h.in:57 */ \
-            /* from cmd_signal.h.in:75 */ \
+        /* from cmd_signal.h.in:60 */ \
+            /* from cmd_signal.h.in:78 */ \
             /* The "wait" string indicates the end of the signals.*/ \
             if (strequal("wait", global_arg)) { \
                 LOG(":: start signal wait\n"); \
@@ -114,6 +117,7 @@ void signal_handler(int signal) { \
                 } else { \
                     /* Looks like a success.*/ \
                     global_err = 0; \
+                    SIGNAL_ENV_CAPTURE; \
                 } \
                 LOG(":: wait complete\n"); \
                 /* Doesn't make sense to keep parsing signals at this point.*/ \
@@ -135,7 +139,7 @@ void signal_handler(int signal) { \
             LOG(":: signal "); \
             LOGLN(global_arg); \
             sigaddset(&global_signal_set, global_arg1_i); \
-            signal(global_arg1_i, &signal_handler); \
+            signal(global_arg1_i, &signal_empty_handler); \
         break;
 #define REQUIRES_ADDL_ARG__SIGNAL
 

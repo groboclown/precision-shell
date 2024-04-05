@@ -31,9 +31,10 @@ while [ "${#port}" -lt 5 ] ; do
   port="${port}1"
 done
 port="${port:0:5}"
+port_incr="${port:3:1}
 
 alive=0
-retries=5
+retries=15
 
 # make sure this uses the kill program, not the Bash built-in kill.
 kill_exec="$( which kill )" || exit 1
@@ -49,11 +50,15 @@ while [ ${alive} = 0 ] && [ ${retries} -gt 0 ] ; do
         alive=1
     else
         retries=$(( retries - 1 ))
-        port=$(( port + 1 ))
+        port=$(( port + port_incr ))
     fi
 done
 if [ ${alive} = 0 ] ; then
     2>&1 echo "Failed to launch server after 5 retries; final port ${port}"
+    2>&1 echo "stdout:"
+    2>&1 cat "${stdout_file}"
+    2>&1 echo "stderr:"
+    2>&1 cat "${stderr_file}"
     exit 1
 fi
 
