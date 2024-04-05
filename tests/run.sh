@@ -34,26 +34,32 @@ get_abs_filename() {
 myself="$( get_abs_filename $0 )"
 here="$( dirname "${myself}" )"
 
-export UID0=$( id -u )
-export GID0=$( id -g )
-export FS="$( get_abs_filename "${PRESH}" )"
-export FS_SERVER="$( dirname "${FS}" )/test_server"
+export UID0=$( id -u ) || exit 1
+export GID0=$( id -g ) || exit 1
+export FS="$( get_abs_filename "${PRESH}" )" || exit 1
+export FS_SERVER="$( dirname "${FS}" )/test_server" || exit 1
 export UTIL_DIR="${here}/_utils"
 
-presh_supports="$( "${FS}" version )"
+presh_supports="$( "${FS}" version )" || exit 1
 
 FAILED=0
 for test_name in "$@" ; do
-    test_script="$( get_abs_filename "${test_name}" )"
-    export TEST_NAME="$( basename ${test_name} .sh )"
+    test_script="$( get_abs_filename "${test_name}" )" || exit 1
+    test_category="$( basename "$( dirname "${test_script}" )"  )" || exit 1
+    TEST_NAME="$( basename "${test_name}" .sh )" || exit 1
+    export TEST_NAME
 
     # Don't run the helper "_" scripts.
-    if [ -x "${test_script}" ] && [ "${TEST_NAME:0:1}" != "_" ] && [ "${TEST_NAME}" != README.md ] ; then
+    if \
+        [ -x "${test_script}" ] \
+        && [ "${test_category:0:1}" != "_" ] \
+        && [ "${TEST_NAME:0:1}" != "_" ] \
+    ; then
         # Set up per-test variables.
         export TEST_DIR="${TEST_TMP_DIR}/${TEST_NAME}.d"
         if [ "${QUIET}" != 1 ]; then
             echo "-------------------------------------------"
-            echo ">> ${TEST_NAME}"
+            echo ">> ${test_category}/${TEST_NAME}"
             cat "${test_script}" | sed -n 's/# desc: \(.*\)/\/\/ \1/p'
         fi
         # Check if the required version is being run.

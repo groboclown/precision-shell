@@ -43,6 +43,7 @@ SOFTWARE.
 #include "cmd_for_each.h"
 #include "cmd_http_request.h"
 #include "cmd_if_else.h"
+#include "cmd_is_eq.h"
 #include "cmd_ln_h.h"
 #include "cmd_ln_s.h"
 #include "cmd_ls_ls.h"
@@ -92,6 +93,7 @@ SOFTWARE.
             GLOBAL_VARDEF__FOR_EACH \
             GLOBAL_VARDEF__EXPECT_HTTP_GET_RESPONSE \
             GLOBAL_VARDEF__IF_ELSE \
+            GLOBAL_VARDEF__IS_EQUAL \
             GLOBAL_VARDEF__LN_H \
             GLOBAL_VARDEF__LN_S \
             GLOBAL_VARDEF__LS_LS_F \
@@ -139,6 +141,7 @@ SOFTWARE.
             INITIALIZE__FOR_EACH \
             INITIALIZE__EXPECT_HTTP_GET_RESPONSE \
             INITIALIZE__IF_ELSE \
+            INITIALIZE__IS_EQUAL \
             INITIALIZE__LN_H \
             INITIALIZE__LN_S \
             INITIALIZE__LS_LS_F \
@@ -186,6 +189,7 @@ SOFTWARE.
             STARTUP_CASE__FOR_EACH \
             STARTUP_CASE__EXPECT_HTTP_GET_RESPONSE \
             STARTUP_CASE__IF_ELSE \
+            STARTUP_CASE__IS_EQUAL \
             STARTUP_CASE__LN_H \
             STARTUP_CASE__LN_S \
             STARTUP_CASE__LS_LS_F \
@@ -233,6 +237,7 @@ SOFTWARE.
             RUN_CASE__FOR_EACH \
             RUN_CASE__EXPECT_HTTP_GET_RESPONSE \
             RUN_CASE__IF_ELSE \
+            RUN_CASE__IS_EQUAL \
             RUN_CASE__LN_H \
             RUN_CASE__LN_S \
             RUN_CASE__LS_LS_F \
@@ -280,6 +285,7 @@ SOFTWARE.
             REQUIRES_ADDL_ARG__FOR_EACH \
             REQUIRES_ADDL_ARG__EXPECT_HTTP_GET_RESPONSE \
             REQUIRES_ADDL_ARG__IF_ELSE \
+            REQUIRES_ADDL_ARG__IS_EQUAL \
             REQUIRES_ADDL_ARG__LN_H \
             REQUIRES_ADDL_ARG__LN_S \
             REQUIRES_ADDL_ARG__LS_LS_F \
@@ -331,6 +337,7 @@ enum CommandIndex {
             ENUM_LIST__FOR_EACH
             ENUM_LIST__EXPECT_HTTP_GET_RESPONSE
             ENUM_LIST__IF_ELSE
+            ENUM_LIST__IS_EQUAL
             ENUM_LIST__LN_H
             ENUM_LIST__LN_S
             ENUM_LIST__LS_LS_F
@@ -381,6 +388,7 @@ enum CommandIndex {
             VIRTUAL_ENUM_LIST__FOR_EACH
             VIRTUAL_ENUM_LIST__EXPECT_HTTP_GET_RESPONSE
             VIRTUAL_ENUM_LIST__IF_ELSE
+            VIRTUAL_ENUM_LIST__IS_EQUAL
             VIRTUAL_ENUM_LIST__LN_H
             VIRTUAL_ENUM_LIST__LN_S
             VIRTUAL_ENUM_LIST__LS_LS_F

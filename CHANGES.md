@@ -1,5 +1,9 @@
 ## v4.5.0
 
+* []()
+    * Added `is-eq` command.
+    * Fixed bad links in the README.
+    * Reorganized tests into categories (i.e. directories).
 * [400365f](400365f32aa1493f14e4087e0a983a1288bd860a)
     * Added storing trapped signal numbers into an environment with `signal`, if environment usage is enabled.
     * Added storing the previous command's exit code, if environment usage is enabled and a command that uses numbers is on.

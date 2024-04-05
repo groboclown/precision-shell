@@ -2,14 +2,18 @@
 
 # This test fails when running inside docker.
 # desc: test-connect with no running server on localhost, port 0 and ipv6.
-# requires: +test-connect +ipv6 +trap +echo
+# requires: +test-connect +ipv6 +echo
 
 # At the moment, a virtual network environment (such as with Docker) causes the
 #    localhost (::1) address to act like it's listening to all ports - connecting
 #    does not cause a failure.  A change is in the works to allow a connection to
 #    send data to allow for triggering the SIGPIPE (13) signal.
 
-"${FS}" -c "trap SIG 13 for [test-connect ::1 0 3] [echo [trapped \${SIG}]] && echo [SUCCESS]" > out.txt 2>err.txt
+"${FS}" -c '
+    signal *SIG 13 &&
+    test-connect ::1 0 3 &&
+    exit ${SIG}
+' > out.txt 2>err.txt
 res=$?
 
 if [ ${res} -ne 1 ] ; then
@@ -17,7 +21,7 @@ if [ ${res} -ne 1 ] ; then
     exit 1
 fi
 
-if [ "$( printf "ERROR test-connect: 3\n" )" != "$( cat err.txt )" ] ; then
+if [ "$( printf "ERROR test-connect: 3\\nFAIL &&\\n" )" != "$( cat err.txt )" ] ; then
     echo "Generated invalid stderr"
     cat err.txt
     exit 1

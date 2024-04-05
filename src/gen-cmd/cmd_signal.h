@@ -35,21 +35,24 @@ SOFTWARE.
 
 #include <signal.h>
 
-void signal_empty_handler(int);
+void signal_handler(int);
+
 #ifdef USES_ENVIRONMENT
 
-#define SIGNAL_ENV_DATA \
-    char signal_env_name[PARSED_ARG_SIZE] = ""; \
-    char signal_itoa[(3 * sizeof(long int)) + 8];
+char signal_env_name[PARSED_ARG_SIZE] = "";
 
 #define SIGNAL_ENV_CAPTURE \
+    char signal_itoa[(3 * sizeof(long int)) + 8]; \
     if (signal_env_name[0] != '\0') { \
         LOG(":: Set env "); \
         LOG(signal_env_name); \
         LOG(" to captured signal "); \
-        LOGLN(shared_itoa(global_arg1_i, signal_itoa)); \
-        setenv(signal_env_name, shared_itoa(global_arg1_i, signal_itoa), 1); \
+        LOGLN(shared_itoa(signal, signal_itoa)); \
+        setenv(signal_env_name, shared_itoa(signal, signal_itoa), 1); \
     }
+
+#define SIGNAL_ENV_CALL \
+    signal_handler(global_arg1_i);
 
 #define SIGNAL_ENV_STORE \
     if (global_arg[0] == '*') { \
@@ -61,42 +64,42 @@ void signal_empty_handler(int);
     }
 
 #else
-#define SIGNAL_ENV_DATA
 #define SIGNAL_ENV_CAPTURE
+#define SIGNAL_ENV_CALL
 #define SIGNAL_ENV_STORE
 #endif
 
 
-/* from cmd_signal.h.in:60 */
+/* from cmd_signal.h.in:63 */
 extern const char cmd_name_signal[];
 #define ENUM_LIST__SIGNAL \
-            /* from cmd_signal.h.in:60 */ \
+            /* from cmd_signal.h.in:63 */ \
             COMMAND_INDEX__SIGNAL,
 #define VIRTUAL_ENUM_LIST__SIGNAL
 #define GLOBAL_VARDEF__SIGNAL \
-            /* from cmd_signal.h.in:60 */ \
+            /* from cmd_signal.h.in:63 */ \
             const char cmd_name_signal[] = "signal"; \
-            /* from cmd_signal.h.in:61 */ \
-void signal_empty_handler(int signal) { \
+            /* from cmd_signal.h.in:64 */ \
+void signal_handler(int signal) { \
+    SIGNAL_ENV_CAPTURE; \
     LOG(":: handled signal\n"); \
 }
 #define INITIALIZE__SIGNAL \
-            /* from cmd_signal.h.in:60 */ \
+            /* from cmd_signal.h.in:63 */ \
             command_list_names[COMMAND_INDEX__SIGNAL] = cmd_name_signal; \
-            /* from cmd_signal.h.in:68 */ \
-            sigset_t global_signal_set; \
-            SIGNAL_ENV_DATA;
+            /* from cmd_signal.h.in:72 */ \
+            sigset_t global_signal_set;
 #define STARTUP_CASE__SIGNAL \
     case COMMAND_INDEX__SIGNAL: \
-        /* from cmd_signal.h.in:60 */ \
-            /* from cmd_signal.h.in:73 */ \
+        /* from cmd_signal.h.in:63 */ \
+            /* from cmd_signal.h.in:76 */ \
             LOG(":: Initializing for signal handling\n"); \
             sigemptyset(&global_signal_set); \
         break;
 #define RUN_CASE__SIGNAL \
     case COMMAND_INDEX__SIGNAL: \
-        /* from cmd_signal.h.in:60 */ \
-            /* from cmd_signal.h.in:78 */ \
+        /* from cmd_signal.h.in:63 */ \
+            /* from cmd_signal.h.in:81 */ \
             /* The "wait" string indicates the end of the signals.*/ \
             if (strequal("wait", global_arg)) { \
                 LOG(":: start signal wait\n"); \
@@ -117,7 +120,7 @@ void signal_empty_handler(int signal) { \
                 } else { \
                     /* Looks like a success.*/ \
                     global_err = 0; \
-                    SIGNAL_ENV_CAPTURE; \
+                    SIGNAL_ENV_CALL; \
                 } \
                 LOG(":: wait complete\n"); \
                 /* Doesn't make sense to keep parsing signals at this point.*/ \
@@ -139,7 +142,7 @@ void signal_empty_handler(int signal) { \
             LOG(":: signal "); \
             LOGLN(global_arg); \
             sigaddset(&global_signal_set, global_arg1_i); \
-            signal(global_arg1_i, &signal_empty_handler); \
+            signal(global_arg1_i, &signal_handler); \
         break;
 #define REQUIRES_ADDL_ARG__SIGNAL
 
