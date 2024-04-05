@@ -1,6 +1,6 @@
 ## v4.5.0
 
-* []()
+* [400365f](400365f32aa1493f14e4087e0a983a1288bd860a)
     * Added storing trapped signal numbers into an environment with `signal`, if environment usage is enabled.
     * Added storing the previous command's exit code, if environment usage is enabled and a command that uses numbers is on.
     * Fixed `noop` debug statements to correctly print the comment.
