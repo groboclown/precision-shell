@@ -107,7 +107,7 @@ SOFTWARE.
     || defined(USE_CMD_WHILE_NO_ERROR) \
     || defined(USE_CMD_WHILE_ERROR) \
     || defined(USE_CMD_FOR_EACH)  \
-    || defined(USE_CMD_IS_EQUAL) \
+    || defined(USE_CMD_IS_EQ) \
     || defined(USES_SHARED_CONNECT)
 
 #define USES_SHARED_STR
