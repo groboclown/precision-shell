@@ -31,7 +31,7 @@ while [ "${#port}" -lt 5 ] ; do
   port="${port}1"
 done
 port="${port:0:5}"
-port_incr="${port:3:1}
+port_incr="${port:3:1}"
 
 alive=0
 retries=15
