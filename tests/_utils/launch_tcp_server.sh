@@ -48,6 +48,10 @@ while [ ${alive} = 0 ] && [ ${retries} -gt 0 ] ; do
         2>&1 echo "Exited with: $?" ;
      ) >>"${stdout_file}" 2>>"${stderr_file}" &
     server_pid=$!
+
+    # Give it a little bit of time to try to bind the port.
+    sleep 0.1
+    
     if "${kill_exec}" "-0" "${server_pid}" ; then
         alive=1
     else

@@ -27,7 +27,7 @@ res=$?
 # The dietlibc seems to always exit with a 141 (SIGPIPE) here, when run from Docker.
 # Try with the debug version, in order to better understand what's causing
 # the failure.
-if [ ${res} -eq 141 ] && [ -x "${FS}-debug" ] ; then
+if [ ${res} -ne 0 ] && [ -x "${FS}-debug" ] ; then
     "${FS}-debug" -c "expect-http-get-response localhost ${port} / 200" >> out.txt 2>>err.txt
     echo "Debug Exit: $?" >>err.txt
 fi

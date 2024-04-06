@@ -82,15 +82,16 @@ int shared_connect_to_address(
 #ifdef DEBUG
             char converted[INET6_ADDRSTRLEN];
             if (addrinfo_next->ai_family == AF_INET6) {
-                printf(":: Attempting connection to IPv6 address %s port %d family %d socktype %d protocol %d\n",
+                fprintf(stdout, ":: Attempting connection to IPv6 address %s port %d family %d socktype %d protocol %d\n",
                     inet_ntop(AF_INET6, &(((struct sockaddr_in6 *)addrinfo_next->ai_addr)->sin6_addr), converted, INET6_ADDRSTRLEN),
                     ntohs(((struct sockaddr_in6 *)addrinfo_next->ai_addr)->sin6_port),
                     addrinfo_next->ai_family, addrinfo_next->ai_socktype, addrinfo_next->ai_protocol);
             } else if (addrinfo_next->ai_family == AF_INET) {
-                printf(":: Attempting connection to IPv4 address %s port %d\n",
+                fprintf(stdout, ":: Attempting connection to IPv4 address %s port %d\n",
                     inet_ntop(AF_INET, &(((struct sockaddr_in *)addrinfo_next->ai_addr)->sin_addr), converted, INET6_ADDRSTRLEN),
                     ntohs(((struct sockaddr_in *)addrinfo_next->ai_addr)->sin_port));
             }
+            fflush(stdout);
 #endif
 
             // Perform connection.
@@ -98,7 +99,8 @@ int shared_connect_to_address(
             if (socket_fd == -1) {
                 LOG(":: failed to open socket\n");
 #ifdef DEBUG
-                printf(":: - error %d\n", errno);
+                fprintf(stdout, ":: - error %d\n", errno);
+                fflush(stdout);
 #endif
                 // No need to close the socket.
                 // Loop again.
@@ -108,18 +110,21 @@ int shared_connect_to_address(
             if (error == -1) {
                 LOG(":: failed to set socket to non-blocking mode\n");
 #ifdef DEBUG
-                printf(":: - error %d\n", errno);
+                fprintf(stdout, ":: - error %d\n", errno);
+                fflush(stdout);
 #endif
                 // Close the socket and loop again.
             } else {
                 // Because the socket is in non-blocking mode,
                 //   chances are that running connect will return an error with
-                //   errno == EINPROGRESS, meaning connection is in-progress.
+                //   errno == EINPROGRESS (115), meaning connection is in-progress.
+                //   Therefore, ignore this specific error.
                 error = connect(socket_fd, addrinfo_next->ai_addr, addrinfo_next->ai_addrlen);
-                if (error == -1) {
+                if (error == -1 && errno != EINPROGRESS) {
                     LOG(":: socket connect error\n");
 #ifdef DEBUG
-                    printf(":: - error %d\n", errno);
+                    fprintf(stdout, ":: - error %d\n", errno);
+                    fflush(stdout);
 #endif
                     // Close the socket and loop again.
                 } else {
@@ -135,7 +140,8 @@ int shared_connect_to_address(
                         if (error == -1) {
                             LOG(":: socket option error\n");
 #ifdef DEBUG
-                            printf(":: - getsockopt error %d\n", errno);
+                            fprintf(stdout, ":: - getsockopt error %d\n", errno);
+                            fflush(stdout);
 #endif
                             // Close the socket and don't loop again.
                         } else if (option == 0) {
@@ -149,7 +155,8 @@ int shared_connect_to_address(
                         } else {
                             LOG(":: socket has error\n");
 #ifdef DEBUG
-                            printf(":: - socket error %d\n", option);
+                            fprintf(stdout, ":: - socket error %d\n", option);
+                            fflush(stdout);
 #endif
                             // Close the socket and try again.
                         }

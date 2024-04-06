@@ -52,6 +52,28 @@ void print_out(const char *text) {
     fsync(STDOUT_FILENO);
 }
 
+void print_out_int(int value) {
+    // An itoa implementation.
+    char buffer[(3 * sizeof(int)) + 1];
+    char *itoa_ptr = buffer + (3 * sizeof(long int));
+    int is_negative = 0;
+    *itoa_ptr = '\0';
+    if (value < 0) {
+        is_negative = 1;
+        value = 0 - value;
+    }
+    // Do-while allows us to add the 0 if the value is zero.
+    do {
+        itoa_ptr -= sizeof(char);
+        *itoa_ptr = '0' + (value % 10);
+        value /= 10;
+    } while (value);
+    if (is_negative) {
+        itoa_ptr -= sizeof(char);
+        *itoa_ptr = '-';
+    }
+    print_out(itoa_ptr);
+}
 
 void print_err(const char *text) {
     write(STDERR_FILENO, (text), strlen(text));
@@ -207,7 +229,6 @@ int main(int argc, const char *argv[]) {
     int total_read_count;
     struct sockaddr_in6 server, client;
     char client_data[1];
-    char str_int[16];
     char last_read = '\0';
     struct handler_data handler_state;
     void (*handler_func)(struct handler_data *) = NULL;
@@ -313,9 +334,8 @@ int main(int argc, const char *argv[]) {
             (*handler_func)(&handler_state);
             last_read = handler_state.client_read;
         }
-        itoa(total_read_count, str_int, 10);
         print_out("Disconnected; read ");
-        print_out(str_int);
+        print_out_int(total_read_count);
         print_out(" bytes.\n");
         close(handler_state.client_sock);
     }
