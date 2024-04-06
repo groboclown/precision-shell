@@ -24,7 +24,7 @@ server_pid="$( cat server-pid.txt )" || exit 1
 "${FS}" -c "expect-http-get-response localhost ${port} / 200" > out.txt 2>err.txt
 res=$?
 
-# The dietlibc seems to always exit with a 141 here, when run from Docker.
+# The dietlibc seems to always exit with a 141 (SIGPIPE) here, when run from Docker.
 # Try with the debug version, in order to better understand what's causing
 # the failure.
 if [ ${res} -eq 141 ] && [ -x "${FS}-debug" ] ; then

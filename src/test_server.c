@@ -49,6 +49,7 @@ SOFTWARE.
 
 void print_out(const char *text) {
     write(STDOUT_FILENO, (text), strlen(text));
+    fsync(STDOUT_FILENO);
 }
 
 
@@ -203,9 +204,10 @@ int main(int argc, const char *argv[]) {
     socklen_t client_size;
     int on;
     int read_size;
+    int total_read_count;
     struct sockaddr_in6 server, client;
     char client_data[1];
-    char bin_buffer[6];
+    char str_int[16];
     char last_read = '\0';
     struct handler_data handler_state;
     void (*handler_func)(struct handler_data *) = NULL;
@@ -301,15 +303,20 @@ int main(int argc, const char *argv[]) {
         //  One.  Byte.  At.  A.  Time.
         handler_state.handler_state = 0;
         handler_state.force_disconnect = 0;
+        total_read_count = 0;
         while (
                 handler_state.force_disconnect == 0
                 && (read_size = recv(handler_state.client_sock, client_data, 1, 0)) > 0
         ) {
+            total_read_count++;
             handler_state.client_read = client_data[0];
             (*handler_func)(&handler_state);
             last_read = handler_state.client_read;
         }
-        print_out("Disconnected\n");
+        itoa(total_read_count, str_int, 10);
+        print_out("Disconnected; read ");
+        print_out(str_int);
+        print_out(" bytes.\n");
         close(handler_state.client_sock);
     }
     close(server_sock);
