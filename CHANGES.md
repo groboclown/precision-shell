@@ -5,6 +5,11 @@
     * Added a typo-fix for the `USE_ENVIRONMENT_INPUT`.  Both the old one (`USE_ENVIROMENT_INPUT`) and the fixed name work.
     * Added a 64-bit / 32-bit CPU fix for outputting information in the test argument runner.
     * Moved LLVM debug mode compiler flags to just use `-gfull` rather than trying to be tricky.
+* []()
+    * Move development guidelines into the `CONTRIBUTING.md` file.
+    * Add tests for the new `is-eq` function.
+    * Add file size listing in the recipes.  This allows for easier updates to the compiled size notes in the readme file.
+    * Bump the version numbers to v4.5.1.
 
 
 ## v4.5.0

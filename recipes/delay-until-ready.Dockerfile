@@ -32,7 +32,9 @@ ENV \
     IPV6=$IPV6 \
     VIRTUAL_NETWORK=yes
 
-RUN build-tools/build-with-alpine-musl.sh
+RUN set -x \
+    && build-tools/build-with-alpine-musl.sh \
+    && ls -l /opt/precision-shell/out/presh
 
 # ---------------------------------------------------------------------------
 # The real image, using what was just built.

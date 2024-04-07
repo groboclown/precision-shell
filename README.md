@@ -1264,35 +1264,35 @@ If you use the input-enabled build, then you can pass the argument `-` to have t
 Last build size:
 
 * Do-nothing build:
-  * [glibc (Ubuntu)](#build-glibc.Dockerfile): 819,656 bytes
-  * [glibc (Arch)](#build-glibc-arch.Dockerfile): 700,432 bytes
-  * [clang/musl (Alpine)](#build-clang.Dockerfile): 25,752 bytes
-  * [musl (Alpine)](#build-musl.Dockerfile): 21,944 bytes
-  * [dietlibc (Alpine)](#build-dietlibc.Dockerfile): 13,256 bytes
+  * [glibc (Ubuntu)](#build-glibc.Dockerfile): 819,664 bytes
+  * [glibc (Arch)](#build-glibc-arch.Dockerfile): 673,528 bytes
+  * [clang/musl (Alpine)](#build-clang.Dockerfile): 25,840 bytes
+  * [musl (Alpine)](#build-musl.Dockerfile): 25,816 bytes
+  * [dietlibc (Alpine)](#build-dietlibc.Dockerfile): 9,576 bytes
 * Minimal build:
-  * glibc (Ubuntu): 823,752 bytes
-  * glibc (Arch): 700,432 bytes
-  * clang (Alpine): 25,752 bytes
-  * musl (Alpine): 21,944 bytes
-  * dietlibc (Alpine): 17,352 bytes
+  * glibc (Ubuntu): 823,760 bytes
+  * glibc (Arch): 673,528 bytes
+  * clang/musl (Alpine): 25,840 bytes
+  * musl (Alpine): 25,816 bytes
+  * dietlibc (Alpine): 13,736 bytes
 * Standard build:
-  * glibc (Ubuntu): 831,944 bytes
-  * glibc (Arch): 704,528 bytes
-  * clang (Alpine): 29,848 bytes
-  * musl (Alpine): 26,040 bytes
-  * dietlibc (Alpine): 17,352 bytes
+  * glibc (Ubuntu): 831,952 bytes
+  * glibc (Arch): 681,720 bytes
+  * clang/musl (Alpine): 29,936 bytes
+  * musl (Alpine): 29,912 bytes
+  * dietlibc (Alpine): 14,576 bytes
 * Non-Network build:
-  * glibc (Ubuntu): 844,232 bytes
-  * glibc (Arch): 720,944 bytes
-  * clang (Alpine): 46,240 bytes
-  * musl (Alpine): 42,432 bytes
-  * dietlibc (Alpine): 29,640 bytes
+  * glibc (Ubuntu): 844,240 bytes
+  * glibc (Arch): 698,104 bytes
+  * clang/musl (Alpine): 50,424 bytes
+  * musl (Alpine): 46,304 bytes
+  * dietlibc (Alpine): 28,208 bytes
 * Full build:
-  * glibc (Ubuntu): 1,077,992 bytes
-  * glibc (Arch): 921,936 bytes
-  * clang (Alpine): 74,912 bytes
-  * musl (Alpine): 71,104 bytes
-  * dietlibc (Alpine): 46,128 bytes
+  * glibc (Ubuntu): 1,078,000 bytes
+  * glibc (Arch): 911,184 bytes
+  * clang/musl (Alpine): 83,192 bytes
+  * musl (Alpine): 83,168 bytes
+  * dietlibc (Alpine): 45,944 bytes
 
 *dietlibc [requires](https://www.fefe.de/dietlibc/FAQ.txt) that you either not distribute the compiled executable, or release the executable under GPL v2.*
 
@@ -1321,67 +1321,6 @@ Contributing new commands requires (this list assumes that the change is for a s
 ## Reporting Security Issues
 
 If you think you discovered an issue that allows for a remote attack on computer running Precision Shell, please open a bug report with enough information to describe what it is, then a representative with the project will reach out to find out more information on a private channel if it's determined to be severe enough to fix without reporting too much information.
-
-
-# Developing
-
-A guide to the special format for command code is in the [source tree](src/README.md).
-
-To compile the shell, you will need a C compiler that includes a version of the standard C libraries.
-
-To test, run:
-
-```bash
-chmod +x tests/*.sh && docker build -f build-(libname).Dockerfile .
-```
-
-You can build directly, but some of the tests require root privileges, which are safer to run from within a container.
-
-To build through Docker and capture the built executables:
-
-```bash
-mkdir -p out
-for libname in glibc musl ; do
-    docker build -t local/presh-${libname} -f build-${libname}.Dockerfile .
-    container=$( docker create local/presh-${libname} )
-    docker cp "${container}:/opt/code/out/presh" out/presh.${libname}
-    docker cp "${container}:/opt/code/out/presh-debug" out/presh-debug.${libname}
-    docker rm "${container}"
-done
-```
-
-The build generates combinations of the flags for different executables with various enabled actions.  The `version` command lists which flags the executable has enabled.
-
-To enable different commands in the compiled executable from the Docker build, run the build command like so:
-
-```bash
-docker build \
-  -t local/presh-${libname} -f build-${libname}.Dockerfile \
-  --build-arg COMMANDS="rm rmdir chmod chown" \
-  .
-```
-
-Additionally, for your own purposes, you can build it against the "dietlibc" library.  However, this has special considerations in that it's GPL v2, and [you can't distribute the binary under this program's MIT license](http://www.fefe.de/dietlibc/FAQ.txt).
-
-```bash
-docker build -t local/presh-dietlibc -f build-dietlibc.Dockerfile . \
-    && ./extract-executables.sh local/presh-dietlibc -o out -s .dietlibc -d
-```
-
-To bump the version number, change the [version.txt](version.txt) file.  Version numbers must be in a dewey decimal format MAJOR.MINOR.PATCH (e.g. `1.2.3`).
-
-
-## Releasing
-
-Releases should:
-
-1. Bump the version number in [version.txt](version.txt).
-2. Bump the version number in [Dockerfile](Dockerfile).
-3. Ensure the builds pass.  These run as part of the GitHub actions.
-4. The root [README.md](README.md) file is updated with the latest binary file sizes.  The automated builds include the file sizes.
-5. Author a new release in GitHub, with the title & tag set to the new version number.  No binary files are included here, but it auto-generates the source tarball.
-
-Version numbers generally follow the guideline of bug fixes increment the patch (third number), added functionality but not backwards incompatible increases the minor (second number), and backwards incompatible changes increases the major (first number).  Some things such as documentation improvements or added platform support, which does not change the functionality of the tool itself, trigger a release, but these will increase the patch number.
 
 
 # License

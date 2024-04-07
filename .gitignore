@@ -67,3 +67,6 @@ dkms.conf
 # IDE
 .vscode/.browse*
 # Allow settings.json and c_cpp_properties.json
+
+# Until the doc samples are ready for use
+/docs/
