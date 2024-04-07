@@ -188,6 +188,7 @@ extern const char cmd_name_env_cat_fd[];
                 tmp_val = write(global_arg2_i, cat_input_result.data, cat_input_result.data_length); \
                 if (tmp_val != cat_input_result.data_length) { \
                     stderrP("ERROR writing\n"); \
+                    global_err = 1; \
                     break; \
                 } \
             } \

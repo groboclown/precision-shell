@@ -52,16 +52,17 @@ The shell supports these commands:
   * [elapsed-time](#elapsed-time) - prints number of seconds since the [start-timer](#start-timer) command was called.
   * [export-elapsed-time](#export-elapsed-time) - records the number of seconds since the [start-timer](#start-timer) command was called into an environment variable.
   * [elapsed-time-under](#elapsed-time-under) - passes with an error code of 0 if the time since the [start-timer](#start-timer) command was called is under the given number of seconds.
+  * [signal .. wait](#signal-wait) - wait for an OS signal before continuing.
 * Control Flow
   * [if-else](#if-else-command) - run a command conditionally based on the error result of another.
   * [subcmd](#subcmd) - run an argument as a complete precision shell command.
   * [not](#not) - run an argument as a complete precision shell command, and invert the error code (non-zero becomes zero, zero becomes 1).
   * [exit](#exit) - exits the command (or sub-command) with an exit code.
   * [sleep](#sleep) - wait for a number of seconds.
-  * [signal .. wait](#signal-wait) - wait for an OS signal before continuing.
   * [for-each](#for-each) - loop over sub-arguments, setting an environment variable with the value and running a sub-command.
   * [while-error](#while-error) - run a sub-command until it ends without error.
   * [while-no-error](#while-no-error) - run a sub-command until it ends with an error.
+  * [is-eq](#is-eq) - compare 2 or more strings for equality.
 * Network
   * [test-connect](#test-connect) - test whether a host is listening on a given port number.
   * [export-host-lookup](#export-host-lookup) - exports to an environment variable the IP address of a hostname.
@@ -73,7 +74,7 @@ The shell supports these commands:
 
 It also supports:
 * [Embedded Quoting](#command-parsing) by using the `[` and `]` symbols to allow easy deep quotes, like `exec [/usr/bin/echo [from native echo]]`
-* [Chaining commands](#command-chaining) together with `&&` and `;` (cannot be disabled).
+* [Chaining commands](#chaining-commands) together with `&&` and `;` (cannot be disabled).
 * [Standard script argument flag](#standard-script-flag) - if passed with the arguments `-c "commands"`, then the shell will parse the commands argument into individual commands (cannot be disabled).
 * [Script files](#script-files) - as an argument if used with `-f script-file-name`.
 * [Commands from stdin](#passing-commands-from-stdin) - With the `-` argument, commands are parsed from stdin.  **Without the streaming input flag, the shell will not read from stdin.**
@@ -539,6 +540,34 @@ presh -c "\
   "
 ```
 
+### is-eq
+
+**Compile flag**: `-USE_CMD_IS_EQUAL`
+
+**Usage**: `is-eq (arg1) (arg2) ...`
+
+Compares the first argument against the remaining arguments for strict equality.  This compares *textual* equality, case sensitive.  If the any of the arguments do not equal, then the command generates an error exit code.
+
+**Example 1:**
+
+If all the arguments strictly equal each other, then this exits with a "0" (no error) exit code.
+
+```bash
+presh -c "is-eq [1] [1] [1] && echo [yes]"
+```
+
+**Example 2:**
+
+If any of the arguments differ, even by case or whitespace, the command fails.  In the following examples, none of them match.
+
+```bash
+presh -c '
+  is-eq [1] [ 1] ; echo [A: ${?}] ;
+  is-eq [1] [1 ] ; echo [B: ${?}] ;
+  is-eq [1] [01] ; echo [C: ${?}]
+'
+```
+
 ### kill-pid
 
 **Compile flag**: `-DUSE_CMD_KILL_PID`
@@ -828,9 +857,9 @@ Removes each empty directory passed as an argument.  If a directory is not empty
 
 **Compile flag**: `-DUSE_CMD_SIGNAL`
 
-**Usage**: `signal [signal1 [signal2]] [wait]`
+**Usage**: `signal [*ENV] [signal1 [signal2]] [wait]`
 
-Waits for any of the OS signal number arguments before continuing.  If no signal is given (just `signal wait`), then it waits for a standard OS interruption, which will kill the whole process.
+Traps OS signal numbers passed as arguments.  If `wait` is given, then waits for any listed signal to occur before continuing.  If no signal is given (just `signal wait`), then it waits for a standard OS interruption, which will kill the whole process.  If the command includes a `*ENV` (where `ENV` is some environment name) argument, and Pres has [environment variable parsing](#environment-variables) enabled, then the shell stores trapped OS signal numbers in the environment variable.
 
 Of note, once a signal is added to the list, it is registered for standard OS ignoring.  Only by adding the statement `wait` will the processing wait for the signal to be raised.  This can be used for interesting applications, such as:
 
@@ -857,14 +886,25 @@ spawn [/usr/sbin/my-server] SERVER_PID && subcmd [
 signal 1 2 9 15 17 wait
 
 # [ Force the child to die, in case the signal wasn't a SIGCHLD (17). ]
-kill-pid 15 ${NODE}
+kill-pid 15 ${SERVER_PID}
 
 # [ Capture the exit code of the spawned server. ]
-wait-pid ${NODE} *EXIT
+wait-pid ${SERVER_PID} *EXIT
 
 # [ Exit the script with the spawned server's exit code. ]
 exit ${EXIT}
 ]
+```
+
+**Example 2:**
+
+Run a process that might generate an unexpected error.
+
+```bash
+#! /usr/bin/presh -f
+
+FIXME
+
 ```
 
 ### sleep
@@ -1133,7 +1173,7 @@ def
 A `;` character erases the previous command's error state, which makes `&&` only sensitive to the previous command's error.
 
 ```bash
-$ presh -c "touch a.txt \
+$ ./presh -c "touch a.txt \
   ; rm a.txt \
   ; # [ This next rm command should fail ] \
   ; rm a.txt \
@@ -1142,6 +1182,17 @@ $ presh -c "touch a.txt \
 ERROR rm: a.txt
 Continuing
 Ending
+```
+
+On top of this, if you terminate the commands with a `;`, then, even if the command ended with an error, the full `presh` execution will not ([`exit`](#exit), though, is immune to this).
+
+```bash
+$ ./presh -c "is-eq 1 2" && echo passed || echo failed
+ERROR is-eq: 2
+failed
+$ ./presh -c "is-eq 1 2 ;" && echo passed || echo failed
+ERROR is-eq: 2
+passed
 ```
 
 A [future feature](https://github.com/groboclown/precision-shell/issues/14) may allow changing the newline behavior via a compile flag.
@@ -1168,6 +1219,8 @@ To escape an environment variable to not parse it or delay its parsing, use a do
 $ presh "echo \$\${ABC}"
 ${ABC}
 ```
+
+Along with the normal environment variables, it also adds the shell-like `${?}` environment reference to allow `;` separated commands to capture the error code of the previous command.  Note that this adds the environment variable `?`; it's not just a shell variable.
 
 ### Standard Script Flag
 

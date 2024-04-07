@@ -3,7 +3,7 @@
 /*
 MIT License
 
-Copyright (c) 2022 groboclown
+Copyright (c) 2022,2024 groboclown
 
 Permission is hereby granted, free of charge, to any person obtaining a copy
 of this software and associated documentation files (the "Software"), to deal
@@ -69,19 +69,19 @@ extern const char cmd_name_noop__shebang[];
     case COMMAND_INDEX__NOOP__NAMED: \
         /* from cmd_noop.h.in:26 */ \
             /* from cmd_noop.h.in:27 */ \
-            LOG(":: ignore"); \
+            LOG(":: ignore "); \
             LOGLN(global_arg); \
         break; \
     case COMMAND_INDEX__NOOP__COMMENT: \
         /* from cmd_noop.h.in:35 */ \
             /* from cmd_noop.h.in:36 */ \
-            LOG(":: ignore"); \
+            LOG(":: ignore "); \
             LOGLN(global_arg); \
         break; \
     case COMMAND_INDEX__NOOP__SHEBANG: \
         /* from cmd_noop.h.in:43 */ \
             /* from cmd_noop.h.in:44 */ \
-            LOG(":: ignore"); \
+            LOG(":: ignore "); \
             LOGLN(global_arg); \
         break;
 #define REQUIRES_ADDL_ARG__NOOP

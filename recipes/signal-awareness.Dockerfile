@@ -1,7 +1,7 @@
 
 # ---------------------------------------------------------------------------
 # Build the software.
-FROM node:18 AS build-env
+FROM node:20 AS build-env
 
 WORKDIR /opt/app
 COPY recipes/support-files/ ./
@@ -12,7 +12,7 @@ RUN npm ci --omit=dev
 
 # ---------------------------------------------------------------------------
 # Create precision shell
-FROM docker.io/library/alpine:3.10 AS presh-builder
+FROM docker.io/library/alpine:3.19 AS presh-builder
 
 WORKDIR /opt/precision-shell
 
@@ -25,14 +25,17 @@ COPY tests/ tests/
 # Adjust this value during the image build with `--build-arg`
 #   to alter which commands to include.
 ARG COMMANDS="spawn kill-pid wait-pid exit signal echo noop enviro"
+ARG IPV6=""
 
-ENV COMMANDS=$COMMANDS
+ENV \
+    COMMANDS=$COMMANDS \
+    IPV6=$IPV6
 
 RUN build-tools/build-with-alpine-musl.sh
 
 # ---------------------------------------------------------------------------
 # The real image, using what was just built.
-FROM gcr.io/distroless/nodejs:18
+FROM gcr.io/distroless/nodejs20-debian12
 LABEL name="local/precision-shell-example"
 
 COPY --from=build-env /opt/app /opt/app
@@ -46,7 +49,10 @@ COPY --from=presh-builder /opt/precision-shell/out/presh /bin/sh
 
 WORKDIR /opt/app/hello_world
 
-ENV LISTEN_PORT 3000
+ARG LISTEN_PORT=3000
+
+ENV \
+    LISTEN_PORT=$LISTEN_PORT
 
 # Because Node doesn't install signal handlers on its own,
 #   have presh listen for user signals.

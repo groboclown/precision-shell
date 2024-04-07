@@ -46,6 +46,7 @@ COMMANDS = \
 	cmd_for_each.h \
 	cmd_http_request.h \
 	cmd_if_else.h \
+	cmd_is_eq.h \
 	cmd_ln_h.h \
 	cmd_ln_s.h \
 	cmd_ls_ls.h \

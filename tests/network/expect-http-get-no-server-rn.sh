@@ -1,12 +1,10 @@
 #!/bin/bash
 
 # desc: attempt an HTTP request against a port that has nothing running on it.
-# requires: +expect-http-get-response
+# requires: +expect-http-get-response -virtual-network
 
-# If running with musl in a docker container, this can fail due to IPv6
-#   reporting a connection without error when there is nothing
-#   listening on the port.  This causes the write to the socket to
-#   fail with a broken pipe (SIGPIPE).
+# This runs in a real network, so the issue with containers accepting
+# connections even if nothing is listening isn't present.
 
 "${FS}" -c "expect-http-get-response localhost 0 / 200" > out.txt 2>err.txt
 res=$?

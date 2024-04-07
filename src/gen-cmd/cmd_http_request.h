@@ -35,6 +35,7 @@ SOFTWARE.
 
 
 #define HTTP_TIMEOUT 60
+#define HTTP_STATUS_LINE_BUFFER_SIZE 20
 
 // host port path expected-code
 //  host -> shared_network_addr
@@ -59,32 +60,32 @@ SOFTWARE.
 
         //  client socket -> tmp_val
 
-/* from cmd_http_request.h.in:37 */
+/* from cmd_http_request.h.in:38 */
 extern const char cmd_name_expect_http_get_response[];
 #define ENUM_LIST__EXPECT_HTTP_GET_RESPONSE \
-            /* from cmd_http_request.h.in:37 */ \
+            /* from cmd_http_request.h.in:38 */ \
             COMMAND_INDEX__EXPECT_HTTP_GET_RESPONSE,
 #define VIRTUAL_ENUM_LIST__EXPECT_HTTP_GET_RESPONSE \
-            /* from cmd_http_request.h.in:55 */ \
+            /* from cmd_http_request.h.in:56 */ \
             COMMAND_INDEX__EXPECT_HTTP_GET_RESPONSE__PATH, \
-            /* from cmd_http_request.h.in:65 */ \
+            /* from cmd_http_request.h.in:66 */ \
             COMMAND_INDEX__EXPECT_HTTP_GET_RESPONSE__CODE,
 #define GLOBAL_VARDEF__EXPECT_HTTP_GET_RESPONSE \
-            /* from cmd_http_request.h.in:37 */ \
+            /* from cmd_http_request.h.in:38 */ \
             const char cmd_name_expect_http_get_response[] = "expect-http-get-response";
 #define INITIALIZE__EXPECT_HTTP_GET_RESPONSE \
-            /* from cmd_http_request.h.in:37 */ \
+            /* from cmd_http_request.h.in:38 */ \
             command_list_names[COMMAND_INDEX__EXPECT_HTTP_GET_RESPONSE] = cmd_name_expect_http_get_response; \
-            /* from cmd_http_request.h.in:66 */ \
+            /* from cmd_http_request.h.in:67 */ \
             const char *expect_http_path = NULL; \
             /* Need just enough space to read in the first line.*/ \
             /*   We don't need the whole line, just enough to get the status code.*/ \
             /*   But this should be more than sufficient.*/ \
-            char http_response_code_parse[20];
+            char http_response_code_parse[HTTP_STATUS_LINE_BUFFER_SIZE];
 #define STARTUP_CASE__EXPECT_HTTP_GET_RESPONSE \
     case COMMAND_INDEX__EXPECT_HTTP_GET_RESPONSE: \
-        /* from cmd_http_request.h.in:37 */ \
-            /* from cmd_http_request.h.in:39 */ \
+        /* from cmd_http_request.h.in:38 */ \
+            /* from cmd_http_request.h.in:40 */ \
             LOG(":: check http get response code equals\n"); \
             /* expect equals*/ \
             global_arg1_i = 0; \
@@ -96,16 +97,16 @@ extern const char cmd_name_expect_http_get_response[];
         break;
 #define RUN_CASE__EXPECT_HTTP_GET_RESPONSE \
     case COMMAND_INDEX__EXPECT_HTTP_GET_RESPONSE__PATH: \
-        /* from cmd_http_request.h.in:55 */ \
-            /* from cmd_http_request.h.in:56 */ \
+        /* from cmd_http_request.h.in:56 */ \
+            /* from cmd_http_request.h.in:57 */ \
             /* Save off the path.*/ \
             expect_http_path = global_arg; \
             /* get the expected code and make the request.*/ \
             global_cmd = COMMAND_INDEX__EXPECT_HTTP_GET_RESPONSE__CODE; \
         break; \
     case COMMAND_INDEX__EXPECT_HTTP_GET_RESPONSE__CODE: \
-        /* from cmd_http_request.h.in:65 */ \
-            /* from cmd_http_request.h.in:82 */ \
+        /* from cmd_http_request.h.in:66 */ \
+            /* from cmd_http_request.h.in:83 */ \
             LOG(":: expecting http response code "); \
             LOGLN(global_arg); \
             /* don't actually parse it.  we're going to just do a string comparison.*/ \
@@ -139,7 +140,7 @@ extern const char cmd_name_expect_http_get_response[];
             /* read in the response.  Just enough to get the protocol and the status code.*/ \
             /* Make sure we read in at most 1 less than the size of the buffer.*/ \
             LOG(":: Reading response\n"); \
-            global_arg2_i = read(tmp_val, (void *)http_response_code_parse, 19); \
+            global_arg2_i = read(tmp_val, (void *)http_response_code_parse, HTTP_STATUS_LINE_BUFFER_SIZE - 1); \
             /* Nothing left to do with the socket.*/ \
             /* Close it; we don't care about what's left to read.*/ \
             close(tmp_val); \

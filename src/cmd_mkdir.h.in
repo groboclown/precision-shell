@@ -26,7 +26,7 @@ AsOptional(command="mkdir",
 
 #include <fcntl.h>
 #include <unistd.h>
-
+#include <sys/stat.h>
 
 WithNamedStep(enum="MKDIR", name="mkdir",
 
