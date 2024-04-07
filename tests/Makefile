@@ -13,7 +13,7 @@ all: clean tests
 
 
 clean:
-	test -d $(OUTDIR) && rm -rf $(OUTDIR) 2>/dev/null || echo ""
+	test -d $(OUTDIR) && rm -rf $(OUTDIR) 2>/dev/null || true
 
 $(OUTDIR)/arg_runner: _arg_runner.c
 	@mkdir -p $(OUTDIR)

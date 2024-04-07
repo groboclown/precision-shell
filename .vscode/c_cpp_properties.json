@@ -12,7 +12,7 @@
             "cStandard": "c11",
             "defines": [
                 "USE_STREAMING_INPUT=1",
-                "USE_ENVIROMENT_INPUT=1"
+                "USE_ENVIRONMENT_INPUT=1"
             ]
         }
     ],

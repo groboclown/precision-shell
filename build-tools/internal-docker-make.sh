@@ -69,7 +69,7 @@ case "${BUILD_MODE}" in
                 if [ ${cmd} = "input" ] ; then
                     cmd_arg="-DUSE_STREAMING_INPUT"
                 elif [ ${cmd} = "enviro" ] ; then
-                    cmd_arg="-DUSE_ENVIROMENT_INPUT"
+                    cmd_arg="-DUSE_ENVIRONMENT_INPUT"
                 elif [ ${cmd} = "reqargs" ] ; then
                     cmd_arg="-DREQUIRE_FULL_CMD"
                 else

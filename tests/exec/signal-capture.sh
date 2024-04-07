@@ -5,12 +5,6 @@
 
 # This tests the intended behavior of a mildly interesting setup.
 
-# "${FS}" version | grep dietlibc > /dev/null 2>&1
-# if [ $? = 0 ] ; then
-#     echo "!!! SKIPPED because dietlibc does not support scenario"
-#     exit 0
-# fi
-
 FS_ABS="$( cd "$( dirname "${FS}" )" ; pwd )/$( basename "${FS}" )" || exit 1
 
 "${FS}" -c '

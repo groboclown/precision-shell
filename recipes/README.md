@@ -20,7 +20,7 @@ Shows how precision shell can be used to enhance a ["distroless"](https://github
 
 The base server allows for a configuration file to set runtime parameters on how to set up the server.  Precision shell constructs this file from a template + environment variables, launches the program, and adds signal handlers for stopping execution.
 
-Presh adds 30,136 bytes by using the musl library.  This could be shrunk down smaller by eliminating the debug commands.
+Presh adds 34,016 bytes by using the musl library.  This could be shrunk down smaller by eliminating the debug commands.
 
 To run the Presh shell in docker image to explore what's in the image, you can run something like:
 
@@ -41,10 +41,10 @@ docker run --rm -it --entrypoint "/bin/sh" local/presch-non-root \
 d-rwxr-xr-x 2 0 0 0 0 4096 /opt/logs
 ```
 
-Presh adds 34,240 bytes to the docker image by using the musl library.  This could be shrunk down smaller by eliminating the debug commands.
+Presh adds 38,112 bytes to the docker image by using the musl library.  This could be shrunk down smaller by eliminating the debug commands.
 
 ## delay-until-ready.Dockerfile
 
 Waits for a dependent service to start running before starting the service.  If the dependent service doesn't start within 5 minutes (300 seconds), then the service fails to run.
 
-Presh adds 46,528 bytes by using the musl library.  This could be shrunk down smaller by eliminating the debug commands.
+Presh adds 54,496 bytes by using the musl library.  This could be shrunk down smaller by eliminating the debug commands.

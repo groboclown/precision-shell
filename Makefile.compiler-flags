@@ -1,6 +1,12 @@
 
 ifneq '' '$(findstring clang, $(CC))'
     # CLANG / LLVM compiler
+    #
+    # clang -Wall -pedantic
+    #       -Wno-unused-variable
+    #       -Wno-switch -I./gen-cmd -I. -static
+    #       -fstandalone-debug -gcodeview -gdwarf-5 -gembed-source -g $MANY_DARGS ../out/_presh-all.c  -o ../out/presh-debug
+
 
     MINFLAGS = \
         -fbinutils-version=4.0 \
@@ -25,14 +31,15 @@ ifneq '' '$(findstring clang, $(CC))'
 
     # not supported in clang 13:
     #    -falign-loops=0 \
+    #    
 
     # not sure the right way to use these:
     #   -malign-branch-boundary=0 \
     #	-fmerge-all-constraints \
 
     # Not used
-    #   -feliminate-unused-debug-types \
-    #   -munaligned-access \
+    #    -feliminate-unused-debug-types \
+    #    -munaligned-access \
 
 
     LFLAGS = -static
@@ -42,13 +49,14 @@ ifneq '' '$(findstring clang, $(CC))'
         -DDEBUG=1 \
         -fstandalone-debug \
         -gfull
-
-    # Multiple, contradicting debug flags can cause some clang versions to crash.
-    # See https://github.com/llvm/llvm-project/issues/79678
-    #    -g
-    #    -gcodeview \
-    #    -gdwarf-5 \
-    #    -gembed-source \
+        # -gcodeview \
+        # -gdwarf-5
+        # -gembed-source \
+        # -g
+        # Careful with these flags.  They can ask LLVM to mix source and no-source debugging information,
+        # which conflict to each other.  This can cause a crash on some versions of clang.
+        # It was fixed in:
+        # https://github.com/llvm/llvm-project/commit/87e22bdd2bd6d77d782f9d64b3e3ae5bdcd5080d
 
 
 else
