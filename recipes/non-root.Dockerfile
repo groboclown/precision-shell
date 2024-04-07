@@ -32,9 +32,7 @@ ENV \
     COMMANDS=$COMMANDS \
     IPV6=$IPV6
 
-RUN set -x \
-    && build-tools/build-with-alpine-musl.sh \
-    && ls -l /opt/precision-shell/out/presh
+RUN build-tools/build-with-alpine-musl.sh
 
 # ---------------------------------------------------------------------------
 # The real image, using what was just built.

@@ -8,7 +8,6 @@
 * []()
     * Move development guidelines into the `CONTRIBUTING.md` file.
     * Add tests for the new `is-eq` function.
-    * Add file size listing in the recipes.  This allows for easier updates to the compiled size notes in the readme file.
     * Bump the version numbers to v4.5.1.
 
 
