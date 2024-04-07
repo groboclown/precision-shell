@@ -1,3 +1,12 @@
+## v4.5.1
+
+* []()
+    * General readability improvements with the top-level README file.
+    * Added a typo-fix for the `USE_ENVIRONMENT_INPUT`.  Both the old one (`USE_ENVIROMENT_INPUT`) and the fixed name work.
+    * Added a 64-bit / 32-bit CPU fix for outputting information in the test argument runner.
+    * Moved LLVM debug mode compiler flags to just use `-gfull` rather than trying to be tricky.
+
+
 ## v4.5.0
 
 * [5d81edd](5d81eddc766e848bd29ebd2540abfe229fe244a0)
