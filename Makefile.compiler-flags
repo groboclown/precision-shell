@@ -1,6 +1,12 @@
 
 ifneq '' '$(findstring clang, $(CC))'
     # CLANG / LLVM compiler
+    #
+    # clang -Wall -pedantic
+    #       -Wno-unused-variable
+    #       -Wno-switch -I./gen-cmd -I. -static
+    #       -fstandalone-debug -gcodeview -gdwarf-5 -gembed-source -g $MANY_DARGS ../out/_presh-all.c  -o ../out/presh-debug
+
 
     MINFLAGS = \
         -fbinutils-version=4.0 \
