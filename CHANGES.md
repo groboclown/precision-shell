@@ -5,7 +5,7 @@
     * Added a typo-fix for the `USE_ENVIRONMENT_INPUT`.  Both the old one (`USE_ENVIROMENT_INPUT`) and the fixed name work.
     * Added a 64-bit / 32-bit CPU fix for outputting information in the test argument runner.
     * Moved LLVM debug mode compiler flags to just use `-gfull` rather than trying to be tricky.
-* []()
+* [f767933](f767933547f654e5b0990e38c6f5a8ebd3e1072c)
     * Move development guidelines into the `CONTRIBUTING.md` file.
     * Add tests for the new `is-eq` function.
     * Bump the version numbers to v4.5.1.
