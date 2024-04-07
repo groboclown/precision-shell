@@ -1,8 +1,9 @@
 #!/bin/bash
 
 cd "$( dirname "$0" )"
+
 if [ "${DEBUG}" = "1" ] ; then
-    exec bash -x ./_run.sh *.sh
+    exec bash -x ./run.sh */*.sh
 else
-    exec ./_run.sh *.sh
+    exec ./run.sh */*.sh
 fi

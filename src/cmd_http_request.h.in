@@ -26,6 +26,7 @@ AsOptional(command="expect-http-get-response",
 
 
 #define HTTP_TIMEOUT 60
+#define HTTP_STATUS_LINE_BUFFER_SIZE 20
 
 // host port path expected-code
 //  host -> shared_network_addr
@@ -69,7 +70,7 @@ AsOptional(command="expect-http-get-response",
             // Need just enough space to read in the first line.
             //   We don't need the whole line, just enough to get the status code.
             //   But this should be more than sufficient.
-            char http_response_code_parse[20];
+            char http_response_code_parse[HTTP_STATUS_LINE_BUFFER_SIZE];
         )
 
         // host port path expected-code
@@ -118,7 +119,7 @@ AsOptional(command="expect-http-get-response",
             // read in the response.  Just enough to get the protocol and the status code.
             // Make sure we read in at most 1 less than the size of the buffer.
             LOG(":: Reading response\n");
-            global_arg2_i = read(tmp_val, (void *)http_response_code_parse, 19);
+            global_arg2_i = read(tmp_val, (void *)http_response_code_parse, HTTP_STATUS_LINE_BUFFER_SIZE - 1);
             // Nothing left to do with the socket.
             // Close it; we don't care about what's left to read.
             close(tmp_val);

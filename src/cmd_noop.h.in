@@ -1,7 +1,7 @@
 /*
 MIT License
 
-Copyright (c) 2022 groboclown
+Copyright (c) 2022,2024 groboclown
 
 Permission is hereby granted, free of charge, to any person obtaining a copy
 of this software and associated documentation files (the "Software"), to deal
@@ -25,7 +25,7 @@ AsOptional(command="noop",
 
     WithNamedStep(enum="NOOP__NAMED", name="noop",
         OnArg(
-            LOG(":: ignore");
+            LOG(":: ignore ");
             LOGLN(global_arg);
         )
     )
@@ -34,7 +34,7 @@ AsOptional(command="noop",
     // # [blah] would work okay here.
     WithNamedStep(enum="NOOP__COMMENT", name="#",
         OnArg(
-            LOG(":: ignore");
+            LOG(":: ignore ");
             LOGLN(global_arg);
         )
     )
@@ -42,7 +42,7 @@ AsOptional(command="noop",
     // allow for shebang headers.
     WithNamedStep(enum="NOOP__SHEBANG", name="#!",
         OnArg(
-            LOG(":: ignore");
+            LOG(":: ignore ");
             LOGLN(global_arg);
         )
     )

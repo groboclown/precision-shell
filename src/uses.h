@@ -107,6 +107,7 @@ SOFTWARE.
     || defined(USE_CMD_WHILE_NO_ERROR) \
     || defined(USE_CMD_WHILE_ERROR) \
     || defined(USE_CMD_FOR_EACH)  \
+    || defined(USE_CMD_IS_EQ) \
     || defined(USES_SHARED_CONNECT)
 
 #define USES_SHARED_STR
@@ -183,6 +184,7 @@ SOFTWARE.
 // USES_SHARED_ITOA - shared integer to ascii code.
 #if    defined(USE_CMD_SPAWN) \
     || defined(USE_CMD_SU_SPAWN) \
+    || (defined(USE_CMD_SIGNAL) && defined(USES_ENVIRONMENT)) \
     || defined(USE_CMD_WAIT_PID) \
     || defined(USE_CMD_FILE_STAT) \
     || defined(USE_CMD_LS_L) \

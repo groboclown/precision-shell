@@ -49,8 +49,31 @@ SOFTWARE.
 
 void print_out(const char *text) {
     write(STDOUT_FILENO, (text), strlen(text));
+    fsync(STDOUT_FILENO);
 }
 
+void print_out_int(int value) {
+    // An itoa implementation.
+    char buffer[(3 * sizeof(int)) + 1];
+    char *itoa_ptr = buffer + (3 * sizeof(long int));
+    int is_negative = 0;
+    *itoa_ptr = '\0';
+    if (value < 0) {
+        is_negative = 1;
+        value = 0 - value;
+    }
+    // Do-while allows us to add the 0 if the value is zero.
+    do {
+        itoa_ptr -= sizeof(char);
+        *itoa_ptr = '0' + (value % 10);
+        value /= 10;
+    } while (value);
+    if (is_negative) {
+        itoa_ptr -= sizeof(char);
+        *itoa_ptr = '-';
+    }
+    print_out(itoa_ptr);
+}
 
 void print_err(const char *text) {
     write(STDERR_FILENO, (text), strlen(text));
@@ -203,9 +226,9 @@ int main(int argc, const char *argv[]) {
     socklen_t client_size;
     int on;
     int read_size;
+    int total_read_count;
     struct sockaddr_in6 server, client;
     char client_data[1];
-    char bin_buffer[6];
     char last_read = '\0';
     struct handler_data handler_state;
     void (*handler_func)(struct handler_data *) = NULL;
@@ -301,15 +324,19 @@ int main(int argc, const char *argv[]) {
         //  One.  Byte.  At.  A.  Time.
         handler_state.handler_state = 0;
         handler_state.force_disconnect = 0;
+        total_read_count = 0;
         while (
                 handler_state.force_disconnect == 0
                 && (read_size = recv(handler_state.client_sock, client_data, 1, 0)) > 0
         ) {
+            total_read_count++;
             handler_state.client_read = client_data[0];
             (*handler_func)(&handler_state);
             last_read = handler_state.client_read;
         }
-        print_out("Disconnected\n");
+        print_out("Disconnected; read ");
+        print_out_int(total_read_count);
+        print_out(" bytes.\n");
         close(handler_state.client_sock);
     }
     close(server_sock);

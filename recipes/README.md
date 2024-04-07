@@ -11,7 +11,7 @@ Shows how to add external signal handling to the launched process.
 
 Because the nodejs process does not run from a shell, but instead directly, the process does not, by default, setup signal handlers to deal with things like a user "Ctrl-C" input to stop the process.  If the process is run as a daemon (which is normal in production), then this isn't a problem.  However, if you run the container for testing, this can be a pain, as you need to run `docker kill (name)` to stop the container.
 
-Presh adds 26,040 bytes by using the musl library.  This could be shrunk down smaller by eliminating the debug commands.
+Presh adds 34,016 bytes by using the musl library.  This could be shrunk down smaller by eliminating the debug commands.
 
 
 ## env-config-file.Dockerfile
