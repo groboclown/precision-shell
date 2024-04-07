@@ -1,6 +1,6 @@
 ## v4.5.0
 
-* []()
+* [5d81edd](5d81eddc766e848bd29ebd2540abfe229fe244a0)
     * Added `is-eq` command.
     * Fixed bad links in the README.
     * Reorganized tests into categories (i.e. directories).
