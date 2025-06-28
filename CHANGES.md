@@ -22,7 +22,7 @@
     * Updated recipes to also use recent dependency versions.
     * Updated recipes text to reflect new `presh` sizes.
     * Updated `README.md` to reflect new compiled sizes.
-* []()
+* [9a1465a](9a1465a3e0f57c5bf96a59f41aaab08994bea6dd)
     * Added some notes on future experiments on compressed executables.  It's getting into already explored territory.
 
 
