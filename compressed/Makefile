@@ -52,7 +52,9 @@ $(OUTDIR)/presh_payload.h: $(OUTDIR)/presh.bin.deflate
 	mkdir -p $(OUTDIR)
 	xxd -i $< > $@.1
 	sed -e 's|unsigned char [a-zA-Z0-9_]\+|unsigned char ___presh_z|g' $@.1 > $@.2
+	rm -f $@.1
 	sed -e 's|unsigned int [a-zA-Z0-9_]\+|unsigned int ___presh_z_len|g' $@.2 > $@
+	rm -f $@.2
 	echo "unsigned int ___presh_len = " `wc -c < $(SRC)` ";" >> $@
 
 # At the moment, dietlibc doesn't run right on the stub.

@@ -1,7 +1,7 @@
 
 # ---------------------------------------------------------------------------
 # Build the software.
-FROM node:20 AS build-env
+FROM public.ecr.aws/docker/library/node:24-alpine AS build-env
 
 WORKDIR /opt/app
 COPY recipes/support-files/ ./
@@ -12,7 +12,7 @@ RUN npm ci --omit=dev
 
 # ---------------------------------------------------------------------------
 # Create precision shell
-FROM docker.io/library/alpine:3.19 AS presh-builder
+FROM public.ecr.aws/docker/library/alpine:3.22 AS presh-builder
 
 WORKDIR /opt/precision-shell
 
@@ -20,6 +20,7 @@ COPY build-tools/ build-tools/
 COPY Makefile Makefile.command-flags Makefile.compiler-flags version.txt ./
 COPY src/ src/
 COPY tests/ tests/
+COPY compressed/ compressed/
 
 
 # Adjust this value during the image build with `--build-arg`
@@ -36,7 +37,7 @@ RUN build-tools/build-with-alpine-musl.sh
 
 # ---------------------------------------------------------------------------
 # The real image, using what was just built.
-FROM gcr.io/distroless/nodejs20-debian12
+FROM gcr.io/distroless/nodejs24-debian12
 LABEL name="local/precision-shell-example"
 
 COPY --from=build-env /opt/app /opt/app
