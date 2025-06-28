@@ -22,7 +22,6 @@ ifneq '' '$(findstring clang, $(CC))'
         -fno-exceptions \
         -fno-signed-char \
         -fno-unroll-loops \
-        -freroll-loops \
         -fshort-enums \
         -fno-threadsafe-statics \
         -Oz \
@@ -32,6 +31,8 @@ ifneq '' '$(findstring clang, $(CC))'
     # not supported in clang 13:
     #    -falign-loops=0 \
     #    
+    # not supported in clang 14:
+    #    -freroll-loops \
 
     # not sure the right way to use these:
     #   -malign-branch-boundary=0 \

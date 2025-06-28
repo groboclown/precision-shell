@@ -1,15 +1,20 @@
-FROM docker.io/library/alpine:3.19
+FROM public.ecr.aws/docker/library/alpine:3.22
 
 # This file is broken up to make rebuilds fast
 # by reusing previous layers that take a while to run.
 
 WORKDIR /opt/code
 
+ENV DIETLIBC_VERSION=0.35
+
+# As of May 26, 2025, the dietlibc certificate expired.
+# Until this changes, this build requires the "--insecure" option.
+
 RUN set -x \
     && apk --no-cache add \
-        build-base=0.5-r3 curl tar xz "bash=~5" "python3=~3.11" \
+        build-base=0.5-r3 curl tar xz linux-headers "bash=~5" "python3=~3.12" \
     && mkdir -p /opt/dietlibc \
-    && curl -o /tmp/dietlibc.tar.xz https://www.fefe.de/dietlibc/dietlibc-0.34.tar.xz \
+    && curl --insecure -o /tmp/dietlibc.tar.xz https://www.fefe.de/dietlibc/dietlibc-${DIETLIBC_VERSION}.tar.xz \
     && xz -d /tmp/dietlibc.tar.xz \
     && tar xf /tmp/dietlibc.tar -C /opt/dietlibc/ --strip 1 \
     && rm /tmp/dietlibc.tar \
@@ -26,6 +31,7 @@ COPY \
     ./
 COPY src/ src/
 COPY tests/ tests/
+COPY compressed/ compressed/
 
 # Change the list of commands to build with the "--build-arg COMMANDS='list' argument"
 ARG BUILD_MODE=build
