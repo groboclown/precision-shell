@@ -8,7 +8,7 @@
     * Updated Dockerfile parent images and their dependent versions to keep up to date with the state-of-the-art.
     * Updated the dietlibc version, as it had a new release in 2024.
     * With this update, the clang flags need to change.
-* []()
+* [d8b8ed7](d8b8ed796122604702250e40d72b01360ee5345f)
     * Updated `cmd-sizes.sh` to include the compressed sizes.
     * Updated the command flags file to include the use of the `NO_GETADDRINFO` flag.
     * Updates to the `README.md` file.
@@ -16,6 +16,8 @@
         * Fixed the wrong use flag for the `exec` command.
         * Included a note about the `export-host-lookup` command not working with statically compiled glibc.
         * After some discovery on GPL and static compilation, added a note about it.
+* []()
+    * Version bump to 4.6.0.
 
 
 ## v4.5.1
