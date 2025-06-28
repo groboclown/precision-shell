@@ -4,9 +4,18 @@
     * Added an additional build target to create a compressed version of the `presh` executable.  In some circumstances, it creates a smaller executable, at the expense of a slightly longer startup time.
 * [3b03d11](3b03d111d2f50fd0bf24c0311e98134d6b0aa88b)
     * As glibc (and potentially others) cannot call `getaddrinfo` from a statically linked executable, added a make flag (`NO_GETADDRINFO=1`) that prevents calls that depend upon it from running.
-* []()
+* [0f21e00](0f21e0063b2a11d895d790a505a7832dfb111d7d)
     * Updated Dockerfile parent images and their dependent versions to keep up to date with the state-of-the-art.
+    * Updated the dietlibc version, as it had a new release in 2024.
     * With this update, the clang flags need to change.
+* []()
+    * Updated `cmd-sizes.sh` to include the compressed sizes.
+    * Updated the command flags file to include the use of the `NO_GETADDRINFO` flag.
+    * Updates to the `README.md` file.
+        * Include notes about compressed capability.
+        * Fixed the wrong use flag for the `exec` command.
+        * Included a note about the `export-host-lookup` command not working with statically compiled glibc.
+        * After some discovery on GPL and static compilation, added a note about it.
 
 
 ## v4.5.1

@@ -359,7 +359,7 @@ This is similar to the Unix `envsubst` command.  It works just like [`cat-fd`](#
 
 ### exec
 
-**Compile flag**: `-DUSE_CMD_TRUNC`
+**Compile flag**: `-DUSE_CMD_EXEC`
 
 **Usage**: `exec (quoted command to run)`
 
@@ -438,6 +438,8 @@ presh -c "start-timer ; sleep 5 ; export-elapsed-time TIME ; echo \${TIME}"
 **Usage**: `export-host-lookup (hostname) (ENV_NAME)`
 
 Exports to an environment variable the IP address of a hostname.
+
+Note: does not work with glibc, because this uses a function that glibc can only run when not compiled statically.  To avoid a compile error, pass `NO_GETADDRINFO=1` when running `make`.
 
 ### expect-http-get-response
 
@@ -1290,13 +1292,13 @@ Last build size:
 * Full build:
   * glibc (Ubuntu): 1,078,000 bytes
   * glibc (Arch): 911,184 bytes
-  * clang/musl (Alpine): 83,192 bytes
+  * clang/musl (Alpine): 87,264 bytes
   * musl (Alpine): 83,168 bytes
   * dietlibc (Alpine): 45,944 bytes
 
 *dietlibc [requires](https://www.fefe.de/dietlibc/FAQ.txt) that you either not distribute the compiled executable, or release the executable under GPL v2.*
 
-These file sizes are *statically compiled*, so they don't have any external dependencies other than the Linux OS.
+These file sizes are *statically compiled*, so they don't have any external dependencies other than the Linux OS.  Due to its nature, glibc cannot run some networking functionality (specifically hostname lookups) when statically compiled.  Some documentation indicates that, by statically compiling the executable with GPL shared libraries, that causes the final executable to become itself covered under GPL.  Please follow best practices when distributing executables.
 
 These were compiled within Docker containers, which are supplied in the code.  For each stdlib library (glibc, musl, dietlibc), the Linux distribution used to compile it is listed.  This is because the Arch Linux compile size is different than the Ubuntu compile size for the same library.  Your millage may differ depending on the distribution and compiler and other minor differences you use.
 
@@ -1317,6 +1319,7 @@ Contributing new commands requires (this list assumes that the change is for a s
 6. Add new test scripts in the `tests` directory.  The [test readme file](tests/README.md) offers a brief overview of what goes into a test script.
 7. Add documentation in the root [README.md](README.md) file, both in the initial command listing, and the detailed description.
 
+See the [CONTRIBUTING.md](CONTRIBUTING.md) file for additional details.
 
 ## Reporting Security Issues
 

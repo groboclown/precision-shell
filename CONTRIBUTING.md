@@ -20,7 +20,7 @@ To compile the shell, you will need a C compiler that includes a version of the 
 To test, run:
 
 ```bash
-chmod +x tests/*.sh && docker build -f build-(libname).Dockerfile .
+chmod +x tests/*.sh tests/*/*.sh && docker build -f build-(libname).Dockerfile .
 ```
 
 You can build directly, but some of the tests require root privileges, which are safer to run from within a container.
@@ -29,10 +29,11 @@ To build through Docker and capture the built executables:
 
 ```bash
 mkdir -p out
-for libname in glibc musl ; do
+for libname in glibc glibc-arch musl ; do
     docker build -t local/presh-${libname} -f build-${libname}.Dockerfile .
     container=$( docker create local/presh-${libname} )
     docker cp "${container}:/opt/code/out/presh" out/presh.${libname}
+    docker cp "${container}:/opt/code/out/presh-zipped" out/presh-zipped.${libname}
     docker cp "${container}:/opt/code/out/presh-debug" out/presh-debug.${libname}
     docker rm "${container}"
 done

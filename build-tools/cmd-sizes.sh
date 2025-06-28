@@ -21,7 +21,12 @@ command_sets=(
 
 set_count="${#command_sets[@]}"
 
-sizefile=/tmp/$$-sized.txt
+exargs=""
+if [ "${NO_GETADDRINFO}" = 1 ] ; then
+    exargs="NO_GETADDRINFO=1"
+fi
+
+sizefile=/tmp/sized.txt
 test -f "${sizefile}" && rm "${sizefile}"
 
 i=0
@@ -31,12 +36,24 @@ while [ $i -lt ${set_count} ] ; do
     # echo "$i : ${name} - ${cmds}"
     outdir=/tmp/presh-$$
     mkdir -p "${outdir}"
-    ( cd "../src" && make src "${cmds}" OUTDIR="${outdir}" >/dev/null 2>&1 )
-    if [ $? != 0 ] || [ ! -f "${outdir}/presh" ] ; then
-        echo "Build failed for: make src ${cmds} OUTDIR=${outdir}" >&2
+    ( cd "../src" && make src "${cmds}" ${exargs} OUTDIR="${outdir}" >/dev/null 2>&1 )
+    if [ $? != 0 ] ; then
+        >&2 echo "Build failed for: make src ${cmds} ${exargs} OUTDIR=${outdir}"
+        exit 1
+    fi
+    ( cd "../compressed" && make build OUTDIR="${outdir}" >/dev/null 2>&1 )
+    if [ $? != 0 ] ; then
+        >&2 echo "Build failed for: make compressed OUTDIR=${outdir}"
+        exit 1
+    fi
+    if [ ! -f "${outdir}/presh" ] || [ ! -f "${outdir}/presh-zipped" ] ; then
+        echo "Build failed for: make ${cmds} OUTDIR=${outdir}" >&2
+        exit 1
     else
         filesize=$( wc -c <"${outdir}/presh" )
         echo "${filesize}|${name}" >> "${sizefile}"
+        filesize=$( wc -c <"${outdir}/presh-zipped" )
+        echo "${filesize}|${name} (compressed)" >> "${sizefile}"
         # echo "${filesize} < ${name}"
     fi
     rm -rf "${outdir}"
@@ -45,4 +62,4 @@ while [ $i -lt ${set_count} ] ; do
 done
 
 cat "${sizefile}"
-rm "${sizefile}"
+# rm "${sizefile}"
