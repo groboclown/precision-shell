@@ -1,3 +1,8 @@
+## v4.6.0
+
+* []()
+    * Added an additional build target to create a compressed version of the `presh` executable.  In some circumstances, it creates a smaller executable, at the expense of a slightly longer startup time.
+
 ## v4.5.1
 
 * [1f0755f](1f0755f209db2a326c8876d6f35310450955fdcf)
