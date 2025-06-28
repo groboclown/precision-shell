@@ -18,10 +18,12 @@
         * After some discovery on GPL and static compilation, added a note about it.
 * [0915c1f](0915c1f5c43a31bec4c70416a6a481acf70fc97f)
     * Version bump to 4.6.0.
-* []()
+* [4cf0f92](4cf0f926102c383ed068c54aa4ae04138664517b)
     * Updated recipes to also use recent dependency versions.
     * Updated recipes text to reflect new `presh` sizes.
     * Updated `README.md` to reflect new compiled sizes.
+* []()
+    * Added some notes on future experiments on compressed executables.  It's getting into already explored territory.
 
 
 ## v4.5.1

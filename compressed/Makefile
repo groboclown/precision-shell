@@ -69,3 +69,18 @@ endif
 $(OUTDIR)/presh-zipped: stub.c tinflate.c $(OUTDIR)/presh_payload.h
 	mkdir -p $(OUTDIR)
 	$(STD_CC) $(CFLAGS) $(LFLAGS) $(MINFLAGS) -I$(OUTDIR) stub.c tinflate.c -o $@
+
+
+$(OUTDIR)/presh-segments.h: $(SRC)
+	readelf -lW $< \
+  		| awk '/LOAD/ { printf("static segment_t SEGMENT_%d = { file_off: 0x%x, mem_sz: 0x%x, mem_vaddr: 0x%x, flags: 0x%x };\n", \
+	++i, $$6, $$5, $$4, $$8) }' \
+        > $@
+	readelf -r $< \
+		| tr -s ' ' \
+		| awk '/_IRELATIV/ { printf("static irelativ_t IRELATIV_%d = { offset: 0x%x, addend: 0x%x };\n", ++i, $$1, $$4) }' \
+		>> $@
+
+$(OUTDIR)/presh-comp: stub.c tinflate.c $(OUTDIR)/presh_payload.h $(OUTDIR)/presh-segments.h
+	mkdir -p $(OUTDIR)
+	$(STD_CC) $(CFLAGS) $(LFLAGS) $(MINFLAGS) -I$(OUTDIR) stub.c tinflate.c -o $@
