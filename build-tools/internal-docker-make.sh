@@ -87,8 +87,12 @@ case "${BUILD_MODE}" in
                 cmdarg="COMMAND_FLAGS=${commands}"
             fi
         fi
-        echo "make \"${cmdarg}\" all"
-        make "${cmdarg}" all
+        exargs=""
+        if [ "${NO_GETADDRINFO}" = 1 ] ; then
+            exargs="NO_GETADDRINFO=1"
+        fi
+        echo "make \"${cmdarg}\" ${exargs} all"
+        make "${cmdarg}" ${exargs} all
         ls -lAS out/presh*
         ;;
 esac

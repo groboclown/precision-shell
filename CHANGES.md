@@ -1,7 +1,10 @@
 ## v4.6.0
 
-* []()
+* [c12690c](c12690c5282fdc1aa5ab93bf7b361b742f83fb74)
     * Added an additional build target to create a compressed version of the `presh` executable.  In some circumstances, it creates a smaller executable, at the expense of a slightly longer startup time.
+* []()
+    * As glibc (and potentially others) cannot call `getaddrinfo` from a statically linked executable, added a make flag (`NO_GETADDRINFO=1`) that prevents calls that depend upon it from running.
+
 
 ## v4.5.1
 
