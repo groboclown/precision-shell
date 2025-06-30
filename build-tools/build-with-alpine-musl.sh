@@ -20,7 +20,7 @@ export BUILD_MODE UID1 GID1 UID2 GID2
 
 # Explicitly not installing python.
 # Add it if you want to rebuild the generated commands.
-apk --no-cache add "build-base=~0.5" "clang-dev=~17" "bash=~5"
+apk --no-cache add "build-base=~0.5" "clang-dev=~20" "bash=~5"
 echo 'LIBNAME=musl' >> version.txt
 
 # This can build with LLVM, which can make smaller executables.

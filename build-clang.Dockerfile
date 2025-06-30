@@ -1,4 +1,4 @@
-FROM docker.io/library/alpine:3.19
+FROM public.ecr.aws/docker/library/alpine:3.22
 
 # This file is broken up to make rebuilds fast
 # by reusing previous layers that take a while to run.
@@ -7,9 +7,9 @@ WORKDIR /opt/code
 
 RUN set -x \
     && apk --no-cache add \
-        "python3=~3.11" "bash=~5.2" \
-        "make=~4.4" "clang=~17.0" "clang-dev=~17.0" "lld=~17.0" \
-        "libc-dev=~0.7" "gcc=~13"
+        "python3=~3.12" "bash=~5.2" \
+        "make=~4.4" "clang=~20.1" "clang-dev=~20.1" "lld=~20.1" \
+        "musl-dev=~1.2" "gcc=~14"
 
 COPY build-tools/ build-tools/
 COPY \
@@ -20,6 +20,7 @@ COPY \
     ./
 COPY src/ src/
 COPY tests/ tests/
+COPY compressed/ compressed/
 
 # Change the list of commands to build with the "--build-arg COMMANDS='list' argument"
 ARG BUILD_MODE=build

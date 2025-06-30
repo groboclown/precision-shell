@@ -1,5 +1,4 @@
-FROM docker.io/library/alpine:3.19
-FROM docker.io/library/alpine:3.19
+FROM public.ecr.aws/docker/library/alpine:3.22
 
 # This file is broken up to make rebuilds fast
 # by reusing previous layers that take a while to run.
@@ -7,7 +6,7 @@ FROM docker.io/library/alpine:3.19
 WORKDIR /opt/code
 
 RUN set -x \
-    && apk --no-cache add build-base=0.5-r3 "bash=~5" "python3=~3.11"
+    && apk --no-cache add build-base=0.5-r3 "bash=~5" "python3=~3.12"
 
 # Change the list of commands to build with the "--build-arg COMMANDS='list' argument"
 ARG BUILD_MODE=build
@@ -34,6 +33,7 @@ COPY \
     ./
 COPY src/ src/
 COPY tests/ tests/
+COPY compressed/ compressed/
 
 RUN    echo 'LIBNAME=musl' >> version.txt \
     && ./build-tools/internal-docker-make.sh

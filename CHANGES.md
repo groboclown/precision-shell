@@ -1,3 +1,38 @@
+## v4.6.0
+
+* [c12690c](c12690c5282fdc1aa5ab93bf7b361b742f83fb74)
+    * Added an additional build target to create a compressed version of the `presh` executable.  In some circumstances, it creates a smaller executable, at the expense of a slightly longer startup time.
+* [3b03d11](3b03d111d2f50fd0bf24c0311e98134d6b0aa88b)
+    * As glibc (and potentially others) cannot call `getaddrinfo` from a statically linked executable, added a make flag (`NO_GETADDRINFO=1`) that prevents calls that depend upon it from running.
+* [0f21e00](0f21e0063b2a11d895d790a505a7832dfb111d7d)
+    * Updated Dockerfile parent images and their dependent versions to keep up to date with the state-of-the-art.
+    * Updated the dietlibc version, as it had a new release in 2024.
+    * With this update, the clang flags need to change.
+* [d8b8ed7](d8b8ed796122604702250e40d72b01360ee5345f)
+    * Updated `cmd-sizes.sh` to include the compressed sizes.
+    * Updated the command flags file to include the use of the `NO_GETADDRINFO` flag.
+    * Updates to the `README.md` file.
+        * Include notes about compressed capability.
+        * Fixed the wrong use flag for the `exec` command.
+        * Included a note about the `export-host-lookup` command not working with statically compiled glibc.
+        * After some discovery on GPL and static compilation, added a note about it.
+* [0915c1f](0915c1f5c43a31bec4c70416a6a481acf70fc97f)
+    * Version bump to 4.6.0.
+* [4cf0f92](4cf0f926102c383ed068c54aa4ae04138664517b)
+    * Updated recipes to also use recent dependency versions.
+    * Updated recipes text to reflect new `presh` sizes.
+    * Updated `README.md` to reflect new compiled sizes.
+* [9a1465a](9a1465a3e0f57c5bf96a59f41aaab08994bea6dd)
+    * Added some notes on future experiments on compressed executables.  It's getting into already explored territory.
+* [a55becb](a55becbe4dfd97d810dd8ee1554af5d5dacb8f99)
+    * Added in an initial cut at the new compressed executable approach (which doesn't run right), and has minimal improvement to the file size.  However, there exist some situations where it looks like it could have a smaller size, so may indicate a place for future investigation to fix.
+    * Taught the docker build command (default operation of `internal-docker-make.sh`) to create the smaller version of the `presh` executable as `out/presh-smallest`.  This allows later stages in a `Dockerfile` to use the smallest version, if it cares about that.
+    * Updated the `recipes` to use the smallest file size, as they care about that.
+    * Updated the file sizes in the `recipes` to reflect the new file sizes.
+    * Added a few improvements to the root `Dockerfile` to indicate its differences from the `sample.Dockerfile`, and to fix its use of `CMD`.
+    * Updated the license copyright, and added an SPDX to it, and added a note about static compilation affects on the binary distribution.
+
+
 ## v4.5.1
 
 * [1f0755f](1f0755f209db2a326c8876d6f35310450955fdcf)

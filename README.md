@@ -359,7 +359,7 @@ This is similar to the Unix `envsubst` command.  It works just like [`cat-fd`](#
 
 ### exec
 
-**Compile flag**: `-DUSE_CMD_TRUNC`
+**Compile flag**: `-DUSE_CMD_EXEC`
 
 **Usage**: `exec (quoted command to run)`
 
@@ -438,6 +438,8 @@ presh -c "start-timer ; sleep 5 ; export-elapsed-time TIME ; echo \${TIME}"
 **Usage**: `export-host-lookup (hostname) (ENV_NAME)`
 
 Exports to an environment variable the IP address of a hostname.
+
+Note: does not work with glibc, because this uses a function that glibc can only run when not compiled statically.  To avoid a compile error, pass `NO_GETADDRINFO=1` when running `make`.
 
 ### expect-http-get-response
 
@@ -1264,41 +1266,42 @@ If you use the input-enabled build, then you can pass the argument `-` to have t
 Last build size:
 
 * Do-nothing build:
-  * [glibc (Ubuntu)](#build-glibc.Dockerfile): 819,664 bytes
-  * [glibc (Arch)](#build-glibc-arch.Dockerfile): 673,528 bytes
-  * [clang/musl (Alpine)](#build-clang.Dockerfile): 25,840 bytes
-  * [musl (Alpine)](#build-musl.Dockerfile): 25,816 bytes
-  * [dietlibc (Alpine)](#build-dietlibc.Dockerfile): 9,576 bytes
+  * [glibc (Ubuntu)](#build-glibc.Dockerfile): 706,568 bytes
+  * [glibc (Arch)](#build-glibc-arch.Dockerfile): 698,808 bytes
+  * [clang/musl (Alpine)](#build-clang.Dockerfile): 25,816 bytes
+  * [musl (Alpine)](#build-musl.Dockerfile): 25,792 bytes
+  * [dietlibc (Alpine)](#build-dietlibc.Dockerfile): 13,200 bytes
 * Minimal build:
-  * glibc (Ubuntu): 823,760 bytes
-  * glibc (Arch): 673,528 bytes
-  * clang/musl (Alpine): 25,840 bytes
-  * musl (Alpine): 25,816 bytes
-  * dietlibc (Alpine): 13,736 bytes
+  * glibc (Ubuntu): 710,664 bytes
+  * glibc (Arch): 698,808 bytes
+  * clang/musl (Alpine): 25,816 bytes
+  * musl (Alpine): 25,792 bytes
+  * dietlibc (Alpine): 17,296 bytes
 * Standard build:
-  * glibc (Ubuntu): 831,952 bytes
-  * glibc (Arch): 681,720 bytes
-  * clang/musl (Alpine): 29,936 bytes
-  * musl (Alpine): 29,912 bytes
-  * dietlibc (Alpine): 14,576 bytes
+  * glibc (Ubuntu): 714,760 bytes
+  * glibc (Arch): 702,904 bytes
+  * clang/musl (Alpine): 29,912 bytes
+  * musl (Alpine): 29,888 bytes
+  * dietlibc (Alpine): 17,296 bytes
 * Non-Network build:
-  * glibc (Ubuntu): 844,240 bytes
-  * glibc (Arch): 698,104 bytes
-  * clang/musl (Alpine): 50,424 bytes
-  * musl (Alpine): 46,304 bytes
-  * dietlibc (Alpine): 28,208 bytes
+  * glibc (Ubuntu): 731,144 bytes
+  * glibc (Arch): 727,480 bytes
+  * clang/musl (Alpine): 50,400 bytes
+  * musl (Alpine): 46,280 bytes
+  * dietlibc (Alpine): 29,592 bytes
 * Full build:
-  * glibc (Ubuntu): 1,078,000 bytes
-  * glibc (Arch): 911,184 bytes
-  * clang/musl (Alpine): 83,192 bytes
-  * musl (Alpine): 83,168 bytes
-  * dietlibc (Alpine): 45,944 bytes
+  * glibc (Ubuntu): 972,872 bytes
+  * glibc (Arch): 944,632 bytes
+  * clang/musl (Alpine): 87,264 bytes
+  * musl (Alpine): 87,240 bytes
+  * musl with self-extracting executable (Alpine): 75,808 bytes
+  * dietlibc (Alpine): 46,072 bytes
 
 *dietlibc [requires](https://www.fefe.de/dietlibc/FAQ.txt) that you either not distribute the compiled executable, or release the executable under GPL v2.*
 
-These file sizes are *statically compiled*, so they don't have any external dependencies other than the Linux OS.
+These file sizes are *statically compiled*, so they don't have any external dependencies other than the Linux OS.  Due to its nature, glibc cannot run some networking functionality (specifically hostname lookups) when statically compiled.  Some documentation indicates that, by statically compiling the executable with GPL shared libraries, that causes the final executable to become itself covered under GPL.  Please follow best practices when distributing executables.
 
-These were compiled within Docker containers, which are supplied in the code.  For each stdlib library (glibc, musl, dietlibc), the Linux distribution used to compile it is listed.  This is because the Arch Linux compile size is different than the Ubuntu compile size for the same library.  Your millage may differ depending on the distribution and compiler and other minor differences you use.
+These were compiled within Docker containers, which are supplied in the code.  For each stdlib library (glibc, musl, dietlibc), the Linux distribution used to compile it is listed.  This is because the Arch Linux compile size is different than the Ubuntu compile size for the same library.  Your milage may differ depending on the distribution and compiler and other minor differences you use.
 
 dietlibc exhibits slightly different behavior than the other libraries, specifically around the [`signal`](#signal-wait) command.  Please see the command documentation for a description of the differences.  If you select a different library for your compilation, please ensure that the provided test suite passes.
 
@@ -1317,6 +1320,7 @@ Contributing new commands requires (this list assumes that the change is for a s
 6. Add new test scripts in the `tests` directory.  The [test readme file](tests/README.md) offers a brief overview of what goes into a test script.
 7. Add documentation in the root [README.md](README.md) file, both in the initial command listing, and the detailed description.
 
+See the [CONTRIBUTING.md](CONTRIBUTING.md) file for additional details.
 
 ## Reporting Security Issues
 

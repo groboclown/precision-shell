@@ -1,4 +1,6 @@
-SUBDIRS = src tests
+SUBDIRS = src compressed tests
+
+NO_GETADDRINFO ?= 0
 
 .PHONY: all clean subdirs $(SUBDIRS) help
 
@@ -10,7 +12,7 @@ clean:
 	test -d out && rm -rf out || echo "."
 
 $(SUBDIRS):
-	$(MAKE) -C $@
+	$(MAKE) -C $@ NO_GETADDRINFO=$(NO_GETADDRINFO)
 
 help:
 	@echo "Compiles and tests the program."
