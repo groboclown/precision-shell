@@ -34,6 +34,7 @@ for libname in glibc glibc-arch musl ; do
     container=$( docker create local/presh-${libname} )
     docker cp "${container}:/opt/code/out/presh" out/presh.${libname}
     docker cp "${container}:/opt/code/out/presh-zipped" out/presh-zipped.${libname}
+    docker cp "${container}:/opt/code/out/presh-comp" out/presh-comp.${libname}
     docker cp "${container}:/opt/code/out/presh-debug" out/presh-debug.${libname}
     docker rm "${container}"
 done
@@ -75,7 +76,7 @@ When ready to release:
 1. Bump the version number in [version.txt](version.txt).
 2. Bump the version number in [Dockerfile](Dockerfile) and [sample.Dockerfile](sample.Dockerfile).
 3. Update the root [README.md](README.md) file with the latest binary file sizes.  The automated builds include the file sizes.
-4. Update [`recipes/README.md`](recipes/README.md) file with the binary file sizes from the recipes build.
+4. Update [`recipes/README.md`](recipes/README.md) file with the binary file sizes from the recipes build.  Find this out by running `recipes/_build_all.sh 2>/dev/null | tee out/recipes.txt` and extracting the `out/presh` file size information.
 5. Create a PR into the `main` branch.
 6. Ensure all builds pass.
 7. Author a new release in GitHub, with the title & tag set to the new version number.  No binary files are included here, but it auto-generates the source tarball.

@@ -43,7 +43,7 @@ COPY --from=build-env /opt/app /opt/app
 
 # To debug the presh script, this can use the presh-debug instead.
 # COPY --from=presh-builder /opt/precision-shell/out/presh-debug /bin/sh
-COPY --from=presh-builder /opt/precision-shell/out/presh /bin/sh
+COPY --from=presh-builder /opt/precision-shell/out/presh-smallest /bin/sh
 
 WORKDIR /opt/app/hello_world
 

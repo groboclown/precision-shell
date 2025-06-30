@@ -33,4 +33,6 @@ FROM scratch
 LABEL name="local/precision-shell-example"
 
 # Copy the image built above and set it as the shell.
-COPY --from=builder /opt/code/precision-shell/out/presh /bin/sh
+COPY --from=builder /opt/code/precision-shell/out/presh-smallest /bin/sh
+
+ENTRYPOINT ["/bin/sh"]

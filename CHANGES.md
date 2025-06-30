@@ -24,6 +24,13 @@
     * Updated `README.md` to reflect new compiled sizes.
 * [9a1465a](9a1465a3e0f57c5bf96a59f41aaab08994bea6dd)
     * Added some notes on future experiments on compressed executables.  It's getting into already explored territory.
+* []()
+    * Added in an initial cut at the new compressed executable approach (which doesn't run right), and has minimal improvement to the file size.  However, there exist some situations where it looks like it could have a smaller size, so may indicate a place for future investigation to fix.
+    * Taught the docker build command (default operation of `internal-docker-make.sh`) to create the smaller version of the `presh` executable as `out/presh-smallest`.  This allows later stages in a `Dockerfile` to use the smallest version, if it cares about that.
+    * Updated the `recipes` to use the smallest file size, as they care about that.
+    * Updated the file sizes in the `recipes` to reflect the new file sizes.
+    * Added a few improvements to the root `Dockerfile` to indicate its differences from the `sample.Dockerfile`, and to fix its use of `CMD`.
+    * Updated the license copyright, and added an SPDX to it, and added a note about static compilation affects on the binary distribution.
 
 
 ## v4.5.1

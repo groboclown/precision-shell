@@ -47,6 +47,8 @@ this_dir="recipes"
 errs=0
 declare -a err_names
 for name in ${this_dir}/*.Dockerfile ; do
+    echo "========================================"
+    echo "Building ${name}"
     base="$( basename "${name}" .Dockerfile )"
     "${CONTAINER_RUNNER}" buildx build "${network_args[@]}" -t "local/presh-${base}:build" -f "${name}" .
     if [ $? != 0 ] ; then

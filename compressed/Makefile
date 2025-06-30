@@ -18,7 +18,8 @@ all: clean build
 
 .PHONY: build
 build: \
-	$(OUTDIR)/presh-zipped
+	$(OUTDIR)/presh-zipped \
+	$(OUTDIR)/presh-comp \
 
 # Note that the arguments to the rm match the all parameters.
 .PHONY: clean
@@ -81,6 +82,34 @@ $(OUTDIR)/presh-segments.h: $(SRC)
 		| awk '/_IRELATIV/ { printf("static irelativ_t IRELATIV_%d = { offset: 0x%x, addend: 0x%x };\n", ++i, $$1, $$4) }' \
 		>> $@
 
-$(OUTDIR)/presh-comp: stub.c tinflate.c $(OUTDIR)/presh_payload.h $(OUTDIR)/presh-segments.h
+$(OUTDIR)/extract-elf: extract-elf.c extract-elf.h
 	mkdir -p $(OUTDIR)
-	$(STD_CC) $(CFLAGS) $(LFLAGS) $(MINFLAGS) -I$(OUTDIR) stub.c tinflate.c -o $@
+	$(CC) $(CFLAGS) $(LFLAGS) $< -o $@
+
+$(OUTDIR)/presh-comp.bin: $(OUTDIR)/extract-elf $(OUTDIR)/presh
+	mkdir -p $(OUTDIR)
+	$(OUTDIR)/extract-elf $(OUTDIR)/presh $(OUTDIR)/load-run.c $(OUTDIR)/load-run.h $(OUTDIR)/presh-comp.bin
+
+$(OUTDIR)/presh-comp.bin.gz: $(OUTDIR)/presh-comp.bin
+	mkdir -p $(OUTDIR)
+	gzip -c -9 $< > $@
+
+$(OUTDIR)/presh-comp.bin.deflate: $(OUTDIR)/presh-comp.bin.gz $(OUTDIR)/gzip-strip
+	mkdir -p $(OUTDIR)
+	$(OUTDIR)/gzip-strip $(OUTDIR)/presh-comp.bin.gz $@
+
+$(OUTDIR)/load-run.c: $(OUTDIR)/presh-comp.bin
+
+$(OUTDIR)/load-run.h: $(OUTDIR)/presh-comp.bin
+
+$(OUTDIR)/presh-comp.bin.h: $(OUTDIR)/presh-comp.bin.deflate
+	xxd -i $< > $@.1
+	sed -e 's|unsigned char [a-zA-Z0-9_]\+|unsigned char ___presh_comp|g' $@.1 > $@.2
+	rm -f $@.1
+	sed -e 's|unsigned int [a-zA-Z0-9_]\+|unsigned int ___presh_comp_len|g' $@.2 > $@
+	rm -f $@.2
+	echo "unsigned int ___presh_len = " `wc -c < $(OUTDIR)/presh-comp.bin` ";" >> $@
+
+$(OUTDIR)/presh-comp: stub2.c tinflate.c tinf.h $(OUTDIR)/presh-comp.bin.h $(OUTDIR)/load-run.c $(OUTDIR)/load-run.h
+	mkdir -p $(OUTDIR)
+	$(CC) $(CFLAGS) $(LFLAGS) $(MINFLAGS) -I$(OUTDIR) stub2.c tinflate.c $(OUTDIR)/load-run.c -o $@

@@ -1301,7 +1301,7 @@ Last build size:
 
 These file sizes are *statically compiled*, so they don't have any external dependencies other than the Linux OS.  Due to its nature, glibc cannot run some networking functionality (specifically hostname lookups) when statically compiled.  Some documentation indicates that, by statically compiling the executable with GPL shared libraries, that causes the final executable to become itself covered under GPL.  Please follow best practices when distributing executables.
 
-These were compiled within Docker containers, which are supplied in the code.  For each stdlib library (glibc, musl, dietlibc), the Linux distribution used to compile it is listed.  This is because the Arch Linux compile size is different than the Ubuntu compile size for the same library.  Your millage may differ depending on the distribution and compiler and other minor differences you use.
+These were compiled within Docker containers, which are supplied in the code.  For each stdlib library (glibc, musl, dietlibc), the Linux distribution used to compile it is listed.  This is because the Arch Linux compile size is different than the Ubuntu compile size for the same library.  Your milage may differ depending on the distribution and compiler and other minor differences you use.
 
 dietlibc exhibits slightly different behavior than the other libraries, specifically around the [`signal`](#signal-wait) command.  Please see the command documentation for a description of the differences.  If you select a different library for your compilation, please ensure that the provided test suite passes.
 
