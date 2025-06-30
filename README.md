@@ -23,6 +23,7 @@ The shell supports these commands:
   * [env-cat-fd](#env-cat-fd) - write the contents of a file to a file descriptor, performing environment variable parsing on the source file.
   * [write-fd](#write-fd) - write the arguments to a file descriptor, either stdout or stdin, or those opened through the `dup-*` commands.
   * [ls](#ls) - list contents of a directory.
+  * [ls-l](#ls-l) - list contents of a directory with content attributes.
   * [ls-t](#ls-t) - list contents and content type of a directory
   * [file-stat](#file-stat) - describe a file
 * Files
@@ -556,11 +557,18 @@ If all the arguments strictly equal each other, then this exits with a "0" (no e
 
 ```bash
 presh -c "is-eq [1] [1] [1] && echo [yes]"
+yes
+```
+
+```bash
+presh -c "is-eq [1] [1] [2] [3]"
+ERROR is-eq: 2
+ERROR is-eq: 2
 ```
 
 **Example 2:**
 
-If any of the arguments differ, even by case or whitespace, the command fails.  In the following examples, none of them match.
+If any of the arguments differ, even by case or whitespace, the command fails.  In the following commands, none of them match.
 
 ```bash
 presh -c '
@@ -609,7 +617,7 @@ Limited use as a diagnostic tool when inspecting an image.  Most securely constr
 **Example:**
 
 ```bash
-$ presh -c "mkdir x ; mkdir y ; touch x/a.txt ; touch y/b.txt ; ls-l x y"
+$ presh -c "mkdir x ; mkdir y ; touch x/a.txt ; touch y/b.txt ; ls x y"
 a.txt
 b.txt
 ```
@@ -627,25 +635,25 @@ Limited use as a diagnostic tool when inspecting an image.  Most securely constr
 The output format has these columns:
 
 1. File attributes.  Each character indicates a different attribute.
-  1. File type.
-    * `-` regular file
-    * `d` directory
-    * `l` symbolic link
-    * `b` block-type device
-    * `c` character-type device
-    * `s` UNIX domain socket
-    * `p` FIFO pipe
-    * `?` other file type
-  2. Sticky flag.  `t` means the userid is "sticky", `s` means the groupid is "sticky", and `-` means no sticky flag.
-  3. Owning user read access.  `r` for allowed, `-` for not.
-  4. Owning user write access. `w` for allowed, `-` for not.
-  5. Owning user execute access.  `x` for allowed, `-` for not.
-  6. Owning group read access.  `r` for allowed, `-` for not.
-  7. Owning group write access. `w` for allowed, `-` for not.
-  8. Owning group execute access.  `x` for allowed, `-` for not.
-  6. Other read access.  `r` for allowed, `-` for not.
-  7. Other write access. `w` for allowed, `-` for not.
-  8. Other execute access.  `x` for allowed, `-` for not.
+    1. File type.
+        * `-` regular file
+        * `d` directory
+        * `l` symbolic link
+        * `b` block-type device
+        * `c` character-type device
+        * `s` UNIX domain socket
+        * `p` FIFO pipe
+        * `?` other file type
+    2. Sticky flag.  `t` means the userid is "sticky", `s` means the groupid is "sticky", and `-` means no sticky flag.
+    3. Owning user read access.  `r` for allowed, `-` for not.
+    4. Owning user write access. `w` for allowed, `-` for not.
+    5. Owning user execute access.  `x` for allowed, `-` for not.
+    6. Owning group read access.  `r` for allowed, `-` for not.
+    7. Owning group write access. `w` for allowed, `-` for not.
+    8. Owning group execute access.  `x` for allowed, `-` for not.
+    6. Other read access.  `r` for allowed, `-` for not.
+    7. Other write access. `w` for allowed, `-` for not.
+    8. Other execute access.  `x` for allowed, `-` for not.
 2. Number of hard links to this file.
 3. Owning user ID (numeric, not name)
 4. Owning group ID (numeric, not name)
@@ -812,7 +820,7 @@ $ presh -c "\
   if-else [touch a-file.txt] \
     # [echo Worked] \
     [echo [chmod does not work]] \
-    [echo [chmod works]]
+    [echo [chmod works]]"
 chmod does not work
 ERROR if-else: echo [chmod works]
 ```
@@ -861,9 +869,9 @@ Removes each empty directory passed as an argument.  If a directory is not empty
 
 **Usage**: `signal [*ENV] [signal1 [signal2]] [wait]`
 
-Traps OS signal numbers passed as arguments.  If `wait` is given, then waits for any listed signal to occur before continuing.  If no signal is given (just `signal wait`), then it waits for a standard OS interruption, which will kill the whole process.  If the command includes a `*ENV` (where `ENV` is some environment name) argument, and Pres has [environment variable parsing](#environment-variables) enabled, then the shell stores trapped OS signal numbers in the environment variable.
+Traps OS signal numbers passed as arguments.  If `wait` is given, then it waits for any listed signal to occur before continuing.  If no signal is given (just `signal wait`), then it waits for a standard OS interruption, which will kill the whole process.  If the command includes a `*ENV` (where `ENV` is some environment name) argument, and presh has [environment variable parsing](#environment-variables) enabled, then the shell stores trapped OS signal numbers in the environment variable.
 
-Of note, once a signal is added to the list, it is registered for standard OS ignoring.  Only by adding the statement `wait` will the processing wait for the signal to be raised.  This can be used for interesting applications, such as:
+Of note, once a signal is added to the list, it is registered for standard OS ignoring.  This applies to the current instruction, future `signal` instruction, and even some signals with child processes.  Only by adding the statement `wait` will the processing wait for the signal to be raised, and even then only for the signals requested in the current command.  This can be used for interesting applications, such as:
 
 ```bash
 presh -c "signal 2 ; signal 15 wait"
@@ -871,7 +879,7 @@ presh -c "signal 2 ; signal 15 wait"
 
 This will cause the shell to ignore SIGINT (2, usually sent by a ctrl-c input), and wait for SIGTERM (15).
 
-*Note that `dietlibc` does not support ignoring signals not waited on, and will exit with an error if the to-be-ignored signals are received.*
+*Note that `dietlibc` [does not support ignoring signals not waited on, and will exit with an error if the to-be-ignored signals are received](https://github.com/groboclown/precision-shell/issues/2).*
 
 **Example 1:**
 
@@ -882,19 +890,19 @@ Run a process that doesn't listen for OS signals, and instead have the shell tak
 
 # [ Spawn the process ]
 spawn [/usr/sbin/my-server] SERVER_PID && subcmd [
-# [ Run this in a subcmd so that fail/pass of each of these instructions ]
-# [   only runs when the spawn started successfully. ]
+    # [ Run this in a subcmd so that fail/pass of each of these instructions ]
+    # [   only runs when the spawn started successfully. ]
 
-signal 1 2 9 15 17 wait
+    signal 1 2 9 15 17 wait
 
-# [ Force the child to die, in case the signal wasn't a SIGCHLD (17). ]
-kill-pid 15 ${SERVER_PID}
+    # [ Force the child to die, in case the signal wasn't a SIGCHLD (17). ]
+    kill-pid 15 ${SERVER_PID}
 
-# [ Capture the exit code of the spawned server. ]
-wait-pid ${SERVER_PID} *EXIT
+    # [ Capture the exit code of the spawned server. ]
+    wait-pid ${SERVER_PID} *EXIT
 
-# [ Exit the script with the spawned server's exit code. ]
-exit ${EXIT}
+    # [ Exit the script with the spawned server's exit code. ]
+    exit ${EXIT}
 ]
 ```
 
@@ -905,7 +913,7 @@ Run a process that might generate an unexpected error.
 ```bash
 #! /usr/bin/presh -f
 
-FIXME
+FIXME this example needs an implementation.
 
 ```
 
