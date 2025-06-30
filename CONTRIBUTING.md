@@ -20,7 +20,7 @@ To compile the shell, you will need a C compiler that includes a version of the 
 To test, run:
 
 ```bash
-chmod +x tests/*.sh && docker build -f build-(libname).Dockerfile .
+chmod +x tests/*.sh tests/*/*.sh && docker build -f build-(libname).Dockerfile .
 ```
 
 You can build directly, but some of the tests require root privileges, which are safer to run from within a container.
@@ -29,10 +29,12 @@ To build through Docker and capture the built executables:
 
 ```bash
 mkdir -p out
-for libname in glibc musl ; do
+for libname in glibc glibc-arch musl ; do
     docker build -t local/presh-${libname} -f build-${libname}.Dockerfile .
     container=$( docker create local/presh-${libname} )
     docker cp "${container}:/opt/code/out/presh" out/presh.${libname}
+    docker cp "${container}:/opt/code/out/presh-zipped" out/presh-zipped.${libname}
+    docker cp "${container}:/opt/code/out/presh-comp" out/presh-comp.${libname}
     docker cp "${container}:/opt/code/out/presh-debug" out/presh-debug.${libname}
     docker rm "${container}"
 done
@@ -74,7 +76,7 @@ When ready to release:
 1. Bump the version number in [version.txt](version.txt).
 2. Bump the version number in [Dockerfile](Dockerfile) and [sample.Dockerfile](sample.Dockerfile).
 3. Update the root [README.md](README.md) file with the latest binary file sizes.  The automated builds include the file sizes.
-4. Update [`recipes/README.md`](recipes/README.md) file with the binary file sizes from the recipes build.
+4. Update [`recipes/README.md`](recipes/README.md) file with the binary file sizes from the recipes build.  Find this out by running `recipes/_build_all.sh 2>/dev/null | tee out/recipes.txt` and extracting the `out/presh` file size information.
 5. Create a PR into the `main` branch.
 6. Ensure all builds pass.
 7. Author a new release in GitHub, with the title & tag set to the new version number.  No binary files are included here, but it auto-generates the source tarball.

@@ -15,6 +15,8 @@ CFLAGS += -DVERSION_NUMBER=\"$(VERSION)-$(LIBNAME)\"
 
 COMMAND_HEADERS_DIR = ./gen-cmd
 
+NO_GETADDRINFO ?= 0
+
 # Normally, we want unused variable warnings, however, with very limited command flags,
 #   we will see this appear.
 # switch is disabled because there are command enums that are markers rather than

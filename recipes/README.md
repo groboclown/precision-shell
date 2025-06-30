@@ -11,7 +11,7 @@ Shows how to add external signal handling to the launched process.
 
 Because the nodejs process does not run from a shell, but instead directly, the process does not, by default, setup signal handlers to deal with things like a user "Ctrl-C" input to stop the process.  If the process is run as a daemon (which is normal in production), then this isn't a problem.  However, if you run the container for testing, this can be a pain, as you need to run `docker kill (name)` to stop the container.
 
-Presh adds 34,016 bytes by using the musl library.  This could be shrunk down smaller by eliminating the debug commands.
+Presh adds 33,992 bytes by using the musl library.  This could be shrunk down smaller by eliminating the debug commands.
 
 
 ## env-config-file.Dockerfile
@@ -20,7 +20,7 @@ Shows how precision shell can be used to enhance a ["distroless"](https://github
 
 The base server allows for a configuration file to set runtime parameters on how to set up the server.  Precision shell constructs this file from a template + environment variables, launches the program, and adds signal handlers for stopping execution.
 
-Presh adds 34,016 bytes by using the musl library.  This could be shrunk down smaller by eliminating the debug commands.
+Presh adds 38,088 bytes by using the musl library.  This could be shrunk down smaller by eliminating the debug commands.
 
 To run the Presh shell in docker image to explore what's in the image, you can run something like:
 
@@ -41,10 +41,10 @@ docker run --rm -it --entrypoint "/bin/sh" local/presch-non-root \
 d-rwxr-xr-x 2 0 0 0 0 4096 /opt/logs
 ```
 
-Presh adds 38,112 bytes to the docker image by using the musl library.  This could be shrunk down smaller by eliminating the debug commands.
+Presh adds 38,088 bytes to the docker image by using the musl library.  This could be shrunk down smaller by eliminating the debug commands.
 
 ## delay-until-ready.Dockerfile
 
 Waits for a dependent service to start running before starting the service.  If the dependent service doesn't start within 5 minutes (300 seconds), then the service fails to run.
 
-Presh adds 54,496 bytes by using the musl library.  This could be shrunk down smaller by eliminating the debug commands.
+Presh adds 58,568 bytes by using the musl library.  This could be shrunk down smaller by eliminating the debug commands.
