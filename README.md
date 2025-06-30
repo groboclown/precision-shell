@@ -1268,33 +1268,33 @@ Last build size:
 * Do-nothing build:
   * [glibc (Ubuntu)](#build-glibc.Dockerfile): 706,568 bytes
   * [glibc (Arch)](#build-glibc-arch.Dockerfile): 698,808 bytes
-  * [clang/musl (Alpine)](#build-clang.Dockerfile): 25,840 bytes
-  * [musl (Alpine)](#build-musl.Dockerfile): 25,816 bytes
+  * [clang/musl (Alpine)](#build-clang.Dockerfile): 25,816 bytes
+  * [musl (Alpine)](#build-musl.Dockerfile): 25,792 bytes
   * [dietlibc (Alpine)](#build-dietlibc.Dockerfile): 13,200 bytes
 * Minimal build:
   * glibc (Ubuntu): 710,664 bytes
   * glibc (Arch): 698,808 bytes
-  * clang/musl (Alpine): 25,840 bytes
-  * musl (Alpine): 25,816 bytes
+  * clang/musl (Alpine): 25,816 bytes
+  * musl (Alpine): 25,792 bytes
   * dietlibc (Alpine): 17,296 bytes
 * Standard build:
   * glibc (Ubuntu): 714,760 bytes
   * glibc (Arch): 702,904 bytes
-  * clang/musl (Alpine): 29,936 bytes
-  * musl (Alpine): 29,912 bytes
+  * clang/musl (Alpine): 29,912 bytes
+  * musl (Alpine): 29,888 bytes
   * dietlibc (Alpine): 17,296 bytes
 * Non-Network build:
   * glibc (Ubuntu): 731,144 bytes
   * glibc (Arch): 727,480 bytes
-  * clang/musl (Alpine): 50,424 bytes
-  * musl (Alpine): 50,400 bytes
+  * clang/musl (Alpine): 50,400 bytes
+  * musl (Alpine): 46,280 bytes
   * dietlibc (Alpine): 29,592 bytes
 * Full build:
   * glibc (Ubuntu): 972,872 bytes
   * glibc (Arch): 944,632 bytes
   * clang/musl (Alpine): 87,264 bytes
-  * musl (Alpine): 87,264 bytes
-  * musl with self-extracting executable (Alpine): 80,792 bytes
+  * musl (Alpine): 87,240 bytes
+  * musl with self-extracting executable (Alpine): 75,808 bytes
   * dietlibc (Alpine): 46,072 bytes
 
 *dietlibc [requires](https://www.fefe.de/dietlibc/FAQ.txt) that you either not distribute the compiled executable, or release the executable under GPL v2.*
