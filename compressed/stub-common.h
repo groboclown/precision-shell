@@ -22,29 +22,17 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
 */
 
-// A unified main function.
-// The 'make' changes this up by replacing the implementation of the
-// stub-run and stub-decompress files during the link stage.
-// The payload file must contain the binary data that's compatible
-// with the decompress function, and can be run by the run function.
+// Standard interface for the stubs to perform decompression.
 
-#include <stdlib.h>
-#include "stub-common.h"
-#include "stub-decompress.h"
-#include "stub-run.h"
-#include "data-payload.h"
+#ifndef STUB_COMMON_H
+#define STUB_COMMON_H
+
+#include <unistd.h>
+
+#define RUN_ERROR_LEN 17
+extern char RUN_ERROR[RUN_ERROR_LEN];
+
+#define WRITE_LAUNCH_ERROR() write(STDERR_FILENO, RUN_ERROR, RUN_ERROR_LEN)
 
 
-int main(int argc, char *argv[], char *envp[]) {
-    unsigned char *dest = malloc(___presh_len);
-    if (!dest) {
-        WRITE_LAUNCH_ERROR();
-        return 50;
-    };
-    if (DECOMPRESS_OK != decompress(dest, ___presh_len, ___presh_z, ___presh_z_len)) {
-        WRITE_LAUNCH_ERROR();
-        return 51;
-    }
-
-    return run_embedded(dest, ___presh_len, argc, argv, envp);
-}
+#endif // STUB_COMMON_H

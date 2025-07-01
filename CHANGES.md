@@ -1,3 +1,12 @@
+## v4.6.1
+
+* []()
+    * Rearranged the `compressed` folder to allow for multiple compression techniques and multiple loaders.  The code now has a cleaner separation between the general headers and the implementing code.
+    * This required massive restructuring of the make file.  It's now a circus of tricks and jumps to keep the file small and easily extensible.
+    * One of the compression algorithms, zstd, requires having the compression tool installed.  If you're running a full compression build, this requires adding zstd to your list of build prerequisites.  To that end, the `build-*.Dockerfile` files have the zstd as a dependency now.
+    * Updated the compressed readme file to describe how to work with this code.
+
+
 ## v4.6.0
 
 * [c12690c](c12690c5282fdc1aa5ab93bf7b361b742f83fb74)

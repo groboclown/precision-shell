@@ -23,7 +23,7 @@ To test, run:
 chmod +x tests/*.sh tests/*/*.sh && docker build -f build-(libname).Dockerfile .
 ```
 
-You can build directly, but some of the tests require root privileges, which are safer to run from within a container.
+You can build directly, but some of the tests require root privileges, which are safer to run from within a container.  For this, the `build-tools/internal-docker-make.sh` allows for the development with the images much easier, especially when combined with one of the `build-*.Dockerfile` in the root directory.
 
 To build through Docker and capture the built executables:
 
@@ -59,6 +59,10 @@ docker build -t local/presh-dietlibc -f build-dietlibc.Dockerfile . \
 ```
 
 To bump the version number, change the [version.txt](version.txt) file.  Version numbers must be in a dewey decimal format MAJOR.MINOR.PATCH (e.g. `1.2.3`).
+
+### Adding a Compression Technique
+
+If you want to contribute to the compression code, that's all in the `compressed` directory, and its readme tells you about how to implement over there.  However, it spills over into the `build-tools/internal-docker-make.sh`, where script code attempts to identify the smallest version of the build executable.  If you add more execution techniques (beyond the 'fd' (file descriptor) and 'lk' (manually linked)) or compression implementations, the list of file extensions to search will need adjusting.
 
 
 ## Releasing

@@ -22,29 +22,32 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
 */
 
-// A unified main function.
-// The 'make' changes this up by replacing the implementation of the
-// stub-run and stub-decompress files during the link stage.
-// The payload file must contain the binary data that's compatible
-// with the decompress function, and can be run by the run function.
+// Standard interface for the stubs to perform decompression.
 
-#include <stdlib.h>
-#include "stub-common.h"
-#include "stub-decompress.h"
-#include "stub-run.h"
-#include "data-payload.h"
+#ifndef STUB_DECOMPRESS_H
+#define STUB_DECOMPRESS_H
+
+#define DECOMPRESS_OK 0
+#define DECOMPRESS_ERR 1
+
+/**
+ * Decompress `sourceLen` bytes of compressed data from `source` into `dest`.
+ *
+ * The variable `destLen` points to must contain the size of `dest` on entry,
+ * and must equal to the final uncompressed size.  If this is not the case,
+ * then the function returns an error.
+ *
+ * Reads at most `sourceLen` bytes from `source`.
+ * Writes exactly `destLen` bytes to `dest`.
+ *
+ * @param dest pointer to where to place decompressed data
+ * @param destLen pointer to variable containing size of `dest`
+ * @param source pointer to compressed data
+ * @param sourceLen size of compressed data
+ * @return `DECOMPRESS_OK` on success, and anything else means error.
+ */
+int decompress(void *dest, unsigned int destLen,
+                           const void *source, unsigned int sourceLen);
 
 
-int main(int argc, char *argv[], char *envp[]) {
-    unsigned char *dest = malloc(___presh_len);
-    if (!dest) {
-        WRITE_LAUNCH_ERROR();
-        return 50;
-    };
-    if (DECOMPRESS_OK != decompress(dest, ___presh_len, ___presh_z, ___presh_z_len)) {
-        WRITE_LAUNCH_ERROR();
-        return 51;
-    }
-
-    return run_embedded(dest, ___presh_len, argc, argv, envp);
-}
+#endif // STUB_DECOMPRESS_H

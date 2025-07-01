@@ -24,6 +24,13 @@ SOFTWARE.
 
 
 // Strip the gzip header and tail, and use the raw DEFLATE data.
+// To test out the stripped file, use:
+// python3
+//  >>> import zlib
+//  >>> with open('output.deflate', 'rb') as fin:
+//  ...     with open('output.bin', 'wb') as fout:
+//  ...         fout.write(zlib.decompress(fin.read(), -zlib.MAX_WBITS))
+
 #include <stdio.h>
 #include <stdlib.h>
 #include <stdint.h>

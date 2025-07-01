@@ -22,29 +22,25 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
 */
 
-// A unified main function.
-// The 'make' changes this up by replacing the implementation of the
-// stub-run and stub-decompress files during the link stage.
-// The payload file must contain the binary data that's compatible
-// with the decompress function, and can be run by the run function.
+// Interface between the stub-decompress and TinyZZZ lzma decoder.
 
-#include <stdlib.h>
-#include "stub-common.h"
+#include <stddef.h>   // size_t
+#include <stdint.h>   // uint8_t, uint16_t, uint32_t
+
 #include "stub-decompress.h"
-#include "stub-run.h"
-#include "data-payload.h"
+#include "tinyzzz-lzma/lzmaD.h"
 
+int decompress(void *dest, unsigned int destLen,
+               const void *source, unsigned int sourceLen) {
+    // return 0 on okay, number on error.
 
-int main(int argc, char *argv[], char *envp[]) {
-    unsigned char *dest = malloc(___presh_len);
-    if (!dest) {
-        WRITE_LAUNCH_ERROR();
-        return 50;
-    };
-    if (DECOMPRESS_OK != decompress(dest, ___presh_len, ___presh_z, ___presh_z_len)) {
-        WRITE_LAUNCH_ERROR();
-        return 51;
-    }
+    // Formally, it should look like this;
+    // unsigned int actualDestLen = destLen;
+    //if (lzmaD(source, sourceLen, dest, &destLen)) != 0) {
+    //    return 1;
+    //}
+    //return destLen != actualDestLen;
 
-    return run_embedded(dest, ___presh_len, argc, argv, envp);
+    // However, if destLen was constructed correctly, then this is just fine:
+    return lzmaD((uint8_t*) source, sourceLen, dest, (size_t*) &destLen);
 }

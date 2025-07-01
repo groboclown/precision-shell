@@ -21,7 +21,7 @@ ENV \
     GID2=2
 
 RUN set -x \
-    && apk --no-cache add build-base=0.5-r3 "bash=~5" "python3=~3.12" git \
+    && apk --no-cache add build-base=0.5-r3 "bash=~5" "python3=~3.12" git zstd \
     && git clone --depth=1 --branch=$BRANCH https://github.com/groboclown/precision-shell.git /opt/code/precision-shell \
     && cd /opt/code/precision-shell \
     && echo 'LIBNAME=musl' >> version.txt \
