@@ -1,3 +1,17 @@
+## v4.6.1
+
+* [370b26d](370b26da38b3ff96a50004227289e1f9baaa72d4)
+    * Rearranged the `compressed` folder to allow for multiple compression techniques and multiple loaders.  The code now has a cleaner separation between the general headers and the implementing code.
+    * This required massive restructuring of the make file.  It's now a circus of tricks and jumps to keep the file small and easily extensible.
+    * One of the compression algorithms, zstd, requires having the compression tool installed.  If you're running a full compression build, this requires adding zstd to your list of build prerequisites.  To that end, the `build-*.Dockerfile` files have the zstd as a dependency now.
+    * Updated the compressed readme file to describe how to work with this code.
+* [86a1442](86a144298ef63daa9c6f9674c3071f34bd0dca78)
+    * Updated the make to strip out unnecessary sections from the ELF executable files.
+* [259b8e7](259b8e7a7c99a061ba98f49b991bb9ec59de4883)
+    * Added a test to ensure that running `cat-fd` on a symbolic link outputs the linked file's contents correctly.
+    * Added a test to ensure that running `cat-fd` on a broken symbolic link reports the correct error.
+
+
 ## v4.6.0
 
 * [c12690c](c12690c5282fdc1aa5ab93bf7b361b742f83fb74)

@@ -12,7 +12,7 @@ ENV DIETLIBC_VERSION=0.35
 
 RUN set -x \
     && apk --no-cache add \
-        build-base=0.5-r3 curl tar xz linux-headers "bash=~5" "python3=~3.12" \
+        build-base=0.5-r3 curl tar xz zstd linux-headers "bash=~5" "python3=~3.12" \
     && mkdir -p /opt/dietlibc \
     && curl --insecure -o /tmp/dietlibc.tar.xz https://www.fefe.de/dietlibc/dietlibc-${DIETLIBC_VERSION}.tar.xz \
     && xz -d /tmp/dietlibc.tar.xz \
@@ -20,7 +20,8 @@ RUN set -x \
     && rm /tmp/dietlibc.tar \
     && ( cd /opt/dietlibc && make && install bin-x86_64/diet /usr/local/bin )
 
-ENV CC="diet cc"
+ENV CC="diet cc" \
+    DIETLIBC_LIBDIR="/opt/dietlibc/bin-x86_64"
 
 COPY build-tools/ build-tools/
 COPY \

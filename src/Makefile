@@ -136,6 +136,7 @@ $(OUTDIR)/presh: $(SRC) $(COMMAND_HEADERS_DIR)/command_list.h
 	mkdir -p $(OUTDIR)
 	cat $(SRC) > $(OUTDIR)/_presh-all.c
 	$(CC) $(CFLAGS) $(LFLAGS) $(MINFLAGS) $(COMMAND_FLAGS) $(OUTDIR)/_presh-all.c $(LDFLAGS) -o $@
+	strip -x -R .comment -R .note -R .gnu.version -R .gnu.version_r $@ || true
 
 
 $(OUTDIR)/presh-debug: $(SRC) $(COMMAND_HEADERS_DIR)/command_list.h

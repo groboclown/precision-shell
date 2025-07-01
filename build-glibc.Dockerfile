@@ -7,7 +7,7 @@ WORKDIR /opt/code
 
 RUN set -x \
     && apt-get update \
-    && apt-get -y install "build-essential" "python3.12-minimal" "iproute2" "xxd" \
+    && apt-get -y install "build-essential" "python3.12-minimal" "iproute2" "xxd" "zstd" \
     && ln -s /usr/bin/python3.12 /usr/bin/python3 \
     && rm -rf /tmp/* /var/cache/apt/*
 

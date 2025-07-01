@@ -381,8 +381,8 @@ void free_elf_sections(Elf_Sections *sections) {
 // --------------------------------------------------------------------
 // -- Main program.
 int main(int argc, char *argv[]) {
-    if (argc != 5) {
-        fprintf(stderr, "Usage: %s <input-elf> <output-c> <output-h> <output-blob>\n", argv[0]);
+    if (argc != 4) {
+        fprintf(stderr, "Usage: %s <input-elf> <output-c> <output-blob>\n", argv[0]);
         return 1;
     }
     FILE *c_out = fopen(argv[2], "w");
@@ -390,23 +390,6 @@ int main(int argc, char *argv[]) {
         perror("Failed to open output C file");
         return 1;
     }
-
-    // --- emit .h
-    FILE *h_out = fopen(argv[3], "w");
-    if (!h_out) {
-        perror("Failed to open output h file");
-        fclose(c_out);
-        return 1;
-    }
-    fprintf(h_out,
-        "#ifndef EMBEDDED_LOADER_H\n"
-        "#define EMBEDDED_LOADER_H\n\n"
-        "#define RUN_ERROR_LEN 17\n"
-        "static char RUN_ERROR[RUN_ERROR_LEN];\n"
-        "/* call this to map+run the embedded ELF blocks. */\n"
-        "int run_embedded(unsigned char *data);\n\n"
-        "#endif\n");
-    fclose(h_out);
 
     // --- read entire ELF into memory
     Elf_Blob elf_blob = {.blob = NULL, .size = 0};
@@ -428,8 +411,8 @@ int main(int argc, char *argv[]) {
         .max_memory_size = 0,
         .e_class = ELFCLASSNONE, // Default to none
     };
-    if (process_elf_segments(&elf_blob, &sections, argv[4])) {
-        fprintf(stderr, "Failed to process ELF segments from %s into blob %s\n", argv[1], argv[4]);
+    if (process_elf_segments(&elf_blob, &sections, argv[3])) {
+        fprintf(stderr, "Failed to process ELF segments from %s into blob %s\n", argv[1], argv[3]);
         free_elf_blob(&elf_blob);
         free_elf_sections(&sections);
         fclose(c_out);
@@ -443,9 +426,8 @@ int main(int argc, char *argv[]) {
         "#include <stdint.h>\n"
         "#include <unistd.h>\n"
         "#include <sys/mman.h>\n"
-        "#include \"%s\"\n\n"
-        ,
-        basename(argv[3])
+        "#include \"stub-common.h\"\n\n"
+        "#include \"stub-run.h\"\n\n"
     );
     if (sections.rela_count > 0) {
         // The structure is ELF class agnostic.
@@ -460,22 +442,20 @@ int main(int argc, char *argv[]) {
     // --- emit loader runner ---
 
     fprintf(c_out,
-        "static char RUN_ERROR[] = \"Launcher failed.\\n\";\n\n"
-
-        // The primary runner
-        "int run_embedded(unsigned char *data) {\n"
+        // The primary runner.
+        // See the stub-run.h header file for the function signature.
+        "int run_embedded(unsigned char *data, unsigned int dataLen, int argc, char *argv[], char *envp[]) {\n"
 
         // Allocate the executable space.
         "  void *base = mmap(NULL, %u,\n"
         "                    PROT_READ|PROT_WRITE|PROT_EXEC,\n"
         "                    MAP_PRIVATE|MAP_ANONYMOUS,\n"
         "                    0, 0);\n"
-        "  if (!base) { write(STDERR_FILENO, RUN_ERROR, RUN_ERROR_LEN); return 10; }\n"
+        "  if (!base) { WRITE_LAUNCH_ERROR(); return 70; }\n"
 
         // Start with clean memory.  This could be done piecewise, but this is smaller.
         "  memset(base, 0, %u);\n\n"
         ,
-        sections.max_memory_size,
         sections.max_memory_size,
         sections.max_memory_size
     );
@@ -615,7 +595,7 @@ int main(int argc, char *argv[]) {
         "  void (*entry_fn)() = (void(*)())(base + 0x%lx);\n"
         "  entry_fn();\n"
         "  // unreachable, but needed by the compiler.\n"
-        "  return 0;\n"
+        "  return 71;\n"
         "}\n\n",
         sections.entry
     );
@@ -624,10 +604,9 @@ int main(int argc, char *argv[]) {
     free_elf_blob(&elf_blob);
     fclose(c_out);
     fprintf(stderr,
-        "ELF extraction complete. C library written to %s, header to %s, data blob to %s\n",
+        "ELF extraction complete. C library written to %s, data blob to %s\n",
         argv[2],
-        argv[3],
-        argv[4]
+        argv[3]
     );
     return 0;
 }
