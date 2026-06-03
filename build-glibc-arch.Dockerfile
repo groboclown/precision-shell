@@ -11,6 +11,13 @@ RUN set -x \
     && pacman -Sy --noconfirm python3 xxd \
     && rm -rf /tmp/* /var/cache/pacman/*
 
+# For the tests to run, they need two extra users.
+RUN set -x \
+    && groupadd --gid 1011 test1 \
+    && groupadd --gid 1012 test2 \
+    && useradd -M --uid 1011 --gid 1011 test1 \
+    && useradd -M --uid 1012 --gid 1012 test2
+
 COPY build-tools/ build-tools/
 COPY \
     Makefile \
@@ -34,10 +41,10 @@ ENV \
     COMMANDS=$COMMANDS \
     IPV6=$IPV6 \
     VIRTUAL_NETWORK=yes \
-    UID1=1 \
-    UID2=2 \
-    GID1=1 \
-    GID2=2
+    UID1=1011 \
+    UID2=1012 \
+    GID1=1011 \
+    GID2=1012
 
-RUN    echo 'LIBNAME=glibc' >> version.txt \
+RUN echo 'LIBNAME=glibc' >> version.txt \
     && ./build-tools/internal-docker-make.sh
