@@ -1,20 +1,22 @@
 FROM public.ecr.aws/docker/library/alpine:3.22
+# Note: dietlibc 0.35 fails to build when using Alpine 3.23.
 
 # This file is broken up to make rebuilds fast
 # by reusing previous layers that take a while to run.
 
 WORKDIR /opt/code
 
+
 ENV DIETLIBC_VERSION=0.35
+COPY vendor/dietlibc-${DIETLIBC_VERSION}.tar.xz /tmp/dietlibc.tar.xz
 
 # As of May 26, 2025, the dietlibc certificate expired.
 # Until this changes, this build requires the "--insecure" option.
 
 RUN set -x \
     && apk --no-cache add \
-        build-base=0.5-r3 curl tar xz zstd linux-headers "bash=~5" "python3=~3.12" \
+        build-base=0.5-r3 tar xz zstd linux-headers "bash=~5" "python3=~3.12" \
     && mkdir -p /opt/dietlibc \
-    && curl --insecure -o /tmp/dietlibc.tar.xz https://www.fefe.de/dietlibc/dietlibc-${DIETLIBC_VERSION}.tar.xz \
     && xz -d /tmp/dietlibc.tar.xz \
     && tar xf /tmp/dietlibc.tar -C /opt/dietlibc/ --strip 1 \
     && rm /tmp/dietlibc.tar \
@@ -50,5 +52,5 @@ ENV \
     UID2=65534 \
     GID2=65534
 
-RUN    echo 'LIBNAME=dietlibc' >> version.txt \
+RUN echo 'LIBNAME=dietlibc' >> version.txt \
     && ./build-tools/internal-docker-make.sh
