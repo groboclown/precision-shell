@@ -7,9 +7,9 @@ WORKDIR /opt/code
 
 RUN set -x \
     && apk --no-cache add \
-        "python3=~3.12" "bash=~5.2" \
-        "make=~4.4" "clang=~20.1" "clang-dev=~20.1" "lld=~20.1" \
-        "musl-dev=~1.2" "gcc=~14" xz zstd
+        "python3=~3" "bash=~5" \
+        "make=~4" "clang=~21" "clang-dev=~21" "lld=~21" \
+        "musl-dev=~1" "gcc=~15" xz zstd
 
 COPY build-tools/ build-tools/
 COPY \
