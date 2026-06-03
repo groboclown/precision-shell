@@ -1,4 +1,4 @@
-FROM public.ecr.aws/docker/library/alpine:3.22
+FROM public.ecr.aws/docker/library/alpine:3
 
 # This file is broken up to make rebuilds fast
 # by reusing previous layers that take a while to run.

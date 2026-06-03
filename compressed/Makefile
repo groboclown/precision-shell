@@ -17,7 +17,9 @@ SRC_LK := $(SRC)-lk
 
 # For loop magic.
 DECOMPRESS_IMPLEMENTATIONS = tinflate tinyzzz-lzma tinyzzz-zstd
-SRC_TYPES = fd lk
+# lk type doesn't work at the moment.
+#SRC_TYPES = fd lk
+SRC_TYPES = fd
 SRC_BIN_FILES = $(foreach ST,$(SRC_TYPES),$(SRC)-$(ST))
 
 
