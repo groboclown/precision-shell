@@ -3,9 +3,6 @@
 # desc: pipe output using dup-w and dup-r into a program
 # requires: +dup-w +dup-r +exec +echo
 
-echo "?? SKIPPED BECAUSE IT REQUIRES DEBUGGING"
-exit 0
-
 echo "dup-w 1 contents.txt" > script.txt
 echo "echo foo bar baz" >> script.txt
 echo "dup-w 1 sorted.txt" >> script.txt
@@ -25,13 +22,13 @@ if [ ! -f contents.txt ] || [ ! -f sorted.txt ] ; then
     exit 1
 fi
 
-if [ "$( printf "foo\\nbar\\baz\\n" )" != "$( cat contents.txt )" ] ; then
+if [ "$( printf "foo\\nbar\\nbaz\\n" )" != "$( cat contents.txt )" ] ; then
     echo "Generated contents.txt incorrect"
     cat contents.txt
     exit 1
 fi
 
-if [ "$( printf "bar\\nbaz\\foo\\n" )" != "$( cat sorted.txt )" ] ; then
+if [ "$( printf "bar\\nbaz\\nfoo\\n" )" != "$( cat sorted.txt )" ] ; then
     echo "Generated sorted.txt incorrect"
     cat sorted.txt
     exit 1
@@ -48,7 +45,7 @@ fi
 
 # should have: out.txt and err.txt
 count="$( ls -1A | wc -l )"
-if [ ${count} != 2 ] ; then
+if [ ${count} != 5 ] ; then
     echo "Generated unexpected files:"
     ls -lA
     exit 1
