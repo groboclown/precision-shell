@@ -2,7 +2,7 @@
 
 /* MIT License
 
-Copyright (c) 2022 groboclown
+Copyright (c) 2022,2026 groboclown
 
 Permission is hereby granted, free of charge, to any person obtaining a copy
 of this software and associated documentation files (the "Software"), to deal
@@ -61,7 +61,7 @@ SOFTWARE.
         shared_split_arg = args_advance_token(shared_split_arg_state); \
         if (shared_split_arg->state == ARG_STATE_END) { \
             break; \
-        } else if (shared_split_arg->state == ARG_STATE_ERR) { \
+        } else if (global_arg3_i >= MAX_SUB_ARG_COUNT || shared_split_arg->state == ARG_STATE_ERR) { \
             global_err = 1; \
             break; \
         } else { \

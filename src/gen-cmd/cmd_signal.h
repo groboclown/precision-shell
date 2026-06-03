@@ -41,6 +41,10 @@ void signal_handler(int);
 
 char signal_env_name[PARSED_ARG_SIZE] = "";
 
+// As a signal handler, this has shaky, at best, logic.
+// POSIX standard does not claim that setenv or write (called by LOG)
+// are async-signal-safe.  shared_itoa should be fine as long as the
+// buffer is read-only.
 #define SIGNAL_ENV_CAPTURE \
     char signal_itoa[(3 * sizeof(long int)) + 8]; \
     if (signal_env_name[0] != '\0') { \
@@ -70,36 +74,36 @@ char signal_env_name[PARSED_ARG_SIZE] = "";
 #endif
 
 
-/* from cmd_signal.h.in:63 */
+/* from cmd_signal.h.in:67 */
 extern const char cmd_name_signal[];
 #define ENUM_LIST__SIGNAL \
-            /* from cmd_signal.h.in:63 */ \
+            /* from cmd_signal.h.in:67 */ \
             COMMAND_INDEX__SIGNAL,
 #define VIRTUAL_ENUM_LIST__SIGNAL
 #define GLOBAL_VARDEF__SIGNAL \
-            /* from cmd_signal.h.in:63 */ \
+            /* from cmd_signal.h.in:67 */ \
             const char cmd_name_signal[] = "signal"; \
-            /* from cmd_signal.h.in:64 */ \
+            /* from cmd_signal.h.in:68 */ \
 void signal_handler(int signal) { \
     SIGNAL_ENV_CAPTURE; \
     LOG(":: handled signal\n"); \
 }
 #define INITIALIZE__SIGNAL \
-            /* from cmd_signal.h.in:63 */ \
+            /* from cmd_signal.h.in:67 */ \
             command_list_names[COMMAND_INDEX__SIGNAL] = cmd_name_signal; \
-            /* from cmd_signal.h.in:72 */ \
+            /* from cmd_signal.h.in:76 */ \
             sigset_t global_signal_set;
 #define STARTUP_CASE__SIGNAL \
     case COMMAND_INDEX__SIGNAL: \
-        /* from cmd_signal.h.in:63 */ \
-            /* from cmd_signal.h.in:76 */ \
+        /* from cmd_signal.h.in:67 */ \
+            /* from cmd_signal.h.in:80 */ \
             LOG(":: Initializing for signal handling\n"); \
             sigemptyset(&global_signal_set); \
         break;
 #define RUN_CASE__SIGNAL \
     case COMMAND_INDEX__SIGNAL: \
-        /* from cmd_signal.h.in:63 */ \
-            /* from cmd_signal.h.in:81 */ \
+        /* from cmd_signal.h.in:67 */ \
+            /* from cmd_signal.h.in:85 */ \
             /* The "wait" string indicates the end of the signals.*/ \
             if (strequal("wait", global_arg)) { \
                 LOG(":: start signal wait\n"); \

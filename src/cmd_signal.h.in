@@ -32,6 +32,10 @@ void signal_handler(int);
 
 char signal_env_name[PARSED_ARG_SIZE] = "";
 
+// As a signal handler, this has shaky, at best, logic.
+// POSIX standard does not claim that setenv or write (called by LOG)
+// are async-signal-safe.  shared_itoa should be fine as long as the
+// buffer is read-only.
 #define SIGNAL_ENV_CAPTURE \
     char signal_itoa[(3 * sizeof(long int)) + 8]; \
     if (signal_env_name[0] != '\0') { \
