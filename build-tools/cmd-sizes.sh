@@ -59,12 +59,12 @@ while [ $i -lt ${set_count} ] ; do
         cmp=""
         # no lk at the moment, as it doesn't work.
         for f in fd-tinflate fd-tinyzzz-lzma fd-tinyzzz-zstd ; do
-            if [ -f "${outfile}/presh-${f}" ] ; then
+            if [ -f "${outdir}/presh-${f}" ] ; then
                 if [ -z "${cmp}" ] ; then
                     cmp="${f}"
-                    fz1=$( wc -c <"out/presh-${f}" )
+                    fz1=$( wc -c <"${outdir}/presh-${f}" )
                 else
-                    fz2=$( wc -c <"out/presh-${f}" )
+                    fz2=$( wc -c <"${outdir}/presh-${f}" )
                     if [ ${fz2} -lt ${fz1} ] ; then
                         cmp="${f}"
                         fz1=${fz2}
@@ -75,6 +75,8 @@ while [ $i -lt ${set_count} ] ; do
 
         if [ ! -z "${cmp}" ] ; then
             echo "${fz1}|${name} (${cmp} compressed)" >> "${sizefile}"
+        else
+            ls "${outdir}/*"
         fi
     fi
     rm -rf "${outdir}"
