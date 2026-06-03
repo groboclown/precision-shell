@@ -29,12 +29,11 @@ To build through Docker and capture the built executables:
 
 ```bash
 mkdir -p out
-for libname in glibc glibc-arch musl ; do
+for libname in glibc glibc-arch musl clang ; do
     docker build -t local/presh-${libname} -f build-${libname}.Dockerfile .
     container=$( docker create local/presh-${libname} )
     docker cp "${container}:/opt/code/out/presh" out/presh.${libname}
-    docker cp "${container}:/opt/code/out/presh-zipped" out/presh-zipped.${libname}
-    docker cp "${container}:/opt/code/out/presh-comp" out/presh-comp.${libname}
+    docker cp "${container}:/opt/code/out/presh-fd" out/presh-fd.${libname}
     docker cp "${container}:/opt/code/out/presh-debug" out/presh-debug.${libname}
     docker rm "${container}"
 done
