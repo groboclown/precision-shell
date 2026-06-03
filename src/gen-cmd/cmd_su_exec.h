@@ -3,7 +3,7 @@
 /*
 MIT License
 
-Copyright (c) 2022 groboclown
+Copyright (c) 2022,2026 groboclown
 
 Permission is hereby granted, free of charge, to any person obtaining a copy
 of this software and associated documentation files (the "Software"), to deal
@@ -39,6 +39,7 @@ SOFTWARE.
 #include <stdlib.h>
 #include <stdio.h>
 #include <unistd.h>
+#include <grp.h>
 #include "args.h"
 #include "output.h"
 #include "globals.h"
@@ -63,32 +64,32 @@ SOFTWARE.
 
 
 
-/* from cmd_su_exec.h.in:55 */
+/* from cmd_su_exec.h.in:56 */
 extern const char cmd_name_su_exec[];
 #define ENUM_LIST__SU_EXEC \
-            /* from cmd_su_exec.h.in:55 */ \
+            /* from cmd_su_exec.h.in:56 */ \
             COMMAND_INDEX__SU_EXEC,
 #define VIRTUAL_ENUM_LIST__SU_EXEC \
-            /* from cmd_su_exec.h.in:79 */ \
+            /* from cmd_su_exec.h.in:80 */ \
             COMMAND_INDEX__SU_EXEC__RUN,
 #define GLOBAL_VARDEF__SU_EXEC \
-            /* from cmd_su_exec.h.in:55 */ \
+            /* from cmd_su_exec.h.in:56 */ \
             const char cmd_name_su_exec[] = "su-exec";
 #define INITIALIZE__SU_EXEC \
-            /* from cmd_su_exec.h.in:55 */ \
+            /* from cmd_su_exec.h.in:56 */ \
             command_list_names[COMMAND_INDEX__SU_EXEC] = cmd_name_su_exec;
 #define STARTUP_CASE__SU_EXEC \
     case COMMAND_INDEX__SU_EXEC: \
-        /* from cmd_su_exec.h.in:55 */ \
-            /* from cmd_su_exec.h.in:58 */ \
+        /* from cmd_su_exec.h.in:56 */ \
+            /* from cmd_su_exec.h.in:59 */ \
         /* arg2: uid*/ \
         global_cmd = COMMAND_INDEX__SHARED_INT2; \
         global_arg3_i = COMMAND_INDEX__SU_EXEC; \
         break;
 #define RUN_CASE__SU_EXEC \
     case COMMAND_INDEX__SU_EXEC: \
-        /* from cmd_su_exec.h.in:55 */ \
-            /* from cmd_su_exec.h.in:64 */ \
+        /* from cmd_su_exec.h.in:56 */ \
+            /* from cmd_su_exec.h.in:65 */ \
         /* arg1: gid*/ \
         LOG(":: storing gid "); \
         LOGLN(global_arg); \
@@ -102,26 +103,31 @@ extern const char cmd_name_su_exec[];
         global_cmd = COMMAND_INDEX__SU_EXEC__RUN; \
         break; \
     case COMMAND_INDEX__SU_EXEC__RUN: \
-        /* from cmd_su_exec.h.in:79 */ \
-            /* from cmd_su_exec.h.in:81 */ \
+        /* from cmd_su_exec.h.in:80 */ \
+            /* from cmd_su_exec.h.in:82 */ \
         /* Split the arguments.*/ \
         SHARED_SPLIT__PARSE_ARG \
-        SU_EXEC_DEBUG_REPORT \
-        /* Delay switching UID and GID until the last possible moment.*/ \
-        /* Note that gid is done first.*/ \
-        global_arg1_i = setgid(global_arg1_i); \
-        if (global_arg1_i >= 0) { \
-            global_arg1_i = setuid(global_arg2_i); \
-            if (global_arg1_i >= 0) { \
-                /* This launches a new executable and terminates this one immediately.*/ \
-                execvp(shared_split_argv[0], (char * const*) shared_split_argv); \
+        if (global_err == 0) { \
+            SU_EXEC_DEBUG_REPORT \
+            /* Delay switching UID and GID until the last possible moment.*/ \
+            tmp_val = setgroups(0, NULL); \
+            if (tmp_val >= 0) { \
+                /* Note that gid is done first.*/ \
+                tmp_val = setgid(global_arg1_i); \
+                if (tmp_val >= 0) { \
+                    tmp_val = setuid(global_arg2_i); \
+                    if (tmp_val >= 0) { \
+                        /* This launches a new executable and terminates this one immediately.*/ \
+                        execvp(shared_split_argv[0], (char * const*) shared_split_argv); \
+                    } \
+                } \
             } \
+            /* Unlike the normal exec, this must exit*/ \
+            /* immediately due to the setuid/setgid.  We don't*/ \
+            /* want unexpected commands running with unexpected permissions.*/ \
+            stderrP("Failed to su-exec "); \
+            stderrPLn(shared_split_argv[0]); \
         } \
-        /* Unlike the normal exec, this must exit*/ \
-        /* immediately due to the setuid/setgid.  We don't*/ \
-        /* want unexpected commands running with unexpected permissions.*/ \
-        stderrP("Failed to su-exec "); \
-        stderrPLn(shared_split_argv[0]); \
         _exit(1); \
         break;
 #define REQUIRES_ADDL_ARG__SU_EXEC \

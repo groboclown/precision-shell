@@ -73,7 +73,7 @@ extern const char cmd_name_spawn[];
 #define VIRTUAL_ENUM_LIST__SPAWN \
             /* from cmd_spawn.h.in:63 */ \
             COMMAND_INDEX__SPAWN__CMD, \
-            /* from cmd_spawn.h.in:104 */ \
+            /* from cmd_spawn.h.in:105 */ \
             COMMAND_INDEX__SPAWN__PID,
 #define GLOBAL_VARDEF__SPAWN \
             /* from cmd_spawn.h.in:53 */ \
@@ -96,35 +96,37 @@ extern const char cmd_name_spawn[];
         /* Split the arguments first.  This is inefficient for the*/ \
         /* parent, but cleans up debug output.*/ \
         SHARED_SPLIT__PARSE_ARG \
-        SPAWN_DEBUG_REPORT \
-        /* Fork the process.  This will have the potential to*/ \
-        /* cause very weird behavior if no argument is given.*/ \
-        global_arg3_i = fork(); \
-        if (global_arg3_i == -1) { \
-            LOG(":: failed to fork process\n"); \
-            global_err = 1; \
-            global_cmd = COMMAND_INDEX__ERR; \
-        } else if (global_arg3_i == 0) { \
-            /* Execute in the same OnArg block as the fork.  This inhibits much*/ \
-            /* of the print statements that would possibly clutter the output as*/ \
-            /* both processes try to write to stdout in debug mode.  This also*/ \
-            /* inhibits weird issues if there wasn't an executable argument.*/ \
-            /* This launches a new executable and terminates this one immediately.*/ \
-            execvp(shared_split_argv[0], (char * const*) shared_split_argv); \
-            /* Exit rather than return.  A failed exec then performing*/ \
-            /*   a return can cause a sub-command context to start running,*/ \
-            /*   which is Very Bad.*/ \
-            _exit(1); \
-        } else { \
-            /* Else this is the parent process.*/ \
-            /* Just slurp up this argument.*/ \
-            /* Then, if the env is next, post the pid to that.*/ \
-            global_cmd = COMMAND_INDEX__SPAWN__PID; \
+        if (global_err == 0) { \
+            SPAWN_DEBUG_REPORT \
+            /* Fork the process.  This will have the potential to*/ \
+            /* cause very weird behavior if no argument is given.*/ \
+            global_arg3_i = fork(); \
+            if (global_arg3_i == -1) { \
+                LOG(":: failed to fork process\n"); \
+                global_err = 1; \
+                global_cmd = COMMAND_INDEX__ERR; \
+            } else if (global_arg3_i == 0) { \
+                /* Execute in the same OnArg block as the fork.  This inhibits much*/ \
+                /* of the print statements that would possibly clutter the output as*/ \
+                /* both processes try to write to stdout in debug mode.  This also*/ \
+                /* inhibits weird issues if there wasn't an executable argument.*/ \
+                /* This launches a new executable and terminates this one immediately.*/ \
+                execvp(shared_split_argv[0], (char * const*) shared_split_argv); \
+                /* Exit rather than return.  A failed exec then performing*/ \
+                /*   a return can cause a sub-command context to start running,*/ \
+                /*   which is Very Bad.*/ \
+                _exit(1); \
+            } else { \
+                /* Else this is the parent process.*/ \
+                /* Just slurp up this argument.*/ \
+                /* Then, if the env is next, post the pid to that.*/ \
+                global_cmd = COMMAND_INDEX__SPAWN__PID; \
+            } \
         } \
         break; \
     case COMMAND_INDEX__SPAWN__PID: \
-        /* from cmd_spawn.h.in:104 */ \
-            /* from cmd_spawn.h.in:105 */ \
+        /* from cmd_spawn.h.in:105 */ \
+            /* from cmd_spawn.h.in:106 */ \
         /* Put the PID into the environment variable global_arg.*/ \
         /* This argument can only be run from the parent due to the logic above.*/ \
         global_itoa_ptr = shared_itoa(global_arg3_i, global_itoa); \
