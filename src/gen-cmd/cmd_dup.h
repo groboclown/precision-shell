@@ -2,7 +2,7 @@
 
 /* MIT License
 
-Copyright (c) 2022 groboclown
+Copyright (c) 2022,2026 groboclown
 
 Permission is hereby granted, free of charge, to any person obtaining a copy
 of this software and associated documentation files (the "Software"), to deal
@@ -135,7 +135,7 @@ extern const char cmd_name_dup_r__setup[];
         /* from cmd_dup.h.in:56 */ \
             /* from cmd_dup.h.in:57 */ \
             LOG(":: preparing dup-r\n"); \
-            global_arg1_i = O_WRONLY | O_CREAT | O_TRUNC; \
+            global_arg1_i = O_RDONLY; \
             global_cmd = COMMAND_INDEX__SHARED_INT2; \
             /* shared int will call this index when it's done.*/ \
             global_arg3_i = COMMAND_INDEX__DUP__TGT; \

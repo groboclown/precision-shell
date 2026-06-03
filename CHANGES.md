@@ -10,6 +10,9 @@
 * [259b8e7](259b8e7a7c99a061ba98f49b991bb9ec59de4883)
     * Added a test to ensure that running `cat-fd` on a symbolic link outputs the linked file's contents correctly.
     * Added a test to ensure that running `cat-fd` on a broken symbolic link reports the correct error.
+* [a759942](a759942ae2b267023c3af7243531860e957a9f45)
+    * Added the dietlibc distribution into the `vendors` directory, due to issues seen with the source fefe.de site.
+    * Updated the `Dockerfile` for the builds to use more modern versions of the packages.
 
 
 ## v4.6.0
