@@ -13,6 +13,8 @@
 * [a759942](a759942ae2b267023c3af7243531860e957a9f45)
     * Added the dietlibc distribution into the `vendors` directory, due to issues seen with the source fefe.de site.
     * Updated the `Dockerfile` for the builds to use more modern versions of the packages.
+* [e6c6f4b](e6c6f4b1e87d321e9963607634ccfd7d410256b6)
+    * Fixed a bug with the dup-r command, where it incorrectly used the same open file modifiers as the the dup-w command, which means that it ends up truncating files rather than opening them for read (#58).
 
 
 ## v4.6.0
