@@ -20,7 +20,7 @@
 * [05ac6c1](05ac6c17776a8084b898389e6d2178aeb2a82208)
     * Fixed several bugs around the execution commands (`exec`, `spawn`, `su-exec`, `su-spawn`) not correctly parsing their arguments.  The sub-argument parser did not check for array size bounds, so more than 100 arguments would cause memory corruption.  Additionally, the commands did not check for whether the argument parsing encountered issues (#56).
     * The `su-exec` and `su-spawn` commands did not drop secondary groups, which could lead to leaking access (#55).
-* []()
+* [7a713da](7a713da707e462f6cf28135fea6220aff2066a1e)
     * Changed the incorrect linked compressed mechanism to instead use a smaller image by using a shared library build of the `presh` image, then links that compressed build with the outer wrapper's statically compiled libc routines.
     * Shrunk the decompression routines so that they don't perform extra compression validation; they assume that the embedded compressed image was correctly compressed.
     * Updated the base README to include the new sizes for this version, and also marked which ones are the compressed versions.
