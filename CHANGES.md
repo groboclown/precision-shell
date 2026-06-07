@@ -15,6 +15,8 @@
     * Updated the `Dockerfile` for the builds to use more modern versions of the packages.
 * [e6c6f4b](e6c6f4b1e87d321e9963607634ccfd7d410256b6)
     * Fixed a bug with the `dup-r` command, where it incorrectly used the same open file modifiers as the the `dup-w` command, which means that it ends up truncating files rather than opening them for read (#58).
+* [3cf56f6](3cf56f6d93b7609a720c51b7a607f2fb3461eacc)
+    * Fixed a bug with the exit command where it incorrectly checks the result of parsing the argument, leading to a potential wrong exit code (#59).
 * [248afb5](248afb51d4ff5e7d3f9d1cc6b79f2926ce68ba9a)
     * Fixed a bug with `wait-pid` command, where it did not properly stop on error conditions, but instead kept running, and incorrectly reap child processes (#57).
 * [05ac6c1](05ac6c17776a8084b898389e6d2178aeb2a82208)
