@@ -57,20 +57,21 @@ while [ $i -lt ${set_count} ] ; do
         # See internal-docker-make.sh
         fz1=0
         cmp=""
-        # no lk at the moment, as it doesn't work.
-        for f in fd-tinflate fd-tinyzzz-lzma fd-tinyzzz-zstd ; do
-            if [ -f "${outdir}/presh-${f}" ] ; then
-                if [ -z "${cmp}" ] ; then
-                    cmp="${f}"
-                    fz1=$( wc -c <"${outdir}/presh-${f}" )
-                else
-                    fz2=$( wc -c <"${outdir}/presh-${f}" )
-                    if [ ${fz2} -lt ${fz1} ] ; then
+        for pref in fd so ; do
+            for f in ${pref}-tinflate ${pref}-tinyzzz-lzma ${pref}-tinyzzz-zstd ; do
+                if [ -f "${outdir}/presh-${f}" ] ; then
+                    if [ -z "${cmp}" ] ; then
                         cmp="${f}"
-                        fz1=${fz2}
+                        fz1=$( wc -c <"${outdir}/presh-${f}" )
+                    else
+                        fz2=$( wc -c <"${outdir}/presh-${f}" )
+                        if [ ${fz2} -lt ${fz1} ] ; then
+                            cmp="${f}"
+                            fz1=${fz2}
+                        fi
                     fi
                 fi
-            fi
+            done
         done
 
         if [ ! -z "${cmp}" ] ; then

@@ -12,7 +12,7 @@ RUN npm ci --omit=dev
 
 # ---------------------------------------------------------------------------
 # Create precision shell
-FROM public.ecr.aws/docker/library/alpine:3.22 AS presh-builder
+FROM public.ecr.aws/docker/library/alpine:3 AS presh-builder
 
 WORKDIR /opt/precision-shell
 

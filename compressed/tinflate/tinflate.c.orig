@@ -25,8 +25,7 @@
 
 #include "tinf.h"
 
-// All error checks removed, as this assumes the source has correct compression.
-// #include <assert.h>
+#include <assert.h>
 #include <limits.h>
 
 #if defined(UINT_MAX) && (UINT_MAX) < 0xFFFFFFFFUL
@@ -114,7 +113,7 @@ static int tinf_build_tree(struct tinf_tree *t, const unsigned char *lengths,
 	unsigned short offs[16];
 	unsigned int i, num_codes, available;
 
-	//assert(num <= 288);
+	assert(num <= 288);
 
 	for (i = 0; i < 16; ++i) {
 		t->counts[i] = 0;
@@ -124,7 +123,7 @@ static int tinf_build_tree(struct tinf_tree *t, const unsigned char *lengths,
 
 	/* Count number of codes for each non-zero length */
 	for (i = 0; i < num; ++i) {
-		//assert(lengths[i] <= 15);
+		assert(lengths[i] <= 15);
 
 		if (lengths[i]) {
 			t->max_sym = i;
@@ -178,7 +177,7 @@ static int tinf_build_tree(struct tinf_tree *t, const unsigned char *lengths,
 
 static void tinf_refill(struct tinf_data *d, int num)
 {
-	//assert(num >= 0 && num <= 32);
+	assert(num >= 0 && num <= 32);
 
 	/* Read bytes until at least num bits available */
 	while (d->bitcount < num) {
@@ -191,14 +190,14 @@ static void tinf_refill(struct tinf_data *d, int num)
 		d->bitcount += 8;
 	}
 
-	//assert(d->bitcount <= 32);
+	assert(d->bitcount <= 32);
 }
 
 static unsigned int tinf_getbits_no_refill(struct tinf_data *d, int num)
 {
 	unsigned int bits;
 
-	//assert(num >= 0 && num <= d->bitcount);
+	assert(num >= 0 && num <= d->bitcount);
 
 	/* Get bits from tag */
 	bits = d->tag & ((1UL << num) - 1);
@@ -245,7 +244,7 @@ static int tinf_decode_symbol(struct tinf_data *d, const struct tinf_tree *t)
 	for (len = 1; ; ++len) {
 		offs = 2 * offs + tinf_getbits(d, 1);
 
-		//assert(len <= 15);
+		assert(len <= 15);
 
 		if (offs < t->counts[len]) {
 			break;
@@ -255,7 +254,7 @@ static int tinf_decode_symbol(struct tinf_data *d, const struct tinf_tree *t)
 		offs -= t->counts[len];
 	}
 
-	//assert(base + offs >= 0 && base + offs < 288);
+	assert(base + offs >= 0 && base + offs < 288);
 
 	return t->symbols[base + offs];
 }
@@ -274,7 +273,7 @@ static int tinf_decode_trees(struct tinf_data *d, struct tinf_tree *lt,
 
 	unsigned int hlit, hdist, hclen;
 	unsigned int i, num, length;
-	// int res;
+	int res;
 
 	/* Get 5 bits HLIT (257-286) */
 	hlit = tinf_getbits_base(d, 5, 257);
@@ -294,9 +293,9 @@ static int tinf_decode_trees(struct tinf_data *d, struct tinf_tree *lt,
 	 *
 	 * See also: https://github.com/madler/zlib/issues/82
 	 */
-	//if (hlit > 286 || hdist > 30) {
-	//	return TINF_DATA_ERROR;
-	//}
+	if (hlit > 286 || hdist > 30) {
+		return TINF_DATA_ERROR;
+	}
 
 	for (i = 0; i < 19; ++i) {
 		lengths[i] = 0;
@@ -311,25 +310,24 @@ static int tinf_decode_trees(struct tinf_data *d, struct tinf_tree *lt,
 	}
 
 	/* Build code length tree (in literal/length tree to save space) */
-	// res = tinf_build_tree(lt, lengths, 19);
-	tinf_build_tree(lt, lengths, 19);
+	res = tinf_build_tree(lt, lengths, 19);
 
-	//if (res != TINF_OK) {
-	//	return res;
-	//}
+	if (res != TINF_OK) {
+		return res;
+	}
 
 	/* Check code length tree is not empty */
-	//if (lt->max_sym == -1) {
-	//	return TINF_DATA_ERROR;
-	//}
+	if (lt->max_sym == -1) {
+		return TINF_DATA_ERROR;
+	}
 
 	/* Decode code lengths for the dynamic trees */
 	for (num = 0; num < hlit + hdist; ) {
 		int sym = tinf_decode_symbol(d, lt);
 
-		//if (sym > lt->max_sym) {
-		//	return TINF_DATA_ERROR;
-		//}
+		if (sym > lt->max_sym) {
+			return TINF_DATA_ERROR;
+		}
 
 		switch (sym) {
 		case 16:
@@ -356,9 +354,9 @@ static int tinf_decode_trees(struct tinf_data *d, struct tinf_tree *lt,
 			break;
 		}
 
-		//if (length > hlit + hdist - num) {
-		//	return TINF_DATA_ERROR;
-		//}
+		if (length > hlit + hdist - num) {
+			return TINF_DATA_ERROR;
+		}
 
 		while (length--) {
 			lengths[num++] = sym;
@@ -366,24 +364,22 @@ static int tinf_decode_trees(struct tinf_data *d, struct tinf_tree *lt,
 	}
 
 	/* Check EOB symbol is present */
-	//if (lengths[256] == 0) {
-	//	return TINF_DATA_ERROR;
-	//}
+	if (lengths[256] == 0) {
+		return TINF_DATA_ERROR;
+	}
 
 	/* Build dynamic trees */
-	//res = tinf_build_tree(lt, lengths, hlit);
-	tinf_build_tree(lt, lengths, hlit);
+	res = tinf_build_tree(lt, lengths, hlit);
 
-	//if (res != TINF_OK) {
-	//	return res;
-	//}
+	if (res != TINF_OK) {
+		return res;
+	}
 
-	// res = tinf_build_tree(dt, lengths + hlit, hdist);
-	tinf_build_tree(dt, lengths + hlit, hdist);
+	res = tinf_build_tree(dt, lengths + hlit, hdist);
 
-	//if (res != TINF_OK) {
-	//	return res;
-	//}
+	if (res != TINF_OK) {
+		return res;
+	}
 
 	return TINF_OK;
 }
@@ -424,14 +420,14 @@ static int tinf_inflate_block_data(struct tinf_data *d, struct tinf_tree *lt,
 		int sym = tinf_decode_symbol(d, lt);
 
 		/* Check for overflow in bit reader */
-		//if (d->overflow) {
-		//	return TINF_DATA_ERROR;
-		//}
+		if (d->overflow) {
+			return TINF_DATA_ERROR;
+		}
 
 		if (sym < 256) {
-			//if (d->dest == d->dest_end) {
-			//	return TINF_BUF_ERROR;
-			//}
+			if (d->dest == d->dest_end) {
+				return TINF_BUF_ERROR;
+			}
 			*d->dest++ = sym;
 		}
 		else {
@@ -444,9 +440,9 @@ static int tinf_inflate_block_data(struct tinf_data *d, struct tinf_tree *lt,
 			}
 
 			/* Check sym is within range and distance tree is not empty */
-			//if (sym > lt->max_sym || sym - 257 > 28 || dt->max_sym == -1) {
-			//	return TINF_DATA_ERROR;
-			//}
+			if (sym > lt->max_sym || sym - 257 > 28 || dt->max_sym == -1) {
+				return TINF_DATA_ERROR;
+			}
 
 			sym -= 257;
 
@@ -457,21 +453,21 @@ static int tinf_inflate_block_data(struct tinf_data *d, struct tinf_tree *lt,
 			dist = tinf_decode_symbol(d, dt);
 
 			/* Check dist is within range */
-			//if (dist > dt->max_sym || dist > 29) {
-			//	return TINF_DATA_ERROR;
-			//}
+			if (dist > dt->max_sym || dist > 29) {
+				return TINF_DATA_ERROR;
+			}
 
 			/* Possibly get more bits from distance code */
 			offs = tinf_getbits_base(d, dist_bits[dist],
 			                         dist_base[dist]);
 
-			//if (offs > d->dest - d->dest_start) {
-			//	return TINF_DATA_ERROR;
-			//}
+			if (offs > d->dest - d->dest_start) {
+				return TINF_DATA_ERROR;
+			}
 
-			//if (d->dest_end - d->dest < length) {
-			//	return TINF_BUF_ERROR;
-			//}
+			if (d->dest_end - d->dest < length) {
+				return TINF_BUF_ERROR;
+			}
 
 			/* Copy match */
 			for (i = 0; i < length; ++i) {
@@ -486,35 +482,32 @@ static int tinf_inflate_block_data(struct tinf_data *d, struct tinf_tree *lt,
 /* Inflate an uncompressed block of data */
 static int tinf_inflate_uncompressed_block(struct tinf_data *d)
 {
-	// unsigned int length, invlength;
-	//unsigned int length, invlength;
-	unsigned int length;
+	unsigned int length, invlength;
 
-	//if (d->source_end - d->source < 4) {
-	//	return TINF_DATA_ERROR;
-	//}
+	if (d->source_end - d->source < 4) {
+		return TINF_DATA_ERROR;
+	}
 
 	/* Get length */
 	length = read_le16(d->source);
 
 	/* Get one's complement of length */
-	//invlength = read_le16(d->source + 2);
-	read_le16(d->source + 2);
+	invlength = read_le16(d->source + 2);
 
 	/* Check length */
-	//if (length != (~invlength & 0x0000FFFF)) {
-	//	return TINF_DATA_ERROR;
-	//}
+	if (length != (~invlength & 0x0000FFFF)) {
+		return TINF_DATA_ERROR;
+	}
 
 	d->source += 4;
 
-	//if (d->source_end - d->source < length) {
-	//	return TINF_DATA_ERROR;
-	//}
+	if (d->source_end - d->source < length) {
+		return TINF_DATA_ERROR;
+	}
 
-	//if (d->dest_end - d->dest < length) {
-	//	return TINF_BUF_ERROR;
-	//}
+	if (d->dest_end - d->dest < length) {
+		return TINF_BUF_ERROR;
+	}
 
 	/* Copy block */
 	while (length--) {
@@ -542,12 +535,11 @@ static int tinf_inflate_fixed_block(struct tinf_data *d)
 static int tinf_inflate_dynamic_block(struct tinf_data *d)
 {
 	/* Decode trees from stream */
-	// int res = tinf_decode_trees(d, &d->ltree, &d->dtree);
-	tinf_decode_trees(d, &d->ltree, &d->dtree);
+	int res = tinf_decode_trees(d, &d->ltree, &d->dtree);
 
-	//if (res != TINF_OK) {
-	//	return res;
-	//}
+	if (res != TINF_OK) {
+		return res;
+	}
 
 	/* Decode block using decoded trees */
 	return tinf_inflate_block_data(d, &d->ltree, &d->dtree);
@@ -575,7 +567,7 @@ int tinf_uncompress(void *dest, unsigned int *destLen,
 
 	do {
 		unsigned int btype;
-		// int res;
+		int res;
 
 		/* Read final block flag */
 		bfinal = tinf_getbits(&d, 1);
@@ -587,33 +579,30 @@ int tinf_uncompress(void *dest, unsigned int *destLen,
 		switch (btype) {
 		case 0:
 			/* Decompress uncompressed block */
-			//res = tinf_inflate_uncompressed_block(&d);
-			tinf_inflate_uncompressed_block(&d);
+			res = tinf_inflate_uncompressed_block(&d);
 			break;
 		case 1:
 			/* Decompress block with fixed Huffman trees */
-			//res = tinf_inflate_fixed_block(&d);
-			tinf_inflate_fixed_block(&d);
+			res = tinf_inflate_fixed_block(&d);
 			break;
 		case 2:
 			/* Decompress block with dynamic Huffman trees */
-			//res = tinf_inflate_dynamic_block(&d);
-			tinf_inflate_dynamic_block(&d);
+			res = tinf_inflate_dynamic_block(&d);
 			break;
-		//default:
-		//	res = TINF_DATA_ERROR;
-		//	break;
+		default:
+			res = TINF_DATA_ERROR;
+			break;
 		}
 
-		//if (res != TINF_OK) {
-		//	return res;
-		//}
+		if (res != TINF_OK) {
+			return res;
+		}
 	} while (!bfinal);
 
 	/* Check for overflow in bit reader */
-	//if (d.overflow) {
-	//	return TINF_DATA_ERROR;
-	//}
+	if (d.overflow) {
+		return TINF_DATA_ERROR;
+	}
 
 	*destLen = d.dest - d.dest_start;
 

@@ -3,8 +3,8 @@ BINDIR = ../out
 OUTDIR = ../out/tests
 
 # Debug versions are not tested, because they include a bunch
-#   of extra output.
-CMDS = presh
+#   of extra output, and the tests check explicitly for output.
+CMDS = presh presh-fd-tinyzzz-lzma presh-so-tinyzzz-lzma
 
 TEST_SCRIPTS := $(wildcard */*.sh)
 
@@ -22,6 +22,8 @@ $(OUTDIR)/arg_runner: _arg_runner.c
 tests: $(CMDS)
 
 $(CMDS): $(OUTDIR)/arg_runner
+	@echo "========================================================================"
+	@echo "Testing $@"
 	@mkdir -p $(OUTDIR)/$@
 	@cp $(OUTDIR)/arg_runner $(OUTDIR)/$@/arg_runner
 	@TEST_TMP_DIR=$(OUTDIR)/$@ PRESH=$(BINDIR)/$@ $(CURDIR)/all.sh

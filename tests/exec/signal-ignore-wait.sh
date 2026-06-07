@@ -17,13 +17,16 @@ fi
 
 
 # make sure we use the kill program, not the Bash built-in kill.
-kill_exec="$( which kill )"
+kill_exec="$( which kill )" || exit 1
 
 # 15 == ctrl-c
 # 10 == user signal
 
 "${FS}" -c "signal 15 && signal 10 wait" >out.txt 2>err.txt &
 childpid=$!
+
+# Give the application some time to finish starting.
+sleep 1
 
 # ensure it's still running
 "${kill_exec}" "-0" "${childpid}"
@@ -53,7 +56,7 @@ sleep 1
 "${kill_exec}" "-0" "${childpid}"
 res=$?
 if [ ${res} -ne 0 ] ; then
-    echo "Did not stay alive on wait (2)."
+    echo "Did not stay alive on wait (2) (${res})."
     echo "stdout:"
     cat out.txt
     echo "stderr:"
@@ -61,7 +64,6 @@ if [ ${res} -ne 0 ] ; then
     exit 1
 fi
 
-sleep 1
 "${kill_exec}" "-10" "${childpid}"
 res=$?
 if [ ${res} -ne 0 ] ; then

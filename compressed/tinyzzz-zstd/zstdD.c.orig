@@ -2,7 +2,7 @@
 #include <stdint.h>   // uint8_t, uint16_t, int32_t, uint64_t
 #include <string.h>   // memset, memcpy
 #include <stdlib.h>   // malloc, free, exit
-//#include <stdio.h>    // printf
+#include <stdio.h>    // printf
 
 
 typedef uint8_t  u8;
@@ -17,14 +17,13 @@ typedef uint64_t u64;
 #define MAX_SEQ_SIZE          (0x18000)
 
 /// This decoder calls exit(1) when it encounters an error, however a production library should propagate error codes
-//#define ERROR(msg)               { printf("Error: %s\n", (msg)); exit(1); }
-//#define ERROR_IF(cond, msg)      { if((cond)) ERROR(msg); }
-//#define ERROR_I_SIZE_IF(cond)    { ERROR_IF((cond), ("Input buffer smaller than it should be or input is corrupted")); }
-//#define ERROR_O_SIZE_IF(cond)    { ERROR_IF((cond), ("Output buffer overflow")); }
-//#define ERROR_CORRUPT_IF(cond)   { ERROR_IF((cond), ("Corruption detected while decompressing")); }
-//#define ERROR_NOT_ZSTD_IF(cond)  { ERROR_IF((cond), ("This data is not valid ZSTD frame")); }
-// Valid error, but handled separately.
-//#define ERROR_MALLOC_IF(cond)    { ERROR_IF((cond), ("Memory allocation error")); }
+#define ERROR(msg)               { printf("Error: %s\n", (msg)); exit(1); }
+#define ERROR_IF(cond, msg)      { if((cond)) ERROR(msg); }
+#define ERROR_I_SIZE_IF(cond)    { ERROR_IF((cond), ("Input buffer smaller than it should be or input is corrupted")); }
+#define ERROR_O_SIZE_IF(cond)    { ERROR_IF((cond), ("Output buffer overflow")); }
+#define ERROR_CORRUPT_IF(cond)   { ERROR_IF((cond), ("Corruption detected while decompressing")); }
+#define ERROR_NOT_ZSTD_IF(cond)  { ERROR_IF((cond), ("This data is not valid ZSTD frame")); }
+#define ERROR_MALLOC_IF(cond)    { ERROR_IF((cond), ("Memory allocation error")); }
 
 #define HUF_MAX_BITS     (13)
 #define HUF_MAX_SYMBS    (256)
@@ -100,14 +99,14 @@ static istream_t istream_new (u8 *ptr, size_t len) {
 }
 
 static u8 istream_get_curr_byte (istream_t *p_st) {
-    // ERROR_I_SIZE_IF(p_st->p >= p_st->plimit);
+    ERROR_I_SIZE_IF(p_st->p >= p_st->plimit);
     return p_st->p[0];
 }
 
 static u64 istream_readbytes (istream_t *p_st, u8 n_bytes) {
     u64 value = 0;
     u8  smt = 0;
-    // ERROR_CORRUPT_IF(p_st->c != 0);
+    ERROR_CORRUPT_IF(p_st->c != 0);
     for (; n_bytes>0; n_bytes--) {
         value |= ((u64)istream_get_curr_byte(p_st)) << smt;
         p_st->p ++;
@@ -121,7 +120,7 @@ static u64 istream_readbits (istream_t *p_st, u8 n_bits) {
     u8 bitpos_end   = p_st->c + n_bits;
     u8 bytepos_end  = bitpos_end / 8;
     u64 valueh, valuel=0;
-    // ERROR_IF(n_bits==0, "why???");
+    ERROR_IF(n_bits==0, "why???");
     p_st->c = 0;
     valueh = istream_readbytes(p_st, bytepos_end);
     valueh >>= bitpos_start;
@@ -145,14 +144,14 @@ static void istream_align (istream_t *p_st) {
 }
 
 static size_t istream_get_remain_len (istream_t *p_st) {
-    // ERROR_CORRUPT_IF(p_st->c != 0);
+    ERROR_CORRUPT_IF(p_st->c != 0);
     return (p_st->plimit - p_st->p);
 }
 
 static u8 *istream_skip (istream_t* p_st, size_t len) {
     u8 *ptr = p_st->p;
-    // ERROR_CORRUPT_IF(p_st->c != 0);
-    // ERROR_I_SIZE_IF(len > (p_st->plimit - p_st->p));
+    ERROR_CORRUPT_IF(p_st->c != 0);
+    ERROR_I_SIZE_IF(len > (p_st->plimit - p_st->p));
     p_st->p += len;
     return ptr;
 }
@@ -213,15 +212,15 @@ static u8 backward_stream_load_and_judge_ended (backward_stream_t *p_bst) {
 
 static void backward_stream_check_ended (backward_stream_t *p_bst) {
     backward_stream_load(p_bst);
-    // ERROR_CORRUPT_IF((p_bst->p + 8) != p_bst->pbase);
-    // ERROR_CORRUPT_IF(p_bst->c != 0);
+    ERROR_CORRUPT_IF((p_bst->p + 8) != p_bst->pbase);
+    ERROR_CORRUPT_IF(p_bst->c != 0);
 }
 
 /// 用 istream_t 对象初始化一个 backward_stream_t 对象 ，用于解码FSE流和huffman流   
 static backward_stream_t backward_stream_new (istream_t st, u8 n_bits_for_huf_read) {
     backward_stream_t bst;
-    // ERROR_CORRUPT_IF(st.c != 0);
-    // ERROR_CORRUPT_IF(st.p >= st.plimit);
+    ERROR_CORRUPT_IF(st.c != 0);
+    ERROR_CORRUPT_IF(st.p >= st.plimit);
     bst.smt   = sizeof(bst.data)*8 - n_bits_for_huf_read;
     bst.pbase = st.p;
     bst.p     = st.plimit - 8;
@@ -262,7 +261,7 @@ static i32 decode_fse_freqs (istream_t *p_st_src, i32 *p_freq, i32 m_bits) {
             } while (repeat == 3);
         }
     }
-    // ERROR_CORRUPT_IF (remaining != 1 || n_symb >= FSE_MAX_SYMBS);
+    ERROR_CORRUPT_IF (remaining != 1 || n_symb >= FSE_MAX_SYMBS);
     istream_align(p_st_src);
 
     return n_symb;
@@ -277,8 +276,8 @@ static void build_fse_table (FSE_table *p_ftab, i32 *p_freq, i32 n_symb) {
     i32 step = (pos_limit >> 1) + (pos_limit >> 3) + 3;
     i32 s, i;
 
-    // ERROR_CORRUPT_IF(p_ftab->m_bits > FSE_MAX_BITS);
-    //ERROR_CORRUPT_IF(n_symb > FSE_MAX_SYMBS);
+    ERROR_CORRUPT_IF(p_ftab->m_bits > FSE_MAX_BITS);
+    ERROR_CORRUPT_IF(n_symb > FSE_MAX_SYMBS);
 
     for (s=0; s<n_symb; s++) {
         if (p_freq[s] == -1) {  // -1是一种特殊的符号频率，代表该symbol频率很低(比1更低)，把他们放在顶部   
@@ -300,7 +299,7 @@ static void build_fse_table (FSE_table *p_ftab, i32 *p_freq, i32 n_symb) {
         }
     }
 
-    // ERROR_CORRUPT_IF(pos != 0);
+    ERROR_CORRUPT_IF(pos != 0);
     
     for (i=0; i<pos_limit; i++) {         // fill baseline and num bits  
         u8 symbol = p_ftab->table[i];
@@ -315,7 +314,7 @@ static void decode_and_build_fse_table (FSE_table *p_ftab, istream_t *p_st_src, 
     i32 n_fse_symb;
     i32 p_fse_freq [FSE_MAX_SYMBS] = {0};
     p_ftab->m_bits = 5 + istream_readbits(p_st_src, 4);
-    // ERROR_CORRUPT_IF(p_ftab->m_bits > max_m_bits);
+    ERROR_CORRUPT_IF(p_ftab->m_bits > max_m_bits);
     n_fse_symb = decode_fse_freqs(p_st_src, p_fse_freq, p_ftab->m_bits);
     build_fse_table(p_ftab, p_fse_freq, n_fse_symb);
 }
@@ -367,12 +366,12 @@ static void convert_huf_weights_to_bits (u8 *p, size_t n_symb) {
     u8  max_bits;
     size_t i;
     for (i=0; i<n_symb-1; i++) {
-        // ERROR_CORRUPT_IF(p[i] > HUF_MAX_BITS);
+        ERROR_CORRUPT_IF(p[i] > HUF_MAX_BITS);
         sum += p[i] ? ((u64)1<<(p[i]-1)) : 0;
     }
     max_bits = 1 + highest_set_bit(sum);
     left = (1 << max_bits) - sum;
-    // ERROR_CORRUPT_IF(left & (left - 1));      // left 必须是2的指数   
+    ERROR_CORRUPT_IF(left & (left - 1));      // left 必须是2的指数   
     p[n_symb-1] = highest_set_bit(left) + 1;
     for (i=0; i<n_symb; i++) {
         if (p[i]) {
@@ -388,7 +387,7 @@ static void build_huf_table (frame_context_t *p_ctx, u8 *bits, i32 n_symb) {
     i32 rank_count [HUF_MAX_BITS + 1] = {0};
     p_ctx->huf_m_bits = 0;
     for (i=0; i<n_symb; i++) {
-        // ERROR_CORRUPT_IF(bits[i] > HUF_MAX_BITS);
+        ERROR_CORRUPT_IF(bits[i] > HUF_MAX_BITS);
         rank_count[bits[i]]++;
         if (p_ctx->huf_m_bits < bits[i]) {
             p_ctx->huf_m_bits = bits[i];
@@ -403,7 +402,7 @@ static void build_huf_table (frame_context_t *p_ctx, u8 *bits, i32 n_symb) {
         rank_idx[i - 1] = rank_idx[i] + rank_count[i] * (1 << ((i32)p_ctx->huf_m_bits - i));
         memset(&p_ctx->huf_n_bits[rank_idx[i]], i, rank_idx[i - 1] - rank_idx[i]);  // The entire range takes the same number of bits so we can memset it 
     }
-    // ERROR_CORRUPT_IF(rank_idx[0] != (1 << p_ctx->huf_m_bits));
+    ERROR_CORRUPT_IF(rank_idx[0] != (1 << p_ctx->huf_m_bits));
     for (i=0; i<n_symb; i++) {  // fill in the table
         if (bits[i] != 0) {
             i32 code = rank_idx[bits[i]];  // Allocate a code for this symbol and set its range in the table 
@@ -418,7 +417,7 @@ static void build_huf_table (frame_context_t *p_ctx, u8 *bits, i32 n_symb) {
 static void decode_and_build_huf_table (frame_context_t *p_ctx, istream_t *p_st_src) {
     u8 p_weights_or_bits [HUF_MAX_SYMBS] = {0};
     size_t n_symb = decode_huf_weights(p_st_src, p_weights_or_bits) + 1;  // 最后一个weight不编码，而是算出来的，所以这里要+1  
-    // ERROR_CORRUPT_IF(n_symb > HUF_MAX_SYMBS);
+    ERROR_CORRUPT_IF(n_symb > HUF_MAX_SYMBS);
     convert_huf_weights_to_bits(p_weights_or_bits, n_symb);
     build_huf_table(p_ctx, p_weights_or_bits, n_symb);
 }
@@ -457,8 +456,8 @@ static void huf_decode_4x1 (frame_context_t *p_ctx, istream_t *p_st_src, size_t 
     istream_t st4 = *p_st_src;
     size_t n_lit123 = ((n_lit+3) / 4);
     size_t n_lit4   = n_lit - n_lit123 * 3;
-    // ERROR_CORRUPT_IF(n_lit < 6);
-    // ERROR_CORRUPT_IF(n_lit123 < n_lit4);
+    ERROR_CORRUPT_IF(n_lit < 6);
+    ERROR_CORRUPT_IF(n_lit123 < n_lit4);
     huf_decode_1x1(p_ctx, &st1, n_lit123, p_dst);
     huf_decode_1x1(p_ctx, &st2, n_lit123, p_dst+n_lit123);
     huf_decode_1x1(p_ctx, &st3, n_lit123, p_dst+n_lit123*2);
@@ -478,7 +477,7 @@ static size_t decode_literals (frame_context_t *p_ctx, istream_t *p_st_src) {
             case 1:  n_lit =  istream_readbits(p_st_src, 12);           break;
             default: n_lit =  istream_readbits(p_st_src, 20);           break;
         }
-        // ERROR_CORRUPT_IF(n_lit > ZSTD_BLOCK_SIZE_MAX);
+        ERROR_CORRUPT_IF(n_lit > ZSTD_BLOCK_SIZE_MAX);
         if (lit_type == 0) {
             memcpy(p_ctx->buf_lit, istream_skip(p_st_src, n_lit) , n_lit);
         } else {
@@ -495,10 +494,10 @@ static size_t decode_literals (frame_context_t *p_ctx, istream_t *p_st_src) {
             default: n_lit    = istream_readbits(p_st_src, 18);
                      huf_size = istream_readbits(p_st_src, 18);  break;
         }
-        // ERROR_CORRUPT_IF(n_lit > ZSTD_BLOCK_SIZE_MAX);
+        ERROR_CORRUPT_IF(n_lit > ZSTD_BLOCK_SIZE_MAX);
         st_huf = istream_fork_substream(p_st_src, huf_size);
         if (lit_type == 3) {                            // 复用前一个 block 的 huffman table  
-            // ERROR_CORRUPT_IF(!p_ctx->huf_table_exist);  // huffman table 必须已经存在  
+            ERROR_CORRUPT_IF(!p_ctx->huf_table_exist);  // huffman table 必须已经存在  
         } else {                                        // 需要解码 huffman table  
             decode_and_build_huf_table(p_ctx, &st_huf);
             p_ctx->huf_table_exist = 1;
@@ -539,7 +538,7 @@ static void decode_and_build_ll_or_of_or_ml_fse_table (FSE_table *p_ftab, istrea
             break;
         }
         default:{ // Repeat_Mode
-            // ERROR_CORRUPT_IF(!p_ftab->exist);
+            ERROR_CORRUPT_IF(!p_ftab->exist);
             break;
         }
     }
@@ -611,7 +610,7 @@ static void decode_sequences_by_fse_and_execute (frame_context_t *p_ctx, istream
 
             u64 of, ml, ll;
             
-            // ERROR_CORRUPT_IF(ll_code > MAX_LL_CODE || ml_code > MAX_ML_CODE);
+            ERROR_CORRUPT_IF(ll_code > MAX_LL_CODE || ml_code > MAX_ML_CODE);
 
             backward_stream_load(&bst);
             of = ((u64)1 << of_code)   + backward_stream_readmove(&bst, of_code);   // "Decoding starts by reading the Number_of_Bits required to decode Offset. It then does the same for Match_Length, and then for Literals_Length."
@@ -654,7 +653,7 @@ static void decode_blocks_in_a_frame (frame_context_t *p_ctx, istream_t *p_st_sr
         switch (block_type) {
             case 0:    // Raw_Block
             case 1:    // RLE_Block
-                // ERROR_O_SIZE_IF(block_len > (p_dst_limit - *pp_dst));
+                ERROR_O_SIZE_IF(block_len > (p_dst_limit - *pp_dst));
                 if (block_type == 0) {
                     memcpy(*pp_dst, istream_skip(p_st_src, block_len), block_len);
                 } else {
@@ -669,7 +668,7 @@ static void decode_blocks_in_a_frame (frame_context_t *p_ctx, istream_t *p_st_sr
                 decode_sequences_by_fse_and_execute(p_ctx, &st_blk, n_seq, n_lit, pp_dst, p_dst_limit);
                 break;
             }
-            // default: ERROR_CORRUPT_IF(1);
+            default: ERROR_CORRUPT_IF(1);
         }
     } while (!block_last);
     if (p_ctx->checksum_flag) {
@@ -683,12 +682,12 @@ static void parse_frame_header (istream_t *p_st_src, u8 *p_checksum_flag, size_t
 
     dictionary_id_flag      = istream_readbits(p_st_src, 2);   // 1-0  Dictionary_ID_flag"
     *p_checksum_flag        = istream_readbits(p_st_src, 1);   // 2    checksum_flag
-    //ERROR_CORRUPT_IF(istream_readbits(p_st_src, 1) != 0);      // 3    Reserved_bit
+    ERROR_CORRUPT_IF(istream_readbits(p_st_src, 1) != 0);      // 3    Reserved_bit
     istream_readbits(p_st_src, 1);                             // 4    Unused_bit
     single_segment_flag     = istream_readbits(p_st_src, 1);   // 5    Single_Segment_flag
     frame_content_size_flag = istream_readbits(p_st_src, 2);   // 7-6  Frame_Content_Size_flag
 
-    //ERROR_IF(dictionary_id_flag, "This zstd data is compressed using a dictionary, but this decoder do not support dictionary");
+    ERROR_IF(dictionary_id_flag, "This zstd data is compressed using a dictionary, but this decoder do not support dictionary");
     
     if (!single_segment_flag) {                                // decode window_size if it exists
         u8 mantissa = istream_readbits(p_st_src, 3);           // mantissa: low  3-bit
@@ -723,19 +722,19 @@ static void decode_frame (frame_context_t *p_ctx, istream_t *p_st_src, u8 **pp_d
         p_ctx->prev_of[1] = 4;
         p_ctx->prev_of[2] = 8;
         parse_frame_header(p_st_src, &p_ctx->checksum_flag, &p_ctx->window_size, &decoded_len);
-        //if (decoded_len) {
-        //    ERROR_O_SIZE_IF(decoded_len > (p_dst_limit - p_dst_base));
-        //}
+        if (decoded_len) {
+            ERROR_O_SIZE_IF(decoded_len > (p_dst_limit - p_dst_base));
+        }
         decode_blocks_in_a_frame(p_ctx, p_st_src, pp_dst, p_dst_limit);
-        //if (decoded_len) {
-        //    ERROR_CORRUPT_IF(decoded_len != (*pp_dst - p_dst_base));
-        //}
+        if (decoded_len) {
+            ERROR_CORRUPT_IF(decoded_len != (*pp_dst - p_dst_base));
+        }
     } else if (SKIP_MAGIC_NUMBER_MIN <= magic && magic <= SKIP_MAGIC_NUMBER_MAX) {
         size_t skip_frame_len = istream_readbytes(p_st_src, 4);
         istream_skip(p_st_src, skip_frame_len);
         // printf("  skip frame length = %lu\n", skip_frame_len);
-    //} else {
-    //    ERROR_NOT_ZSTD_IF(1);
+    } else {
+        ERROR_NOT_ZSTD_IF(1);
     }
 }
 
@@ -745,16 +744,12 @@ static void decode_frame (frame_context_t *p_ctx, istream_t *p_st_src, u8 **pp_d
 /// ZSTD 解码函数（外部可调用） 
 //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
-int zstdD (u8 *p_src, size_t src_len, u8 *p_dst, size_t *p_dst_len) {
+void zstdD (u8 *p_src, size_t src_len, u8 *p_dst, size_t *p_dst_len) {
     u8 *p_dst_base  = p_dst;
     u8 *p_dst_limit = p_dst + (*p_dst_len);
     istream_t st_src = istream_new(p_src, src_len);
     frame_context_t *p_ctx = (frame_context_t*)malloc(sizeof(frame_context_t));
-    // Valid error checking.
-    // ERROR_MALLOC_IF(p_ctx == NULL);
-    if (p_ctx == NULL) {
-        return 1;
-    }
+    ERROR_MALLOC_IF(p_ctx == NULL);
     while (istream_get_remain_len(&st_src) > 0) {
         decode_frame(p_ctx, &st_src, &p_dst, p_dst_limit);
     }

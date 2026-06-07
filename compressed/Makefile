@@ -13,13 +13,12 @@ SRC ?= $(OUTDIR)/presh
 # The binary blob for the different versions of the stub runner.
 # Very explicitly done to allow for easy suffix.
 SRC_FD := $(SRC)-fd
-SRC_LK := $(SRC)-lk
+SRC_SO := $(SRC)-so
+SRC_SHARED_SO := $(OUTDIR)/presh-shared.so
 
 # For loop magic.
 DECOMPRESS_IMPLEMENTATIONS = tinflate tinyzzz-lzma tinyzzz-zstd
-# lk type doesn't work at the moment.
-#SRC_TYPES = fd lk
-SRC_TYPES = fd
+SRC_TYPES = fd so
 SRC_BIN_FILES = $(foreach ST,$(SRC_TYPES),$(SRC)-$(ST))
 
 
@@ -50,13 +49,17 @@ clean:
 		$(OUTDIR)/extract-elf \
 		$(OUTDIR)/stub-run-fd.c \
 		$(OUTDIR)/stub-run-lk.c \
+		$(OUTDIR)/stub-run-so.c \
 		$(SRC_FD) \
-		$(SRC_LK) \
+		$(SRC_SO) \
 		2>/dev/null || true
 
 $(SRC):
 	@echo "You must run 'make' in the src directory to build this."
 	exit 1
+
+$(SRC_SHARED_SO):
+	$(MAKE) -C ../src shared OUTDIR=$(OUTDIR) SHARED_CC="$(STD_CC)"
 
 # ---------------------------------------------------------------------
 # Helper utilities
@@ -72,11 +75,12 @@ $(OUTDIR)/extract-elf: extract-elf.c extract-elf.h
 # ---------------------------------------------------------------------
 # The stub runner binaries and runners.
 # Runs off the source ELF file.  Generates its own binary file.
-$(SRC_LK): $(SRC) $(OUTDIR)/extract-elf
-	mkdir -p $(OUTDIR)
-	$(OUTDIR)/extract-elf $(SRC) $(OUTDIR)/stub-run-lk.c $(SRC_LK)
 
-$(OUTDIR)/stub-run-lk.c: $(SRC_LK)
+$(SRC_SO): $(SRC_SHARED_SO) $(OUTDIR)/extract-elf
+	mkdir -p $(OUTDIR)
+	$(OUTDIR)/extract-elf $(SRC_SHARED_SO) $(OUTDIR)/stub-run-so.c $(SRC_SO)
+
+$(OUTDIR)/stub-run-so.c: $(SRC_SO)
 
 $(SRC_FD): $(SRC)
 	mkdir -p $(OUTDIR)
@@ -209,7 +213,7 @@ $(COMP_BIN).c: $(COMP_BIN)
 $(BIN): stub.c $(COMP_BIN).c $(OUTDIR)/stub-run-$(SRC_TYPE).c stub-$(COMP_IMPL).c $(wildcard $(COMP_IMPL)/*.c) $(wildcard $(COMP_IMPL)/*.h) stub-common.c stub-common.h data-payload.h
 	echo "Building $(BIN) for $(COMP_IMPL) with source type $(SRC_TYPE)"
 	# $(CC) $(CFLAGS) $(LFLAGS) $(MINFLAGS) stub.c $(COMP_BIN).c $(OUTDIR)/stub-run-$(SRC_TYPE).c stub-$(COMP_IMPL).c $(wildcard $(COMP_IMPL)/*.c) stub-common.c -o $(BIN)
-	$(CC) $(CFLAGS) $(LFLAGS) $(DFLAGS) stub.c $(COMP_BIN).c $(OUTDIR)/stub-run-$(SRC_TYPE).c stub-$(COMP_IMPL).c $(wildcard $(COMP_IMPL)/*.c) stub-common.c -o $(BIN)
+	$(CC) $(CFLAGS) $(LFLAGS) -no-pie $(DFLAGS) stub.c $(COMP_BIN).c $(OUTDIR)/stub-run-$(SRC_TYPE).c stub-$(COMP_IMPL).c $(wildcard $(COMP_IMPL)/*.c) stub-common.c -o $(BIN)
 	strip -x -R .comment -R .note -R .gnu.version -R .gnu.version_r $(BIN) || true
 
 build: $(BIN)
