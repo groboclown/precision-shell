@@ -88,12 +88,11 @@ for cmd in "${command_list[@]}" ; do
         else
             echo "===================================================" > "${mkout}"
             echo "${cmdarg}" >> "${mkout}"
-            ( cd ../tests && QUIET=1 make tests >> "${mkout}" 2>&1 )
+            # ( cd ../tests && QUIET=1 make tests >> "${mkout}" 2>&1 )
+            ( cd ../tests && make tests >> "${mkout}" 2>&1 )
             if [ $? != 0 ] ; then
-                t=/tmp/tmp.$$.txt
-                cat "${failures}" "${mkout}" > "${t}"
-                rm "${failures}"
-                mv "${t}" "${failures}"
+                echo "Failed running with ${cmdarg}"
+                cat "${mkout}" >> "${failures}"
                 fail_count=$(( fail_count + 1 ))
             fi
         fi
