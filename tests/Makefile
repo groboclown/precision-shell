@@ -25,6 +25,7 @@ tests: $(CMDS)
 
 $(CMDS): $(OUTDIR)/arg_runner
 	@echo "========================================================================"
+	@test -f $(OUTDIR)/$@ || ( ls -l $(OUTDIR) ; >&2 echo "Did not compile $(OUTDIR)/$@" ; exit 1 )
 	@echo "Testing $@"
 	@mkdir -p $(OUTDIR)/$@
 	@cp $(OUTDIR)/arg_runner $(OUTDIR)/$@/arg_runner
