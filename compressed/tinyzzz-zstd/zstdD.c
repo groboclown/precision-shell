@@ -679,8 +679,8 @@ static void decode_blocks_in_a_frame (frame_context_t *p_ctx, istream_t *p_st_sr
 
 
 static void parse_frame_header (istream_t *p_st_src, u8 *p_checksum_flag, size_t *p_window_size, size_t *p_decoded_len) {
-    // u8 single_segment_flag, frame_content_size_flag;
-    u8 dictionary_id_flag, single_segment_flag, frame_content_size_flag;
+    //u8 dictionary_id_flag, single_segment_flag, frame_content_size_flag;
+    u8 single_segment_flag, frame_content_size_flag;
 
     // dictionary_id_flag      = istream_readbits(p_st_src, 2);   // 1-0  Dictionary_ID_flag"
     *p_checksum_flag        = istream_readbits(p_st_src, 1);   // 2    checksum_flag
