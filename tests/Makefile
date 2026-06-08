@@ -29,7 +29,7 @@ $(CMDS): $(OUTDIR)/arg_runner
 	@echo "Testing $@"
 	@mkdir -p $(OUTDIR)/$@
 	@cp $(OUTDIR)/arg_runner $(OUTDIR)/$@/arg_runner
-	@TEST_TMP_DIR=$(OUTDIR)/$@ PRESH=$(BINDIR)/$@ DEBUG=1 $(CURDIR)/all.sh
+	@TEST_TMP_DIR=$(OUTDIR)/$@ PRESH=$(BINDIR)/$@ $(CURDIR)/all.sh
 
 .PHONY: $(TEST_SCRIPTS)
 $(TEST_SCRIPTS): $(OUTDIR)/arg_runner
