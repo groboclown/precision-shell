@@ -679,9 +679,10 @@ static void decode_blocks_in_a_frame (frame_context_t *p_ctx, istream_t *p_st_sr
 
 
 static void parse_frame_header (istream_t *p_st_src, u8 *p_checksum_flag, size_t *p_window_size, size_t *p_decoded_len) {
+    // u8 single_segment_flag, frame_content_size_flag;
     u8 dictionary_id_flag, single_segment_flag, frame_content_size_flag;
 
-    dictionary_id_flag      = istream_readbits(p_st_src, 2);   // 1-0  Dictionary_ID_flag"
+    // dictionary_id_flag      = istream_readbits(p_st_src, 2);   // 1-0  Dictionary_ID_flag"
     *p_checksum_flag        = istream_readbits(p_st_src, 1);   // 2    checksum_flag
     //ERROR_CORRUPT_IF(istream_readbits(p_st_src, 1) != 0);      // 3    Reserved_bit
     istream_readbits(p_st_src, 1);                             // 4    Unused_bit
@@ -717,7 +718,7 @@ static void decode_frame (frame_context_t *p_ctx, istream_t *p_st_src, u8 **pp_d
     u64 magic = istream_readbytes(p_st_src, 4);
     if (magic == ZSTD_MAGIC_NUMBER) {
         size_t decoded_len = 0;
-        u8 *p_dst_base = *pp_dst;
+        //u8 *p_dst_base = *pp_dst;
         memset(p_ctx, 0, sizeof(*p_ctx));
         p_ctx->prev_of[0] = 1;
         p_ctx->prev_of[1] = 4;
@@ -760,4 +761,5 @@ int zstdD (u8 *p_src, size_t src_len, u8 *p_dst, size_t *p_dst_len) {
     }
     free(p_ctx);
     *p_dst_len = (p_dst - p_dst_base);
+    return 0;
 }
