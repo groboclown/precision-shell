@@ -211,7 +211,9 @@ $(COMP_BIN).c: $(COMP_BIN)
 
 $(BIN): stub.c $(COMP_BIN).c $(OUTDIR)/stub-run-$(SRC_TYPE).c stub-$(COMP_IMPL).c $(wildcard $(COMP_IMPL)/*.c) $(wildcard $(COMP_IMPL)/*.h) stub-common.c stub-common.h data-payload.h
 	echo "Building $(BIN) for $(COMP_IMPL) with source type $(SRC_TYPE)"
-	$(CC) $(CFLAGS) $(LFLAGS) -no-pie $(MINFLAGS) stub.c $(COMP_BIN).c $(OUTDIR)/stub-run-$(SRC_TYPE).c stub-$(COMP_IMPL).c $(wildcard $(COMP_IMPL)/*.c) stub-common.c -o $(BIN)
+	$(CC) $(CFLAGS) $(LFLAGS) -no-pie $(DFLAGS) stub.c $(COMP_BIN).c $(OUTDIR)/stub-run-$(SRC_TYPE).c stub-$(COMP_IMPL).c $(wildcard $(COMP_IMPL)/*.c) stub-common.c -o $(BIN).1
+	$(CC) $(CFLAGS) $(LFLAGS) $(MINFLAGS) stub.c $(COMP_BIN).c $(OUTDIR)/stub-run-$(SRC_TYPE).c stub-$(COMP_IMPL).c $(wildcard $(COMP_IMPL)/*.c) stub-common.c -o $(BIN).2
+	cp $(BIN).1 $(BIN)
 	strip -x -R .comment -R .note -R .gnu.version -R .gnu.version_r $(BIN) || true
 
 build: $(BIN)

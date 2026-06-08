@@ -41,6 +41,7 @@ int decompress(void *dest, unsigned int destLen,
     //}
     //return destLen != actualDestLen;
 
-    // However, if destLen was constructed correctly, then this is just fine:
-    return lzmaD((uint8_t*) source, sourceLen, dest, (size_t*) &destLen);
+    // Avoid writing a size_t through an unsigned int stack slot on 64-bit builds.
+    size_t actualDestLen = (size_t)destLen;
+    return lzmaD((uint8_t*) source, sourceLen, dest, &actualDestLen);
 }

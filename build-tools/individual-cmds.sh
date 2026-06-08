@@ -88,9 +88,7 @@ for cmd in "${command_list[@]}" ; do
         else
             echo "===================================================" > "${mkout}"
             echo "${cmdarg}" >> "${mkout}"
-            # Due to some issues, the compression construction doesn't construct correctly on clang+musl.
-            # Until that can be ferreted out, this just tests that the primary (non-compressed) version works.
-            ( cd ../tests && QUIET=1 make tests CMDS=presh >> "${mkout}" 2>&1 )
+            ( cd ../tests && QUIET=1 make tests >> "${mkout}" 2>&1 )
             if [ $? != 0 ] ; then
                 echo "Failed running with ${cmdarg}"
                 cat "${mkout}" >> "${failures}"

@@ -353,17 +353,19 @@ static int lzmaDecode (uint8_t *p_src, size_t src_len, uint8_t *p_dst, size_t *p
             uint32_t dist_slot, bcnt;
             
             dist_slot = rangeDecodeInt(&coder, probs_dist_slot[len_min5_minus2], 6);       // decode distance slot (0~63)
-            bcnt  = (dist_slot >> 1) - 1;
-            dist  = (2 | (dist_slot & 1));                                                 // high 2 bits of dist
-            dist<<= bcnt;
-            
-            if        (dist_slot >=14) {                                                   // dist slot = 14~63
-                dist |= rangeDecodeIntByFixedProb (&coder, bcnt-4) << 4;
-                dist |= bitsReverse(rangeDecodeInt(&coder, probs_dist_align, 4), 4);
-            } else if (dist_slot >=4 ) {                                                   // dist slot = 4~13
-                dist |= bitsReverse(rangeDecodeInt(&coder, probs_dist_special[dist_slot-4], bcnt), bcnt);
-            } else {                                                                       // dist slot = 0~3
-                dist  = dist_slot;
+            if (dist_slot < 4) {                                                           // dist slot = 0~3
+                dist = dist_slot;
+            } else {
+                bcnt  = (dist_slot >> 1) - 1;
+                dist  = (2 | (dist_slot & 1));                                             // high 2 bits of dist
+                dist <<= bcnt;
+
+                if (dist_slot >=14) {                                               // dist slot = 14~63
+                    dist |= rangeDecodeIntByFixedProb (&coder, bcnt-4) << 4;
+                    dist |= bitsReverse(rangeDecodeInt(&coder, probs_dist_align, 4), 4);
+                } else {                                                                   // dist slot = 4~13
+                    dist |= bitsReverse(rangeDecodeInt(&coder, probs_dist_special[dist_slot-4], bcnt), bcnt);
+                }
             }
             
             if (dist == 0xFFFFFFFF)                                                        // meeting end marker
