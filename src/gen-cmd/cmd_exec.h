@@ -3,7 +3,7 @@
 /*
 MIT License
 
-Copyright (c) 2022 groboclown
+Copyright (c) 2022,2026 groboclown
 
 Permission is hereby granted, free of charge, to any person obtaining a copy
 of this software and associated documentation files (the "Software"), to deal
@@ -80,13 +80,15 @@ extern const char cmd_name_exec[];
             /* from cmd_exec.h.in:56 */ \
         /* Split the arguments.*/ \
         SHARED_SPLIT__PARSE_ARG \
-        EXEC_DEBUG_REPORT \
-        /* This launches a new executable and terminates this one immediately.*/ \
-        execvp(shared_split_argv[0], (char * const*) shared_split_argv); \
-        /* If the code is still running at this point, then there was an error.*/ \
-        /* Rather than returning, allow the next command argument to run.*/ \
-        /* Additionally, this will allow normal error reporting to report the problem.*/ \
-        global_err = 1; \
+        if (global_err == 0) { \
+            EXEC_DEBUG_REPORT \
+            /* This launches a new executable and terminates this one immediately.*/ \
+            execvp(shared_split_argv[0], (char * const*) shared_split_argv); \
+            /* If the code is still running at this point, then there was an error.*/ \
+            /* Rather than returning, allow the next command argument to run.*/ \
+            /* Additionally, this will allow normal error reporting to report the problem.*/ \
+            global_err = 1; \
+        } \
         break; \
         break;
 #define REQUIRES_ADDL_ARG__EXEC

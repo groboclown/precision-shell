@@ -81,7 +81,8 @@ else
         -fno-align-functions \
         -fno-align-jumps \
         -fno-align-loops \
-        -fno-align-labels
+        -fno-align-labels \
+        -DNDEBUG
 
     #	-Oz \
 

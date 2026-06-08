@@ -46,15 +46,39 @@ while [ $i -lt ${set_count} ] ; do
         >&2 echo "Build failed for: make compressed OUTDIR=${outdir}"
         exit 1
     fi
-    if [ ! -f "${outdir}/presh" ] || [ ! -f "${outdir}/presh-zipped" ] ; then
+    if [ ! -f "${outdir}/presh" ] ; then
         echo "Build failed for: make ${cmds} OUTDIR=${outdir}" >&2
         exit 1
     else
         filesize=$( wc -c <"${outdir}/presh" )
         echo "${filesize}|${name}" >> "${sizefile}"
-        filesize=$( wc -c <"${outdir}/presh-zipped" )
-        echo "${filesize}|${name} (compressed)" >> "${sizefile}"
         # echo "${filesize} < ${name}"
+
+        # See internal-docker-make.sh
+        fz1=0
+        cmp=""
+        for pref in fd so ; do
+            for f in ${pref}-tinflate ${pref}-tinyzzz-lzma ${pref}-tinyzzz-zstd ; do
+                if [ -f "${outdir}/presh-${f}" ] ; then
+                    if [ -z "${cmp}" ] ; then
+                        cmp="${f}"
+                        fz1=$( wc -c <"${outdir}/presh-${f}" )
+                    else
+                        fz2=$( wc -c <"${outdir}/presh-${f}" )
+                        if [ ${fz2} -lt ${fz1} ] ; then
+                            cmp="${f}"
+                            fz1=${fz2}
+                        fi
+                    fi
+                fi
+            done
+        done
+
+        if [ ! -z "${cmp}" ] ; then
+            echo "${fz1}|${name} (${cmp} compressed)" >> "${sizefile}"
+        else
+            ls "${outdir}/*"
+        fi
     fi
     rm -rf "${outdir}"
 

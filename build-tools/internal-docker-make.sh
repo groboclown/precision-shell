@@ -93,15 +93,18 @@ case "${BUILD_MODE}" in
         fi
         echo "make \"${cmdarg}\" ${exargs} all"
         make "${cmdarg}" ${exargs} all
-        if [ -f "out/presh" ] && [ -f "out/presh-zipped" ] ; then
-            fz1=$( wc -c <"out/presh" )
-            fz2=$( wc -c <"out/presh-zipped" )
-            if [ ${fz1} -lt ${fz2} ] ; then
-                cp out/presh out/presh-smallest
-            else
-                cp out/presh-zipped out/presh-smallest
+        cp out/presh out/presh-smallest
+        fz1=$( wc -c <"out/presh-smallest" )
+        # no lk at the moment, as it doesn't work.
+        for f in fd-tinflate fd-tinyzzz-lzma fd-tinyzzz-zstd ; do
+            if [ -f "out/presh-${f}" ] ; then
+                fz2=$( wc -c <"out/presh-${f}" )
+                if [ ${fz2} -lt ${fz1} ] ; then
+                    fz1=${fz2}
+                    cp "out/presh-${f}" "out/presh-smallest"
+                fi
             fi
-        fi
+        done
         ls -lAS out/presh*
 
         ;;

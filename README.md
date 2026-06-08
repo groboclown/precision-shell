@@ -1271,39 +1271,40 @@ If you use the input-enabled build, then you can pass the argument `-` to have t
 
 # Compiled Size
 
+The can also construct a self-decompressing version of the executable - the executable unpacks the actual `presh` executable then runs it.  The table below includes where this mechanism produces a smaller executable.
+
 Last build size:
 
 * Do-nothing build:
-  * [glibc (Ubuntu)](#build-glibc.Dockerfile): 706,568 bytes
-  * [glibc (Arch)](#build-glibc-arch.Dockerfile): 698,808 bytes
-  * [clang/musl (Alpine)](#build-clang.Dockerfile): 25,816 bytes
-  * [musl (Alpine)](#build-musl.Dockerfile): 25,792 bytes
-  * [dietlibc (Alpine)](#build-dietlibc.Dockerfile): 13,200 bytes
+  * [glibc (Ubuntu)](#build-glibc.Dockerfile): 706,456 bytes
+  * [glibc (Arch)](#build-glibc-arch.Dockerfile): 759,904 bytes
+  * [clang/musl (Alpine)](#build-clang.Dockerfile): 25,688 bytes
+  * [musl (Alpine)](#build-musl.Dockerfile): 30,152 bytes
+  * [dietlibc (Alpine)](#build-dietlibc.Dockerfile): 13,096 bytes
 * Minimal build:
-  * glibc (Ubuntu): 710,664 bytes
-  * glibc (Arch): 698,808 bytes
-  * clang/musl (Alpine): 25,816 bytes
-  * musl (Alpine): 25,792 bytes
-  * dietlibc (Alpine): 17,296 bytes
+  * glibc (Ubuntu): 710,552 bytes
+  * glibc (Arch): 759,904 bytes
+  * clang/musl (Alpine): 29,784 bytes
+  * musl (Alpine): 30,152 bytes
+  * dietlibc (Alpine): 17,192 bytes
 * Standard build:
-  * glibc (Ubuntu): 714,760 bytes
-  * glibc (Arch): 702,904 bytes
-  * clang/musl (Alpine): 29,912 bytes
-  * musl (Alpine): 29,888 bytes
-  * dietlibc (Alpine): 17,296 bytes
+  * glibc (Ubuntu): 714,648 bytes
+  * glibc (Arch): 768,096 bytes
+  * clang/musl (Alpine): 29,784 bytes
+  * musl (Alpine): 34,248 bytes
+  * dietlibc (Alpine): 17,192 bytes
 * Non-Network build:
-  * glibc (Ubuntu): 731,144 bytes
-  * glibc (Arch): 727,480 bytes
-  * clang/musl (Alpine): 50,400 bytes
-  * musl (Alpine): 46,280 bytes
-  * dietlibc (Alpine): 29,592 bytes
+  * glibc (Ubuntu): 731,032 bytes
+  * glibc (Arch): 796,800 bytes
+  * clang/musl (Alpine): 50,272 bytes (42,904 bytes using lzma self-decompressing executable)
+  * musl (Alpine): 50,640 bytes (42,200 bytes using lzma self-decompressing executable)
+  * dietlibc (Alpine): 29,488 bytes (28,224 bytes using lzma self-decompressing executable)
 * Full build:
-  * glibc (Ubuntu): 972,872 bytes
-  * glibc (Arch): 944,632 bytes
-  * clang/musl (Alpine): 87,264 bytes
-  * musl (Alpine): 87,240 bytes
-  * musl with self-extracting executable (Alpine): 75,808 bytes
-  * dietlibc (Alpine): 46,072 bytes
+  * glibc (Ubuntu): 972,760 bytes (770,320 bytes using lzma self-decompressing executable)
+  * glibc (Arch): 1,042,624 bytes (825,856 bytes using lzma self-decompressing executable)
+  * clang/musl (Alpine): 91,232 bytes (42,904 bytes using lzma self-decompressing executable)
+  * musl (Alpine): 87,504 bytes (42,200 bytes using lzma self-decompressing executable)
+  * dietlibc (Alpine): 45,968 bytes (28,224 bytes using lzma self-decompressing executable)
 
 *dietlibc [requires](https://www.fefe.de/dietlibc/FAQ.txt) that you either not distribute the compiled executable, or release the executable under GPL v2.*
 

@@ -1,3 +1,35 @@
+## v4.6.1
+
+* [370b26d](370b26da38b3ff96a50004227289e1f9baaa72d4)
+    * Rearranged the `compressed` folder to allow for multiple compression techniques and multiple loaders.  The code now has a cleaner separation between the general headers and the implementing code.
+    * This required massive restructuring of the make file.  It's now a circus of tricks and jumps to keep the file small and easily extensible.
+    * One of the compression algorithms, zstd, requires having the compression tool installed.  If you're running a full compression build, this requires adding zstd to your list of build prerequisites.  To that end, the `build-*.Dockerfile` files have the zstd as a dependency now.
+    * Updated the compressed readme file to describe how to work with this code.
+* [86a1442](86a144298ef63daa9c6f9674c3071f34bd0dca78)
+    * Updated the make to strip out unnecessary sections from the ELF executable files.
+* [259b8e7](259b8e7a7c99a061ba98f49b991bb9ec59de4883)
+    * Added a test to ensure that running `cat-fd` on a symbolic link outputs the linked file's contents correctly.
+    * Added a test to ensure that running `cat-fd` on a broken symbolic link reports the correct error.
+* [a759942](a759942ae2b267023c3af7243531860e957a9f45)
+    * Added the dietlibc distribution into the `vendors` directory, due to issues seen with the source fefe.de site.
+    * Updated the `Dockerfile` for the builds to use more modern versions of the packages.
+* [e6c6f4b](e6c6f4b1e87d321e9963607634ccfd7d410256b6)
+    * Fixed a bug with the `dup-r` command, where it incorrectly used the same open file modifiers as the the `dup-w` command, which means that it ends up truncating files rather than opening them for read (#58).
+* [3cf56f6](3cf56f6d93b7609a720c51b7a607f2fb3461eacc)
+    * Fixed a bug with the exit command where it incorrectly checks the result of parsing the argument, leading to a potential wrong exit code (#59).
+* [248afb5](248afb51d4ff5e7d3f9d1cc6b79f2926ce68ba9a)
+    * Fixed a bug with `wait-pid` command, where it did not properly stop on error conditions, but instead kept running, and incorrectly reap child processes (#57).
+* [05ac6c1](05ac6c17776a8084b898389e6d2178aeb2a82208)
+    * Fixed several bugs around the execution commands (`exec`, `spawn`, `su-exec`, `su-spawn`) not correctly parsing their arguments.  The sub-argument parser did not check for array size bounds, so more than 100 arguments would cause memory corruption.  Additionally, the commands did not check for whether the argument parsing encountered issues (#56).
+    * The `su-exec` and `su-spawn` commands did not drop secondary groups, which could lead to leaking access (#55).
+* [7a713da](7a713da707e462f6cf28135fea6220aff2066a1e)
+    * Changed the incorrect linked compressed mechanism to instead use a smaller image by using a shared library build of the `presh` image, then links that compressed build with the outer wrapper's statically compiled libc routines.
+    * Shrunk the decompression routines so that they don't perform extra compression validation; they assume that the embedded compressed image was correctly compressed.
+    * Updated the base README to include the new sizes for this version, and also marked which ones are the compressed versions.
+    * Fixed some of the samples and tools that use Alpine to reference current versions of libraries.
+    * Fixed the `signal-ignore-wait.sh` test to be less time sensitive.
+
+
 ## v4.6.0
 
 * [c12690c](c12690c5282fdc1aa5ab93bf7b361b742f83fb74)

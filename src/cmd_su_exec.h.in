@@ -1,7 +1,7 @@
 /*
 MIT License
 
-Copyright (c) 2022 groboclown
+Copyright (c) 2022,2026 groboclown
 
 Permission is hereby granted, free of charge, to any person obtaining a copy
 of this software and associated documentation files (the "Software"), to deal
@@ -30,6 +30,7 @@ AsOptional(command="su-exec",
 #include <stdlib.h>
 #include <stdio.h>
 #include <unistd.h>
+#include <grp.h>
 #include "args.h"
 #include "output.h"
 #include "globals.h"
@@ -81,24 +82,29 @@ WithVirtualStep(enum="SU_EXEC__RUN",
     OnArg(
         // Split the arguments.
         SHARED_SPLIT__PARSE_ARG
-        SU_EXEC_DEBUG_REPORT
+        if (global_err == 0) {
+            SU_EXEC_DEBUG_REPORT
 
-        // Delay switching UID and GID until the last possible moment.
-        // Note that gid is done first.
-        global_arg1_i = setgid(global_arg1_i);
-        if (global_arg1_i >= 0) {
-            global_arg1_i = setuid(global_arg2_i);
-            if (global_arg1_i >= 0) {
-                // This launches a new executable and terminates this one immediately.
-                execvp(shared_split_argv[0], (char * const*) shared_split_argv);
+            // Delay switching UID and GID until the last possible moment.
+            tmp_val = setgroups(0, NULL);
+            if (tmp_val >= 0) {
+                // Note that gid is done first.
+                tmp_val = setgid(global_arg1_i);
+                if (tmp_val >= 0) {
+                    tmp_val = setuid(global_arg2_i);
+                    if (tmp_val >= 0) {
+                        // This launches a new executable and terminates this one immediately.
+                        execvp(shared_split_argv[0], (char * const*) shared_split_argv);
+                    }
+                }
             }
-        }
 
-        // Unlike the normal exec, this must exit
-        // immediately due to the setuid/setgid.  We don't
-        // want unexpected commands running with unexpected permissions.
-        stderrP("Failed to su-exec ");
-        stderrPLn(shared_split_argv[0]);
+            // Unlike the normal exec, this must exit
+            // immediately due to the setuid/setgid.  We don't
+            // want unexpected commands running with unexpected permissions.
+            stderrP("Failed to su-exec ");
+            stderrPLn(shared_split_argv[0]);
+        }
         _exit(1);
     )
 )

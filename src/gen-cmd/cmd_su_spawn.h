@@ -37,6 +37,7 @@ SOFTWARE.
 
 #include <stdlib.h>
 #include <unistd.h>
+#include <grp.h>
 #include "args.h"
 #include "output.h"
 #include "globals.h"
@@ -66,34 +67,34 @@ SOFTWARE.
 
     // If this doesn't have another argument, bad things will happen.
 
-/* from cmd_su_spawn.h.in:53 */
+/* from cmd_su_spawn.h.in:54 */
 extern const char cmd_name_su_spawn[];
 #define ENUM_LIST__SU_SPAWN \
-            /* from cmd_su_spawn.h.in:53 */ \
+            /* from cmd_su_spawn.h.in:54 */ \
             COMMAND_INDEX__SU_SPAWN,
 #define VIRTUAL_ENUM_LIST__SU_SPAWN \
-            /* from cmd_su_spawn.h.in:78 */ \
+            /* from cmd_su_spawn.h.in:79 */ \
             COMMAND_INDEX__SU_SPAWN__CMD, \
-            /* from cmd_su_spawn.h.in:130 */ \
+            /* from cmd_su_spawn.h.in:135 */ \
             COMMAND_INDEX__SU_SPAWN__PID,
 #define GLOBAL_VARDEF__SU_SPAWN \
-            /* from cmd_su_spawn.h.in:53 */ \
+            /* from cmd_su_spawn.h.in:54 */ \
             const char cmd_name_su_spawn[] = "su-spawn";
 #define INITIALIZE__SU_SPAWN \
-            /* from cmd_su_spawn.h.in:53 */ \
+            /* from cmd_su_spawn.h.in:54 */ \
             command_list_names[COMMAND_INDEX__SU_SPAWN] = cmd_name_su_spawn;
 #define STARTUP_CASE__SU_SPAWN \
     case COMMAND_INDEX__SU_SPAWN: \
-        /* from cmd_su_spawn.h.in:53 */ \
-            /* from cmd_su_spawn.h.in:57 */ \
+        /* from cmd_su_spawn.h.in:54 */ \
+            /* from cmd_su_spawn.h.in:58 */ \
         /* arg2: uid*/ \
         global_cmd = COMMAND_INDEX__SHARED_INT2; \
         global_arg3_i = COMMAND_INDEX__SU_SPAWN; \
         break;
 #define RUN_CASE__SU_SPAWN \
     case COMMAND_INDEX__SU_SPAWN: \
-        /* from cmd_su_spawn.h.in:53 */ \
-            /* from cmd_su_spawn.h.in:63 */ \
+        /* from cmd_su_spawn.h.in:54 */ \
+            /* from cmd_su_spawn.h.in:64 */ \
         /* arg1: gid*/ \
         LOG(":: storing gid "); \
         LOGLN(global_arg); \
@@ -107,51 +108,56 @@ extern const char cmd_name_su_spawn[];
         global_cmd = COMMAND_INDEX__SU_SPAWN__CMD; \
         break; \
     case COMMAND_INDEX__SU_SPAWN__CMD: \
-        /* from cmd_su_spawn.h.in:78 */ \
-            /* from cmd_su_spawn.h.in:79 */ \
+        /* from cmd_su_spawn.h.in:79 */ \
+            /* from cmd_su_spawn.h.in:80 */ \
         /* global_arg3_i == pid*/ \
         /* Split the arguments first.  This is inefficient for the*/ \
         /* parent, but cleans up debug output.*/ \
         SHARED_SPLIT__PARSE_ARG \
-        SU_SPAWN_DEBUG_REPORT \
-        /* Fork the process.  This will have the potential to*/ \
-        /* cause very weird behavior if no argument is given.*/ \
-        global_arg3_i = fork(); \
-        if (global_arg3_i == -1) { \
-            LOG(":: failed to fork process\n"); \
-            global_err = 1; \
-            global_cmd = COMMAND_INDEX__ERR; \
-        } else if (global_arg3_i == 0) { \
-            /* Execute in the same OnArg block as the fork.  This inhibits much*/ \
-            /* of the print statements that would possibly clutter the output as*/ \
-            /* both processes try to write to stdout in debug mode.  This also*/ \
-            /* inhibits weird issues if there wasn't an executable argument.*/ \
-            /* Delay switching UID and GID until the last possible moment.*/ \
-            /* Note that gid is done first.*/ \
-            global_arg1_i = setgid(global_arg1_i); \
-            if (global_arg1_i >= 0) { \
-                global_arg1_i = setuid(global_arg2_i); \
-                if (global_arg1_i >= 0) { \
-                    /* This launches a new executable and terminates this one immediately.*/ \
-                    execvp(shared_split_argv[0], (char * const*) shared_split_argv); \
+        if (global_err == 0) { \
+            SU_SPAWN_DEBUG_REPORT \
+            /* Fork the process.  This will have the potential to*/ \
+            /* cause very weird behavior if no argument is given.*/ \
+            global_arg3_i = fork(); \
+            if (global_arg3_i == -1) { \
+                LOG(":: failed to fork process\n"); \
+                global_err = 1; \
+                global_cmd = COMMAND_INDEX__ERR; \
+            } else if (global_arg3_i == 0) { \
+                /* Execute in the same OnArg block as the fork.  This inhibits much*/ \
+                /* of the print statements that would possibly clutter the output as*/ \
+                /* both processes try to write to stdout in debug mode.  This also*/ \
+                /* inhibits weird issues if there wasn't an executable argument.*/ \
+                /* Delay switching UID and GID until the last possible moment.*/ \
+                /* Note that gid is done first.*/ \
+                tmp_val = setgroups(0, NULL); \
+                if (tmp_val >= 0) { \
+                    tmp_val = setgid(global_arg1_i); \
+                    if (tmp_val >= 0) { \
+                        tmp_val = setuid(global_arg2_i); \
+                        if (tmp_val >= 0) { \
+                            /* This launches a new executable and terminates this one immediately.*/ \
+                            execvp(shared_split_argv[0], (char * const*) shared_split_argv); \
+                        } \
+                    } \
                 } \
+                /* Unlike the normal exec, this must exit*/ \
+                /* immediately due to the setuid/setgid.  We don't*/ \
+                /* want unexpected commands running in an unexpected state.*/ \
+                stderrP("Failed to su-spawn "); \
+                stderrPLn(shared_split_argv[0]); \
+                _exit(1); \
+            } else { \
+                /* Else this is the parent process.*/ \
+                /* Just slurp up this argument.*/ \
+                /* Then, if the env is next, post the pid to that.*/ \
+                global_cmd = COMMAND_INDEX__SU_SPAWN__PID; \
             } \
-            /* Unlike the normal exec, this must exit*/ \
-            /* immediately due to the setuid/setgid.  We don't*/ \
-            /* want unexpected commands running in an unexpected state.*/ \
-            stderrP("Failed to su-spawn "); \
-            stderrPLn(shared_split_argv[0]); \
-            _exit(1); \
-        } else { \
-            /* Else this is the parent process.*/ \
-            /* Just slurp up this argument.*/ \
-            /* Then, if the env is next, post the pid to that.*/ \
-            global_cmd = COMMAND_INDEX__SU_SPAWN__PID; \
         } \
         break; \
     case COMMAND_INDEX__SU_SPAWN__PID: \
-        /* from cmd_su_spawn.h.in:130 */ \
-            /* from cmd_su_spawn.h.in:131 */ \
+        /* from cmd_su_spawn.h.in:135 */ \
+            /* from cmd_su_spawn.h.in:136 */ \
         /* Put the PID into the environment variable global_arg.*/ \
         /* This argument can only be run from the parent due to the logic above.*/ \
         global_itoa_ptr = shared_itoa(global_arg3_i, global_itoa); \

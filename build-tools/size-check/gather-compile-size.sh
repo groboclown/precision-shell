@@ -22,8 +22,11 @@ mkdir -p "${outdir}"
 if [ $? != 0 ] || [ ! -f "${outdir}/presh" ] ; then
     echo "${minflags}" >> "${badfile}"
 else
-    filesize=$( wc -c <"${outdir}/presh" )
+    filesize1=$( wc -c <"${outdir}/presh" )
+    filesize2=$( wc -c <"${outdir}/presh-fd" )
     rm -r "${outdir}"
-    echo "${filesize}|${minflags}|${COMMAND_FLAGS}" >> "${sizefile}"
-    echo "${filesize} < ${minflags}"
+    echo "${filesize1}|${minflags}|std|${COMMAND_FLAGS}" >> "${sizefile}"
+    echo "${filesize2}|${minflags}|compressed|${COMMAND_FLAGS}" >> "${sizefile}"
+    echo "${filesize1} < ${minflags} (std)"
+    echo "${filesize2} < ${minflags} (compressed)"
 fi

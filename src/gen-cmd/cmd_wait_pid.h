@@ -2,7 +2,7 @@
 
 /* MIT License
 
-Copyright (c) 2022 groboclown
+Copyright (c) 2022,2026 groboclown
 
 Permission is hereby granted, free of charge, to any person obtaining a copy
 of this software and associated documentation files (the "Software"), to deal
@@ -85,6 +85,7 @@ extern const char cmd_name_wait_pid[];
                 LOG("::  - Bad number, or out of range\n"); \
                 global_cmd = COMMAND_INDEX__ERR; \
                 global_err = 1; \
+                goto wait_pid_end; \
             } \
         } \
         global_arg2_i = waitpid(global_arg1_i, &global_arg3_i, 0); \
@@ -98,6 +99,7 @@ extern const char cmd_name_wait_pid[];
             LOGLN(&global_arg[1]); \
             setenv(&global_arg[1], global_itoa_ptr, 1); \
         } \
+    wait_pid_end: \
         break;
 #define REQUIRES_ADDL_ARG__WAIT_PID
 

@@ -22,33 +22,22 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
 */
 
+// Interface between the stub-decompress and tinflate
 
-#include <stdlib.h>
-#include <unistd.h>
-#include "tinf.h"
-#include "presh-comp.bin.h"
-#include "load-run.h"
+#include "stub-decompress.h"
+#include "tinflate/tinf.h"
 
+int decompress(void *dest, unsigned int destLen,
+               const void *source, unsigned int sourceLen) {
+    // return 0 on okay, number on error.
 
-int main(int argc, char *argv[], char *envp[]) {
-    int ret;
+    // Formally, it should look like this;
+    // unsigned int actualDestLen = destLen;
+    //if (tinf_uncompress(dest, &actualDestLen, source, sourceLen) != TINF_OK) {
+    //    return 1;
+    //}
+    //return destLen != actualDestLen;
 
-    unsigned int destSize = ___presh_len;
-    unsigned char *dest = malloc(destSize);
-    if (!dest) {
-        write(STDERR_FILENO, RUN_ERROR, RUN_ERROR_LEN);
-        return 16;
-    }
-    ret = tinf_uncompress(dest, &destSize, ___presh_comp, ___presh_comp_len);
-    if (ret < 0) {
-        write(STDERR_FILENO, RUN_ERROR, RUN_ERROR_LEN);
-        return 17;
-    }
-    if (ret != TINF_OK) {
-        write(STDERR_FILENO, RUN_ERROR, RUN_ERROR_LEN);
-        return 18;
-    }
-
-    // Run the embedded ELF loader with the provided data.
-    return run_embedded(dest);
+    // However, if destLen was constructed correctly, then this is just fine:
+    return tinf_uncompress(dest, &destLen, source, sourceLen) != TINF_OK;
 }

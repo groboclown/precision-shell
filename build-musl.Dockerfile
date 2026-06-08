@@ -1,4 +1,4 @@
-FROM public.ecr.aws/docker/library/alpine:3.22
+FROM public.ecr.aws/docker/library/alpine:3
 
 # This file is broken up to make rebuilds fast
 # by reusing previous layers that take a while to run.
@@ -6,7 +6,7 @@ FROM public.ecr.aws/docker/library/alpine:3.22
 WORKDIR /opt/code
 
 RUN set -x \
-    && apk --no-cache add build-base=0.5-r3 "bash=~5" "python3=~3.12"
+    && apk --no-cache add "build-base=~0.5" "bash=~5" "python3=~3.12" zstd xz
 
 # Change the list of commands to build with the "--build-arg COMMANDS='list' argument"
 ARG BUILD_MODE=build

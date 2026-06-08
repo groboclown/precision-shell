@@ -1,7 +1,7 @@
 /*
 MIT License
 
-Copyright (c) 2025 groboclown
+Copyright (c) 2025,2026 groboclown
 
 Permission is hereby granted, free of charge, to any person obtaining a copy
 of this software and associated documentation files (the "Software"), to deal
@@ -81,39 +81,30 @@ typedef struct {
 } Elf_Section;
 
 typedef struct {
-    Elf64_Addr entry;  // Entry point address
-    Elf32_Half e_class;  // ELF class (ELFCLASS32 or ELFCLASS32)
+    Elf32_Half e_machine;  // ELF machine (EM_X86_64, EM_AARCH64, ...)
+    Elf64_Addr min_vaddr;  // Lowest PT_LOAD address
+    Elf64_Addr max_vaddr;  // Highest PT_LOAD end address
 
-    Elf_Section *tls;  // thread-local storage section
     Elf_Section *load;  // Loader segment array
     unsigned int load_count;  // count of loader segments
     Elf_Section *relro;    // RELRO (make read-only after relocation) entry array
     unsigned int relro_count;  // count of RELRO entries
 
-    // rel entries are dynamically loaded libraries relocated at runtime.
-    // However, this is not supported in this implementation.
-
-    // rela, however, are relocations that are applied at runtime not associated with
-    // dynamically loaded libraries.  And this must support them.
-    unsigned int rela_blob_offset;  // offset in the blob where RELA entries start
-    unsigned int rela_count;  // count of RELA entries
-
-    unsigned int max_memory_size;  // maximum memory size of all segments + vaddr.
+    // Shared-object dynamic loader metadata.
+    Elf64_Addr dynsym_vaddr;
+    Elf64_Addr dynstr_vaddr;
+    Elf64_Xword dynsym_ent_size;
+    Elf64_Addr rela_vaddr;
+    Elf64_Xword rela_size;
+    Elf64_Addr jmprel_vaddr;
+    Elf64_Xword jmprel_size;
+    Elf64_Addr init_vaddr;
+    Elf64_Addr fini_vaddr;
+    Elf64_Addr init_array_vaddr;
+    Elf64_Xword init_array_size;
+    Elf64_Addr fini_array_vaddr;
+    Elf64_Xword fini_array_size;
 } Elf_Sections;
-
-// The data structure that will be written into the blob for RELA.
-// It doesn't need the 'info' section.
-typedef struct {
-    Elf64_Addr r_offset;  // Address of the relocation
-    Elf64_Sxword r_addend;  // Addend
-} Blob64_Rela;
-
-typedef struct {
-    Blob64_Rela *rela;  // RELA entries
-    unsigned int count;  // count of RELA entries
-    unsigned int alloc;  // allocated count of RELA entries
-    size_t size;   // size of the RELA entries in bytes
-} Blob64_Rela_Array;
 
 
 #endif // __EXTRACT_ELF_H__

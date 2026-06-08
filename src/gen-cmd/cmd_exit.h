@@ -3,7 +3,7 @@
 /*
 MIT License
 
-Copyright (c) 2022 groboclown
+Copyright (c) 2022,2026 groboclown
 
 Permission is hereby granted, free of charge, to any person obtaining a copy
 of this software and associated documentation files (the "Software"), to deal
@@ -61,7 +61,7 @@ extern const char cmd_name_exit[];
             /* from cmd_exit.h.in:38 */ \
         /* An argument is required.*/ \
         global_err = helper_arg_to_uint(global_arg, 10, 0xff); \
-        if (global_arg1_i < 0) { \
+        if (global_err < 0) { \
             LOG("::  - Bad exit code, or out of range\n"); \
             global_cmd = COMMAND_INDEX__ERR; \
             global_err = 1; \

@@ -10,6 +10,10 @@ streaming_arg="$( grep -E "^STREAMING_INPUT = " ../Makefile.command-flags | cut 
 reqargs_arg="$( grep -E "^REQUIRE_FULL_CMD = " ../Makefile.command-flags | cut -f 3 -d ' ' )"
 enviro_arg="$( grep -E "^ENVIRO_INPUT = " ../Makefile.command-flags | cut -f 3 -d ' ' )"
 
+# Supported compression
+compressed_algo=( tinflate tinyzzz-lzma tinyzzz-zstd )
+compressed_assembly=( fd so )
+
 # Slimmed down flag combinations, for ones that matter.
 extra_flag_combos=( \
     "" \
@@ -47,14 +51,29 @@ for cmd in "${command_list[@]}" ; do
         mkout=/tmp/presh-$$.txt
         ( cd ../src && make "${cmdarg}" >"${mkout}" 2>&1 )
         if [ $? != 0 ] ; then
-            # compile failure is just bad
+            # compile failure is just bad; exit immediately
             echo "Build failure with:"
             echo "${cmdarg}"
             cat "${mkout}"
             rm "${mkout}"
             exit 1
         fi
+        ( cd ../compressed && make >>"${mkout}" 2>&1 )
+        if [ $? != 0 ] ; then
+            # compile failure is just bad; exit immediately
+            echo "Compress build failure with:"
+            cat "${mkout}"
+            rm "${mkout}"
+            exit 1
+        fi
         cp ../out/presh "${bindir}/${exe_name}"
+        for algo in "${compressed_algo[@]}" ; do
+            for assembly in "${compressed_assembly[@]}" ; do
+                test -f "../out/presh-${assembly}-${algo}" \
+                    && cp "../out/presh-${assembly}-${algo}" "${bindir}/${exe_name}-${assembly}-${algo}" \
+                    || echo "Did not create compressed ${assembly} with ${algo} compression."
+            done
+        done
         rm "${mkout}"
         touch "${mkout}"
 
@@ -71,10 +90,8 @@ for cmd in "${command_list[@]}" ; do
             echo "${cmdarg}" >> "${mkout}"
             ( cd ../tests && QUIET=1 make tests >> "${mkout}" 2>&1 )
             if [ $? != 0 ] ; then
-                t=/tmp/tmp.$$.txt
-                cat "${failures}" "${mkout}" > "${t}"
-                rm "${failures}"
-                mv "${t}" "${failures}"
+                echo "Failed running with ${cmdarg}"
+                cat "${mkout}" >> "${failures}"
                 fail_count=$(( fail_count + 1 ))
             fi
         fi
