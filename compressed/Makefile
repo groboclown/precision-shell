@@ -48,7 +48,6 @@ clean:
 		$(OUTDIR)/gzip-stripped \
 		$(OUTDIR)/extract-elf \
 		$(OUTDIR)/stub-run-fd.c \
-		$(OUTDIR)/stub-run-lk.c \
 		$(OUTDIR)/stub-run-so.c \
 		$(SRC_FD) \
 		$(SRC_SO) \
@@ -146,6 +145,7 @@ $(SRC_BIN)-tinyzzz-zstd.bin: $(SRC_BIN)-zstd.zst
 	mkdir -p $(OUTDIR)
 	cp $(SRC_BIN)-zstd.zst $(SRC_BIN)-tinyzzz-zstd.bin
 
+
 # ...................
 # LZ4
 # Experiments show this to have larger files than other ones, even gz,
@@ -197,7 +197,6 @@ clean: clean-$(COMP_IMPL)-$(SRC_TYPE)
 clean-$(COMP_IMPL)-$(SRC_TYPE):
 	rm -f \
 		$(COMP_BIN).c \
-		$(COMP_BIN)-lk.c \
 		$(BIN) \
 		2>/dev/null || true
 

@@ -4,7 +4,9 @@ OUTDIR = ../out/tests
 
 # Debug versions are not tested, because they include a bunch
 #   of extra output, and the tests check explicitly for output.
-CMDS = presh presh-fd-tinyzzz-lzma presh-so-tinyzzz-lzma
+# This doesn't test every compression type, but instead that the general
+#   construction and execution technique works as expected.
+CMDS = presh presh-fd-tinyzzz-lzma presh-so-tinflate
 
 TEST_SCRIPTS := $(wildcard */*.sh)
 
