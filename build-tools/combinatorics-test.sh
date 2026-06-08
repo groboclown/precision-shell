@@ -2,9 +2,9 @@
 
 # Run the full test suite, over all combination of commands.
 # This can take a while to run.
-# Right now, there's 39 commands + 3 other flags, for a total of 42 combinations.
+# At initial time of writing, there were 39 commands + 3 other flags, for a total of 42 combinations.
 # That's 2^42 combinations to try (4,398,046,511,104).
-# If 1 combination is run per second, that's 139,461 years.
+# If this runs 1 combination per second, it will take 139,461 years.
 # So, a while.
 cd "$( dirname "$0" )"
 
@@ -42,14 +42,9 @@ while [ ${running} = 1 ] ; do
 
     cmdarg="COMMAND_FLAGS=${commands}"
 
-    # Kick off the build in the background with a maximum number
-    #   of background processes.
-    # if [ ${job_count} -ge ${MAX_JOB_COUNT} ] ; then
-    #     # Wait for the next child job to finish.
-    #     wait -n
-    #     job_count=${MAX_JOB_COUNT}
-    # fi
-    # job_count=$(( job_count + 1 ))
+    # This could switch to running the tests in the background.
+    # However, if we go that way, this should instead use Makefile,
+    # as that has very good built-in job controls.
 
     echo "XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX"
     echo "${cmdarg}"
@@ -66,7 +61,7 @@ while [ ${running} = 1 ] ; do
     fi
     rm "${mkout}"
 
-    ( cd ../tests && QUIET=1 make tests )
+    ( cd ../tests && QUIET=1 make tests CMDS=presh )
 
     # change commands
     remainder=1

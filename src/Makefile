@@ -24,6 +24,7 @@ NO_GETADDRINFO ?= 0
 CFLAGS += -Wall -pedantic -Wno-unused-variable -Wno-switch -I$(COMMAND_HEADERS_DIR) -I.
 OUTDIR = ../out
 SRC = main.c helpers.c globals.c command_runner.c args.c load_input.c
+SHARED_CC ?= $(CC)
 
 # cmd_find_cmd.h must always be first.
 # cmd_version.h must always be second-to-last.
@@ -92,6 +93,10 @@ all: clean src debug $(OUTDIR)/test_server
 src: \
 	$(OUTDIR)/presh
 
+.PHONY: shared
+shared: \
+	$(OUTDIR)/presh-shared.so
+
 .PHONY: debug
 debug: \
 	$(OUTDIR)/presh-debug
@@ -143,6 +148,14 @@ $(OUTDIR)/presh-debug: $(SRC) $(COMMAND_HEADERS_DIR)/command_list.h
 	mkdir -p $(OUTDIR)
 	cat $(SRC) > $(OUTDIR)/_presh-all.c
 	$(CC) $(CFLAGS) $(LFLAGS) $(DFLAGS) $(COMMAND_FLAGS) $(OUTDIR)/_presh-all.c $(LDFLAGS) -o $@
+
+
+# The shared object version of the presh executable, used by some compression techniques.
+# The dietlibc build doesn't build out to a shared library, so it needs to fall back to a normal c compiler.
+$(OUTDIR)/presh-shared.so: $(SRC) $(COMMAND_HEADERS_DIR)/command_list.h
+	mkdir -p $(OUTDIR)
+	cat $(SRC) > $(OUTDIR)/_presh-all.c
+	$(SHARED_CC) $(CFLAGS) -std=gnu17 -fPIC $(filter-out -s,$(MINFLAGS)) $(COMMAND_FLAGS) -shared -Wl,-Bsymbolic $(OUTDIR)/_presh-all.c $(LDFLAGS) -o $@
 
 
 $(OUTDIR)/test_server: test_server.c

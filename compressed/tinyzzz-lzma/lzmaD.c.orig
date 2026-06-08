@@ -4,11 +4,11 @@
 
 #define   R_OK                           0
 #define   R_ERR_MEMORY_RUNOUT            1
-//#define   R_ERR_UNSUPPORTED              2
-//#define   R_ERR_OUTPUT_OVERFLOW          3
-//#define   R_ERR_INPUT_OVERFLOW           4
-//#define   R_ERR_DATA                     5
-//#define   R_ERR_OUTPUT_LEN_MISMATCH      6
+#define   R_ERR_UNSUPPORTED              2
+#define   R_ERR_OUTPUT_OVERFLOW          3
+#define   R_ERR_INPUT_OVERFLOW           4
+#define   R_ERR_DATA                     5
+#define   R_ERR_OUTPUT_LEN_MISMATCH      6
 
 #define RET_WHEN_ERR(err_code)          { int ec = (err_code); if (ec)  return ec; }
 
@@ -263,7 +263,6 @@ static int lzmaDecode (uint8_t *p_src, size_t src_len, uint8_t *p_dst, size_t *p
     
     probs_literal = (uint16_t (*) [N_PREV_BYTE_LC_MSBS] [3*(1<<8)]) malloc (sizeof(uint16_t) * N_PREV_BYTE_LC_MSBS * N_LIT_POS_STATES * 3*(1<<8));    // since this array is quiet large (3145728 items, 6MB), we need to use malloc
     
-    // This is correct to error on.
     if (probs_literal == 0)
         return R_ERR_MEMORY_RUNOUT;
     
@@ -291,8 +290,8 @@ static int lzmaDecode (uint8_t *p_src, size_t src_len, uint8_t *p_dst, size_t *p
         uint32_t dist=0, len=0;
         PACKET_t type;
         
-        //if (coder.overflow)
-        //    return R_ERR_INPUT_OVERFLOW;
+        if (coder.overflow)
+            return R_ERR_INPUT_OVERFLOW;
         
         if        ( !rangeDecodeBit(&coder, &probs_is_match    [state][pos_state]) ) {  // decoded bit sequence = 0     (packet LIT)
             type = PKT_LIT;
@@ -353,19 +352,17 @@ static int lzmaDecode (uint8_t *p_src, size_t src_len, uint8_t *p_dst, size_t *p
             uint32_t dist_slot, bcnt;
             
             dist_slot = rangeDecodeInt(&coder, probs_dist_slot[len_min5_minus2], 6);       // decode distance slot (0~63)
-            if (dist_slot < 4) {                                                           // dist slot = 0~3
-                dist = dist_slot;
-            } else {
-                bcnt  = (dist_slot >> 1) - 1;
-                dist  = (2 | (dist_slot & 1));                                             // high 2 bits of dist
-                dist <<= bcnt;
-
-                if (dist_slot >=14) {                                               // dist slot = 14~63
-                    dist |= rangeDecodeIntByFixedProb (&coder, bcnt-4) << 4;
-                    dist |= bitsReverse(rangeDecodeInt(&coder, probs_dist_align, 4), 4);
-                } else {                                                                   // dist slot = 4~13
-                    dist |= bitsReverse(rangeDecodeInt(&coder, probs_dist_special[dist_slot-4], bcnt), bcnt);
-                }
+            bcnt  = (dist_slot >> 1) - 1;
+            dist  = (2 | (dist_slot & 1));                                                 // high 2 bits of dist
+            dist<<= bcnt;
+            
+            if        (dist_slot >=14) {                                                   // dist slot = 14~63
+                dist |= rangeDecodeIntByFixedProb (&coder, bcnt-4) << 4;
+                dist |= bitsReverse(rangeDecodeInt(&coder, probs_dist_align, 4), 4);
+            } else if (dist_slot >=4 ) {                                                   // dist slot = 4~13
+                dist |= bitsReverse(rangeDecodeInt(&coder, probs_dist_special[dist_slot-4], bcnt), bcnt);
+            } else {                                                                       // dist slot = 0~3
+                dist  = dist_slot;
             }
             
             if (dist == 0xFFFFFFFF)                                                        // meeting end marker
@@ -374,11 +371,11 @@ static int lzmaDecode (uint8_t *p_src, size_t src_len, uint8_t *p_dst, size_t *p
             dist ++;
         }
             
-        //if ((size_t)dist > pos)
-        //    return R_ERR_DATA;
+        if ((size_t)dist > pos)
+            return R_ERR_DATA;
         
-        //if ((pos+len) > *p_dst_len)
-        //    return R_ERR_OUTPUT_OVERFLOW;
+        if ((pos+len) > *p_dst_len)
+            return R_ERR_OUTPUT_OVERFLOW;
         
         if (type == PKT_LIT)
             p_dst[pos] = prev_byte;
@@ -426,8 +423,8 @@ static int parseLzmaHeader (uint8_t *p_src, uint8_t *p_lc, uint8_t *p_lp, uint8_
         for (i=0; i<8; i++) {
             if (i < sizeof(size_t)) {
                 *p_uncompressed_len |= (((size_t)p_src[5+i]) << (i<<3));    // get (sizeof(size_t)) bytes from p_src, and put it to (*p_uncompressed_len)
-            //} else if (p_src[5+i] > 0) {
-            //    return R_ERR_OUTPUT_OVERFLOW;                               // uncompressed length overflow from the machine's memory address limit
+            } else if (p_src[5+i] > 0) {
+                return R_ERR_OUTPUT_OVERFLOW;                               // uncompressed length overflow from the machine's memory address limit
             }
         }
     }
@@ -437,8 +434,8 @@ static int parseLzmaHeader (uint8_t *p_src, uint8_t *p_lc, uint8_t *p_lp, uint8_
     *p_lp = (uint8_t)(byte0 % 5);
     *p_pb = (uint8_t)(byte0 / 5);
     
-    //if (*p_lc > MAX_LC || *p_lp > MAX_LP || *p_pb > MAX_PB)
-    //    return R_ERR_UNSUPPORTED;
+    if (*p_lc > MAX_LC || *p_lp > MAX_LP || *p_pb > MAX_PB)
+        return R_ERR_UNSUPPORTED;
     
     return R_OK;
 }
@@ -449,29 +446,26 @@ int lzmaD (uint8_t *p_src, size_t src_len, uint8_t *p_dst, size_t *p_dst_len) {
     uint32_t dict_len, uncompressed_len_known;
     size_t   uncompressed_len = 0;
     
-    //if (src_len < LZMA_HEADER_LEN)
-    //    return R_ERR_INPUT_OVERFLOW;
+    if (src_len < LZMA_HEADER_LEN)
+        return R_ERR_INPUT_OVERFLOW;
     
-    // Errors no longer returned by this.
-    // RET_WHEN_ERR( parseLzmaHeader(p_src, &lc, &lp, &pb, &dict_len, &uncompressed_len, &uncompressed_len_known) )
-    parseLzmaHeader(p_src, &lc, &lp, &pb, &dict_len, &uncompressed_len, &uncompressed_len_known);
+    RET_WHEN_ERR( parseLzmaHeader(p_src, &lc, &lp, &pb, &dict_len, &uncompressed_len, &uncompressed_len_known) )
     
     //printf("[LZMAd] lc=%d   lp=%d   pb=%d   dict_len=%u\n", lc, lp, pb, dict_len);
     
     if (uncompressed_len_known) {
-        //if (uncompressed_len > *p_dst_len)
-        //    return R_ERR_OUTPUT_OVERFLOW;
+        if (uncompressed_len > *p_dst_len)
+            return R_ERR_OUTPUT_OVERFLOW;
         *p_dst_len = uncompressed_len;
         //printf("[LZMAd] uncompressed length = %lu (parsed from header)\n"                                  , *p_dst_len);
     } else {
         //printf("[LZMAd] uncompressed length is not in header, decoding using output buffer length = %lu\n" , *p_dst_len);
     }
     
-    // Because this tries a 'malloc', it can correctly error.
     RET_WHEN_ERR( lzmaDecode(p_src+LZMA_HEADER_LEN, src_len-LZMA_HEADER_LEN, p_dst, p_dst_len, lc, lp, pb) );
     
-    //if (uncompressed_len_known && uncompressed_len != *p_dst_len)
-    //    return R_ERR_OUTPUT_LEN_MISMATCH;
+    if (uncompressed_len_known && uncompressed_len != *p_dst_len)
+        return R_ERR_OUTPUT_LEN_MISMATCH;
     
     return R_OK;
 }

@@ -15,7 +15,7 @@ COPY vendor/dietlibc-${DIETLIBC_VERSION}.tar.xz /tmp/dietlibc.tar.xz
 
 RUN set -x \
     && apk --no-cache add \
-        build-base=0.5-r3 tar xz zstd linux-headers "bash=~5" "python3=~3.12" \
+        "build-base=~0.5" tar xz zstd linux-headers "bash=~5" "python3=~3.12" \
     && mkdir -p /opt/dietlibc \
     && xz -d /tmp/dietlibc.tar.xz \
     && tar xf /tmp/dietlibc.tar -C /opt/dietlibc/ --strip 1 \

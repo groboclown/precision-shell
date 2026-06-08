@@ -14,9 +14,20 @@
     * Added the dietlibc distribution into the `vendors` directory, due to issues seen with the source fefe.de site.
     * Updated the `Dockerfile` for the builds to use more modern versions of the packages.
 * [e6c6f4b](e6c6f4b1e87d321e9963607634ccfd7d410256b6)
-    * Fixed a bug with the dup-r command, where it incorrectly used the same open file modifiers as the the dup-w command, which means that it ends up truncating files rather than opening them for read (#58).
+    * Fixed a bug with the `dup-r` command, where it incorrectly used the same open file modifiers as the the `dup-w` command, which means that it ends up truncating files rather than opening them for read (#58).
 * [3cf56f6](3cf56f6d93b7609a720c51b7a607f2fb3461eacc)
     * Fixed a bug with the exit command where it incorrectly checks the result of parsing the argument, leading to a potential wrong exit code (#59).
+* [248afb5](248afb51d4ff5e7d3f9d1cc6b79f2926ce68ba9a)
+    * Fixed a bug with `wait-pid` command, where it did not properly stop on error conditions, but instead kept running, and incorrectly reap child processes (#57).
+* [05ac6c1](05ac6c17776a8084b898389e6d2178aeb2a82208)
+    * Fixed several bugs around the execution commands (`exec`, `spawn`, `su-exec`, `su-spawn`) not correctly parsing their arguments.  The sub-argument parser did not check for array size bounds, so more than 100 arguments would cause memory corruption.  Additionally, the commands did not check for whether the argument parsing encountered issues (#56).
+    * The `su-exec` and `su-spawn` commands did not drop secondary groups, which could lead to leaking access (#55).
+* [7a713da](7a713da707e462f6cf28135fea6220aff2066a1e)
+    * Changed the incorrect linked compressed mechanism to instead use a smaller image by using a shared library build of the `presh` image, then links that compressed build with the outer wrapper's statically compiled libc routines.
+    * Shrunk the decompression routines so that they don't perform extra compression validation; they assume that the embedded compressed image was correctly compressed.
+    * Updated the base README to include the new sizes for this version, and also marked which ones are the compressed versions.
+    * Fixed some of the samples and tools that use Alpine to reference current versions of libraries.
+    * Fixed the `signal-ignore-wait.sh` test to be less time sensitive.
 
 
 ## v4.6.0

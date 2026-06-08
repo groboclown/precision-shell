@@ -35,15 +35,13 @@ int decompress(void *dest, unsigned int destLen,
     // return 0 on okay, number on error.
 
     // Formally, it should look like this;
-    // unsigned int actualDestLen = destLen;
-    //if (lzmaD(source, sourceLen, dest, &destLen)) != 0) {
+    //unsigned int actualDestLen = destLen;
+    //if (lzmaD(source, sourceLen, dest, &destLen) != 0) {
     //    return 1;
     //}
     //return destLen != actualDestLen;
 
-    // This isn't good.  The library currently does not return error codes,
-    // but instead just calls exit(1) on error.  This will require a bit
-    // of changing.
-    zstdD((uint8_t*) source, sourceLen, dest, (size_t*) &destLen);
-    return 0;
+    // Avoid writing a size_t through an unsigned int stack slot on 64-bit builds.
+    size_t actualDestLen = (size_t)destLen;
+    return zstdD((uint8_t*) source, sourceLen, dest, &actualDestLen);
 }

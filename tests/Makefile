@@ -3,8 +3,10 @@ BINDIR = ../out
 OUTDIR = ../out/tests
 
 # Debug versions are not tested, because they include a bunch
-#   of extra output.
-CMDS = presh
+#   of extra output, and the tests check explicitly for output.
+# This doesn't test every compression type, but instead that the general
+#   construction and execution technique works as expected.
+CMDS = presh presh-fd-tinyzzz-lzma presh-so-tinflate
 
 TEST_SCRIPTS := $(wildcard */*.sh)
 
@@ -22,6 +24,9 @@ $(OUTDIR)/arg_runner: _arg_runner.c
 tests: $(CMDS)
 
 $(CMDS): $(OUTDIR)/arg_runner
+	@echo "========================================================================"
+	@test -f $(BINDIR)/$@ || ( ls -l $(BINDIR) ; >&2 echo "Did not compile $(BINDIR)/$@" ; exit 1 )
+	@echo "Testing $@"
 	@mkdir -p $(OUTDIR)/$@
 	@cp $(OUTDIR)/arg_runner $(OUTDIR)/$@/arg_runner
 	@TEST_TMP_DIR=$(OUTDIR)/$@ PRESH=$(BINDIR)/$@ $(CURDIR)/all.sh
